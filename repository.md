@@ -94,23 +94,31 @@ What it becomes is open: made the surface's own, or given a whole of its own som
 
 ## 5. How a project takes it in
 
-A project takes the repository in as a git submodule: pinned at a commit, read in place by people and by sessions, and moved forward when the project chooses. It is public, so a project takes it in with no key.
+A project takes the repository in as a git submodule: pinned at a commit, read in place by people and by sessions, and moved forward when the project chooses. It is public and belongs to no one, so a project takes it in with no key and no condition.
 
 *Reasoned, the author's direction, 2026-09-14; public, the author's decision the same day.*
 
-### 5.1 Why a submodule
+### 5.1 It is dedicated to the public domain
+
+Everything here that is the author's is dedicated to the public domain under [CC0 1.0](LICENSE): anyone may use it for anything, with no credit asked. It was public already, and the dedication only says so plainly.
+
+What it guards against is someone taking a copy and claiming it, which cannot hold: nobody can own what is in the public domain, and the dated history here shows who wrote it. Quotations and images from others keep their own terms.
+
+*In force, the author's decision, 2026-09-14.*
+
+### 5.2 Why a submodule
 
 A submodule is chosen over a subtree, which keeps no clear line back to one home, and over a package, which hands a session built files rather than the tree it reads.
 
 *Reasoned, the author's, 2026-09-14.*
 
-### 5.2 OpenLight takes it in at the path it left
+### 5.3 OpenLight takes it in at the path it left
 
-OpenLight replaces the arc's folder with the submodule at the same path, `@md/spec/research/knowledge`, so every link into it from OpenLight's own knowledge stays true. Mounting it from OpenLight's root, once that entry is substrate, comes [later](#7-what-comes-next).
+OpenLight replaced the arc's folder with the submodule at the same path, `@md/spec/research/knowledge`, so every link into it from OpenLight's own knowledge stays true. Mounting it from OpenLight's root, once that entry is substrate, comes [later](#7-what-comes-next).
 
 *In force, the author's decision, 2026-09-14.*
 
-### 5.3 A folder becoming a submodule trips git once
+### 5.4 A folder becoming a submodule trips git once
 
 Checking out an OpenLight commit from before the folder became a submodule, from a commit after it, is refused until the submodule's files are moved aside. Moving the submodule later with `git mv` does not trip in the same way: it leaves only an untracked folder where the submodule stood.
 
@@ -128,7 +136,7 @@ Each step stands on the ones before it.
 
 4. In Hjulverkstan and the closed-source client: replace the copy of `code.md` with the submodule.
 
-*In force, 2026-09-14.*
+*In force, 2026-09-14; the first three steps were done that day, and the fourth waits on the two projects.*
 
 ## 7. What comes next
 
