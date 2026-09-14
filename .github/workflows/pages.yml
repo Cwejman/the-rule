@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       # the warnings are printed for whoever reads the run, and never stop the ship
@@ -28,9 +28,11 @@ jobs:
         run: bun poc/surface/surface.ts . --check
       - name: Build
         run: mkdir -p _site && bun poc/surface/surface.ts . --build _site/index.html
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+          # an image stands in a .img folder, which the artifact leaves out unless told
+          include-hidden-files: true
 
   deploy:
     needs: build
@@ -40,4 +42,4 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
