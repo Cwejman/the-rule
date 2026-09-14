@@ -26,7 +26,7 @@
 // coherent, declarative over imperative, data over logic, pure functions with
 // their side effects kept apart, flat data with one source of truth.
 
-import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync } from "node:fs";
+import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync, mkdirSync, copyFileSync } from "node:fs";
 import { resolve, dirname, relative, join, sep, basename } from "node:path";
 import { marked } from "marked";
 
@@ -179,19 +179,28 @@ async function serve(rootArg: string, port: number): Promise<void> {
 //
 // The same process runs once and writes the page with the body inside it, in a
 // script tag that holds data rather than code. Every `<` in the JSON is written
-// as \u003c, so a brief containing the closing tag cannot end it early.
+// as \u003c, so a brief containing the closing tag cannot end it early. Images
+// other than sketches are written beside the page.
 
 async function build(rootArg: string, out: string): Promise<void> {
   const body = await trace(rootArg);
   body.warnings.forEach((w) => console.warn("  " + w));
-  // every image the body holds as a file is carried inside, as a data address, so the page stays one file; a remote
+  // a sketch is already inside, as markup; every other image the body holds as a file is written beside the page at the
+  // path it has in the body, and its address carries a hash of its bytes, so a changed image is fetched again. A remote
   // image stays remote, since it may change after the build
   const rootDir = dirname(rootFileOf(rootArg));
+  const outDir = dirname(resolve(out));
   const images = body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.asset && !t.svg);
-  images.forEach((t) => (t.src = `data:${imageType(t.asset!)};base64,${readFileSync(join(rootDir, t.asset!)).toString("base64")}`));
-  const carried = images.reduce((n, t) => n + t.src!.length, 0);
+  const written = new Set<string>();
+  images.forEach((t) => {
+    const from = join(rootDir, t.asset!);
+    const to = join(outDir, t.asset!);
+    if (!written.has(to) && resolve(from) !== resolve(to)) (mkdirSync(dirname(to), { recursive: true }), copyFileSync(from, to));
+    written.add(to);
+    t.src = `${t.asset!.split("/").map(encodeURIComponent).join("/")}?v=${Bun.hash(readFileSync(from)).toString(36)}`;
+  });
   writeFileSync(out, page(body, await clientScript()));
-  console.log(`${body.briefs.length} briefs from ${body.root} → ${out}${images.length ? `, ${images.length} images carried inside (${Math.round(carried / 1024)} kB)` : ""}`);
+  console.log(`${body.briefs.length} briefs from ${body.root} → ${out}${written.size ? `, ${written.size} image${written.size === 1 ? "" : "s"} written beside it` : ""}`);
 }
 
 // # 2. How the body is assembled

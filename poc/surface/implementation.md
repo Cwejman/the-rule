@@ -156,9 +156,11 @@ The page is written with the body inside it, in a script tag that holds data rat
 
 The browser never runs that tag, so nothing in a brief can become code. Every `<` in the JSON is written as `\u003c`, since a brief containing the closing tag would otherwise end it early. On start the client reads the tag if it is there, and asks the process for the body if it is not.
 
-Every image the body holds as a file is carried inside the published page as a data address, so the page stays one file. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
+A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
 
-*In force, the author's decision, 2026-09-12. That parsing a JSON string is faster than an equally large object literal is carried from V8's guidance and not checked here.*
+The rule's own page is built this way on every commit to its main branch, by a workflow in `.github/workflows/pages.yml`, and served at [its GitHub Pages address](https://cwejman.github.io/the-rule/). The workflow runs the check first, so its warnings stand in the run, and ships the page whatever they say.
+
+*In force, the author's decision, 2026-09-12; images beside the page rather than inside it, and the rule's pipeline, the author's asks of 2026-09-14. That parsing a JSON string is faster than an equally large object literal is carried from V8's guidance and not checked here.*
 
 ## 6. How it is drawn
 
@@ -272,6 +274,6 @@ A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and
 
 ## 10. What is not settled yet
 
-Whether a file's status travels with its briefs, which waits until a widget needs it; its kind already does, since a record's level says so. Where the published page stands beside the wiki that OpenLight already publishes from the same markdown. How large the published page may grow with its images carried inside, since nothing yet warns of it.
+Whether a file's status travels with its briefs, which waits until a widget needs it; its kind already does, since a record's level says so.
 
 *Open, 2026-09-13; what the lane and the practice leave open stands at their own feet.*
