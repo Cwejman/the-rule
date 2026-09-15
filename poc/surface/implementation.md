@@ -122,7 +122,7 @@ surface.html#the-proof-of-concept/the-surface/reading-and-orientation-come-apart
 
 It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, its level at faces.
 
-The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5-arriving-lays-the-lane), and the folds a reader made are kept apart from it, [in the browser](#65-what-the-browser-keeps).
+The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5-arriving-lays-the-lane), and the folds a reader made are kept apart from it, [in the browser](#66-what-the-browser-keeps).
 
 *In force, the author's decision, 2026-09-12; the scope and the focus in the address as built on 2026-09-13.*
 
@@ -234,7 +234,9 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws the scope as nodes from the same state the lane draws, so folding on one is folding on the other. Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone nested inside its column, so no layout is computed by hand. One SVG over the nodes draws the arrows from each step to the next, measured after the nodes are laid and divided by the zoom, and drawn again only on a fold, a resize, or the fonts landing.
+The canvas draws the scope as nodes from the same state the lane draws, so folding on one is folding on the other.
+
+Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone nested inside its column, so no layout is computed by hand. One SVG over the nodes draws the arrows from each step to the next, measured after the nodes are laid and divided by the zoom, and drawn again only on a fold, a resize, or the fonts landing.
 
 Pan and zoom are one transform on the stage, which the browser composites without laying anything out again. The wheel pans, and a pinch, which arrives as a wheel with the control key or as Safari's own gesture, zooms about the pointer. A drag on the ground pans, a press on a row goes, and a press on a zone's ground folds its brief. A change of scope fits the stage to the canvas's width, never larger than life, and a focus that leaves the view is eased back into it. The view is kept in the browser with the lane, per scope.
 
