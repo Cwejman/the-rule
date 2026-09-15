@@ -857,6 +857,8 @@ type Settings = {
   fade: number;
   /** the spacing of the prose's lines, as a multiple of the serif's size */
   leading: number;
+  /** the most width the canvas takes beside or without the lane, so a wide screen keeps its space */
+  canvas: number;
   /** where the reading line stands: always at the middle, or easing onto the opening and the last brief at the ends */
   line: "middle" | "ends";
   /** what a brief weighs in the figures that weigh: the cost of its text alone, or the experience of it, its images counted as the room they take */
@@ -879,6 +881,7 @@ const DEFAULTS: Settings = {
   dim: 0.4,
   fade: 8,
   leading: 1.6,
+  canvas: 720,
   line: "ends",
   weight: "cost",
   flick: 1,
@@ -1445,7 +1448,7 @@ function pointersHtml(): string {
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "measure" | "gap" | "dim" | "fade"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "measure" | "gap" | "dim" | "fade" | "canvas"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
@@ -1454,6 +1457,7 @@ const KNOBS: Knob[] = [
   { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
   { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
+  { key: "canvas", row: "page", name: "the canvas's greatest width", min: 360, max: 1600, step: 40, glyph: `<rect x="2.5" y="4" width="11" height="8" rx="1.5"/><path d="M5 8h6M6.5 6.5 5 8l1.5 1.5M9.5 6.5 11 8l-1.5 1.5"/>` },
 ];
 
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
@@ -1849,7 +1853,10 @@ function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   const S = state.scope;
   const root = brief(S)!;
-  const entry = `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
+  // how the reader came here stands above the entry, the last few moves as cells, as the way down draws them
+  const came = state.trail.filter((h) => brief(h.to)).slice(-TRAIL_SHOWN);
+  const trail = came.length ? `<div class="ctrail" data-tip="how you came here">${came.map(hopCell).join("")}</div>` : "";
+  const entry = `<div class="cnode entry" ${hued(S)}>${trail}<div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
   ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
   if (fitted !== S) {
     fitCanvas();
@@ -2036,7 +2043,7 @@ function recallView(): void {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -2153,7 +2160,8 @@ function drawLayout(): void {
     el.style.gridColumn = `${tracks.length - 1}`;
   };
   if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
-  if (on.canvas) place(ui.canvas, `minmax(${CANVAS_MIN}px, 1fr)`);
+  // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
+  if (on.canvas) place(ui.canvas, `minmax(${CANVAS_MIN}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
   if (on.lane) place(ui.scroll, `${mid}px`);
   if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
@@ -2273,6 +2281,9 @@ const CELL: Record<Move, string> = {
   out: `<svg viewBox="0 0 10 10"><path d="M2 6.5 5 3.5 8 6.5"/></svg>`,
   link: `<svg viewBox="0 0 16 16">${ICON.links}</svg>`,
 };
+/** One cell of the trail, wherever it is drawn: a press that goes back to before that move. */
+const hopCell = (h: Hop): string => `<span class="cell ${h.kind}" data-a="${esc(h.to)}" data-hop="${state.trail.indexOf(h)}" ${hued(h.to)}>${CELL[h.kind]}</span>`;
+
 /** What a move was, in a word or two. */
 const said = (h: Hop): string => ({ go: "went to", in: "scoped into", out: "scoped out to", link: "followed a link to" })[h.kind];
 
@@ -2294,8 +2305,7 @@ function drawCrumb(): void {
     .join(CHEVRON);
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
-  const cell = (h: Hop) => `<span class="cell ${h.kind}" data-a="${esc(h.to)}" data-hop="${state.trail.indexOf(h)}" ${hued(h.to)}>${CELL[h.kind]}</span>`;
-  const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(cell).join("")}</span>` : "";
+  const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
   ui.crumb.innerHTML = `<span class="place">${place}</span>${depth}${way}`;
   placeCrumb();
 }
@@ -2329,6 +2339,11 @@ function placeCrumb(): void {
   const right = Math.max(...edges.map((r) => r.right));
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
   ui.crumb.style.width = `${Math.round(right - left)}px`;
+  // the pull's gauge lies over the top of the prose, just under the way down
+  const lane = ui.lane.getBoundingClientRect();
+  ui.pull.style.left = `${Math.round(lane.left - a0.left)}px`;
+  ui.pull.style.width = `${Math.round(lane.width)}px`;
+  ui.pull.style.top = `${ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4}px`;
   placeCanvas();
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   ui.scroll.style.setProperty("--rim-crumb", ui.crumb.hidden ? "0px" : `${ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`);
@@ -2892,6 +2907,43 @@ function scrollToFocus(smooth: boolean): void {
   ui.scroll.scrollTo({ top: target, behavior: smooth ? "smooth" : "auto" });
 }
 
+// ### 3.14.1 Pull past the top
+//
+// At the top of a scope, scrolling up beyond where the lane can go fills a
+// gauge, and when it is full the reader is taken up a level, as some
+// applications refresh when pulled past their top. A pull that stops drains.
+
+/** How far a pull must go before it takes the reader up. */
+const PULL = 320;
+let pulled = 0;
+let pullTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Takes a wheel at the lane: up at the top of a scope fills the gauge; anything else drains it. */
+function pull(e: WheelEvent): void {
+  clearTimeout(pullTimer);
+  if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
+  pulled = Math.min(PULL, pulled + -e.deltaY);
+  drawPull();
+  if (pulled >= PULL) {
+    pulled = 0;
+    drawPull();
+    return popUp();
+  }
+  pullTimer = setTimeout(drainPull, 500);
+}
+
+function drainPull(): void {
+  pulled = 0;
+  drawPull();
+}
+
+/** The gauge: a line over the top of the lane that fills from its middle out. */
+function drawPull(): void {
+  const g = ui.pull;
+  g.hidden = pulled === 0;
+  g.style.setProperty("--pull", (pulled / PULL).toFixed(3));
+}
+
 /** Where the pointer last moved, and whether a scroll has come under it since. */
 const pointer = { x: -1, y: -1, still: false };
 
@@ -3164,9 +3216,11 @@ function wire(): void {
       e.preventDefault();
       ui.scroll.scrollTop += e.deltaY;
       flick(e);
+      pull(e);
     },
     { passive: false },
   );
+  ui.scroll.addEventListener("wheel", pull, { passive: true });
 
   // over the canvas the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
   ui.canvas.addEventListener(
@@ -3350,6 +3404,7 @@ async function start(): Promise<void> {
     <header id="header"><span class="warnings chrome dim"></span><span class="notice chrome"></span></header>
     <main id="areas">
       <nav id="crumb" class="chrome" hidden></nav>
+      <div id="pull" hidden><i></i></div>
       <section class="wing" data-area="wingL"></section>
       <section id="canvas" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
@@ -3361,6 +3416,7 @@ async function start(): Promise<void> {
   ui = {
     header: $("#header"),
     crumb: $("#crumb"),
+    pull: $("#pull"),
     tip: $("#tip"),
     areas: $("#areas"),
     canvas: $("#canvas"),
@@ -3499,6 +3555,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #crumb .step.more { color: var(--faint); cursor: default; margin-right: 2px; }
 #crumb svg { flex: none; width: 7px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
 #header .notice { color: var(--lit); }
+/* the pull's gauge: a hairline over the prose that fills from its middle out as the reader pulls past the top */
+#pull { position: absolute; z-index: 5; height: 2px; pointer-events: none; }
+#pull i { position: absolute; top: 0; height: 2px; left: 50%; width: calc(var(--pull, 0) * 100%); transform: translateX(-50%); border-radius: 1px; background: var(--muted); transition: width .08s linear; }
 /* the one tooltip: on the page's own ground, lifted by a soft shadow and the rim an image keeps, never under the pointer */
 #tip { position: fixed; z-index: 9; max-width: 320px; padding: 7px 10px 8px; border-radius: 8px; background: var(--ground); color: var(--muted); font-size: 12px; line-height: 1.35; box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 6px 20px rgb(0 0 0 / .12), 0 0 0 1px var(--rim); pointer-events: none; white-space: pre-line; }
 #tip .what { display: block; color: var(--faint); margin-bottom: 1px; }
@@ -3556,6 +3615,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
+.ctrail { display: flex; justify-content: center; gap: 3px; margin-bottom: 6px; }
+.ctrail .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; }
+.ctrail .cell svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ctrail .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
+.ctrail .cell:hover, .ctrail .cell.lit { color: var(--on); background: var(--wash); }
 .crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }

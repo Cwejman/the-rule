@@ -166,7 +166,13 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 7.4 The way down stands over the lane
+### 7.4 Pull past the top
+
+At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken up a level, as some applications refresh when pulled past their top. A pull that stops drains, so nothing happens by accident, and with the whole body as scope there is nothing to pull up to.
+
+*The author's ask of 2026-09-15; as built the same day.*
+
+### 7.5 The way down stands over the lane
 
 The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is opened, [the depth](canvas.md#32-scope-and-how-far-things-explode), which moves the lane and the canvas alike; and how the reader came here, at the right.
 
@@ -188,7 +194,7 @@ The lane lays a level as a reading: the brief that gives the most understanding 
 
 A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3-the-shape) already shows it, open or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
 
-Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#74-the-way-down-stands-over-the-lane).
+Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#75-the-way-down-stands-over-the-lane).
 
 A target with no level beneath it cannot be a scope, so the lane scopes to its parent with the target in focus, and the way down always has a placement to show. Escape steps back a move as it undoes any change, and the trail is kept with the lane in the browser, so a reload keeps it.
 

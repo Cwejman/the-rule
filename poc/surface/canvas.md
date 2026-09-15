@@ -112,7 +112,7 @@ It costs one addition the practice must name: the trace reads the written headin
 
 Everything above the scope stands visible over the entry, in the hue of its branch, and needs no grouping beyond the hue. Where the reader explicitly came from is marked apart from the rest, as the trail marks it now.
 
-What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus: a link leaves its right side and arrives at the target's right side, as a bracket in the margin, and the target's cell for it lights, so no line crosses a node; an in-cell pointed at draws its line on the left side instead. The trail over the entry is not yet drawn.
+What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus: a link leaves its right side and arrives at the target's right side, as a bracket in the margin, and the target's cell for it lights, so no line crosses a node; an in-cell pointed at draws its line on the left side instead. Above the entry stand the last few moves that led here, as the way down draws them, each a press back.
 
 *The author's question and the session's answer, 2026-09-15; the ports and their edges as built the same day, the trail owed.*
 
@@ -132,7 +132,7 @@ On a linear run the drawer is simply scrolled, and scrolling to the next piece m
 
 ### 7.2 Pull past the top
 
-At the top of a scope, pulling up beyond where the lane can go should fill a gauge, and when it is full the reader is taken up, as some applications refresh when pulled past their top. The same could hold in the canvas mode with the prose to one side. A small detail.
+At the top of a scope, pulling up beyond where the lane can go should fill a gauge, and when it is full the reader is taken up, as some applications refresh when pulled past their top. The same could hold in the canvas mode with the prose to one side. A small detail, [built in the lane](lane.md#74-pull-past-the-top), where it serves with or without the canvas.
 
 *The author's, 2026-09-15.*
 
@@ -140,6 +140,6 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 Which of the two ways of holding the prose is built first; the drawer, the lane itself beside the canvas, is what stands, since [the middle holds both](framework.md#27-the-middle-holds-one-pane-or-two).
 
-How a jump edge is told apart from an offer, since both are links in prose, and whether the trail is drawn over the entry. The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform); pull past the top waits, and so does the rim the rows carry, which the surface otherwise refuses and the author has not yet art directed. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
+How a jump edge is told apart from an offer, since both are links in prose, and whether the trail is drawn over the entry. The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform); the rim the rows carry, which the surface otherwise refuses, waits on the author's art direction. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
 
 *Open, 2026-09-15.*

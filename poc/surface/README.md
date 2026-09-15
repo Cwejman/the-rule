@@ -76,7 +76,7 @@ The surface is going to have a few modes, and the second is a canvas: the body a
 
 Four things the surface does not answer cross the levels beneath, so they stand here rather than at one level's foot.
 
-How a reader sees where they have been, as a map. The way down now carries [a line of it](lane.md#74-the-way-down-stands-over-the-lane), the briefs a reader followed links from, and the map of the visits is what [the canvas](canvas.md) would draw.
+How a reader sees where they have been, as a map. The way down now carries [a line of it](lane.md#75-the-way-down-stands-over-the-lane), the briefs a reader followed links from, and the map of the visits is what [the canvas](canvas.md) would draw.
 
 Whether the harness can be modified after all. Its SDK could assemble a context from the substrate rather than append to a trail, which is the largest gain in reach here, and it is unanswered.
 

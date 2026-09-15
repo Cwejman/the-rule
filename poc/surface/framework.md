@@ -71,7 +71,7 @@ A wing holds up to two figures, one at its top and one at its foot. A figure of 
 
 The middle holds the lane, the canvas, or both, the canvas at the left and the lane at the right, and it is never empty: its strip toggles a pane, and the last one cannot be taken away.
 
-With both standing, the lane keeps its measure and the canvas takes what is left, no narrower than a floor. The gutters belong to the lane and stand only beside it, so no gutter ever stands beside the canvas, and the wings do not care what the middle holds.
+With both standing, the lane keeps its measure and the canvas takes what is left, no narrower than a floor and no wider than a setting, its greatest width, so a wide screen keeps its space around the row. The gutters belong to the lane and stand only beside it, so no gutter ever stands beside the canvas, and the wings do not care what the middle holds.
 
 *Reasoned, the author's, 2026-09-15, so that the three cases, the lane, the canvas, or both, are one rule and nothing is tiled.*
 
