@@ -48,7 +48,7 @@ No widget repeats what is in view, and a mark is spent in proportion to how live
 
 A cell in any figure, a step or a cell of the way down, an icon on a strip, and a link in the lane when no gutter tells of it, each says what it is a moment after the pointer rests on it: for a brief, its path drawn as the way down draws one, then its name, and for a link the opening words of its face.
 
-It is one element on the page's own ground, placed beneath what is pointed at and never under the pointer, and it goes with any scroll or press. The ahead keeps naming its pointed cell beneath the figure as well.
+It is one element on the page's own ground, never under the pointer, and it goes with any scroll or press. Where it would hide what is looked at it moves aside: beside a figure, on the side nearest the lane and level with the cell, since a tooltip over the shape covers the very cell pointed at; beside a node on the canvas, past its ports; and beneath anything else. The ahead keeps naming its pointed cell beneath the figure as well.
 
 *Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#j-an-overlay-at-all) stays refused, and this tells only what is not in view.*
 

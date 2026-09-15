@@ -2628,7 +2628,11 @@ function tip(e: PointerEvent): void {
   if (html) tipTimer = setTimeout(() => showTip(el, html), 260);
 }
 
-/** Shows the tooltip beneath an element, centred on it and kept on the screen, or above it when there is no room beneath. */
+/**
+ * Shows the tooltip where it hides nothing. Over a figure it would cover what is pointed at, so there it stands beside
+ * the figure, on the side nearest the lane, level with the cell. On the canvas it stands beside the row, past its ports,
+ * level with it. Anywhere else it stands beneath the element, centred, or above it when there is no room beneath.
+ */
 function showTip(el: Element, html: string): void {
   const t = ui.tip;
   t.innerHTML = html;
@@ -2636,9 +2640,24 @@ function showTip(el: Element, html: string): void {
   const r = el.getBoundingClientRect();
   const w = t.offsetWidth;
   const h = t.offsetHeight;
-  const left = clamp(r.left + r.width / 2 - w / 2, 8, innerWidth - w - 8);
-  const top = r.bottom + 8 + h > innerHeight - 8 ? r.top - h - 8 : r.bottom + 8;
-  t.style.left = `${Math.round(left)}px`;
+  const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
+  const fig = el.closest("svg.fig, .tree, .pointers, .settings");
+  const wing = el.closest<HTMLElement>(".wing");
+  let left: number;
+  let top: number;
+  if (fig && wing) {
+    const f = fig.getBoundingClientRect();
+    left = wing.dataset.area === "wingL" ? f.right + 12 : f.left - w - 12;
+    top = level();
+  } else if (el.closest("#canvas")) {
+    const row = el.closest(".cline")?.getBoundingClientRect() ?? r;
+    left = row.right + 56 + w <= innerWidth - 8 ? row.right + 56 : row.left - w - 56;
+    top = level();
+  } else {
+    left = r.left + r.width / 2 - w / 2;
+    top = r.bottom + 8 + h > innerHeight - 8 ? r.top - h - 8 : r.bottom + 8;
+  }
+  t.style.left = `${Math.round(clamp(left, 8, innerWidth - w - 8))}px`;
   t.style.top = `${Math.round(top)}px`;
 }
 
