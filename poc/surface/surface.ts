@@ -2582,6 +2582,8 @@ function tip(e: PointerEvent): void {
   if (el === tipped) return;
   hideTip();
   tipped = el;
+  // a port cell under the pointer draws its own line, so the edges follow the element and not only the brief pointed at
+  if (canvasOn() && (el?.classList.contains("pc") || el?.classList.contains("crow"))) drawEdges();
   if (!el) return;
   const html = tipHtml(el);
   if (html) tipTimer = setTimeout(() => showTip(el, html), 260);
@@ -3455,7 +3457,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 56px; }
 .cnode { display: flex; flex-direction: column; align-items: stretch; }
 /* the zone continues the parent row's own sides: the row squares its lower corners and the dashed edges begin exactly where its sides end */
-.czone { padding: 14px 12px 12px; cursor: pointer; border: 1px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
+.czone { padding: 14px 44px 12px; cursor: pointer; border: 1px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
 .czone:hover { border-color: var(--door); }
 .cnode.open > .cline > .crow { border-radius: 6px 6px 0 0; }
 .czone.borrowed { padding-top: 8px; }
