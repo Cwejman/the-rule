@@ -2237,7 +2237,7 @@ function alignEnds(): void {
   // the browser anchors the scroll against a change of room above; a lane at its top stays at its top
   const atTop = ui.scroll.scrollTop === 0;
   ui.content.style.paddingTop = `${Math.round(P)}px`;
-  ui.content.style.paddingBottom = `${Math.round(B)}px`;
+  ui.content.style.paddingBottom = `${Math.round(B) + hang}px`;
   if (atTop) ui.scroll.scrollTop = 0;
   const sMax = Math.max(0, ui.scroll.scrollHeight - h);
   ends.top = Math.round(P) + off + 24;
@@ -2361,6 +2361,7 @@ function placeCrumb(): void {
 /** Adjuncts stand in the gutter columns at the height of the line they belong to, pushed down where two would meet. */
 function drawAdjuncts(): void {
   const on = fits();
+  let overhang = 0;
   (["gutterL", "gutterR"] as const).forEach((area) => {
     const col = ui.parts[area];
     const widget = widgetOf(area);
@@ -2383,8 +2384,17 @@ function drawAdjuncts(): void {
         floor = top + el.offsetHeight + 6;
       });
     });
+    overhang = Math.max(overhang, floor - col.clientHeight);
   });
+  // what the gutters hang below the last brief would meet the box's hard edge, since the foot's fade eases away at the
+  // end of the prose; so the lane's ends keep room beneath its end for it, inside the clear foot
+  const before = hang;
+  hang = overhang > 0 ? Math.round(overhang + 12) : 0;
+  if (hang !== before) alignEnds();
 }
+
+/** The room the gutters need beneath the lane's end, measured as they are laid and kept by the lane's ends. */
+let hang = 0;
 
 /** The reading line, where it stands on the screen now. */
 const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt(ui.scroll.scrollTop);

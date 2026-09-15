@@ -70,7 +70,7 @@ The brief highlighted stands at full ink and every other brief stands one step d
 
 ### 4.5 A fade at the edges
 
-The prose fades out a little in from the top and the bottom of the viewport, over a short run, so [the strip](framework.md#3-the-strip) at the foot never reads as an edge of the text. The fade at the top comes in with the reading line, since nothing stands above the opening to fade. The run is the fade setting, kept apart from the dim since the author turned one expecting the other.
+The prose fades out a little in from the top and the bottom of the viewport, over a short run, so [the strip](framework.md#3-the-strip) at the foot never reads as an edge of the text. The fade at the top comes in with the reading line, since nothing stands above the opening to fade, and the same holds at the foot; what a gutter hangs below the last brief would then meet the box's hard edge, so the lane keeps room beneath its end for it. The run is the fade setting, kept apart from the dim since the author turned one expecting the other.
 
 *Reasoned, the author's, 2026-09-13; the edge fade was shortened and moved in on the author's second reading.*
 
