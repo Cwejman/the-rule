@@ -1421,7 +1421,7 @@ function pathHtml(to: string): string {
 }
 
 /** The opening words of a brief's face. */
-const faceOf = (b: Brief): string => trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), 110);
+const faceOf = (b: Brief): string => trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), 90);
 
 /** What points at a brief, told at its foot. */
 function footHtml(b: Brief): string {
@@ -3760,13 +3760,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .gutter[data-area="gutterL"] .adj { border-left: 0; border-right: 2px solid var(--rest); padding: 0 8px 0 0; }
 .adj.lit { border-color: var(--lit); }
 /* a path is the titles above a brief with a chevron between, as the way down draws them, wrapping where it must */
-.path { display: flex; flex-wrap: wrap; align-items: center; gap: 1px 5px; color: var(--faint); font-size: 12px; line-height: 1.3; }
+.path { display: flex; flex-wrap: wrap; align-items: center; gap: 1px 5px; color: var(--faint); font-size: 11px; line-height: 1.3; }
 .path svg { flex: none; width: 7px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
 .gutter[data-area="gutterL"] .path { justify-content: flex-end; }
 .adj .path { margin-bottom: 1px; }
-.adj .name { display: block; color: var(--ink); cursor: pointer; }
+/* three sizes: the path smallest and faint, the name the largest, the opening words a step smaller and quieter */
+.adj .name { display: block; color: var(--ink); font-weight: calc(500 - var(--thin)); cursor: pointer; }
 .adj .name:hover, .adj .name.lit { color: var(--on); }
-.adj .gloss { display: block; color: var(--muted); }
+.adj .gloss { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 1px; }
 .adj.dim .gloss { color: var(--faint); }
 .adj.foot { border-left-color: transparent; border-right-color: transparent; }
 /* what points at a brief stands one name to a line, so the names never run together */
