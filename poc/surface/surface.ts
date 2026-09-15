@@ -1876,9 +1876,9 @@ function drawEdges(): void {
   // the cell to the source's left. Lines never cross the nodes
   all<HTMLElement>(".pc.tie", st).forEach((c) => c.classList.remove("tie"));
   const rowOf = (x: string) => st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(x)}"]`);
-  const bracket = (x1: number, y1: number, x2: number, y2: number, dir: 1 | -1) => {
+  const bracket = (x1: number, y1: number, x2: number, y2: number, dir: 1 | -1, to: string) => {
     const d = dir * (44 + Math.abs(y2 - y1) * 0.12);
-    return `<path class="link" d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + d).toFixed(1)} ${y1.toFixed(1)},${(x2 + d).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
+    return `<path class="link" ${hued(to)} d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + d).toFixed(1)} ${y1.toFixed(1)},${(x2 + d).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
   };
   const mid = (q: { top: number; bottom: number }) => (q.top + q.bottom) / 2;
   const hovIn = st.querySelector<HTMLElement>(".port.in .pc[data-a]:hover");
@@ -1888,7 +1888,7 @@ function drawEdges(): void {
     if (from && from !== row) {
       const r = at(row);
       const q = at(from);
-      paths.push(bracket(r.left, mid(r), q.left, mid(q), -1));
+      paths.push(bracket(r.left, mid(r), q.left, mid(q), -1, hovIn.dataset.a!));
     }
   } else {
     const hovOut = st.querySelector<HTMLElement>(".port.out .pc[data-a]:hover");
@@ -1901,7 +1901,7 @@ function drawEdges(): void {
         const t = rowOf(c.dataset.a!);
         if (!t || t === row) return;
         const q = at(t);
-        paths.push(bracket(r.right, mid(r), q.right, mid(q), 1));
+        paths.push(bracket(r.right, mid(r), q.right, mid(q), 1, c.dataset.a!));
         t.parentElement!.querySelector(`.port.in .pc[data-a="${cssEsc(a)}"]`)?.classList.add("tie");
       });
     }
@@ -1952,15 +1952,15 @@ function applyView(ease: boolean): void {
   rememberView();
 }
 
-/** Fits the scope to the canvas's width, never larger than life, and stands it at the top. */
+/** Fits the scope to the canvas's width, never larger than life and never smaller than reads, and stands it at the top. */
 function fitCanvas(): void {
   const st = stage();
   if (!st) return;
   const W = ui.canvas.clientWidth;
   const w = st.scrollWidth || 1;
-  view.k = clamp((W - 48) / w, 0.4, 1);
-  view.x = Math.max(24, (W - w * view.k) / 2);
-  view.y = 56;
+  view.k = clamp((W - 2 * CANVAS_INSET) / w, 0.6, 1);
+  view.x = Math.max(CANVAS_INSET, (W - w * view.k) / 2);
+  view.y = CANVAS_INSET;
 }
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
@@ -1972,7 +1972,7 @@ function followFocus(): void {
   if (!row) return;
   const c = ui.canvas.getBoundingClientRect();
   const r = row.getBoundingClientRect();
-  const inside = r.top >= c.top + 56 && r.bottom <= c.bottom - 48 && r.left >= c.left && r.right <= c.right;
+  const inside = r.top >= c.top + CANVAS_INSET && r.bottom <= c.bottom - CANVAS_INSET && r.left >= c.left && r.right <= c.right;
   if (inside) return;
   const s0 = st.getBoundingClientRect();
   const y = (r.top - s0.top) / view.k;
@@ -2280,17 +2280,33 @@ function drawCrumb(): void {
 /** The panes of the middle that stand on the screen. */
 const panesShown = (): HTMLElement[] => [ui.canvas, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
 
+/** How far the nodes stand in from the canvas's rim. */
+const CANVAS_INSET = 24;
+
+/** The canvas stands in the band the figures stand in: below the way down, above the strip's room at the foot. */
+function placeCanvas(): void {
+  const s = state.settings;
+  const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
+  ui.canvas.style.marginTop = `${Math.round(top)}px`;
+  ui.canvas.style.marginBottom = `${s.gap + STRIP}px`;
+}
+
 /**
  * The way down spans the middle, whatever it holds: the placement at its left edge, the depth beside the trail against
  * its right, so the cells keep their place as moves are added. With the lane alone it is as wide as the prose.
  */
 function placeCrumb(): void {
-  const rects = panesShown().map((el) => (el === ui.scroll ? ui.lane : el).getBoundingClientRect());
+  // the bar aligns with the prose, and with the nodes, which stand in from the canvas's rim
+  const edges = panesShown().map((el) => {
+    const r = el.getBoundingClientRect();
+    return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left + CANVAS_INSET, right: r.right - CANVAS_INSET };
+  });
   const a0 = ui.areas.getBoundingClientRect();
-  const left = Math.min(...rects.map((r) => r.left));
-  const right = Math.max(...rects.map((r) => r.right));
+  const left = Math.min(...edges.map((r) => r.left));
+  const right = Math.max(...edges.map((r) => r.right));
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
   ui.crumb.style.width = `${Math.round(right - left)}px`;
+  placeCanvas();
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   ui.scroll.style.setProperty("--rim-crumb", ui.crumb.hidden ? "0px" : `${ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`);
 }
@@ -3446,26 +3462,32 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
-#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); }
-#stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
+/* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
+#canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
+#stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
-#edges path { fill: none; stroke: var(--door); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+/* an arrow is neutral, since a step's order says nothing of where it stands; a link line takes its target's hue */
+#edges path { fill: none; stroke: var(--faint); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 /* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
    dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
-.ccol, .czone { display: flex; flex-direction: column; gap: 16px; }
-.ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 56px; }
-.cnode { display: flex; flex-direction: column; align-items: stretch; }
-/* the zone continues the parent row's own sides: the row squares its lower corners and the dashed edges begin exactly where its sides end */
-.czone { padding: 14px 44px 12px; cursor: pointer; border: 1px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
+.ccol, .czone { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+/* a set is a row of columns, wrapping past three, since nothing in it stands on anything */
+.ccol.set, .czone.set { flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 24px 56px; max-width: 892px; }
+.cnode { display: flex; flex-direction: column; align-items: center; }
+/* the zone's dashed edges emerge from the parent row's straight sides: the zone begins behind the row, above its rounded
+   lower corners, and the row paints over it, so the row keeps its corners */
+.czone { margin-top: -8px; padding: 22px 44px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
 .czone:hover { border-color: var(--door); }
-.cnode.open > .cline > .crow { border-radius: 6px 6px 0 0; }
+
 .czone.borrowed { padding-top: 8px; }
 .zlabel { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: var(--sans); font-size: 11px; color: var(--faint); margin-bottom: 2px; }
 .zlabel .icon { width: 11px; height: 11px; }
 .zlabel .name { color: var(--muted); }
-.cline { position: relative; display: flex; align-items: stretch; }
-.crow { flex: 1 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
+/* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
+.crow { flex: none; display: flex; align-items: baseline; gap: 7px; width: 260px; padding: 9px 12px; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
@@ -3477,9 +3499,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the depth strip stands in the way down, before the trail: a cell per level, the open ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
-#depth .dc.on { background: var(--rest); color: var(--ink); }
-#depth .dc:hover { background: var(--door); color: var(--ground); }
-.crow .num { flex: none; font-size: 11px; color: var(--faint); }
+#depth .dc.on { background: var(--track); color: var(--ink); }
+#depth .dc:hover { background: var(--muted); color: var(--ground); }
+.crow .num { flex: none; font-size: .85em; color: var(--faint); }
 .crow .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
