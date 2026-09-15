@@ -1793,6 +1793,18 @@ let followed = "";
 const canvasOn = (): boolean => !ui.canvas.hidden;
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
+/** A brief's number counted from the scope root, so the nesting reads from where the reader stands: 2.1 under the scope's second brief. */
+function scopedNumber(b: Brief): string {
+  const parts = prefixesOf(b.address)
+    .filter((a) => a !== "" && within(a, state.scope) && a !== state.scope)
+    .map((a) => {
+      const parent = brief(parentOf(a));
+      const i = level(parentOf(a)).findIndex((k) => k.address === a);
+      return parent?.set ? letterOf(i) : `${i + 1}`;
+    });
+  return parts.length === 1 ? `${parts[0]}.` : parts.join(".");
+}
+
 /** One node: its row, and beneath it its zone when it is whole and has a level. */
 function canvasNodeHtml(b: Brief): string {
   const whole = gradeOf(b.address) === "whole";
@@ -1808,7 +1820,7 @@ function canvasNodeHtml(b: Brief): string {
       : "";
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrowed = home ? `<span class="borrowed" data-a="${esc(home.address)}" data-tip="borrows ${esc(home.title || state.body!.title)}">${icon("links")}</span>` : "";
-  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${borrowed}</div>`;
+  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${borrowed}</div>`;
   const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
   // a borrowing node's zone is its home's level, named as such; a folded borrowed brief is drawn at its face
   const zoneOf = home ? level(home.address) : kids;
@@ -1868,7 +1880,7 @@ function drawEdges(): void {
       const y1 = a.bottom + 1;
       const y2 = b.top - 1;
       if (y2 - y1 < 4) return;
-      paths.push(`<path d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 4).toFixed(1)}M${(x - 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}L${x.toFixed(1)} ${(y2 - 1).toFixed(1)}L${(x + 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}"/>`);
+      paths.push(`<path class="arrow" d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}M${(x - 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}L${(x + 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}"/>`);
     });
   });
   // the links of the highlighted node leave its right side and arrive at the target's right side, as a bracket in the
@@ -2288,7 +2300,7 @@ function placeCanvas(): void {
   const s = state.settings;
   const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
-  ui.canvas.style.marginBottom = `${s.gap + STRIP}px`;
+  ui.canvas.style.marginBottom = `${STRIP}px`;
 }
 
 /**
@@ -2296,10 +2308,10 @@ function placeCanvas(): void {
  * its right, so the cells keep their place as moves are added. With the lane alone it is as wide as the prose.
  */
 function placeCrumb(): void {
-  // the bar aligns with the prose, and with the nodes, which stand in from the canvas's rim
+  // the bar stands flush with the prose's edges and with the canvas's rim
   const edges = panesShown().map((el) => {
     const r = el.getBoundingClientRect();
-    return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left + CANVAS_INSET, right: r.right - CANVAS_INSET };
+    return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
   });
   const a0 = ui.areas.getBoundingClientRect();
   const left = Math.min(...edges.map((r) => r.left));
@@ -3470,6 +3482,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 /* an arrow is neutral, since a step's order says nothing of where it stands; a link line takes its target's hue */
 #edges path { fill: none; stroke: var(--faint); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+#edges path.arrow { stroke: var(--faint); stroke-width: 1; opacity: .7; }
 /* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
    dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
 .ccol, .czone { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -3478,7 +3491,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cnode { display: flex; flex-direction: column; align-items: center; }
 /* the zone's dashed edges emerge from the parent row's straight sides: the zone begins behind the row, above its rounded
    lower corners, and the row paints over it, so the row keeps its corners */
-.czone { margin-top: -8px; padding: 22px 44px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
+.czone { margin-top: -8px; padding: 22px 24px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
 .czone:hover { border-color: var(--door); }
 
 .czone.borrowed { padding-top: 8px; }
@@ -3487,7 +3500,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .zlabel .name { color: var(--muted); }
 .cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
 /* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
-.crow { flex: none; display: flex; align-items: baseline; gap: 7px; width: 260px; padding: 9px 12px; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 19em; padding: .65em .9em; border-radius: .6em; font-family: var(--sans); font-size: calc(var(--body) * .8); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
@@ -3506,7 +3519,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-.crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
+.crow.root { width: auto; max-width: 24em; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
