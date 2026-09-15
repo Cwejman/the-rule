@@ -2922,7 +2922,17 @@ const PULL_DEAD = 0.15;
 let pulled = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
 
-/** Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything else lets it drain. */
+/**
+ * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
+ * whole notches of a hundred or more, or in lines, where a trackpad arrives as small fractional deltas.
+ */
+const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.deltaY) >= 100 && Number.isInteger(e.deltaY));
+
+/**
+ * Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything
+ * else lets it drain. A trackpad's pull springs back a moment after the fingers stop, as a pull on a phone springs back
+ * when they lift; a mouse wheel's notches come slower than that, so its pull is kept between notches.
+ */
 function pull(e: WheelEvent): void {
   clearTimeout(pullTimer);
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
@@ -2933,7 +2943,7 @@ function pull(e: WheelEvent): void {
     drawPull(true);
     return popUp();
   }
-  pullTimer = setTimeout(drainPull, 300);
+  pullTimer = setTimeout(drainPull, notched(e) ? 1500 : 300);
 }
 
 function drainPull(): void {
