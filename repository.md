@@ -152,4 +152,6 @@ How a change made while working inside a project travels back here, which a subm
 
 Whether the labs keep the stamp, which [the practice leaves open](poc/practice.md#12-the-labs-files-are-frozen).
 
-*Open, 2026-09-14.*
+Where thoughts that arrive from the projects that depend on the rule are received: the rule wants an entry point, an inbox, for them. [Toolmaking](tool-making/README.md) was the first arrival, on 2026-09-15, and it was mounted directly.
+
+*Open, 2026-09-14; the inbox added 2026-09-15.*

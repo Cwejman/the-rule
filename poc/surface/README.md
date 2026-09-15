@@ -64,11 +64,19 @@ Either way the file reads [the stamped](#2-what-it-is-handed) markdown and hands
 
 [the level beneath](implementation.md)
 
-## 7. What this does not answer
+## 7. The canvas
+
+The surface is going to have a few modes, and the second is a canvas: the body as nodes a reader moves among, with its scope and how far it explodes under their hand, and the prose read in place or in a drawer beside. It is asked for by work, whose pieces are reused and reached from several places, and it is not built.
+
+*The author's, 2026-09-15; open.*
+
+[the level beneath](canvas.md)
+
+## 8. What this does not answer
 
 Four things the surface does not answer cross the levels beneath, so they stand here rather than at one level's foot.
 
-How a reader sees where they have been. The lane keeps what a reader opened, so part of the trail shows as what stands unfolded, but [following a link lays the lane afresh](lane.md#9-following-a-link-moves-you), and though the browser's history and [escape](lane.md#52-escape-is-an-undo) both step back, nothing draws the way. The drawing that would is a map of the visits rather than a line back through them. It is owed, and it is not needed to begin.
+How a reader sees where they have been, as a map. The way down now carries [a line of it](lane.md#74-the-way-down-stands-over-the-lane), the briefs a reader followed links from, and the map of the visits is what [the canvas](canvas.md) would draw.
 
 Whether the harness can be modified after all. Its SDK could assemble a context from the substrate rather than append to a trail, which is the largest gain in reach here, and it is unanswered.
 
@@ -78,7 +86,7 @@ What stands beside a brief in the left gutter. Commits and people belong there, 
 
 *Open, 2026-09-13.*
 
-## 8. What was tried and refused
+## 9. What was tried and refused
 
 What the programs before this model reached for is kept beneath, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. That level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another.
 

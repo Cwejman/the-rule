@@ -89,7 +89,7 @@ The state is the body and its index of [addresses](implementation.md#32-the-addr
 
 Everything drawn that names a brief carries that brief's address. That one convention is what keeps the widgets in step: pointing at a brief in any of them lights it in all of them, and pressing it anywhere goes.
 
-*Reasoned, carried from [the first program](README.md#8-what-was-tried-and-refused), 2026-09-12.*
+*Reasoned, carried from [the first program](README.md#9-what-was-tried-and-refused), 2026-09-12.*
 
 ## 5. Settings are data, and a figure edits them
 

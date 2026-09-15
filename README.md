@@ -50,3 +50,11 @@ The rule has a repository of its own as a pragmatic first step. Projects needed 
 *In force, the author's decision, 2026-09-14.*
 
 [the level beneath](repository.md)
+
+## 6. Toolmaking
+
+Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles. It began in a project that depends on the rule and is built here from 2026-09-15, since nothing in it is secret and what serves one project serves the others.
+
+*The author's, 2026-09-15; the primitives ratified 2026-09-14, the rest open.*
+
+[the level beneath](tool-making/README.md)
