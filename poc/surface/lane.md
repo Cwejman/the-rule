@@ -84,7 +84,7 @@ Scrolling afterwards moves the focus and changes no grade, so nothing reflows un
 
 ### 5.1 Going from a figure is not an arrival
 
-Going to a brief from [the tree](widgets.md#2-the-tree) or another [figure](framework.md#1-two-kinds-of-widget) keeps every fold the reader has made, opens only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
+Going to a brief from [the tree](widgets.md#2-the-tree) or another [figure](framework.md#1-three-kinds-of-widget) keeps every fold the reader has made, opens only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
 
 A reload of the place the reader stood is not an arrival either. The lane as laid, its scope and every fold, is kept in the browser's storage as it changes, and a reload at the same address lays it again as it was left.
 

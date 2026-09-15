@@ -6,15 +6,17 @@ status: in force
 
 # Five areas, and what stands in them
 
-## 1. Two kinds of widget
+## 1. Three kinds of widget
 
-A gutter and a wing want different contracts, and naming the difference is what keeps every widget small.
+A gutter, a wing and the middle want different contracts, and naming the difference is what keeps every widget small.
 
 An adjunct stands in a gutter. Given a brief in the lane, read from the shared state, it returns what should stand beside that brief, aligned with it and scrolling with it: a link's target beside the link's own line, what points at the brief at its foot, and later a commit or a person. It never draws the body.
 
 A figure stands in a wing. Given the body and the shared state, it returns a drawing that stands on its own: the tree, the shape beneath the focus, the lane as laid, the body whole. It never touches the prose.
 
-*Reasoned, the author's, 2026-09-13.*
+A pane stands in the middle, and there are two: the lane, which is the reading, and [the canvas](canvas.md), which is the scope as nodes. Each draws itself from the shared state through its own functions, and both act through the same verbs.
+
+*Reasoned, the author's, 2026-09-13; the pane 2026-09-15.*
 
 ## 2. The areas
 
@@ -55,15 +57,23 @@ Any area closes by hand, from its own [strip](#3-the-strip). A closed area takes
 
 ### 2.5 Giving way
 
-As the screen narrows the areas give way in one order: the gutters first, as a pair, then the right wing, then the left, until the lane stands alone. An area gives way when its width and one space no longer fit, and an area given no room is gone from the row, strip and all, until the screen widens.
+As the screen narrows the areas give way in one order: the canvas first, when it stands beside the lane, then the gutters as a pair, then the right wing, then the left, until the lane stands alone. An area gives way when its width and one space no longer fit, and an area given no room is gone from the row, strip and all, until the screen widens.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13; the canvas first, 2026-09-15, since the lane is the reading.*
 
 ### 2.6 What an area holds
 
 A wing holds up to two figures, one at its top and one at its foot. A figure of fixed size, [the plate](widgets.md#7-the-plate) or [the settings](widgets.md#6-settings), takes only the height it needs; a figure that grows, the shape, [the tree](widgets.md#2-the-tree) or the ahead, takes what is left, shared evenly when both grow. A gutter holds one adjunct. Nothing nests further, splits, or is dragged.
 
 *Reasoned, the author's, 2026-09-13; the second figure the author's ask of 2026-09-14.*
+
+### 2.7 The middle holds one pane or two
+
+The middle holds the lane, the canvas, or both, the canvas at the left and the lane at the right, and it is never empty: its strip toggles a pane, and the last one cannot be taken away.
+
+With both standing, the lane keeps its measure and the canvas takes what is left, no narrower than a floor. The gutters belong to the lane and stand only beside it, so no gutter ever stands beside the canvas, and the wings do not care what the middle holds.
+
+*Reasoned, the author's, 2026-09-15, so that the three cases, the lane, the canvas, or both, are one rule and nothing is tiled.*
 
 ## 3. The strip
 

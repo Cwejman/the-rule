@@ -823,7 +823,12 @@ type Index = {
 /** A brief in the lane stands at its face or whole; a brief not in the lane has no grade. */
 type Grade = "face" | "whole";
 
-type AreaName = "wingL" | "gutterL" | "gutterR" | "wingR";
+type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
+/** The panes the middle can hold, in the order they stand: the canvas at the left, the lane at the right. */
+const PANES = ["canvas", "lane"] as const;
+type PaneName = (typeof PANES)[number];
+/** The least width the canvas stands in beside the lane; narrower, it gives way. */
+const CANVAS_MIN = 360;
 type Theme = "light" | "dark" | "system";
 const THEMES: Theme[] = ["light", "dark", "system"];
 /** The three faces a heading or the prose can be set in. */
@@ -862,7 +867,7 @@ type Settings = {
   /** the face of the headings, and of the prose */
   headings: Face;
   prose: Face;
-  /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed */
+  /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
   areas: Record<AreaName, string[]>;
 };
 
@@ -880,7 +885,7 @@ const DEFAULTS: Settings = {
   theme: "system",
   headings: "serif",
   prose: "serif",
-  areas: { wingL: ["shape"], gutterL: [], gutterR: ["links"], wingR: ["ahead"] },
+  areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
 };
 
 const state = {
@@ -1161,7 +1166,9 @@ type Adjunct = { kind: "adjunct"; name: string; icon: string; of: (b: Brief, art
  * draws, so nothing beside it moves as it redraws; and whether it grows into the wing's height or takes only what it needs.
  */
 type Figure = { kind: "figure"; name: string; icon: string; draw: (w: number, h: number) => string; width: () => number; grow: boolean; onFocus?: boolean; onPoint?: boolean };
-type Widget = Adjunct | Figure;
+/** A pane stands in the middle: the lane, or the canvas. It draws itself from the state through its own functions. */
+type Pane = { kind: "pane"; name: string; icon: string };
+type Widget = Adjunct | Figure | Pane;
 
 const ICON: Record<string, string> = {
   none: `<path d="M5 5l6 6M11 5l-6 6"/>`,
@@ -1171,6 +1178,8 @@ const ICON: Record<string, string> = {
   plate: `<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/>`,
   settings: `<path d="M4 11.5a5.5 5.5 0 1 1 8 0"/><path d="M8 8v-3"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
+  lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
+  canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
 
@@ -1183,14 +1192,19 @@ const WIDGETS: Record<string, Widget> = {
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   pointers: { kind: "figure", name: "links, for the brief in focus", icon: "links", draw: () => pointersHtml(), width: () => 240, grow: false, onFocus: true },
+  canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
+  lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
 };
 
 const AREAS: { name: AreaName; kind: Widget["kind"] }[] = [
   { name: "wingL", kind: "figure" },
   { name: "gutterL", kind: "adjunct" },
+  { name: "middle", kind: "pane" },
   { name: "gutterR", kind: "adjunct" },
   { name: "wingR", kind: "figure" },
 ];
+/** The panes the middle holds, in their fixed order. */
+const panesHeld = (held: string[] = state.settings.areas.middle): PaneName[] => PANES.filter((p) => held.includes(p));
 /** The widgets an area holds, in order. */
 const widgetsOf = (area: AreaName): Widget[] => state.settings.areas[area].map((k) => WIDGETS[k]).filter((w): w is Widget => !!w);
 type WingName = "wingL" | "wingR";
@@ -1208,13 +1222,15 @@ const figureNames = (area: WingName): string[] => {
 /** The first widget an area holds, which is all a gutter holds. */
 const widgetOf = (area: AreaName): Widget => widgetsOf(area)[0] ?? WIDGETS.none;
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
-const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => k === "none" || WIDGETS[k].kind === kind);
+const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => (k === "none" && kind !== "pane") || WIDGETS[k].kind === kind);
 /** A strip's width: its icons laid in a row. */
 const stripWidth = (kind: Widget["kind"]): number => choicesFor(kind).length * 30 - 4;
 
 /** What an area holds once an icon on its strip is pressed: close empties it, a widget held is let go, a wing holds two, a third taking the place at the foot. */
 function pressed(area: AreaName, k: string): string[] {
   const held = state.settings.areas[area];
+  // the middle toggles a pane and is never left empty, its panes in their fixed order
+  if (area === "middle") return held.includes(k) ? (held.length > 1 ? panesHeld(held.filter((x) => x !== k)) : held) : panesHeld([...held, k]);
   const wing = area.startsWith("wing");
   return k === "none" ? [] : held.includes(k) ? held.filter((x) => x !== k) : !wing ? [k] : held.length < 2 ? [...held, k] : [held[0], k];
 }
@@ -1227,7 +1243,7 @@ function pressed(area: AreaName, k: string): string[] {
 function stripHtml(area: AreaName, kind: Widget["kind"]): string {
   const held = state.settings.areas[area];
   const offered = choicesFor(kind).filter(
-    (k) => k === "none" || held.includes(k) || ((k !== "pointers" || squeezed("gutterL") || squeezed("gutterR")) && fitsWith({ ...state.settings.areas, [area]: pressed(area, k) })[area]),
+    (k) => k === "none" || kind === "pane" || held.includes(k) || ((k !== "pointers" || squeezed("gutterL") || squeezed("gutterR")) && fitsWith({ ...state.settings.areas, [area]: pressed(area, k) })[area]),
   );
   if (!isOpen(area) && offered.length <= 1) return "";
   return `<div class="strip" data-strip="${area}">${offered
@@ -1492,8 +1508,10 @@ function loadSettings(): void {
   AREAS.forEach(({ name, kind }) => {
     const held = state.settings.areas[name] as unknown;
     const list = Array.isArray(held) ? held : typeof held === "string" && held !== "none" ? [held] : [];
-    state.settings.areas[name] = list.filter((k) => WIDGETS[k]?.kind === kind && k !== "none").slice(0, kind === "figure" ? 2 : 1);
+    state.settings.areas[name] = list.filter((k) => WIDGETS[k]?.kind === kind && k !== "none").slice(0, kind === "adjunct" ? 1 : 2);
   });
+  state.settings.areas.middle = panesHeld(state.settings.areas.middle);
+  if (state.settings.areas.middle.length === 0) state.settings.areas.middle = ["lane"];
   if (!THEMES.includes(state.settings.theme)) state.settings.theme = DEFAULTS.theme;
   if (!FACES.includes(state.settings.headings)) state.settings.headings = DEFAULTS.headings;
   if (!FACES.includes(state.settings.prose)) state.settings.prose = DEFAULTS.prose;
@@ -1754,7 +1772,7 @@ function plateSvg(W: number, H: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; tip: HTMLElement; areas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -1784,9 +1802,9 @@ function band(h: number): { top: number; height: number } {
 /** What each area holds, as the settings keep it or as a press would leave it. */
 type Held = Record<AreaName, string[]>;
 
-/** How wide an area stands with what it holds: closed, nothing; a gutter its column; a wing its widest figure, its strip free to reach a little past it. */
+/** How wide an area stands with what it holds: closed, nothing; a gutter its column; a wing its widest figure, its strip free to reach a little past it; the middle is laid apart. */
 const widthIn = (held: Held, area: AreaName): number =>
-  held[area].length === 0 ? 0 : area.startsWith("gutter") ? GUTTER : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
+  held[area].length === 0 || area === "middle" ? 0 : area.startsWith("gutter") ? GUTTER : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
 const widthOf = (area: AreaName): number => widthIn(state.settings.areas, area);
 /** A closed area takes no room at all; its strip stands at the foot of where it would open. */
 const takesRoom = (area: AreaName): boolean => isOpen(area);
@@ -1797,12 +1815,21 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * left, and the lane stands alone. An open area costs its own width and one space; a closed one costs nothing and is
  * always allowed, since all it shows is its strip.
  */
-function fitsWith(held: Held): Record<AreaName, boolean> {
+/** Which areas the width allows, and which panes of the middle. */
+type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean };
+function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Record<AreaName, boolean> = { wingL: false, gutterL: false, gutterR: false, wingR: false };
-  AREAS.forEach(({ name }) => (on[name] = held[name].length === 0));
-  let used = s.measure + 2 * s.gap;
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false };
+  AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
+  // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
+  const panes = panesHeld(held.middle);
+  on.lane = panes.includes("lane");
+  on.canvas = panes.includes("canvas");
+  let used = (on.lane ? s.measure + 2 * s.gap : 0) + (on.canvas ? CANVAS_MIN + (on.lane ? s.gap : 2 * s.gap) : 0);
+  if (on.lane && on.canvas && used > ui.areas.clientWidth) (on.canvas = false), (used = s.measure + 2 * s.gap);
   for (const group of [["wingL"], ["wingR"], ["gutterL", "gutterR"]] as AreaName[][]) {
+    // the gutters belong to the lane and stand only beside it
+    if (group[0] === "gutterL" && !on.lane) break;
     const need = group.reduce((x, a) => x + (held[a].length ? widthIn(held, a) + s.gap : 0), 0);
     if (used + need > ui.areas.clientWidth) break;
     used += need;
@@ -1810,7 +1837,7 @@ function fitsWith(held: Held): Record<AreaName, boolean> {
   }
   return on;
 }
-const fits = (): Record<AreaName, boolean> => fitsWith(state.settings.areas);
+const fits = (): Fit => fitsWith(state.settings.areas);
 
 /** Applies the settings: type registers from zoom and ratio, and the row of areas from measure, gap and what is open. */
 function drawLayout(): void {
@@ -1851,20 +1878,24 @@ function drawLayout(): void {
   // every area is as wide as what it holds, and the spaces beside them are one: at the two edges of the viewport as
   // between the wings and the lane. The gap is the least a space is given, and what the width leaves over is shared
   // among the spaces evenly, so no area carries room it does not use
-  const space = `minmax(${s.gap}px, 1fr)`;
+  // with the canvas standing, the spaces are the gap exactly and the canvas takes what is left; without it they share what is left
+  const space = on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
   const tracks = [space];
-  const place = (el: HTMLElement, width: number) => {
-    tracks.push(`${width}px`, space);
+  const place = (el: HTMLElement, width: string) => {
+    tracks.push(width, space);
     el.style.gridColumn = `${tracks.length - 1}`;
   };
-  if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, widthOf("wingL"));
-  place(ui.scroll, mid);
-  if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, widthOf("wingR"));
+  if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
+  if (on.canvas) place(ui.canvas, `minmax(${CANVAS_MIN}px, 1fr)`);
+  if (on.lane) place(ui.scroll, `${mid}px`);
+  if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
   ui.areas.style.columnGap = "0px";
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
   ui.content.style.columnGap = `${s.gap}px`;
-  AREAS.forEach(({ name }) => (ui.parts[name].hidden = !on[name] || !takesRoom(name)));
+  ui.canvas.hidden = !on.canvas;
+  ui.scroll.hidden = !on.lane;
+  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !on[name] || !takesRoom(name)));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
 }
@@ -2170,6 +2201,13 @@ function drawStrips(): void {
   const stripOf = (name: AreaName) => ui.strips.querySelector<HTMLElement>(`[data-strip="${name}"]`);
   /** Where a row of a given width would stand on its own: its left edge on the screen. */
   const anchor = (name: AreaName, width: number): number => {
+    // the middle's row is centred under whatever panes stand
+    if (name === "middle") {
+      const shown = [ui.canvas, ui.scroll].filter((el) => !el.hidden).map((el) => el.getBoundingClientRect());
+      const left = Math.min(...shown.map((r) => r.left));
+      const right = Math.max(...shown.map((r) => r.right));
+      return (left + right) / 2 - width / 2;
+    }
     // an open area's row is centred under it
     if (takesRoom(name)) {
       const r = ui.parts[name].getBoundingClientRect();
@@ -2206,6 +2244,8 @@ function drawStrips(): void {
     if (wing) place(wing, wingAt);
     if (gutter) place(gutter, gutterAt);
   });
+  const middle = stripOf("middle");
+  if (middle) place(middle, anchor("middle", middle.offsetWidth));
 }
 
 function drawAll(): void {
@@ -2942,6 +2982,7 @@ async function start(): Promise<void> {
     <main id="areas">
       <nav id="crumb" class="chrome" hidden></nav>
       <section class="wing" data-area="wingL"></section>
+      <section id="canvas" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section class="wing" data-area="wingR"></section>
       <div id="strips"></div>
@@ -2953,12 +2994,13 @@ async function start(): Promise<void> {
     crumb: $("#crumb"),
     tip: $("#tip"),
     areas: $("#areas"),
+    canvas: $("#canvas"),
     scroll: $("#scroll"),
     content: $("#content"),
     lane: $("#lane"),
     notice: $("#header .notice"),
     strips: $("#strips"),
-    parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
+    parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), middle: $("#scroll"), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
   };
   wire();
   setBody(await load());
@@ -3098,6 +3140,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
+#canvas { position: relative; overflow: hidden; min-width: 0; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
