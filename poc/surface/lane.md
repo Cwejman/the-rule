@@ -168,7 +168,9 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 ### 7.4 Pull past the top
 
-At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken up a level, as some applications refresh when pulled past their top. A pull that stops drains, so nothing happens by accident, and with the whole body as scope there is nothing to pull up to.
+At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken up a level, as some applications refresh when pulled past their top.
+
+A pull that stops drains, so nothing happens by accident. Only a fresh gesture counts, one begun after the lane has rested at its top a moment, since the momentum of the scroll that brought it there is not a pull; and with the whole body as scope there is nothing to pull up to.
 
 *The author's ask of 2026-09-15; as built the same day.*
 

@@ -1841,10 +1841,15 @@ const PORT_SHOWN = 5;
 /** A node's port: what points at it on the left, what it points at on the right, a cell per brief in its hue. */
 function portHtml(b: Brief, side: "in" | "out"): string {
   const ix = state.index!;
-  const list = side === "in" ? Array.from(ix.backlinks.get(b.address) ?? []) : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
+  const backs = Array.from(ix.backlinks.get(b.address) ?? []);
+  // borrowers stand first among what leads to a brief, since a borrow is a place its level stands and a link an offer
+  const list = side === "in" ? [...backs.filter((a) => brief(a)?.borrow === b.address), ...backs.filter((a) => brief(a)?.borrow !== b.address)] : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
   const shown = list.filter((a) => brief(a)).slice(0, list.length > PORT_SHOWN + 1 ? PORT_SHOWN : PORT_SHOWN + 1);
   const more = list.length - shown.length;
-  const cells = shown.map((a) => `<i class="pc" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
+  // where several lead here, the one the reader came through is marked: the brief they stood in before the last move
+  const last = state.trail.at(-1);
+  const from = last && b.address === state.scope && list.length > 1 ? last.lane.focus : null;
+  const cells = shown.map((a) => `<i class="pc${from !== null && (within(from, a) || within(a, from)) ? " came" : ""}" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
   return `<span class="port ${side}">${side === "in" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}${cells}${side === "out" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}</span>`;
 }
 
@@ -1853,10 +1858,9 @@ function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   const S = state.scope;
   const root = brief(S)!;
-  // how the reader came here stands above the entry, the last few moves as cells, as the way down draws them
-  const came = state.trail.filter((h) => brief(h.to)).slice(-TRAIL_SHOWN);
-  const trail = came.length ? `<div class="ctrail" data-tip="how you came here">${came.map(hopCell).join("")}</div>` : "";
-  const entry = `<div class="cnode entry" ${hued(S)}>${trail}<div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
+  // the entry carries its ports like any node: what leads here stands at its left, borrowers first, and where there are
+  // several the one the reader actually came through is marked
+  const entry = `<div class="cnode entry" ${hued(S)}><div class="cline">${portHtml(root, "in")}<div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div>${portHtml(root, "out")}</div></div>`;
   ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
   if (fitted !== S) {
     fitCanvas();
@@ -2914,34 +2918,46 @@ function scrollToFocus(smooth: boolean): void {
 // applications refresh when pulled past their top. A pull that stops drains.
 
 /** How far a pull must go before it takes the reader up. */
-const PULL = 320;
+const PULL = 600;
+/** How long the lane must rest at its top, with no wheel, before an upward wheel counts as a pull rather than the tail of the scroll that brought it there. */
+const PULL_REST = 260;
 let pulled = 0;
+let lastWheel = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
 
-/** Takes a wheel at the lane: up at the top of a scope fills the gauge; anything else drains it. */
+/** Takes a wheel at the lane: up at the top of a scope, from a fresh gesture, fills the gauge; anything else lets it drain. */
 function pull(e: WheelEvent): void {
+  const now = performance.now();
+  const rested = now - lastWheel > PULL_REST;
+  lastWheel = now;
   clearTimeout(pullTimer);
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
+  // the momentum of the scroll that reached the top is not a pull: a pull begins after the lane has rested there
+  if (pulled === 0 && !rested) return;
   pulled = Math.min(PULL, pulled + -e.deltaY);
-  drawPull();
+  drawPull(false);
   if (pulled >= PULL) {
     pulled = 0;
-    drawPull();
+    drawPull(true);
     return popUp();
   }
-  pullTimer = setTimeout(drainPull, 500);
+  pullTimer = setTimeout(drainPull, 400);
 }
 
 function drainPull(): void {
+  if (pulled === 0) return;
   pulled = 0;
-  drawPull();
+  drawPull(true);
 }
 
-/** The gauge: a line over the top of the lane that fills from its middle out. */
-function drawPull(): void {
+/** The gauge: a line over the top of the lane that fills from its middle out, and eases back when it drains. */
+function drawPull(ease: boolean): void {
   const g = ui.pull;
-  g.hidden = pulled === 0;
+  g.classList.toggle("easing", ease);
   g.style.setProperty("--pull", (pulled / PULL).toFixed(3));
+  if (pulled > 0) g.hidden = false;
+  else if (ease) setTimeout(() => pulled === 0 && (g.hidden = true), 260);
+  else g.hidden = true;
 }
 
 /** Where the pointer last moved, and whether a scroll has come under it since. */
@@ -3557,7 +3573,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #header .notice { color: var(--lit); }
 /* the pull's gauge: a hairline over the prose that fills from its middle out as the reader pulls past the top */
 #pull { position: absolute; z-index: 5; height: 2px; pointer-events: none; }
-#pull i { position: absolute; top: 0; height: 2px; left: 50%; width: calc(var(--pull, 0) * 100%); transform: translateX(-50%); border-radius: 1px; background: var(--muted); transition: width .08s linear; }
+#pull i { position: absolute; top: 0; height: 2px; left: 50%; width: calc(var(--pull, 0) * 100%); transform: translateX(-50%); border-radius: 1px; background: var(--muted); }
+#pull.easing i { transition: width .25s ease-out; }
 /* the one tooltip: on the page's own ground, lifted by a soft shadow and the rim an image keeps, never under the pointer */
 #tip { position: fixed; z-index: 9; max-width: 320px; padding: 7px 10px 8px; border-radius: 8px; background: var(--ground); color: var(--muted); font-size: 12px; line-height: 1.35; box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 6px 20px rgb(0 0 0 / .12), 0 0 0 1px var(--rim); pointer-events: none; white-space: pre-line; }
 #tip .what { display: block; color: var(--faint); margin-bottom: 1px; }
@@ -3615,11 +3632,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-.ctrail { display: flex; justify-content: center; gap: 3px; margin-bottom: 6px; }
-.ctrail .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; }
-.ctrail .cell svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.ctrail .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
-.ctrail .cell:hover, .ctrail .cell.lit { color: var(--on); background: var(--wash); }
+/* the way the reader came through, where several lead to the entry */
+.pc.came { background: var(--on); box-shadow: 0 0 0 2px var(--ground), 0 0 0 3px var(--on); }
 .crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
