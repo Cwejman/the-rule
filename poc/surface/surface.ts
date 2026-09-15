@@ -2916,7 +2916,7 @@ function scrollToFocus(smooth: boolean): void {
 // applications refresh when pulled past their top. A pull that stops drains.
 
 /** How far a pull must go before it takes the reader up. */
-const PULL = 480;
+const PULL = 420;
 /** How much of a pull passes unseen, so the tail of a scroll that only just reached the top does not flash the gauge. */
 const PULL_DEAD = 0.15;
 let pulled = 0;
@@ -2930,8 +2930,8 @@ const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.del
 
 /**
  * Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything
- * else lets it drain. A trackpad's pull springs back a moment after the fingers stop, as a pull on a phone springs back
- * when they lift; a mouse wheel's notches come slower than that, so its pull is kept between notches.
+ * else lets it drain. A pull that stops springs back after a second of quiet, long enough for a second swipe to continue
+ * the first; a mouse wheel's notches come slower still, so its pull is kept longer between them.
  */
 function pull(e: WheelEvent): void {
   clearTimeout(pullTimer);
@@ -2943,7 +2943,8 @@ function pull(e: WheelEvent): void {
     drawPull(true);
     return popUp();
   }
-  pullTimer = setTimeout(drainPull, notched(e) ? 1500 : 300);
+  // a swipe with its momentum seldom reaches the whole pull, so the pull is held long enough for the next swipe to continue it
+  pullTimer = setTimeout(drainPull, notched(e) ? 1500 : 1000);
 }
 
 function drainPull(): void {

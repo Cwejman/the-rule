@@ -170,7 +170,7 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken up a level, as some applications refresh when pulled past their top.
 
-A pull that stops drains, so nothing happens by accident: on a trackpad it springs back a moment after the fingers stop, as a pull on a phone springs back when they lift, and a mouse wheel, told apart by its notches, keeps its pull between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical; a short dead zone keeps the tail of an ordinary scroll from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-where-only-the-lane-fits).
+A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical; a short dead zone keeps the tail of an ordinary scroll from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-where-only-the-lane-fits).
 
 *The author's ask of 2026-09-15; as built the same day.*
 
