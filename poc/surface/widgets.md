@@ -150,7 +150,7 @@ The first row sets the type: the zoom, the heading ratio, the line height and th
 
 Each switch is a setting's name and its few values, a row apiece. The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides). The reading line stands [at the middle or easing to the ends](lane.md#41-where-the-reading-line-stands). [The flick](lane.md#65-the-flick-a-trial) is on or off.
 
-The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure.
+The ahead answers for a brief that hides something, or always, for any highlighted brief with anything beneath it, so a reader may preview every level as they move. The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure.
 
 *Reasoned, the author's asks of 2026-09-13 and 2026-09-14.*
 

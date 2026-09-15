@@ -124,7 +124,7 @@ In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press wi
 
 The space bar folds or opens the brief in focus, and with shift held it folds the brief above, the parent of the focus, which takes the reader up to it. It acts when it is let go, so it can also be held: held a moment, it opens every brief in the scope, and with shift folds every brief in the scope to its face, and letting it go then does nothing more.
 
-The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
+The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right opens the scope one level less or one level more, as [the depth strip](canvas.md#32-scope-and-how-far-things-explode) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
 
 *Reasoned, the author's, 2026-09-13; the space bar acting on release and opening the scope when held, 2026-09-14.*
 

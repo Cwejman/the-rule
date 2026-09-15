@@ -863,6 +863,8 @@ type Settings = {
   line: "middle" | "ends";
   /** what a brief weighs in the figures that weigh: the cost of its text alone, or the experience of it, its images counted as the room they take */
   weight: "cost" | "experience";
+  /** what the ahead answers for: only a brief that hides something, or every highlighted brief with anything beneath it */
+  ahead: "hidden" | "always";
   flick: number;
   /** light, dark, or whichever the system is set to */
   theme: Theme;
@@ -884,6 +886,7 @@ const DEFAULTS: Settings = {
   canvas: 720,
   line: "ends",
   weight: "cost",
+  ahead: "hidden",
   flick: 1,
   theme: "system",
   headings: "serif",
@@ -1302,10 +1305,12 @@ function treeHtml(): string {
 
 let aheadRoot: string | null = null;
 
-/** What a brief hides at its grade: paragraphs beyond its face, and its level beneath, when either is out of the lane. */
+/** What a brief hides at its grade: paragraphs beyond its face, and its level beneath, when either is out of the lane; set to always, the ahead answers for any brief with anything beneath it. */
 const hides = (a: string): boolean => {
   const b = brief(a);
-  return b !== undefined && gradeOf(a) !== "whole" && (blocksOf(b).length > 1 || (level(a).length > 0 && !level(a).some((k) => inLane(k.address))));
+  if (!b) return false;
+  if (state.settings.ahead === "always") return blocksOf(b).length > 1 || level(a).length > 0;
+  return gradeOf(a) !== "whole" && (blocksOf(b).length > 1 || (level(a).length > 0 && !level(a).some((k) => inLane(k.address))));
 };
 
 /** The brief the ahead answers for: the pointed brief when it hides something, otherwise the focus; a cell inside the figure never re-roots it. */
@@ -1487,13 +1492,14 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
   { key: "prose", name: "prose", values: FACES },
   { key: "line", name: "reading line", values: ["middle", "ends"] },
   { key: "weight", name: "weight", values: ["cost", "experience"] },
+  { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
 ];
 
@@ -1529,6 +1535,7 @@ function loadSettings(): void {
   if (!FACES.includes(state.settings.prose)) state.settings.prose = DEFAULTS.prose;
   if (state.settings.line !== "middle" && state.settings.line !== "ends") state.settings.line = DEFAULTS.line;
   if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
+  if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
 }
 const saveSettings = (): void => void localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
 
@@ -3333,6 +3340,9 @@ function wire(): void {
     // the arrows move the focus and fold nothing: up and down along the lane, left to the parent, right into the level beneath
     if (e.key === "ArrowUp") (e.preventDefault(), step(-1));
     else if (e.key === "ArrowDown") (e.preventDefault(), step(1));
+    // shift with left and right opens the scope one level less or one level more, as the depth strip does
+    else if (e.key === "ArrowLeft" && e.shiftKey) (e.preventDefault(), openTo(Math.max(0, openDepth() - 1)));
+    else if (e.key === "ArrowRight" && e.shiftKey) (e.preventDefault(), openTo(Math.min(scopeDepth(), openDepth() + 1)));
     else if (e.key === "ArrowLeft") (e.preventDefault(), up());
     else if (e.key === "ArrowRight") (e.preventDefault(), down());
     // scoping: enter makes the focus the root of the lane, shift and enter widens by a level
