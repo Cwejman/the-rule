@@ -82,7 +82,7 @@ async function clientScript(): Promise<string> {
     if (a < 0 || b < 0 || b < a) throw new Error(`cannot slice ${from} to ${to} out of this file`);
     return src.slice(a, b);
   };
-  const ts = `${between("## 2\\.1", "## 2\\.2")}\n${between("# 3\\.", "## 3\\.15")}`;
+  const ts = `${between("## 2\\.1", "## 2\\.2")}\n${between("# 3\\.", "## 3\\.16")}`;
   const js = new Bun.Transpiler({ loader: "ts", target: "browser" }).transformSync(ts);
   if (js.includes("</script")) throw new Error("the client script would close its own tag");
   return js;
@@ -1767,7 +1767,159 @@ function plateSvg(W: number, H: number): string {
   return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}${centre}${labels.join("")}</svg>`;
 }
 
-// ## 3.11 Drawing, and drawing again
+// ## 3.11 The canvas: the scope as nodes
+//
+// The scope's root stands at the top as the entry, and its level beneath it as
+// a column, each brief a node. Folded, a node is its row, with marks for what
+// it hides. Whole, its row opens a zone beneath it holding its level as a
+// column again, or as a row of columns when the level is a set. The nodes are
+// HTML laid out by the browser; one SVG over them draws the arrows from each
+// step to the next once the nodes are measured; and pan and zoom are one
+// transform on the stage, kept in the browser like the lane.
+
+type View = { x: number; y: number; k: number };
+const view: View = { x: 24, y: 24, k: 1 };
+/** The scope the canvas was last fitted to, so a change of scope fits again and a fold does not. */
+let fitted: string | null = null;
+let followed = "";
+
+const canvasOn = (): boolean => !ui.canvas.hidden;
+const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
+
+/** One node: its row, and beneath it its zone when it is whole and has a level. */
+function canvasNodeHtml(b: Brief): string {
+  const whole = gradeOf(b.address) === "whole";
+  const kids = level(b.address);
+  const rest = blocksOf(b).slice(1);
+  const beneath = beneathCount(b.address);
+  const on = prefixesOf(state.focus).includes(b.address);
+  // a folded node says what it hides: a bar per paragraph, a frame per image, and a tail as long as its level is heavy
+  const tail = beneath ? Math.round(Math.min(64, 8 + Math.log2(1 + (state.index!.branch.get(b.address) ?? 0) / 400) * 10)) : 0;
+  const marks =
+    !whole && (rest.length || beneath)
+      ? `<span class="marks">${rest.slice(0, 8).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`
+      : "";
+  const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
+  const borrowed = home ? `<span class="borrowed" data-a="${esc(home.address)}" data-tip="borrows ${esc(home.title || state.body!.title)}">${icon("links")}</span>` : "";
+  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${borrowed}</div>`;
+  const zone = whole && kids.length ? `<div class="czone${b.set ? " set" : ""}" data-fold="${esc(b.address)}">${kids.map(canvasNodeHtml).join("")}</div>` : "";
+  return `<div class="cnode" ${hued(b.address)}>${row}${zone}</div>`;
+}
+
+/** Draws the canvas whole from the state: the entry, the column beneath it, then the arrows; fits the view when the scope changed. */
+function drawCanvas(): void {
+  if (!canvasOn() || !state.body) return;
+  const S = state.scope;
+  const root = brief(S)!;
+  const entry = `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
+  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
+  if (fitted !== S) {
+    fitCanvas();
+    fitted = S;
+  }
+  applyView(false);
+  drawEdges();
+}
+
+/** The arrows: from the foot of each node to the head of the next, in every column that is a sequence, measured under the transform. */
+function drawEdges(): void {
+  const st = stage();
+  const svg = st?.querySelector<SVGSVGElement>("#edges");
+  if (!st || !svg) return;
+  const k = view.k;
+  const s0 = st.getBoundingClientRect();
+  const at = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    return { left: (r.left - s0.left) / k, top: (r.top - s0.top) / k, right: (r.right - s0.left) / k, bottom: (r.bottom - s0.top) / k };
+  };
+  const paths: string[] = [];
+  all<HTMLElement>(".ccol:not(.set), .czone:not(.set)", st).forEach((col) => {
+    const nodes = Array.from(col.children).filter((c) => c.classList.contains("cnode"));
+    nodes.slice(0, -1).forEach((n, i) => {
+      const a = at(n);
+      const row = nodes[i + 1].querySelector(".crow")!;
+      const b = at(row);
+      const x = (b.left + b.right) / 2;
+      const y1 = a.bottom + 1;
+      const y2 = b.top - 1;
+      if (y2 - y1 < 4) return;
+      paths.push(`<path d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 4).toFixed(1)}M${(x - 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}L${x.toFixed(1)} ${(y2 - 1).toFixed(1)}L${(x + 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}"/>`);
+    });
+  });
+  svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
+  svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
+  svg.innerHTML = paths.join("");
+}
+
+/** Applies the view to the stage, easing when asked. */
+function applyView(ease: boolean): void {
+  const st = stage();
+  if (!st) return;
+  st.classList.toggle("easing", ease);
+  st.style.transform = `translate(${view.x.toFixed(1)}px, ${view.y.toFixed(1)}px) scale(${view.k.toFixed(3)})`;
+  rememberView();
+}
+
+/** Fits the scope to the canvas's width, never larger than life, and stands it at the top. */
+function fitCanvas(): void {
+  const st = stage();
+  if (!st) return;
+  const W = ui.canvas.clientWidth;
+  const w = st.scrollWidth || 1;
+  view.k = clamp((W - 48) / w, 0.4, 1);
+  view.x = Math.max(24, (W - w * view.k) / 2);
+  view.y = 24;
+}
+
+/** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
+function followFocus(): void {
+  const st = stage();
+  if (!st || followed === state.focus) return;
+  followed = state.focus;
+  const row = st.querySelector<HTMLElement>(`.crow[data-a="${cssEsc(state.focus)}"]`);
+  if (!row) return;
+  const c = ui.canvas.getBoundingClientRect();
+  const r = row.getBoundingClientRect();
+  const inside = r.top >= c.top + 24 && r.bottom <= c.bottom - 48 && r.left >= c.left && r.right <= c.right;
+  if (inside) return;
+  const s0 = st.getBoundingClientRect();
+  const y = (r.top - s0.top) / view.k;
+  view.y = Math.round(c.height / 3 - y * view.k);
+  if (r.left < c.left || r.right > c.right) view.x = Math.round(c.width / 2 - ((r.left - s0.left) / view.k + row.offsetWidth / 2) * view.k);
+  applyView(true);
+}
+
+/** Zooms about a point of the canvas, so what is under the pointer stays under it. */
+function zoomAt(px: number, py: number, factor: number): void {
+  const k = clamp(view.k * factor, 0.25, 2);
+  const c = ui.canvas.getBoundingClientRect();
+  const x = px - c.left;
+  const y = py - c.top;
+  view.x = x - (x - view.x) * (k / view.k);
+  view.y = y - (y - view.y) * (k / view.k);
+  view.k = k;
+  applyView(false);
+}
+
+const viewKey = (): string => `surface.view:${laneKey()}`;
+let viewTimer: ReturnType<typeof setTimeout> | undefined;
+function rememberView(): void {
+  clearTimeout(viewTimer);
+  viewTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(viewKey(), JSON.stringify({ ...view, scope: state.scope }));
+    } catch {}
+  }, 150);
+}
+/** The view as the reader left it for this scope, if any, so a reload keeps the canvas where it stood. */
+function recallView(): void {
+  try {
+    const kept = JSON.parse(localStorage.getItem(viewKey()) ?? "null");
+    if (kept && kept.scope === state.scope && typeof kept.k === "number") Object.assign(view, { x: kept.x, y: kept.y, k: kept.k }), (fitted = state.scope);
+  } catch {}
+}
+
+// ## 3.12 Drawing, and drawing again
 //
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
@@ -1906,6 +2058,7 @@ function drawLane(): void {
   ui.lane.innerHTML = laneHtml();
   alignEnds();
   drawAdjuncts();
+  drawCanvas();
   rememberLane();
 }
 
@@ -2085,10 +2238,11 @@ function focusUnderLine(): string {
 /** Marks the path and the focus wherever rows and articles stand, and moves the tree's line, without drawing again. */
 function drawFocusMarks(): void {
   const onPath = new Set(prefixesOf(state.focus));
-  all<HTMLElement>(".brief, .row", ui.areas).forEach((el) => {
+  all<HTMLElement>(".brief, .row, .crow", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
   });
+  if (canvasOn()) followFocus();
   all<HTMLElement>("svg.fig [data-a]", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
@@ -2257,7 +2411,7 @@ function drawAll(): void {
   light();
 }
 
-// ## 3.12 One brief lit, wherever it is drawn
+// ## 3.13 One brief lit, wherever it is drawn
 
 function light(): void {
   const a = state.pointed;
@@ -2286,7 +2440,7 @@ function point(a: string | null): void {
   drawWings("point");
 }
 
-// ## 3.12.1 One tooltip, beneath whatever the pointer rests on
+// ## 3.13.1 One tooltip, beneath whatever the pointer rests on
 //
 // A cell, an icon, a step of the way down, or a link when no gutter tells of it:
 // what it is, and for a brief where it stands, its path drawn as the way down
@@ -2352,7 +2506,7 @@ function hideTip(): void {
 /** A line in the header for what the reader is owed a word about: an address that did not resolve. */
 const notice = (text: string): void => void (ui.notice.textContent = text);
 
-// ## 3.13 Moving: pressing goes, a fold line folds, dragging scrubs, and the address follows the focus
+// ## 3.14 Moving: pressing goes, a fold line folds, dragging scrubs, and the address follows the focus
 
 /** The address after the hash: the focus, and after `?in=` the scope, when the lane is scoped. */
 const readHash = (): string => decodeURIComponent(location.hash.replace(/^#\/?/, "").split("?")[0]).replace(/\/+$/, "");
@@ -2727,6 +2881,10 @@ function wire(): void {
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
     if (t.closest("a[href]") || window.getSelection()?.toString()) return;
+    // on the canvas a row goes, and only the ground of a zone folds
+    const crow = t.closest<HTMLElement>(".crow");
+    if (crow) return void (state.scrubbing || crow.classList.contains("root") || goTo(crow.dataset.a!));
+    if (t.closest("#canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
     // the line of a borrowing brief follows to the home of what it borrows, as a link would
@@ -2766,13 +2924,15 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape"; el: HTMLElement; x: number; y: number; start: number; moved: boolean } | null = null;
+  let drag: { kind: "knob" | "shape" | "canvas"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
+    const cv = (e.target as HTMLElement).closest<HTMLElement>("#canvas");
     if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
+    else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
     if (drag) (e.target as Element).setPointerCapture?.(e.pointerId);
   });
   document.addEventListener("pointermove", (e) => {
@@ -2782,7 +2942,11 @@ function wire(): void {
     if (!drag.moved && Math.abs(dy) < 3) return;
     drag.moved = true;
     state.scrubbing = true;
-    if (drag.kind === "knob") {
+    if (drag.kind === "canvas") {
+      view.x = drag.vx! + (e.clientX - drag.x);
+      view.y = drag.vy! + (e.clientY - drag.y);
+      applyView(false);
+    } else if (drag.kind === "knob") {
       const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
       const v = clamp(drag.start - (dy / 150) * (k.max - k.min), k.min, k.max);
       state.settings[k.key] = Math.round(v / k.step) * k.step;
@@ -2821,13 +2985,36 @@ function wire(): void {
     (e) => {
       state.holding = null;
       const t = e.target as HTMLElement;
-      if (t.closest("#scroll") || t.closest("[data-knob]")) return;
+      if (t.closest("#scroll") || t.closest("[data-knob]") || t.closest("#canvas")) return;
       e.preventDefault();
       ui.scroll.scrollTop += e.deltaY;
       flick(e);
     },
     { passive: false },
   );
+
+  // over the canvas the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
+  ui.canvas.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      hideTip();
+      if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      view.x -= e.deltaX;
+      view.y -= e.deltaY;
+      applyView(false);
+    },
+    { passive: false },
+  );
+  // Safari sends a pinch as a gesture of its own, with the scale so far
+  let pinch = 1;
+  ui.canvas.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
+  ui.canvas.addEventListener("gesturechange", (e) => {
+    e.preventDefault();
+    const g = e as Event & { scale: number; clientX: number; clientY: number };
+    zoomAt(g.clientX, g.clientY, g.scale / pinch);
+    pinch = g.scale;
+  });
 
   // the flick: a small reversal of the scroll, down then up then down within a moment, cycles the brief in focus
   const legs: { t: number; d: number }[] = [];
@@ -2934,12 +3121,13 @@ function wire(): void {
     placeCrumb();
     alignEnds();
     drawAdjuncts();
+    drawCanvas();
     drawStrips();
     drawWingsAligned();
   });
 }
 
-// ## 3.14 Where the body comes from
+// ## 3.15 Where the body comes from
 //
 // Published, the body is inside the page and is read before the page is drawn
 // over. Live, it is asked of the process, and asked again whenever the change
@@ -2963,6 +3151,7 @@ function setBody(body: Body): void {
     const kept = recalledLane();
     history.replaceState(null, "", location.hash || "#/");
     state.scope = brief(readScope()) ? readScope() : "";
+    recallView();
     return kept ? resume(readHash(), kept) : arrive(readHash());
   }
   // the lane is drawn again from the new body, keeping the grades that still resolve and the scroll
@@ -3008,6 +3197,7 @@ async function start(): Promise<void> {
   document.fonts?.ready.then(() => {
     alignEnds();
     drawAdjuncts();
+    drawEdges();
     drawWings();
   });
   if (inlined === null) {
@@ -3024,7 +3214,7 @@ async function start(): Promise<void> {
 
 if (typeof document !== "undefined") start();
 
-// ## 3.15 The page's style
+// ## 3.16 The page's style
 //
 // Flat, as the design language asks: no boxes, hierarchy from type and rhythm,
 // ink only for a live fact. A serif for the prose and a sans for the chrome; the
@@ -3140,7 +3330,31 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
-#canvas { position: relative; overflow: hidden; min-width: 0; }
+#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; }
+#stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+#stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+#edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+#edges path { fill: none; stroke: var(--door); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+/* a level is a column of nodes; a set is a row of columns; a zone is a whole node's level, on a faint ground inside the column */
+.ccol, .czone { display: flex; flex-direction: column; gap: 16px; }
+.ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 20px; }
+.czone { margin: 8px 0 2px 20px; padding: 12px; border-radius: 10px; background: var(--wash); cursor: pointer; }
+.czone:hover { background: var(--veil); }
+.cnode { display: flex; flex-direction: column; }
+.crow { display: flex; align-items: baseline; gap: 6px; width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow .num { flex: none; font-size: 11px; color: var(--faint); }
+.crow .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crow.on .num { color: var(--on); }
+.crow.here { box-shadow: 0 0 0 1.5px var(--on); }
+.crow.lit, .crow:hover { box-shadow: 0 0 0 1.5px var(--lit); }
+.crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
+.crow.root:hover { box-shadow: none; }
+.crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+.crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
+.crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
+.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
+.crow .borrowed { flex: none; color: var(--door); }
+.crow .borrowed .icon { width: 11px; height: 11px; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }

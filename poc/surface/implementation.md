@@ -232,7 +232,15 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 *Measured, 2026-09-13: the gamut by hue and the contrast (APCA) were computed for every role. The highlight had asked 0.17 chroma where cyan holds 0.10, and now asks 0.12.*
 
-### 6.5 What the browser keeps
+### 6.5 The canvas is HTML under one transform
+
+The canvas draws the scope as nodes from the same state the lane draws, so folding on one is folding on the other. Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone nested inside its column, so no layout is computed by hand. One SVG over the nodes draws the arrows from each step to the next, measured after the nodes are laid and divided by the zoom, and drawn again only on a fold, a resize, or the fonts landing.
+
+Pan and zoom are one transform on the stage, which the browser composites without laying anything out again. The wheel pans, and a pinch, which arrives as a wheel with the control key or as Safari's own gesture, zooms about the pointer. A drag on the ground pans, a press on a row goes, and a press on a zone's ground folds its brief. A change of scope fits the stage to the canvas's width, never larger than life, and a focus that leaves the view is eased back into it. The view is kept in the browser with the lane, per scope.
+
+*In force, 2026-09-15, as built; the skeleton, before zones for borrows, ports and edges for links.*
+
+### 6.6 What the browser keeps
 
 Three things outlive a draw, and none of them is in the address, so that the address says only where a reader stands. The settings are kept in the browser's storage, once for every body.
 

@@ -136,8 +136,8 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 ## 8. What this leaves open
 
-Whether the canvas is a mode beside the lane or a figure grown to fill the page, and how the two share the areas. Which of the two ways of holding the prose is built first.
+Which of the two ways of holding the prose is built first; the drawer, the lane itself beside the canvas, is what stands, since [the middle holds both](framework.md#27-the-middle-holds-one-pane-or-two).
 
-How a jump edge and a port's edges are drawn without the lines the surface refuses. How the canvas is panned and zoomed, and whether it is HTML with the edges in an overlay, so the prose keeps its type. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
+How a jump edge and a port's edges are drawn without the lines the surface refuses. The canvas as built so far is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform): columns, zones, arrows, marks on folded nodes, pan and zoom; zones for borrows, rows for sets, ports and their edges wait. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
 
 *Open, 2026-09-15.*
