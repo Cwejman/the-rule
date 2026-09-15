@@ -3759,7 +3759,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .adj .gloss { display: block; color: var(--muted); }
 .adj.dim .gloss { color: var(--faint); }
 .adj.foot { border-left-color: transparent; border-right-color: transparent; }
-.adj.foot .name { display: inline; margin-right: 8px; }
+/* what points at a brief stands one name to a line, so the names never run together */
+.adj.foot .name { display: block; }
 .adj.foot .gloss { margin-bottom: 2px; }
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
 .pointers { width: 100%; max-width: 240px; display: flex; flex-direction: column; gap: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); }
