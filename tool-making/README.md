@@ -100,8 +100,10 @@ So it is not known whether this is a new dynamic in the substrate, or the existi
 
 *The author's, 2026-09-15.*
 
-## 4. What this leaves open
+## 4. What was settled, and what is left open
 
-Whether [the practice's rule of one mount per part](../poc/practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry) is what a child with several parents relaxes, and what an address becomes then. How the ratified level beneath and the words above become one, brief by brief, in discussion. And the title of the level beneath, which the check reads against the brief that mounts it and which only a review with the author may change.
+A child with several parents is [a borrow](../poc/practice.md#36-a-second-lone-link-borrows-and-the-first-place-is-the-home): a lone link last in a brief places a structure there, the first such place is its home, and every later one borrows it. Links in prose stay offers. A branch is a step whose level holds one brief per condition, each placing or borrowing its path, and the flow continues at the next step of the level above. Both are drawn by [the canvas](../poc/surface/canvas.md).
 
-*Open, 2026-09-15.*
+Left open: how the ratified level beneath and the words above become one, brief by brief, in discussion.
+
+*Settled in discussion 2026-09-15, the author's decisions, the borrow as a trial; the rest open.*

@@ -49,6 +49,10 @@ async function run(): Promise<void> {
     const body = await trace(root);
     console.log(`${body.briefs.length} briefs traced from ${body.root}`);
     body.warnings.forEach((w) => console.log("  " + w));
+    const borrows = body.briefs.filter((b) => b.borrow !== undefined);
+    if (borrows.length) console.log(`${borrows.length} borrow${borrows.length === 1 ? "" : "s"}:\n${borrows.map((b) => `  ${b.file} ${b.number} "${b.title}" borrows ${b.borrow || "the root"}`).join("\n")}`);
+    const sets = body.briefs.filter((b) => b.set);
+    if (sets.length) console.log(`${sets.length} level${sets.length === 1 ? "" : "s"} of letters: ${sets.map((b) => `${b.file} ${b.number || "·"}`).join(", ")}`);
     // faces past the practice's flag are listed apart from the warnings, since each is read and may be left with a reason
     const long = body.briefs.flatMap((b) => {
       const face = textOf(b.body.filter((t) => t.type !== "space").slice(0, 1)).length;
@@ -271,6 +275,10 @@ type Brief = {
   body: Tok[];
   /** whether a level stands beneath it, by subsections or by a mount */
   door: boolean;
+  /** set by the trace when the brief's level is a set of letters: no brief of it stands on another */
+  set?: boolean;
+  /** set by the trace when the brief's lone link names a level already placed elsewhere: the address of its home */
+  borrow?: string;
 };
 
 /** The body: every brief in reading order, and what the trace had to say. */
@@ -307,11 +315,20 @@ const textOf = (toks: Tok[] = []): string =>
     )
     .join("");
 
-/** The heading's number as written and its title without it. */
+/**
+ * The heading's number as written and its title without it. A segment is digits for a step, or letters for a brief of a
+ * set, 4.a; a lone letter counts only with its period, a., so a heading that begins with a word is never read as one.
+ */
 const splitHeading = (text: string): { written: string; title: string } => {
-  const m = /^(\d+(?:\.\d+)*)\.?\s+(.*)$/.exec(text.trim());
-  return m ? { written: m[1], title: m[2].trim() } : { written: "", title: text.trim() };
+  const m = /^(\d+(?:\.(?:\d+|[a-z]{1,2}))*\.?|[a-z]{1,2}\.)\s+(.*)$/.exec(text.trim());
+  return m ? { written: m[1].replace(/\.$/, ""), title: m[2].trim() } : { written: "", title: text.trim() };
 };
+
+/** The letter of a place in a set: a to z, then aa, as columns are lettered. */
+const letterOf = (i: number): string => (i >= 26 ? letterOf(Math.floor(i / 26) - 1) : "") + String.fromCharCode(97 + (i % 26));
+
+/** Whether a written number's last segment is a letter. */
+const isLettered = (written: string): boolean => /[a-z]+$/.test(written);
 
 /** The address one level up; the root's parent is the root. */
 const parentOf = (address: string): string => address.slice(0, Math.max(0, address.lastIndexOf("/")));
@@ -483,11 +500,18 @@ async function trace(rootArg: string): Promise<Body> {
   };
 
   /** Traces one file's sections under `owner`, in reading order, following each mount as it is met. */
-  const traceLevel = (sections: Section[], owner: Brief, abs: string, file: string, kind: string): void =>
+  const traceLevel = (sections: Section[], owner: Brief, abs: string, file: string, kind: string): void => {
+    // a level is a set when its headings carry letters; a level that mixes letters and numbers is read by its first
+    const heads = sections.map((s) => splitHeading(s.heading));
+    const marked = heads.filter((h) => h.written);
+    const set = marked.length > 0 && isLettered(marked[0].written);
+    if (marked.some((h) => isLettered(h.written) !== set)) warn(`${file}: the level under "${owner.title || "the title"}" mixes letters and numbers; read as ${set ? "a set" : "a sequence"}`);
+    if (set) owner.set = true;
     sections.forEach((s, i) => {
-      const { written, title } = splitHeading(s.heading);
+      const { written, title } = heads[i];
       // Numbers restart in every file, as the practice writes them: a mounted level counts from one.
-      const number = owner.number && owner.file === file ? `${owner.number}.${i + 1}` : `${i + 1}`;
+      const place = set ? letterOf(i) : `${i + 1}`;
+      const number = owner.number && owner.file === file ? `${owner.number}.${place}` : place;
       const address = addressFor(owner.address, title);
       if (!address.endsWith(slug(title))) warn(`${file}: another brief titled "${title}" in the same level; this one is addressed ${address}`);
       if (written && written !== number) warn(`${file}: "${title}" is numbered ${written} and stands at ${number}`);
@@ -498,14 +522,31 @@ async function trace(rootArg: string): Promise<Body> {
       traceLevel(s.children, brief, abs, file, kind);
       traceMount(brief, s.children.length > 0, abs, file);
     });
+  };
 
-  /** Follows a brief's mount, if it has one and may: the paragraph leaves the body and the file becomes the level. */
+  /**
+   * Follows a brief's mount, if it has one and may: the paragraph leaves the body and the file becomes the level. A lone
+   * link to a file already placed, or to a heading in one, borrows that level instead: the first place the reading met
+   * it is its home, and the borrowing brief only points there.
+   */
   const traceMount = (brief: Brief, hasSubsections: boolean, abs: string, file: string): void => {
     const m = mountOf(brief.body);
     if (!m) return;
     if (hasSubsections) return warn(`${file}: "${brief.title}" mounts ${m.href} and has subsections of its own; the mount is skipped`);
-    const target = entryOf(resolve(dirname(abs), m.href!));
+    const hash = m.href!.indexOf("#");
+    const path = hash < 0 ? m.href! : m.href!.slice(0, hash);
+    const anchor = hash < 0 ? "" : m.href!.slice(hash + 1);
+    const target = entryOf(path ? resolve(dirname(abs), path) : abs);
     if (!within(target)) return warn(`${file}: "${brief.title}" mounts ${m.href}, which lies above the root; the mount is skipped`);
+    const home = table.get(anchor ? `${target}#${anchor}` : target);
+    if (home !== undefined) {
+      if (home === brief.address) return warn(`${file}: "${brief.title}" borrows itself; the link is skipped`);
+      brief.body = withoutMount(brief.body);
+      brief.borrow = home;
+      brief.door = true;
+      return;
+    }
+    if (anchor) return warn(`${file}: "${brief.title}" borrows ${m.href}, which the reading has not met; the link is skipped`);
     brief.body = withoutMount(brief.body);
     const r = read(target);
     if ("fault" in r) return warn(`${rel(target)}: ${r.fault}`);
@@ -890,7 +931,10 @@ function indexBody(body: Body): Index {
     return branch.get(a)!;
   };
   body.briefs.forEach((b) => branchOf(b.address));
-  const pointers = body.briefs.flatMap((b) => linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [{ to: l.to, from: b.address }] : [])));
+  const pointers = body.briefs.flatMap((b) => [
+    ...linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [{ to: l.to, from: b.address }] : [])),
+    ...(b.borrow !== undefined ? [{ to: b.borrow, from: b.address }] : []),
+  ]);
   const backlinks = new Map(Array.from(Map.groupBy(pointers, (p) => p.to), ([to, ps]) => [to, new Set(ps.map((p) => p.from))]));
   const depth = Math.max(0, ...body.briefs.map((b) => depthOf(b.address)));
   return { by, children, own, branch, backlinks, depth };
@@ -1073,6 +1117,9 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       : "";
   // a whole brief folds from a line at its foot
   const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${CHEVRON}<span>fold</span></div>` : "";
+  // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
+  const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
+  const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
@@ -1080,7 +1127,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
     (first ? blocks([first]) : "") +
     more +
     `</div>` +
-    (g === "whole" ? blocks(rest) + less : "") +
+    (g === "whole" ? blocks(rest) + borrow + less : "") +
     `</article>`
   );
 }
@@ -2642,6 +2689,9 @@ function wire(): void {
     if (t.closest("a[href]") || window.getSelection()?.toString()) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
+    // the line of a borrowing brief follows to the home of what it borrows, as a link would
+    const borrowed = t.closest<HTMLElement>("[data-borrow]");
+    if (borrowed) return void follow(borrowed.dataset.borrow!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
       const area = pick.dataset.area as AreaName;
@@ -3085,6 +3135,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .act .bars i.image { width: 9px; height: 7px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .act .bars b { font-weight: calc(500 - var(--thin)); margin-left: 2px; }
 .act.less { margin-top: -6px; }
+.act.borrow { flex-wrap: wrap; gap: 6px; color: var(--muted); }
+.act.borrow .icon { width: 12px; height: 12px; flex: none; }
+.act.borrow .name { color: var(--ink); }
+.act.borrow:hover .name { color: var(--on); }
 .pointing .brief.here:not(.lit):not(.keep) { opacity: calc(1 - var(--dim)); }
 .brief.lit, .brief.keep { opacity: 1; }
 .head { position: relative; font-family: var(--head-face); display: flex; align-items: baseline; font-weight: calc(600 - var(--thin)); line-height: 1.2; letter-spacing: calc(-.012em * var(--head-tight)); margin: 0 0 .56em; transition: color .12s; }

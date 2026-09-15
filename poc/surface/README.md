@@ -30,7 +30,7 @@ What it finds there it does not interpret. What counts as a brief, and what nest
 
 A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.
 
-*Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#11-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
+*Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
 
 [the level beneath](lane.md)
 
@@ -88,7 +88,7 @@ What stands beside a brief in the left gutter. Commits and people belong there, 
 
 ## 9. What was tried and refused
 
-What the programs before this model reached for is kept beneath, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. That level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another.
+What the programs before this model reached for is kept beneath, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. That level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another, and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
 
 Two programs were built before this model. A reader and its nine briefs of specification were built in one sitting on 2026-09-11, before anything was specified first, each change made before the last had been used, and both were retired to git the next day. The first reading model was written on 2026-09-13 against a specification written first, a level to a pane, three abreast, and the author used it that day. Its trace of the body, the reading of the files that hands the page its briefs, and its figures carry into this model; its reading model does not.
 

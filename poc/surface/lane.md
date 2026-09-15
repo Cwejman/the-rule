@@ -22,7 +22,7 @@ A brief never folds past its face, so nothing in the lane is ever a bare name, a
 
 Org-mode has cycled a heading between folded, children and whole for twenty years, so folding at a heading is a gesture readers already hold. The face is what it lacks, and it is the code's own unit; the bare heading is what this model leaves out.
 
-*Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third grade, the heading alone](refused.md#17-folding-to-the-heading-alone), was built and refused the same day.*
+*Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third grade, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 
 ## 3. One step ahead
 
@@ -66,7 +66,7 @@ The moment the lane scrolls, the highlight swings back to the reading line and w
 
 The brief highlighted stands at full ink and every other brief stands one step dimmer, so the reader sees what a fold will act on. The step is the dim setting.
 
-*Reasoned, the author's, 2026-09-13; [a fade by distance from the focus](refused.md#16-a-fade-by-distance-from-the-focus) was built first and refused.*
+*Reasoned, the author's, 2026-09-13; [a fade by distance from the focus](refused.md#p-a-fade-by-distance-from-the-focus) was built first and refused.*
 
 ### 4.5 A fade at the edges
 
@@ -110,7 +110,7 @@ A folded brief carries a line beneath its face that says open, with a small bar 
 
 The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line, and no key acts on it either, so nothing about it can ever change under the reader.
 
-*Reasoned, the author's, 2026-09-13; [a mark beside the heading](refused.md#18-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#20-a-tinted-surface-as-the-fold) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused.*
 
 ### 6.2 The same act wherever the brief is drawn
 

@@ -50,7 +50,7 @@ A cell in any figure, a step or a cell of the way down, an icon on a strip, and 
 
 It is one element on the page's own ground, placed beneath what is pointed at and never under the pointer, and it goes with any scroll or press. The ahead keeps naming its pointed cell beneath the figure as well.
 
-*Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#10-an-overlay-at-all) stays refused, and this tells only what is not in view.*
+*Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#j-an-overlay-at-all) stays refused, and this tells only what is not in view.*
 
 ## 2. The tree
 
@@ -60,7 +60,7 @@ Pressing a row's name goes to the brief. A line lies across the highlighted row 
 
 When the lane is [scoped](lane.md#7-scoping-the-lane), the levels above stand as dim rows over the root, each a way out.
 
-*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#15-the-path-as-columns-of-siblings-stacked) and [a tree with an opening of its own](refused.md#21-a-tree-with-an-opening-of-its-own) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an opening of its own](refused.md#u-a-tree-with-an-opening-of-its-own) were built first and refused.*
 
 ## 3. The shape
 
@@ -102,7 +102,7 @@ Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows wha
 
 The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on.
 
-*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#19-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view.*
+*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view.*
 
 ### 4.1 It draws in the shape's form
 
@@ -118,7 +118,7 @@ Where what it draws is too large for its paragraphs to stay legible it steps dow
 
 First, one block per brief, its own size, with every brief still in place. Where that still does not fit, the deepest level is dropped and the brief that held it carries a grey tail as long as the dropped level is heavy, [as the shape marks a fold](#31-a-folded-brief-tells-what-it-hides), until what is left fits. The caption says which step it stands on.
 
-*Reasoned, the author's, 2026-09-13; [a step that merged a whole level into one block](refused.md#22-a-level-merged-into-one-block) was refused.*
+*Reasoned, the author's, 2026-09-13; [a step that merged a whole level into one block](refused.md#v-a-level-merged-into-one-block) was refused.*
 
 ## 5. Links
 
@@ -126,7 +126,7 @@ Links is the right [gutter's](framework.md#2-the-areas) first widget. Beside eac
 
 The link itself is underlined in its target's branch hue, so the colour says where a link leads before it is pointed at. At the brief's foot it tells what points at the brief. Pointing at any of them lights the target wherever it is drawn, and pressing goes.
 
-This is what lets looking be free without [an overlay](refused.md#10-an-overlay-at-all). Everything an overlay told about a link now stands beside the link, and everything it told about a brief stands in the lane or in the wings.
+This is what lets looking be free without [an overlay](refused.md#j-an-overlay-at-all). Everything an overlay told about a link now stands beside the link, and everything it told about a brief stands in the lane or in the wings.
 
 When the width [squeezes the gutters out](framework.md#25-giving-way), the same adjuncts are carried into the wing on the gutter's side, stacked under the name of the brief in focus, beneath the one figure the wing holds; a wing holding two carries nothing, and the strip offers the figure while the gutter has no room.
 
@@ -136,7 +136,7 @@ When the width [squeezes the gutters out](framework.md#25-giving-way), the same 
 
 Settings is a wing widget that edits [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values.
 
-*Reasoned, the author's, 2026-09-13; [a dial](refused.md#23-a-dial) was built first and refused.*
+*Reasoned, the author's, 2026-09-13; [a dial](refused.md#w-a-dial) was built first and refused.*
 
 ### 6.1 The meters
 
@@ -170,7 +170,7 @@ The plate is a wing widget: the body whole in one square, drawn as droplets on a
 
 ### 7.1 Droplets meet without merging
 
-Each droplet is cut by its neighbours where they meet, so the plate is shared by what each brief [weighs](#62-the-switches), and a droplet stays compact however small it gets, where [a rectangle's cells degenerate](refused.md#6-a-rectangle-dividing-into-rectangles). Pressing a droplet goes there, and pressing with the modifier key held, command or control, folds or opens it in place, since a droplet has no room beside it for a second press.
+Each droplet is cut by its neighbours where they meet, so the plate is shared by what each brief [weighs](#62-the-switches), and a droplet stays compact however small it gets, where [a rectangle's cells degenerate](refused.md#f-a-rectangle-dividing-into-rectangles). Pressing a droplet goes there, and pressing with the modifier key held, command or control, folds or opens it in place, since a droplet has no room beside it for a second press.
 
 *Reasoned, the author's, 2026-09-12.*
 

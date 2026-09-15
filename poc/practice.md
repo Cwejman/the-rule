@@ -97,11 +97,29 @@ A file not under the code, one without [the stamp](#2-a-file-says-it-is-under-th
 
 *Preferred, the author's, 2026-09-12; whether orphans stay allowed is open.*
 
+### 3.6 A second lone link borrows, and the first place is the home
+
+A lone link last in a brief always says the same thing, that the structure stands here, and a file may be named that way from more than one brief.
+
+The first place the reading meets it is its home: that mount gives the level its one address and its one place in a linear reading, and every later lone link to it is a borrow, laid beneath the borrowing brief folded, so the prose is never read twice. Nothing is written to tell the two apart; the trace tells them apart by order, and the check says which is which.
+
+The ground offered is [the primitives' rule](../tool-making/primitives.md#21-shared-ground-rises-to-a-shared-level) that shared work rises to the level covering all who use it and is placed before what depends on it, so the home is where it is read first. The author is not sure that follows from the rule itself, and it is used for now to see.
+
+*A trial, the author's decision, 2026-09-15; not yet built in the trace, which still skips a second mount, and the doubt is the author's own.*
+
 ## 4. Headings carry numbers
 
 Headings are numbered, and the numbers nest with the headings: 1, then 1.1 and 1.2 inside it, then 1.1.1. The title is unnumbered. The numbers tell a reader where they are while scrolling, and give every brief a short address that can be spoken or written anywhere, and that a script can read and move by.
 
 *Preferred, the author's.*
+
+### 4.1 A level of letters is a set
+
+A number claims that a brief stands on the ones before it. Where no brief of a level stands on another, the headings carry letters in place of the last number, 4.a and 4.b under 4, or a. and b. at the top of a file, and the level is a set: each brief readable alone, in any order, and the parent standing on the set rather than on a chain.
+
+Letters say independence and nothing more. Prose is linear, so a set is still laid in some order, the most useful first, and the letter removes only the reader's right to infer dependence from that order. Where the order is merely not yet chosen the numbers stay, since the order is a claim to fix. What a reader makes of independence is the domain's: a flow reads a set under a step as alternatives, take one, and a body of knowledge reads it as something looked up rather than read through. Letters run out at z and continue as aa, as columns do.
+
+*A trial, the author's proposal of 2026-09-15, its meaning as independence found in discussion; the surface's refusals are the first level lettered.*
 
 ## 5. The face is declared by position
 
