@@ -2647,16 +2647,17 @@ function showTip(el: Element, html: string): void {
   let top: number;
   if (fig && wing) {
     const f = fig.getBoundingClientRect();
-    left = wing.dataset.area === "wingL" ? f.right + 12 : f.left - w - 12;
+    left = wing.dataset.area === "wingL" ? f.right + 8 : f.left - w - 8;
     top = level();
   } else if (el.closest("#canvas")) {
-    // past the row and its ports, as far as they actually reach, and no further
+    // past the row, its ports and the dashed edge of the zone it sits in, as far as they actually reach, and no further
     const line = el.closest(".cline");
     const row = line?.getBoundingClientRect() ?? r;
     const out = line?.querySelector(".port.out")?.getBoundingClientRect();
     const into = line?.querySelector(".port.in")?.getBoundingClientRect();
-    const right = Math.max(row.right, out?.right ?? 0) + 12;
-    const leftOf = Math.min(row.left, into?.left ?? Infinity) - w - 12;
+    const zone = line?.parentElement?.closest(".czone")?.getBoundingClientRect();
+    const right = Math.max(row.right, out?.right ?? 0, zone?.right ?? 0) + 12;
+    const leftOf = Math.min(row.left, into?.left ?? Infinity, zone?.left ?? Infinity) - w - 12;
     left = right + w <= innerWidth - 8 ? right : leftOf;
     top = level();
   } else {
