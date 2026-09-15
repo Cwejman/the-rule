@@ -1837,7 +1837,7 @@ function drawCanvas(): void {
   const S = state.scope;
   const root = brief(S)!;
   const entry = `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
-  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>${depthHtml()}`;
+  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
   if (fitted !== S) {
     fitCanvas();
     fitted = S;
@@ -1871,27 +1871,40 @@ function drawEdges(): void {
       paths.push(`<path d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 4).toFixed(1)}M${(x - 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}L${x.toFixed(1)} ${(y2 - 1).toFixed(1)}L${(x + 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}"/>`);
     });
   });
-  // the links of the highlighted node, to and from whatever of their targets stands on the canvas
-  const a = state.pointed ?? state.focus;
-  const row = st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(a)}"]`);
-  if (row) {
-    const r = at(row);
-    const curve = (x1: number, y1: number, x2: number, y2: number) => `<path class="link" d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + 40).toFixed(1)} ${y1.toFixed(1)},${(x2 - 40).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
-    const rowOf = (x: string) => st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(x)}"]`);
-    all<HTMLElement>(".port.out .pc[data-a]", row.parentElement!).forEach((c) => {
-      const t = rowOf(c.dataset.a!);
-      if (t && t !== row) {
+  // the links of the highlighted node leave its right side and arrive at the target's right side, as a bracket in the
+  // margin, and the target's cell for it lights; an in-cell pointed at draws its line on the left side instead, from
+  // the cell to the source's left. Lines never cross the nodes
+  all<HTMLElement>(".pc.tie", st).forEach((c) => c.classList.remove("tie"));
+  const rowOf = (x: string) => st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(x)}"]`);
+  const bracket = (x1: number, y1: number, x2: number, y2: number, dir: 1 | -1) => {
+    const d = dir * (44 + Math.abs(y2 - y1) * 0.12);
+    return `<path class="link" d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + d).toFixed(1)} ${y1.toFixed(1)},${(x2 + d).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
+  };
+  const mid = (q: { top: number; bottom: number }) => (q.top + q.bottom) / 2;
+  const hovIn = st.querySelector<HTMLElement>(".port.in .pc[data-a]:hover");
+  if (hovIn) {
+    const row = hovIn.closest(".cline")!.querySelector<HTMLElement>(".crow")!;
+    const from = rowOf(hovIn.dataset.a!);
+    if (from && from !== row) {
+      const r = at(row);
+      const q = at(from);
+      paths.push(bracket(r.left, mid(r), q.left, mid(q), -1));
+    }
+  } else {
+    const hovOut = st.querySelector<HTMLElement>(".port.out .pc[data-a]:hover");
+    const a = hovOut ? hovOut.closest(".cline")!.querySelector<HTMLElement>(".crow")!.dataset.a! : state.pointed ?? state.focus;
+    const row = rowOf(a);
+    if (row) {
+      const r = at(row);
+      const cells = hovOut ? [hovOut] : all<HTMLElement>(".port.out .pc[data-a]", row.parentElement!);
+      cells.forEach((c) => {
+        const t = rowOf(c.dataset.a!);
+        if (!t || t === row) return;
         const q = at(t);
-        paths.push(curve(r.right, (r.top + r.bottom) / 2, q.left, (q.top + q.bottom) / 2));
-      }
-    });
-    all<HTMLElement>(".port.in .pc[data-a]", row.parentElement!).forEach((c) => {
-      const f = rowOf(c.dataset.a!);
-      if (f && f !== row) {
-        const q = at(f);
-        paths.push(curve(q.right, (q.top + q.bottom) / 2, r.left, (r.top + r.bottom) / 2));
-      }
-    });
+        paths.push(bracket(r.right, mid(r), q.right, mid(q), 1));
+        t.parentElement!.querySelector(`.port.in .pc[data-a="${cssEsc(a)}"]`)?.classList.add("tie");
+      });
+    }
   }
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
@@ -1910,7 +1923,7 @@ function openDepth(): number {
   return d;
 }
 
-/** The depth strip: a cell per level beneath the scope, the open depth marked; pressing or scrubbing across sets it. */
+/** The depth strip, in the way down: a cell per level beneath the scope, the open depth marked; pressing or scrubbing across sets it, in the lane as on the canvas. */
 function depthHtml(): string {
   const n = scopeDepth();
   if (n === 0) return "";
@@ -1947,7 +1960,7 @@ function fitCanvas(): void {
   const w = st.scrollWidth || 1;
   view.k = clamp((W - 48) / w, 0.4, 1);
   view.x = Math.max(24, (W - w * view.k) / 2);
-  view.y = 24;
+  view.y = 56;
 }
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
@@ -1959,7 +1972,7 @@ function followFocus(): void {
   if (!row) return;
   const c = ui.canvas.getBoundingClientRect();
   const r = row.getBoundingClientRect();
-  const inside = r.top >= c.top + 24 && r.bottom <= c.bottom - 48 && r.left >= c.left && r.right <= c.right;
+  const inside = r.top >= c.top + 56 && r.bottom <= c.bottom - 48 && r.left >= c.left && r.right <= c.right;
   if (inside) return;
   const s0 = st.getBoundingClientRect();
   const y = (r.top - s0.top) / view.k;
@@ -2125,7 +2138,9 @@ function drawLayout(): void {
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
   ui.content.style.columnGap = `${s.gap}px`;
   ui.canvas.hidden = !on.canvas;
-  ui.scroll.hidden = !on.lane;
+  // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
+  ui.scroll.classList.toggle("off", !on.lane);
+  ui.scroll.style.width = on.lane ? "" : `${mid}px`;
   AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !on[name] || !takesRoom(name)));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
@@ -2249,7 +2264,8 @@ const said = (h: Hop): string => ({ go: "went to", in: "scoped into", out: "scop
 function drawCrumb(): void {
   const S = state.scope;
   const trail = state.trail.filter((h) => brief(h.to));
-  ui.crumb.hidden = S === "" && trail.length === 0;
+  const depth = depthHtml();
+  ui.crumb.hidden = S === "" && trail.length === 0 && depth === "";
   const place = prefixesOf(S)
     .map((a) => (a === S ? `<span class="step root" data-a="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>` : `<span class="step" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>`))
     .join(CHEVRON);
@@ -2257,16 +2273,24 @@ function drawCrumb(): void {
   const cut = trail.length - shown.length;
   const cell = (h: Hop) => `<span class="cell ${h.kind}" data-a="${esc(h.to)}" data-hop="${state.trail.indexOf(h)}" ${hued(h.to)}>${CELL[h.kind]}</span>`;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(cell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}</span>${way}`;
+  ui.crumb.innerHTML = `<span class="place">${place}</span>${depth}${way}`;
   placeCrumb();
 }
 
-/** The way down stands exactly as wide as the lane: the placement at its left edge, the trail against its right, so the cells keep their place as moves are added. */
+/** The panes of the middle that stand on the screen. */
+const panesShown = (): HTMLElement[] => [ui.canvas, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
+
+/**
+ * The way down spans the middle, whatever it holds: the placement at its left edge, the depth beside the trail against
+ * its right, so the cells keep their place as moves are added. With the lane alone it is as wide as the prose.
+ */
 function placeCrumb(): void {
-  const lane = ui.lane.getBoundingClientRect();
+  const rects = panesShown().map((el) => (el === ui.scroll ? ui.lane : el).getBoundingClientRect());
   const a0 = ui.areas.getBoundingClientRect();
-  ui.crumb.style.left = `${Math.round(lane.left - a0.left)}px`;
-  ui.crumb.style.width = `${Math.round(lane.width)}px`;
+  const left = Math.min(...rects.map((r) => r.left));
+  const right = Math.max(...rects.map((r) => r.right));
+  ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
+  ui.crumb.style.width = `${Math.round(right - left)}px`;
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   ui.scroll.style.setProperty("--rim-crumb", ui.crumb.hidden ? "0px" : `${ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`);
 }
@@ -2436,7 +2460,7 @@ function drawStrips(): void {
   const anchor = (name: AreaName, width: number): number => {
     // the middle's row is centred under whatever panes stand
     if (name === "middle") {
-      const shown = [ui.canvas, ui.scroll].filter((el) => !el.hidden).map((el) => el.getBoundingClientRect());
+      const shown = panesShown().map((el) => el.getBoundingClientRect());
       const left = Math.min(...shown.map((r) => r.left));
       const right = Math.max(...shown.map((r) => r.right));
       return (left + right) / 2 - width / 2;
@@ -3091,7 +3115,7 @@ function wire(): void {
     { passive: false },
   );
   // the depth strip scrubs: with the button held, crossing a cell sets that depth
-  ui.canvas.addEventListener("pointerover", (e) => {
+  ui.crumb.addEventListener("pointerover", (e) => {
     const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
     if (dc && e.buttons & 1) openTo(Number(dc.dataset.depth));
   });
@@ -3399,7 +3423,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #crumb .step.root.lit { color: var(--on); }
 #crumb .place, #crumb .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }
 /* how the reader came here stands spaced away from how here is placed, on the same line */
-#crumb .trail { flex: none; margin-left: auto; padding-left: 28px; gap: 3px; }
+#crumb .trail { flex: none; padding-left: 28px; gap: 3px; }
+#crumb .place { flex: 1 1 auto; }
 #crumb .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; transition: color .15s, background .15s; }
 #crumb .cell svg { width: 10px; height: 10px; opacity: 1; }
 #crumb .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
@@ -3419,44 +3444,44 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
-#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; }
+#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); }
 #stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
-#edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+#edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 #edges path { fill: none; stroke: var(--door); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 /* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
    dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
 .ccol, .czone { display: flex; flex-direction: column; gap: 16px; }
 .ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 56px; }
 .cnode { display: flex; flex-direction: column; align-items: stretch; }
-.cnode.open { border: 1.25px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
-.cnode.open:has(> .czone:hover) { border-color: var(--door); }
-.czone { padding: 14px 12px 12px; cursor: pointer; }
+/* the zone continues the parent row's own sides: the row squares its lower corners and the dashed edges begin exactly where its sides end */
+.czone { padding: 14px 12px 12px; cursor: pointer; border: 1px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
+.czone:hover { border-color: var(--door); }
+.cnode.open > .cline > .crow { border-radius: 6px 6px 0 0; }
 .czone.borrowed { padding-top: 8px; }
 .zlabel { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: var(--sans); font-size: 11px; color: var(--faint); margin-bottom: 2px; }
 .zlabel .icon { width: 11px; height: 11px; }
 .zlabel .name { color: var(--muted); }
 .cline { position: relative; display: flex; align-items: stretch; }
-.cnode.open > .cline { margin: 0 -1.25px; }
-.crow { flex: 1 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow { flex: 1 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
 .port.out { left: 100%; padding-left: 8px; }
 .pc { display: block; width: 8px; height: 8px; border-radius: 2px; background: var(--door); cursor: pointer; transition: background .15s; }
-.pc:hover, .pc.lit { background: var(--lit); }
+.pc:hover, .pc.lit, .pc.tie { background: var(--lit); }
 .pc.more { width: auto; height: auto; background: none; color: var(--faint); font-family: var(--sans); font-size: 10px; line-height: 1; cursor: default; }
 #edges path.link { stroke: var(--lit); stroke-dasharray: 3 3; }
-/* the depth strip stands in the canvas's top right corner, off the stage: a cell per level, the open ones marked */
-#depth { position: absolute; top: 10px; right: 12px; z-index: 2; display: flex; gap: 3px; font-family: var(--sans); font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
+/* the depth strip stands in the way down, before the trail: a cell per level, the open ones marked */
+#depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--rest); color: var(--ink); }
 #depth .dc:hover { background: var(--door); color: var(--ground); }
 .crow .num { flex: none; font-size: 11px; color: var(--faint); }
 .crow .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crow.on .num { color: var(--on); }
-.crow.here { box-shadow: 0 0 0 1.5px var(--on); }
-.crow.lit, .crow:hover { box-shadow: 0 0 0 1.5px var(--lit); }
+.crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
+.crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
 .crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
@@ -3471,6 +3496,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
   -webkit-mask-image: linear-gradient(to bottom, transparent max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))), black calc(max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))) + var(--edge) * var(--lift, 1)), black calc(100% - (var(--rim-foot) + var(--edge)) * var(--drop, 1)), transparent calc(100% - var(--rim-foot) * var(--drop, 1))); mask-image: linear-gradient(to bottom, transparent max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))), black calc(max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))) + var(--edge) * var(--lift, 1)), black calc(100% - (var(--rim-foot) + var(--edge)) * var(--drop, 1)), transparent calc(100% - var(--rim-foot) * var(--drop, 1))); }
 #scroll::-webkit-scrollbar { display: none; }
+#scroll.off { position: absolute; left: 0; top: 0; bottom: 0; visibility: hidden; pointer-events: none; }
 /* the room above and below the lane is set by the reading line's setting, each time the lane is laid */
 #content { position: relative; display: grid; margin: 0 auto; padding: 50vh 0; }
 .gutter { position: relative; }

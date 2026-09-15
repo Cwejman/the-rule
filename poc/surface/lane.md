@@ -168,7 +168,7 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 ### 7.4 The way down stands over the lane
 
-The way down stands over the lane, as wide as the prose and no wider, and carries two runs on one line: how here is placed, at the left edge, and how the reader came here, at the right.
+The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is opened, [the depth](canvas.md#32-scope-and-how-far-things-explode), which moves the lane and the canvas alike; and how the reader came here, at the right.
 
 How here is placed is the run of levels from the root to the scope. The levels above stand as faint names, each a press that scopes out to it, the scope root a step darker, and a small chevron between, each name lit in its branch's colour when pointed at. The prose is always clear beneath it, whatever the fade at the top is doing, and a wing's figures begin below it too.
 

@@ -40,7 +40,7 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels open, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
 
-As built, a strip in the canvas's corner holds a cell per level beneath the scope, the open ones marked, and a press or a scrub across it opens the scope to that depth and folds beyond, in the lane as on the canvas.
+As built, a strip in the way down holds a cell per level beneath the scope, the open ones marked, and a press or a scrub across it opens the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown.
 
 *The author's, 2026-09-15; the strip as built the same day.*
 
@@ -70,7 +70,7 @@ An unfolded step opens a zone inside the column, beneath its own line, holding t
  │
 ```
 
-A zone is held by dashed edges that come out of the parent row's own sides, at the author's suggestion once a first cut with a shifted, shaded zone had been seen, so the parent is seen to hold what stands under it and nothing shifts; pointing at its ground lights its edges, and pressing it folds the brief. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it. In use the canvas proved narrower than expected, since a flow that does not branch is a column.
+A zone is held by dashed edges that continue the parent row's own sides, the row squaring its lower corners where they begin, at the author's suggestion once a first cut with a shifted, shaded zone had been seen, so the parent is seen to hold what stands under it and nothing shifts; pointing at its ground lights its edges, and pressing it folds the brief. The canvas itself keeps an edge, the rim an image keeps, so it is not cut off unseen. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it. In use the canvas proved narrower than expected, since a flow that does not branch is a column.
 
 *The author's direction, 2026-09-15, from the session's drawing; the dashed edges the author's, the same day, on seeing the first cut.*
 
@@ -112,7 +112,7 @@ It costs one addition the practice must name: the trace reads the written headin
 
 Everything above the scope stands visible over the entry, in the hue of its branch, and needs no grouping beyond the hue. Where the reader explicitly came from is marked apart from the rest, as the trail marks it now.
 
-What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus, as dashed curves from its ports to whatever of their targets stands on the canvas. The trail over the entry is not yet drawn.
+What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus: a link leaves its right side and arrives at the target's right side, as a bracket in the margin, and the target's cell for it lights, so no line crosses a node; an in-cell pointed at draws its line on the left side instead. The trail over the entry is not yet drawn.
 
 *The author's question and the session's answer, 2026-09-15; the ports and their edges as built the same day, the trail owed.*
 
