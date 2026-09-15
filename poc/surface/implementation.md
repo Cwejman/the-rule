@@ -236,11 +236,13 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 The canvas draws the scope as nodes from the same state the lane draws, so folding on one is folding on the other.
 
-Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone nested inside its column, so no layout is computed by hand. One SVG over the nodes draws the arrows from each step to the next, measured after the nodes are laid and divided by the zoom, and drawn again only on a fold, a resize, or the fonts landing.
+Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone beneath its row, held by dashed edges that come out of the row's own sides, so no layout is computed by hand and nothing shifts. A borrowing node's zone is its home's level, named as such above it. One SVG over the nodes draws the arrows from each step to the next, and the links of the highlighted node as dashed curves from its ports to whatever of their targets stand on the canvas, measured after the nodes are laid and divided by the zoom, and drawn again on a fold, a resize, a change of focus or pointer, or the fonts landing.
+
+The ports stand outside the row, what points at the node to its left and what it points at to its right, a cell per brief in its hue, the rest collapsed into a count past five. The depth strip stands in the canvas's corner off the stage, a cell per level beneath the scope; a press or a scrub across it opens every brief of the scope to that depth and folds beyond, as one change the reader can undo.
 
 Pan and zoom are one transform on the stage, which the browser composites without laying anything out again. The wheel pans, and a pinch, which arrives as a wheel with the control key or as Safari's own gesture, zooms about the pointer. A drag on the ground pans, a press on a row goes, and a press on a zone's ground folds its brief. A change of scope fits the stage to the canvas's width, never larger than life, and a focus that leaves the view is eased back into it. The view is kept in the browser with the lane, per scope.
 
-*In force, 2026-09-15, as built; the skeleton, before zones for borrows, ports and edges for links.*
+*In force, 2026-09-15, as built.*
 
 ### 6.6 What the browser keeps
 

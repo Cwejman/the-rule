@@ -40,7 +40,9 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels open, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
 
-*The author's, 2026-09-15.*
+As built, a strip in the canvas's corner holds a cell per level beneath the scope, the open ones marked, and a press or a scrub across it opens the scope to that depth and folds beyond, in the lane as on the canvas.
+
+*The author's, 2026-09-15; the strip as built the same day.*
 
 ## 4. Down for sequence, across for choice
 
@@ -68,15 +70,15 @@ An unfolded step opens a zone inside the column, beneath its own line, holding t
  │
 ```
 
-A zone is drawn as a faint ground rather than a line, unless a dashed edge proves wanted, and pointing at its ground lights its brief. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it.
+A zone is held by dashed edges that come out of the parent row's own sides, at the author's suggestion once a first cut with a shifted, shaded zone had been seen, so the parent is seen to hold what stands under it and nothing shifts; pointing at its ground lights its edges, and pressing it folds the brief. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it. In use the canvas proved narrower than expected, since a flow that does not branch is a column.
 
-*The author's direction, 2026-09-15, from the session's drawing.*
+*The author's direction, 2026-09-15, from the session's drawing; the dashed edges the author's, the same day, on seeing the first cut.*
 
 ### 4.1 A folded node says how deep it is
 
-A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. The canvas is free to find its own form for that.
+A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. As built, a folded row carries a bar per paragraph, a frame per image, and a tail as long as its level is heavy.
 
-*The author's, 2026-09-15.*
+*The author's, 2026-09-15; the marks as built the same day.*
 
 ## 5. What the substrate gives the canvas
 
@@ -110,9 +112,9 @@ It costs one addition the practice must name: the trace reads the written headin
 
 Everything above the scope stands visible over the entry, in the hue of its branch, and needs no grouping beyond the hue. Where the reader explicitly came from is marked apart from the rest, as the trail marks it now.
 
-What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus, from its ports to whatever of their targets stands on the canvas.
+What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus, as dashed curves from its ports to whatever of their targets stands on the canvas. The trail over the entry is not yet drawn.
 
-*The author's question and the session's answer, 2026-09-15; open until drawn.*
+*The author's question and the session's answer, 2026-09-15; the ports and their edges as built the same day, the trail owed.*
 
 ## 7. The prose beside the nodes
 
@@ -138,6 +140,6 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 Which of the two ways of holding the prose is built first; the drawer, the lane itself beside the canvas, is what stands, since [the middle holds both](framework.md#27-the-middle-holds-one-pane-or-two).
 
-How a jump edge and a port's edges are drawn without the lines the surface refuses. The canvas as built so far is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform): columns, zones, arrows, marks on folded nodes, pan and zoom; zones for borrows, rows for sets, ports and their edges wait. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
+How a jump edge is told apart from an offer, since both are links in prose, and whether the trail is drawn over the entry. The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform); pull past the top waits, and so does the rim the rows carry, which the surface otherwise refuses and the author has not yet art directed. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
 
 *Open, 2026-09-15.*

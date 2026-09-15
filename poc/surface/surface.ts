@@ -962,6 +962,13 @@ const nearestInLane = (a: string): string => prefixesOf(a).findLast((p) => inLan
 /** How many briefs stand beneath an address, at any depth. */
 const beneathCount = (a: string): number => level(a).reduce((s, k) => s + 1 + beneathCount(k.address), 0);
 
+/** The level a brief opens onto: its own, or the one it borrows. */
+const levelOf = (b: Brief): Brief[] => level(b.borrow ?? b.address);
+/** How many briefs a brief opens onto, its own or borrowed. */
+const beneathOf = (b: Brief): number => beneathCount(b.borrow ?? b.address);
+/** Whether a brief can open at all: paragraphs past its face, or a level, its own or borrowed. */
+const opens = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
+
 const fmt = (n: number) => n.toLocaleString("en-US");
 const shownNumber = (b: Brief) => (b.number.includes(".") ? b.number : `${b.number}.`);
 const trim = (s: string, n: number): string => (n <= 0 ? "" : s.length <= n ? s : n < 4 ? "" : s.slice(0, n - 1).trimEnd() + "…");
@@ -1110,7 +1117,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const d = Math.min(4, depthIn(b.address));
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
-  const beneath = beneathCount(b.address);
+  const beneath = beneathOf(b);
   // a folded brief says beneath its face that it opens: a bar per paragraph it hides, a frame per image, and how many
   // briefs lie beneath
   const more =
@@ -1791,7 +1798,7 @@ function canvasNodeHtml(b: Brief): string {
   const whole = gradeOf(b.address) === "whole";
   const kids = level(b.address);
   const rest = blocksOf(b).slice(1);
-  const beneath = beneathCount(b.address);
+  const beneath = beneathOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
   // a folded node says what it hides: a bar per paragraph, a frame per image, and a tail as long as its level is heavy
   const tail = beneath ? Math.round(Math.min(64, 8 + Math.log2(1 + (state.index!.branch.get(b.address) ?? 0) / 400) * 10)) : 0;
@@ -1802,8 +1809,26 @@ function canvasNodeHtml(b: Brief): string {
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrowed = home ? `<span class="borrowed" data-a="${esc(home.address)}" data-tip="borrows ${esc(home.title || state.body!.title)}">${icon("links")}</span>` : "";
   const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${borrowed}</div>`;
-  const zone = whole && kids.length ? `<div class="czone${b.set ? " set" : ""}" data-fold="${esc(b.address)}">${kids.map(canvasNodeHtml).join("")}</div>` : "";
-  return `<div class="cnode" ${hued(b.address)}>${row}${zone}</div>`;
+  const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
+  // a borrowing node's zone is its home's level, named as such; a folded borrowed brief is drawn at its face
+  const zoneOf = home ? level(home.address) : kids;
+  const label = home && whole && zoneOf.length ? `<div class="zlabel">${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
+  const set = home ? home.set : b.set;
+  const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
+  return `<div class="cnode${zone ? " open" : ""}" ${hued(b.address)}>${line}${zone}</div>`;
+}
+
+/** How many cells a port shows before the rest collapse into a count. */
+const PORT_SHOWN = 5;
+
+/** A node's port: what points at it on the left, what it points at on the right, a cell per brief in its hue. */
+function portHtml(b: Brief, side: "in" | "out"): string {
+  const ix = state.index!;
+  const list = side === "in" ? Array.from(ix.backlinks.get(b.address) ?? []) : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
+  const shown = list.filter((a) => brief(a)).slice(0, list.length > PORT_SHOWN + 1 ? PORT_SHOWN : PORT_SHOWN + 1);
+  const more = list.length - shown.length;
+  const cells = shown.map((a) => `<i class="pc" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
+  return `<span class="port ${side}">${side === "in" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}${cells}${side === "out" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}</span>`;
 }
 
 /** Draws the canvas whole from the state: the entry, the column beneath it, then the arrows; fits the view when the scope changed. */
@@ -1812,7 +1837,7 @@ function drawCanvas(): void {
   const S = state.scope;
   const root = brief(S)!;
   const entry = `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div></div>`;
-  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
+  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>${depthHtml()}`;
   if (fitted !== S) {
     fitCanvas();
     fitted = S;
@@ -1846,9 +1871,63 @@ function drawEdges(): void {
       paths.push(`<path d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 4).toFixed(1)}M${(x - 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}L${x.toFixed(1)} ${(y2 - 1).toFixed(1)}L${(x + 3.5).toFixed(1)} ${(y2 - 5).toFixed(1)}"/>`);
     });
   });
+  // the links of the highlighted node, to and from whatever of their targets stands on the canvas
+  const a = state.pointed ?? state.focus;
+  const row = st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(a)}"]`);
+  if (row) {
+    const r = at(row);
+    const curve = (x1: number, y1: number, x2: number, y2: number) => `<path class="link" d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + 40).toFixed(1)} ${y1.toFixed(1)},${(x2 - 40).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
+    const rowOf = (x: string) => st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(x)}"]`);
+    all<HTMLElement>(".port.out .pc[data-a]", row.parentElement!).forEach((c) => {
+      const t = rowOf(c.dataset.a!);
+      if (t && t !== row) {
+        const q = at(t);
+        paths.push(curve(r.right, (r.top + r.bottom) / 2, q.left, (q.top + q.bottom) / 2));
+      }
+    });
+    all<HTMLElement>(".port.in .pc[data-a]", row.parentElement!).forEach((c) => {
+      const f = rowOf(c.dataset.a!);
+      if (f && f !== row) {
+        const q = at(f);
+        paths.push(curve(q.right, (q.top + q.bottom) / 2, r.left, (r.top + r.bottom) / 2));
+      }
+    });
+  }
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
   svg.innerHTML = paths.join("");
+}
+
+// ### 3.11.1 The depth: every brief in the scope opened to a depth, and folded beyond it
+
+/** The deepest level beneath the scope root, counted from it. */
+const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter((b) => within(b.address, state.scope)).map((b) => depthIn(b.address)));
+
+/** The depth the scope stands open to: the largest such that every brief with a level above it is whole. */
+function openDepth(): number {
+  let d = 0;
+  while (d < scopeDepth() && state.body!.briefs.every((b) => !within(b.address, state.scope) || depthIn(b.address) !== d || levelOf(b).length === 0 || gradeOf(b.address) === "whole")) d++;
+  return d;
+}
+
+/** The depth strip: a cell per level beneath the scope, the open depth marked; pressing or scrubbing across sets it. */
+function depthHtml(): string {
+  const n = scopeDepth();
+  if (n === 0) return "";
+  const open = openDepth();
+  return `<div id="depth" data-tip="how far the scope is opened">${Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= open ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("")}</div>`;
+}
+
+/** Opens every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
+function openTo(n: number): void {
+  const inScope = state.body!.briefs.filter((b) => b.address !== state.scope && within(b.address, state.scope));
+  refold(() => {
+    inScope.filter((b) => depthIn(b.address) === n && inLane(b.address)).forEach((b) => setGrade(b.address, "face"));
+    inScope
+      .filter((b) => depthIn(b.address) < n && opens(b))
+      .sort((x, y) => depthOf(x.address) - depthOf(y.address))
+      .forEach((b) => setGrade(b.address, "whole"));
+  });
 }
 
 /** Applies the view to the stage, easing when asked. */
@@ -2242,7 +2321,7 @@ function drawFocusMarks(): void {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
   });
-  if (canvasOn()) followFocus();
+  if (canvasOn()) (followFocus(), drawEdges());
   all<HTMLElement>("svg.fig [data-a]", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
@@ -2438,6 +2517,7 @@ function point(a: string | null): void {
   state.pointed = a;
   light();
   drawWings("point");
+  if (canvasOn()) drawEdges();
 }
 
 // ## 3.13.1 One tooltip, beneath whatever the pointer rests on
@@ -2447,7 +2527,7 @@ function point(a: string | null): void {
 // draws one. It comes a moment after the pointer rests, beneath the element and
 // never under the pointer, and goes with any scroll or press.
 
-const TIP_SEL = "[data-tip], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a]";
+const TIP_SEL = "[data-tip], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .pc[data-a], .crow[data-a]";
 let tipped: Element | null = null;
 let tipTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -2778,7 +2858,7 @@ function refold(change: () => void, anchor: string = state.focus, jump = false):
 /** A fold toggles one brief between its face and whole. Opening a brief not in the lane opens what leads to it. */
 function cycle(a: string): void {
   const b = brief(a);
-  if (a === "" || !b || (blocksOf(b).length <= 1 && level(a).length === 0)) return;
+  if (a === "" || !b || !opens(b)) return;
   // only a fold that takes away what stood under the reader moves them; opening, or folding elsewhere, never scrolls
   const jump = gradeOf(a) === "whole" && within(state.focus, a);
   refold(
@@ -2833,7 +2913,7 @@ const HOLD = 450;
 /** Space held: every brief in the scope opened whole, the heading in focus kept where it stands. */
 function openAll(): void {
   refold(() =>
-    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && (blocksOf(b).length > 1 || level(b.address).length > 0) && setGrade(b.address, "whole")),
+    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && opens(b) && setGrade(b.address, "whole")),
   );
 }
 
@@ -2884,6 +2964,10 @@ function wire(): void {
     // on the canvas a row goes, and only the ground of a zone folds
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) return void (state.scrubbing || crow.classList.contains("root") || goTo(crow.dataset.a!));
+    const pc = t.closest<HTMLElement>(".pc[data-a]");
+    if (pc) return void goTo(pc.dataset.a!);
+    const dc = t.closest<HTMLElement>("[data-depth]");
+    if (dc) return void openTo(Number(dc.dataset.depth));
     if (t.closest("#canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
@@ -2929,7 +3013,7 @@ function wire(): void {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
-    const cv = (e.target as HTMLElement).closest<HTMLElement>("#canvas");
+    const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
     if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
     else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
@@ -3006,6 +3090,11 @@ function wire(): void {
     },
     { passive: false },
   );
+  // the depth strip scrubs: with the button held, crossing a cell sets that depth
+  ui.canvas.addEventListener("pointerover", (e) => {
+    const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
+    if (dc && e.buttons & 1) openTo(Number(dc.dataset.depth));
+  });
   // Safari sends a pinch as a gesture of its own, with the scale so far
   let pinch = 1;
   ui.canvas.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
@@ -3335,13 +3424,34 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 #edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
 #edges path { fill: none; stroke: var(--door); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
-/* a level is a column of nodes; a set is a row of columns; a zone is a whole node's level, on a faint ground inside the column */
+/* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
+   dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
 .ccol, .czone { display: flex; flex-direction: column; gap: 16px; }
-.ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 20px; }
-.czone { margin: 8px 0 2px 20px; padding: 12px; border-radius: 10px; background: var(--wash); cursor: pointer; }
-.czone:hover { background: var(--veil); }
-.cnode { display: flex; flex-direction: column; }
-.crow { display: flex; align-items: baseline; gap: 6px; width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.ccol.set, .czone.set { flex-direction: row; align-items: flex-start; gap: 56px; }
+.cnode { display: flex; flex-direction: column; align-items: stretch; }
+.cnode.open { border: 1.25px dashed var(--track); border-top: 0; border-radius: 0 0 10px 10px; transition: border-color .15s; }
+.cnode.open:has(> .czone:hover) { border-color: var(--door); }
+.czone { padding: 14px 12px 12px; cursor: pointer; }
+.czone.borrowed { padding-top: 8px; }
+.zlabel { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: var(--sans); font-size: 11px; color: var(--faint); margin-bottom: 2px; }
+.zlabel .icon { width: 11px; height: 11px; }
+.zlabel .name { color: var(--muted); }
+.cline { position: relative; display: flex; align-items: stretch; }
+.cnode.open > .cline { margin: 0 -1.25px; }
+.crow { flex: 1 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 240px; padding: 5px 9px; border-radius: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+/* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
+.port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
+.port.in { right: 100%; padding-right: 8px; }
+.port.out { left: 100%; padding-left: 8px; }
+.pc { display: block; width: 8px; height: 8px; border-radius: 2px; background: var(--door); cursor: pointer; transition: background .15s; }
+.pc:hover, .pc.lit { background: var(--lit); }
+.pc.more { width: auto; height: auto; background: none; color: var(--faint); font-family: var(--sans); font-size: 10px; line-height: 1; cursor: default; }
+#edges path.link { stroke: var(--lit); stroke-dasharray: 3 3; }
+/* the depth strip stands in the canvas's top right corner, off the stage: a cell per level, the open ones marked */
+#depth { position: absolute; top: 10px; right: 12px; z-index: 2; display: flex; gap: 3px; font-family: var(--sans); font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
+#depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
+#depth .dc.on { background: var(--rest); color: var(--ink); }
+#depth .dc:hover { background: var(--door); color: var(--ground); }
 .crow .num { flex: none; font-size: 11px; color: var(--faint); }
 .crow .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crow.on .num { color: var(--on); }
