@@ -970,7 +970,8 @@ const beneathOf = (b: Brief): number => beneathCount(b.borrow ?? b.address);
 const opens = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
 
 const fmt = (n: number) => n.toLocaleString("en-US");
-const shownNumber = (b: Brief) => (b.number.includes(".") ? b.number : `${b.number}.`);
+/** The number a heading shows in the lane: counted from the scope, as the canvas counts, since a reader stands in the substrate and not in a file. */
+const shownNumber = (b: Brief): string => scopedNumber(b);
 const trim = (s: string, n: number): string => (n <= 0 ? "" : s.length <= n ? s : n < 4 ? "" : s.slice(0, n - 1).trimEnd() + "…");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
@@ -1876,11 +1877,12 @@ function drawEdges(): void {
       const a = at(n);
       const row = nodes[i + 1].querySelector(".crow")!;
       const b = at(row);
+      // flush with the node it leaves, short of the node it reaches, the head the end of its line
       const x = (b.left + b.right) / 2;
-      const y1 = a.bottom + 1;
-      const y2 = b.top - 1;
-      if (y2 - y1 < 4) return;
-      paths.push(`<path class="arrow" d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}M${(x - 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}L${(x + 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}"/>`);
+      const y1 = a.bottom;
+      const y2 = b.top - 4;
+      if (y2 - y1 < 6) return;
+      paths.push(`<path class="arrow" d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 3).toFixed(1)}M${(x - 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}L${(x + 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}"/>`);
     });
   });
   // the links of the highlighted node leave its right side and arrive at the target's right side, as a bracket in the
@@ -3491,7 +3493,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 /* an arrow is neutral, since a step's order says nothing of where it stands; a link line takes its target's hue */
 #edges path { fill: none; stroke: var(--faint); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
-#edges path.arrow { stroke: var(--faint); stroke-width: 1; opacity: .7; }
+#edges path.arrow { stroke: var(--rim); stroke-width: 1; stroke-linecap: butt; }
 /* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
    dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
 .ccol, .czone { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -3585,7 +3587,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .head.d2 { font-size: var(--h2); }
 .head.d3 { font-size: var(--h3); }
 .head.d4 { font-size: var(--h4); }
-.head .num { flex: 0 0 auto; margin-right: .5rem; font-family: var(--sans); font-size: var(--small); font-weight: calc(500 - var(--thin)); letter-spacing: 0; color: var(--faint); }
+.head .num { flex: 0 0 auto; margin-right: .4em; font-family: var(--sans); font-size: calc(.5em + 4px); font-weight: calc(500 - var(--thin)); letter-spacing: 0; color: var(--faint); }
 .head .title { flex: 1 1 auto; }
 .brief.lit .title { color: var(--on); }
 .brief.on .num { color: var(--on); font-weight: calc(600 - var(--thin)); }

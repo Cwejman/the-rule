@@ -42,7 +42,7 @@ A brief's address is the titles on its way down from the root, each written as a
 the-proof-of-concept/the-surface/reading-and-orientation-come-apart/following-a-link-moves-you
 ```
 
-The address alone gives a brief's parent and depth, and the list's order gives its place in its level, so the number a heading shows is derived when it is drawn and never stored.
+The address alone gives a brief's parent and depth, and the list's order gives its place in its level, so the number a heading shows is derived when it is drawn and never stored: counted from the scope root, in the lane as on the canvas, so the nesting reads from where the reader stands rather than from a file, which the reader never sees.
 
 Titles rather than positions, because a reader's history and a sent link hold addresses, and a position changes whenever a brief is inserted before it. A title path survives inserting, removing and reordering. It breaks on a rename or a move, as a file's anchor already does, and an address that no longer resolves falls back to its nearest ancestor that does, with the reader told.
 
