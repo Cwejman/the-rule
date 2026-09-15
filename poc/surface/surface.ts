@@ -1846,10 +1846,7 @@ function portHtml(b: Brief, side: "in" | "out"): string {
   const list = side === "in" ? [...backs.filter((a) => brief(a)?.borrow === b.address), ...backs.filter((a) => brief(a)?.borrow !== b.address)] : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
   const shown = list.filter((a) => brief(a)).slice(0, list.length > PORT_SHOWN + 1 ? PORT_SHOWN : PORT_SHOWN + 1);
   const more = list.length - shown.length;
-  // where several lead here, the one the reader came through is marked: the brief they stood in before the last move
-  const last = state.trail.at(-1);
-  const from = last && b.address === state.scope && list.length > 1 ? last.lane.focus : null;
-  const cells = shown.map((a) => `<i class="pc${from !== null && (within(from, a) || within(a, from)) ? " came" : ""}" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
+  const cells = shown.map((a) => `<i class="pc" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
   return `<span class="port ${side}">${side === "in" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}${cells}${side === "out" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}</span>`;
 }
 
@@ -1858,9 +1855,9 @@ function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   const S = state.scope;
   const root = brief(S)!;
-  // the entry carries its ports like any node: what leads here stands at its left, borrowers first, and where there are
-  // several the one the reader actually came through is marked
-  const entry = `<div class="cnode entry" ${hued(S)}><div class="cline">${portHtml(root, "in")}<div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title || state.body.title)}</span></div>${portHtml(root, "out")}</div></div>`;
+  // the entry is the scope's root, named at the top; at the root of the body there is nothing above the first brief, so
+  // the column simply begins with it
+  const entry = S ? `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title)}</span></div></div>` : "";
   ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
   if (fitted !== S) {
     fitCanvas();
@@ -3620,7 +3617,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .port.out { left: 100%; padding-left: 8px; }
 .pc { display: block; width: 8px; height: 8px; border-radius: 2px; background: var(--door); cursor: pointer; transition: background .15s; }
 .pc:hover, .pc.lit, .pc.tie { background: var(--lit); }
-.pc.more { width: auto; height: auto; background: none; color: var(--faint); font-family: var(--sans); font-size: 10px; line-height: 1; cursor: default; }
+.pc.more { width: auto; height: 8px; display: grid; align-items: center; background: none; color: var(--faint); font-family: var(--sans); font-size: 8.5px; line-height: 1; letter-spacing: -.02em; cursor: default; }
 #edges path.link { stroke: var(--lit); stroke-dasharray: 3 3; }
 /* the depth strip stands in the way down, before the trail: a cell per level, the open ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
@@ -3632,8 +3629,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-/* the way the reader came through, where several lead to the entry */
-.pc.came { background: var(--on); box-shadow: 0 0 0 2px var(--ground), 0 0 0 3px var(--on); }
 .crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
