@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="sketch" viewBox="0 0 600 292" width="600" height="292">
+<style id="sketch">
+svg.sketch { font-family: var(--sans, "Source Sans 3", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif); font-size: 13px; }
+svg.sketch text { fill: var(--ink, #141414); font-weight: calc(400 - var(--thin, 0)); }
+svg.sketch .note { font-size: 11px; }
+svg.sketch .strong { font-weight: calc(600 - var(--thin, 0)); }
+svg.sketch .ground { fill: var(--ground, #ffffff); }
+svg.sketch .stroke-ground { stroke: var(--ground, #ffffff); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-ink { stroke: var(--ink, #141414); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-muted { stroke: var(--muted, #6b6b6b); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-faint { stroke: var(--faint, #a8a8a8); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-wash { stroke: var(--wash, rgb(0 0 0 / .035)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-veil { stroke: var(--veil, rgb(0 0 0 / .05)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-track { stroke: var(--track, rgb(0 0 0 / .08)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-meter { stroke: var(--meter, oklch(62% 0.19 28)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-rim { stroke: var(--rim, rgb(0 0 0 / .08)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-rest { stroke: var(--rest, oklch(88% 0.045 var(--h, 60))); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-door { stroke: var(--door, oklch(74% 0.085 var(--h, 60))); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-on { stroke: var(--on, oklch(42% 0.072 var(--h, 60))); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-lit { stroke: var(--lit, oklch(60% 0.12 var(--h, 60))); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-glow { stroke: var(--glow, oklch(80% 0.08 var(--h, 60))); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-grey { stroke: var(--grey, oklch(90% 0 0)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .stroke-hub { stroke: var(--hub, oklch(92% 0.01 60)); fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+svg.sketch .fill-ground { fill: var(--ground, #ffffff); }
+svg.sketch .fill-ink { fill: var(--ink, #141414); }
+svg.sketch .fill-muted { fill: var(--muted, #6b6b6b); }
+svg.sketch .fill-faint { fill: var(--faint, #a8a8a8); }
+svg.sketch .fill-wash { fill: var(--wash, rgb(0 0 0 / .035)); }
+svg.sketch .fill-veil { fill: var(--veil, rgb(0 0 0 / .05)); }
+svg.sketch .fill-track { fill: var(--track, rgb(0 0 0 / .08)); }
+svg.sketch .fill-meter { fill: var(--meter, oklch(62% 0.19 28)); }
+svg.sketch .fill-rim { fill: var(--rim, rgb(0 0 0 / .08)); }
+svg.sketch .fill-rest { fill: var(--rest, oklch(88% 0.045 var(--h, 60))); }
+svg.sketch .fill-door { fill: var(--door, oklch(74% 0.085 var(--h, 60))); }
+svg.sketch .fill-on { fill: var(--on, oklch(42% 0.072 var(--h, 60))); }
+svg.sketch .fill-lit { fill: var(--lit, oklch(60% 0.12 var(--h, 60))); }
+svg.sketch .fill-glow { fill: var(--glow, oklch(80% 0.08 var(--h, 60))); }
+svg.sketch .fill-grey { fill: var(--grey, oklch(90% 0 0)); }
+svg.sketch .fill-hub { fill: var(--hub, oklch(92% 0.01 60)); }
+</style>
+<rect class="ground" width="600" height="292" rx="10"/>
+
+<!-- importance alone: the top comes whole, and its rest stands on parts not yet read -->
+<g transform="translate(80 28)">
+  <text class="strong" x="0" y="0">importance alone</text>
+  <text x="0" y="40">the top</text>
+  <rect class="fill-track" x="0" y="52" width="200" height="4" rx="2"/>
+  <rect class="fill-track" x="0" y="64" width="200" height="4" rx="2"/>
+  <rect class="fill-on" x="0" y="76" width="200" height="4" rx="2"/>
+  <rect class="fill-on" x="0" y="88" width="200" height="4" rx="2"/>
+  <rect class="fill-on" x="0" y="100" width="96" height="4" rx="2"/>
+  <rect class="fill-faint" x="0" y="124" width="64" height="8" rx="2"/>
+  <rect class="fill-track" x="0" y="140" width="200" height="4" rx="2"/>
+  <rect class="fill-track" x="0" y="152" width="108" height="4" rx="2"/>
+  <rect class="fill-faint" x="0" y="176" width="56" height="8" rx="2"/>
+  <rect class="fill-track" x="0" y="192" width="200" height="4" rx="2"/>
+  <rect class="fill-track" x="0" y="204" width="140" height="4" rx="2"/>
+  <path class="stroke-muted" d="M -4 88 C -24 88 -24 128 -8 128"/>
+  <path class="stroke-muted" d="M -11 124 L -7 128 L -11 132"/>
+  <path class="stroke-muted" d="M -4 88 C -44 88 -44 180 -8 180"/>
+  <path class="stroke-muted" d="M -11 176 L -7 180 L -11 184"/>
+</g>
+
+<!-- the gradient: the top gives what can be read now, and its rest goes beneath, after what it stands on -->
+<g transform="translate(364 28)">
+  <text class="strong" x="0" y="0">the gradient</text>
+  <text x="0" y="40">the top</text>
+  <rect class="fill-track" x="0" y="52" width="200" height="4" rx="2"/>
+  <rect class="fill-track" x="0" y="64" width="120" height="4" rx="2"/>
+  <rect class="fill-faint" x="16" y="88" width="64" height="8" rx="2"/>
+  <rect class="fill-track" x="16" y="104" width="184" height="4" rx="2"/>
+  <rect class="fill-track" x="16" y="116" width="96" height="4" rx="2"/>
+  <rect class="fill-faint" x="16" y="140" width="56" height="8" rx="2"/>
+  <rect class="fill-track" x="16" y="156" width="184" height="4" rx="2"/>
+  <rect class="fill-track" x="16" y="168" width="124" height="4" rx="2"/>
+  <text x="16" y="200">the rest</text>
+  <rect class="fill-on" x="16" y="212" width="184" height="4" rx="2"/>
+  <rect class="fill-on" x="16" y="224" width="184" height="4" rx="2"/>
+  <rect class="fill-on" x="16" y="236" width="80" height="4" rx="2"/>
+  <path class="stroke-muted" d="M 12 224 C -16 224 -16 144 8 144"/>
+  <path class="stroke-muted" d="M 5 140 L 9 144 L 5 148"/>
+  <path class="stroke-muted" d="M 12 224 C -36 224 -36 92 8 92"/>
+  <path class="stroke-muted" d="M 5 88 L 9 92 L 5 96"/>
+</g>
+</svg>

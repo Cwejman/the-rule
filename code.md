@@ -44,6 +44,9 @@ Reading is linear. A reader takes one thing after another, and prose can be laid
 
 The gradient is their balance: at every point, the biggest understanding that can be given in what the reader holds there, and beneath it what that understanding did not need. What everyone shares sits at the top, what fewer need sits deeper, and the same holds again at every depth. There is no set number of layers, only the next understanding under the last.
 
+![Two runs of prose side by side. The left, "importance alone", lays a part headed "the top" whose last three lines are coloured, then two more parts; arcs meaning "stands on" run from the coloured lines down to the two parts after them. The right, "the gradient", lays "the top" with only its first two lines, then shifted right beneath it the two other parts, and last a part headed "the rest" holding the three coloured lines, with arcs running from it back up to the two parts before it](.img/gradient-balance.svg)\
+The same knowledge in two orders. By importance alone the top comes all at once, and part of it stands on what the reader has not yet read. By the gradient the top gives the most that can be understood from what the reader holds, and the rest of it goes beneath, after what it stands on.
+
 Every part on the way down is a checkpoint. The reader has gained the most important understanding there was to gain by then, and stands whole. From there the choice is theirs: go on down this path, or go back up and take another. Stopping is never a loss.
 
 A win is understanding gained for the effort it cost. The effort is what the reading asks of the reader, and it begins before the reading does: a part that looks like too much is harder to understand, because comprehension follows the reader's confidence in it.
@@ -111,6 +114,9 @@ Beside every brief lie others at the same depth, and they come in an order. This
 At every level the briefs are laid in the order they stand on each other, each on the ones before it and never on the ones after. Beneath each lies what its level did not need.
 
 That is what a reader may skip, on one condition: the next brief on a level stands only on the briefs beside it, never on what is nested inside them. Where it must, it links there, since the reader was allowed to skip. Where that is frequent, the understanding was misplaced and belonged at this level.
+
+![A level of three headed briefs down the page. Beneath the first, two smaller briefs are shifted right and drawn paler, labelled "may be skipped". On the left, coloured arcs labelled "stands on" run from each brief of the level back to every brief of the level before it, passing the nested briefs by. In a line of the last brief a coloured stretch curves out on the right and into the second nested brief, labelled "link"](.img/holarchy-order.svg)\
+A level of three briefs, the first with two parts nested beneath it: each brief stands only on the briefs before it at its level, never on what is nested inside them, so a reader may skip the nested parts; where the last needs one of them, it links there.
 
 Nesting comes in three forms, and the order is met in each. A folder with its entry file: the entry is the brief, the files and folders beside it are its parts, and the entry's prose is what orders them, never the directories naming order listing. A document's headings: a heading with its paragraphs is the brief, its subheadings are its parts, and when the depth outgrows the headings a folder takes over. A paragraph with its bullets: the paragraph is the brief and each bullet a part, and this nests no further, since a bullet cannot be broken up and no link can reach it.
 
