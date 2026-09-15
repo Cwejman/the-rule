@@ -168,11 +168,13 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 ### 7.4 The way down stands over the lane
 
-The way down, the run of levels from the root to the scope, stands over the lane, level with the prose's left edge.
+The way down stands over the lane, as wide as the prose and no wider, and carries two runs on one line: how here is placed, at the left edge, and how the reader came here, at the right.
 
-The levels above stand as faint names, each a press that scopes out to it, the scope root a step darker, and a small chevron between, each name lit in its branch's colour when pointed at. The prose is always clear beneath it, whatever the fade at the top is doing, and a wing's figures begin below it too.
+How here is placed is the run of levels from the root to the scope. The levels above stand as faint names, each a press that scopes out to it, the scope root a step darker, and a small chevron between, each name lit in its branch's colour when pointed at. The prose is always clear beneath it, whatever the fade at the top is doing, and a wing's figures begin below it too.
 
-*Reasoned, the author's, 2026-09-14.*
+How the reader came here is the trail, against the lane's right edge on the same line, so its cells keep their place as moves are added at the right: a cell per move, oldest first. A going is a small block, a scoping a chevron down or up, [a link followed](#9-following-a-link-moves-you) the link glyph, each in the hue of where it went, and pointing at one says what it was. Folds and scrolls are not moves, and two moves that bring the lane back where it stood before the first, a scoping in and out again, are no journey, so both leave. Pressing a cell lays the lane back as it stood before that move and cuts the trail back to there; where the trail grows too long it is cut at its root, the oldest first. It stands only once a move has been made.
+
+*Reasoned, the author's, 2026-09-14; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day.*
 
 ## 8. A record is ordered by time
 
@@ -184,11 +186,15 @@ The lane lays a level as a reading: the brief that gives the most understanding 
 
 ## 9. Following a link moves you
 
-A link's target lies at a path of its own, so following it [lays the lane afresh](#5-arriving-lays-the-lane) at that address, and the way back is the browser's history or escape. That is a way back and not a good one, and it asks a reader to press before knowing where they will land.
+A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3-the-shape) already shows it, open or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
 
-What answers that is the gutter: a link's target is told beside the link, [in the links](widgets.md#5-links), so it is read about before it is taken.
+Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#74-the-way-down-stands-over-the-lane).
 
-*Reasoned, carried from the first model, 2026-09-13.*
+A target with no level beneath it cannot be a scope, so the lane scopes to its parent with the target in focus, and the way down always has a placement to show. Escape steps back a move as it undoes any change, and the trail is kept with the lane in the browser, so a reload keeps it.
+
+The reader is told where a link leads before they take it: its target stands beside the link, [in the links](widgets.md#5-links).
+
+*Reasoned, the author's, 2026-09-15: that a non-local link scopes, that a local one does not, and that the way down levels up to carry both how here is placed and how the reader came here. The first model laid every link afresh, 2026-09-13.*
 
 ## 10. Where only the lane fits
 

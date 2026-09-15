@@ -44,6 +44,14 @@ No widget repeats what is in view, and a mark is spent in proportion to how live
 
 *Reasoned, 2026-09-13.*
 
+### 1.6 One tooltip, beneath the pointer
+
+A cell in any figure, a step or a cell of the way down, an icon on a strip, and a link in the lane when no gutter tells of it, each says what it is a moment after the pointer rests on it: for a brief, its path drawn as the way down draws one, then its name, and for a link the opening words of its face.
+
+It is one element on the page's own ground, placed beneath what is pointed at and never under the pointer, and it goes with any scroll or press. The ahead keeps naming its pointed cell beneath the figure as well.
+
+*Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#10-an-overlay-at-all) stays refused, and this tells only what is not in view.*
+
 ## 2. The tree
 
 The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, open where the brief is whole. It is not a second state: folding a row folds the brief in the lane and opening one opens it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
@@ -100,7 +108,7 @@ The ahead is the right wing's first widget: what the highlighted brief hides. It
 
 It draws [as the shape draws](#3-the-shape), so a reader learns one figure and not two: first the brief itself with the paragraphs its face hides, then everything beneath it, each brief a heading bar and its paragraphs as blocks, shifted right by nesting. So opening a brief that is only more paragraphs is understood as exactly that, before it is pressed.
 
-No names are drawn in the cells; the cell under the pointer is named beneath the figure. The figure is only as large as what it draws needs, and it keeps its root while the pointer moves within it, so it does not redraw under the pointer. Pressing a cell goes there, which opens it.
+No names are drawn in the cells; the cell under the pointer is named beneath the figure, and above it the brief whose hidden part is drawn is named by its whole path, since the path is its address. The figure is only as large as what it draws needs, and it keeps its root while the pointer moves within it, so it does not redraw under the pointer. Pressing a cell goes there, which opens it.
 
 *Reasoned, the author's ask of 2026-09-13.*
 
@@ -114,11 +122,15 @@ First, one block per brief, its own size, with every brief still in place. Where
 
 ## 5. Links
 
-Links is the right [gutter's](framework.md#2-the-areas) first widget. Beside each link in a brief, on the link's own line, it tells the target: its title and the opening words of its face, or that it leads out of the body, or that the brief is not yet written. At the brief's foot it tells what points at the brief. Pointing at any of them lights the target wherever it is drawn, and pressing goes.
+Links is the right [gutter's](framework.md#2-the-areas) first widget. Beside each link in a brief, on the link's own line, it tells the target: where it stands, its whole path drawn as the way down draws one, then its title and the opening words of its face, or that it leads out of the body, or that the brief is not yet written.
+
+The link itself is underlined in its target's branch hue, so the colour says where a link leads before it is pointed at. At the brief's foot it tells what points at the brief. Pointing at any of them lights the target wherever it is drawn, and pressing goes.
 
 This is what lets looking be free without [an overlay](refused.md#10-an-overlay-at-all). Everything an overlay told about a link now stands beside the link, and everything it told about a brief stands in the lane or in the wings.
 
-*Reasoned, the author's, 2026-09-13.*
+When the width [squeezes the gutters out](framework.md#25-giving-way), the same adjuncts are carried into the wing on the gutter's side, stacked under the name of the brief in focus, beneath the one figure the wing holds; a wing holding two carries nothing, and the strip offers the figure while the gutter has no room.
+
+*Reasoned, the author's, 2026-09-13; the carry into the wing the author's ask of 2026-09-15.*
 
 ## 6. Settings
 
@@ -154,7 +166,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one square, drawn as droplets on a round plate. The root sits at the centre, its briefs are droplets around it, and each carries its own smaller droplets further out, level by level to the rim. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is grey at every depth.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#8-what-was-tried-and-refused).*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#9-what-was-tried-and-refused).*
 
 ### 7.1 Droplets meet without merging
 
