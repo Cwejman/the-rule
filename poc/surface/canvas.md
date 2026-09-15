@@ -138,8 +138,8 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 ## 8. What this leaves open
 
-Which of the two ways of holding the prose is built first; the drawer, the lane itself beside the canvas, is what stands, since [the middle holds both](framework.md#27-the-middle-holds-one-pane-or-two).
+How a jump edge is told apart from an offer, since both are links in prose. Which of several borrowers the reader came through, once the substrate holds a borrowed flow. Prose read in place in the nodes, the second way of holding it, since the drawer is what stands. The rim the rows carry, which the surface otherwise refuses, and the look of the canvas as a whole, which wait on the author's art direction with real material. And a touch reading, for the canvas as for the lane.
 
-How a jump edge is told apart from an offer, since both are links in prose, and whether the trail is drawn over the entry. The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform); the rim the rows carry, which the surface otherwise refuses, waits on the author's art direction. And whether [a level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) is decided.
+The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform), and [the level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) stands as a trial in the practice.
 
 *Open, 2026-09-15.*
