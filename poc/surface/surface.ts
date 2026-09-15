@@ -1832,7 +1832,8 @@ function canvasNodeHtml(b: Brief): string {
   const label = home && whole && zoneOf.length ? `<div class="zlabel">${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
   const set = home ? home.set : b.set;
   const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
-  return `<div class="cnode${zone ? " open" : ""}" ${hued(b.address)}>${line}${zone}</div>`;
+  // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
+  return `<div class="cnode${zone ? " open" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -2915,22 +2916,16 @@ function scrollToFocus(smooth: boolean): void {
 // applications refresh when pulled past their top. A pull that stops drains.
 
 /** How far a pull must go before it takes the reader up. */
-const PULL = 600;
-/** How long the lane must rest at its top, with no wheel, before an upward wheel counts as a pull rather than the tail of the scroll that brought it there. */
-const PULL_REST = 260;
+const PULL = 480;
+/** How much of a pull passes unseen, so the tail of a scroll that only just reached the top does not flash the gauge. */
+const PULL_DEAD = 0.15;
 let pulled = 0;
-let lastWheel = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
 
-/** Takes a wheel at the lane: up at the top of a scope, from a fresh gesture, fills the gauge; anything else lets it drain. */
+/** Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything else lets it drain. */
 function pull(e: WheelEvent): void {
-  const now = performance.now();
-  const rested = now - lastWheel > PULL_REST;
-  lastWheel = now;
   clearTimeout(pullTimer);
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
-  // the momentum of the scroll that reached the top is not a pull: a pull begins after the lane has rested there
-  if (pulled === 0 && !rested) return;
   pulled = Math.min(PULL, pulled + -e.deltaY);
   drawPull(false);
   if (pulled >= PULL) {
@@ -2938,7 +2933,7 @@ function pull(e: WheelEvent): void {
     drawPull(true);
     return popUp();
   }
-  pullTimer = setTimeout(drainPull, 400);
+  pullTimer = setTimeout(drainPull, 300);
 }
 
 function drainPull(): void {
@@ -2947,12 +2942,13 @@ function drainPull(): void {
   drawPull(true);
 }
 
-/** The gauge: a line over the top of the lane that fills from its middle out, and eases back when it drains. */
+/** The gauge: a line over the top of the lane that fills from its middle out past the dead zone, and eases back when it drains. */
 function drawPull(ease: boolean): void {
   const g = ui.pull;
+  const share = Math.max(0, (pulled / PULL - PULL_DEAD) / (1 - PULL_DEAD));
   g.classList.toggle("easing", ease);
-  g.style.setProperty("--pull", (pulled / PULL).toFixed(3));
-  if (pulled > 0) g.hidden = false;
+  g.style.setProperty("--pull", share.toFixed(3));
+  if (share > 0) g.hidden = false;
   else if (ease) setTimeout(() => pulled === 0 && (g.hidden = true), 260);
   else g.hidden = true;
 }
@@ -3610,7 +3606,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .zlabel .name { color: var(--muted); }
 .cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
 /* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
-.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 260px; padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: max(180px, calc(260px - 16px * var(--d, 0))); padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
