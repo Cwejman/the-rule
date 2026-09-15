@@ -2650,8 +2650,14 @@ function showTip(el: Element, html: string): void {
     left = wing.dataset.area === "wingL" ? f.right + 12 : f.left - w - 12;
     top = level();
   } else if (el.closest("#canvas")) {
-    const row = el.closest(".cline")?.getBoundingClientRect() ?? r;
-    left = row.right + 56 + w <= innerWidth - 8 ? row.right + 56 : row.left - w - 56;
+    // past the row and its ports, as far as they actually reach, and no further
+    const line = el.closest(".cline");
+    const row = line?.getBoundingClientRect() ?? r;
+    const out = line?.querySelector(".port.out")?.getBoundingClientRect();
+    const into = line?.querySelector(".port.in")?.getBoundingClientRect();
+    const right = Math.max(row.right, out?.right ?? 0) + 12;
+    const leftOf = Math.min(row.left, into?.left ?? Infinity) - w - 12;
+    left = right + w <= innerWidth - 8 ? right : leftOf;
     top = level();
   } else {
     left = r.left + r.width / 2 - w / 2;
