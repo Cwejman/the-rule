@@ -1961,6 +1961,12 @@ function applyView(ease: boolean): void {
   if (!st) return;
   st.classList.toggle("easing", ease);
   st.style.transform = `translate(${view.x.toFixed(1)}px, ${view.y.toFixed(1)}px) scale(${view.k.toFixed(3)})`;
+  // the type shrinks slower than the boxes, by the square root of the zoom, so names stay readable as the overview grows
+  const kz = (1 / Math.sqrt(view.k)).toFixed(3);
+  if (st.style.getPropertyValue("--kz") !== kz) {
+    st.style.setProperty("--kz", kz);
+    requestAnimationFrame(drawEdges);
+  }
   rememberView();
 }
 
@@ -2037,6 +2043,8 @@ const cssEsc = (s: string): string => s.replace(/["\\]/g, "\\$&");
 const GUTTER = 210;
 /** The room beneath a wing's figures that its strip stands in, above the space every area keeps. */
 const STRIP = 34;
+/** The room the foot keeps clear: the strip's icons with as much above them as below. */
+const FOOT = STRIP + 10;
 /** Where the prose's fade lies at each edge of the lane: clear from the edge to here, then fading in over the fade setting. */
 const RIM = { top: 3, foot: 6 };
 
@@ -2051,7 +2059,7 @@ const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hid
 function band(h: number): { top: number; height: number } {
   const s = state.settings;
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
-  const foot = Math.max(s.gap + STRIP, (h * (RIM.foot + s.fade / 2)) / 100);
+  const foot = Math.max(s.gap + STRIP, FOOT + (h * s.fade) / 2 / 100);
   return { top: Math.round(top), height: Math.max(0, Math.round(h - top - foot)) };
 }
 
@@ -2119,7 +2127,8 @@ function drawLayout(): void {
   root.setProperty("--dim", `${s.dim}`);
   root.setProperty("--edge", `${s.fade}%`);
   root.setProperty("--rim-top", `${RIM.top}%`);
-  root.setProperty("--rim-foot", `${RIM.foot}%`);
+  // the prose clears the foot by the strip's room, as it clears the way down at the top, so the two fades balance
+  root.setProperty("--rim-foot", `${FOOT}px`);
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
@@ -2300,7 +2309,7 @@ function placeCanvas(): void {
   const s = state.settings;
   const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
-  ui.canvas.style.marginBottom = `${STRIP}px`;
+  ui.canvas.style.marginBottom = `${FOOT}px`;
 }
 
 /**
@@ -3500,7 +3509,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .zlabel .name { color: var(--muted); }
 .cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
 /* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
-.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 19em; padding: .65em .9em; border-radius: .6em; font-family: var(--sans); font-size: calc(var(--body) * .8); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 260px; padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
@@ -3519,7 +3528,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.on .num { color: var(--on); }
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-.crow.root { width: auto; max-width: 24em; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
+.crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
