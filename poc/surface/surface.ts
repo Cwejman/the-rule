@@ -2921,6 +2921,9 @@ const PULL = 420;
 const PULL_DEAD = 0.15;
 let pulled = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
+/** The size of the last upward delta at the top, and whether a push has been felt: momentum only ever decays, a finger makes the deltas rise. */
+let lastMag = 0;
+let pushing = false;
 
 /**
  * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
@@ -2936,7 +2939,13 @@ const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.del
 function pull(e: WheelEvent): void {
   clearTimeout(pullTimer);
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
-  pulled = Math.min(PULL, pulled + -e.deltaY);
+  // the momentum of a scroll that reaches the top must never count: its deltas only decay, so the pull arms only once a
+  // delta at the top rises, which only a finger pushing, or a wheel's notch, does
+  const mag = -e.deltaY;
+  if (mag > lastMag + 0.5 || notched(e)) pushing = true;
+  lastMag = mag;
+  if (!pushing) return;
+  pulled = Math.min(PULL, pulled + mag);
   drawPull(false);
   if (pulled >= PULL) {
     pulled = 0;
@@ -2948,6 +2957,8 @@ function pull(e: WheelEvent): void {
 }
 
 function drainPull(): void {
+  pushing = false;
+  lastMag = 0;
   if (pulled === 0) return;
   pulled = 0;
   drawPull(true);
