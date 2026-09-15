@@ -1448,7 +1448,7 @@ function pointersHtml(): string {
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "measure" | "gap" | "dim" | "fade" | "canvas"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "measure" | "gap" | "dim" | "fade" | "canvas"; row: "type" | "page" | "canvas"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
@@ -1457,7 +1457,7 @@ const KNOBS: Knob[] = [
   { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
   { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
-  { key: "canvas", row: "page", name: "the canvas's greatest width", min: 360, max: 1600, step: 40, glyph: `<rect x="2.5" y="4" width="11" height="8" rx="1.5"/><path d="M5 8h6M6.5 6.5 5 8l1.5 1.5M9.5 6.5 11 8l-1.5 1.5"/>` },
+  { key: "canvas", row: "canvas", name: "the canvas's greatest width", min: 360, max: 1600, step: 40, glyph: `<rect x="2.5" y="4" width="11" height="8" rx="1.5"/><path d="M5 8h6M6.5 6.5 5 8l1.5 1.5M9.5 6.5 11 8l-1.5 1.5"/>` },
 ];
 
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
@@ -1483,7 +1483,7 @@ function settingsHtml(): string {
     `<span class="name">${w.name}</span><span class="values">${w.values
       .map((v, i) => `<button class="pick${s[w.key] === v ? " on" : ""}" data-set="${w.key}" data-value="${v}">${w.labels?.[i] ?? v}</button>`)
       .join("")}</span>`;
-  return `<div class="settings">${(["type", "page"] as const).map((r) => `<div class="knobs">${KNOBS.filter((k) => k.row === r).map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.map(row).join("")}</div></div>`;
+  return `<div class="settings">${(["type", "page", "canvas"] as const).map((r) => `<div class="knobs">${KNOBS.filter((k) => k.row === r).map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.map(row).join("")}</div></div>`;
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
