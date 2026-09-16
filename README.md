@@ -51,7 +51,17 @@ The rule has a repository of its own as a pragmatic first step. Projects needed 
 
 [the level beneath](repository.md)
 
-## 6. Toolmaking
+## 6. Second thoughts
+
+Where the author doubts what stands beneath this entry, the doubt is written at the root rather than at the level it is about. A large part of what stands here was written by sessions and has not been read or ratified by him, and a doubt filed deep in such a level is one that has disappeared.
+
+Two stand open now, both about folding: that nothing on the page folds what a reader has just read, and that some levels ought to be entered and read rather than unfolded for a preview.
+
+*The author's, 2026-09-16; open, and nothing beneath has been changed to answer them.*
+
+[the level beneath](second-thoughts.md)
+
+## 7. Toolmaking
 
 Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles. It began in a project that depends on the rule and is built here from 2026-09-15, since nothing in it is secret and what serves one project serves the others.
 

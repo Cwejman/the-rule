@@ -62,29 +62,27 @@ Even fitted, the figure and the acts on one line left neither room to read, so o
 
 ## 3. One chooser, in two grains
 
-The foot is not a second design. It is [the strip](framework.md#3-the-strip) in a second grain: wide, it is the row; narrow, the row folds into one round mark at the foot of the page, and pressing it opens the row as a wide pill beside it and presses again to close. One table, one set of states, one cycle, so a choice is never specified twice.
+The foot is not a second design. It is [the strip](framework.md#3-the-strip) in a second grain: wide, it is the row of every choice there is; narrow, it is a shorter row of the few that mean anything on a phone, and that row always stands. One table, one set of states, so a choice is never specified twice.
 
-The mark gets out of the way as a reader reads: it hides on a sustained scroll down and comes back on a scroll up. Sustained, not on any downward delta, since [the pull](lane.md#74-pull-past-the-top) already reads the scroll's direction at the top and the two must not fight.
+Nothing at the foot opens or closes. [A mark that opened the row as a pill](refused.md#y-a-mark-at-the-foot-that-opens-the-row) was built and refused: it put every choice two presses away, it hid the acts of what was chosen while it stood open, and the two shapes read as two different things.
 
-Where the pill can no longer hold what the row holds, the press may instead scatter the choices out from the mark, which then becomes the way to close them. That is a third grain, and it waits until the pill is actually full.
+The row gets out of the way as a reader reads: it hides on a sustained scroll down and comes back on a scroll up. Sustained, not on any downward delta, since [the pull](lane.md#74-pull-past-the-top) already reads the scroll's direction at the top and the two must not fight; and a scroll the page made itself, arriving somewhere or settling on a brief, is not the reader reading, so it neither hides the row nor counts towards hiding it.
 
-*The author's, 2026-09-16; as built the same day, the mark leaving after a hundred and forty of scrolling down and coming back after forty up. The scatter is held as a trial for later.*
+*The author's, 2026-09-16; as built the same day, the row leaving after a hundred and forty of scrolling down and coming back after forty up. That it should always stand is the author's, on reading the mark.*
 
 ### 3.1 The foot stands on a glass of its own
 
-The mark, the pill and the card are not the page's ground with ink on it. They stand on a glass: a muted surface over whatever the prose is doing beneath, blurred, with a light rim and a soft shadow. A translucent grey without it read as a fade rather than as a thing, and the page is white, so a white surface alone would not have separated either.
+The row and the card are not the page's ground with ink on it. They stand on a glass: a muted surface over whatever the prose is doing beneath, blurred, with a light rim and a soft shadow. A translucent grey without it read as a fade rather than as a thing, and the page is white, so a white surface alone would not have separated either.
 
-There are two of them, and the difference is meant. What a reader opened, the pill and the card, stands on the solid glass, since they are looking at it. The mark, which is there the whole time they read, stands sheerer and blurs less, since it is not what they came for.
+It is one glass and not two. A sheerer one for what stands there the whole time a reader reads, beside a solid one for what they opened, read as two different things standing side by side.
 
-It carries a mark of the page and what stands beside it, not three dots, since the dots said nothing of what a press would open.
+And it comes and goes rather than appearing: it eases away and back over four tenths of a second, lifting a little as it goes. A browser paints its own grey over what a finger taps and leaves it there while the press draws what comes next, so the page turns that off.
 
-And it comes and goes rather than appearing: it eases away and back over four tenths of a second, lifting a little as it goes.
-
-*The author's asks of 2026-09-16, on reading the first build on his phone: a surface with a border, blur and a light shadow, more expressive than three dots, and a coming and going that is not rigid.*
+*The author's asks of 2026-09-16, on reading each build on his phone: a surface with a border, blur and a light shadow; one glass rather than two; and no grey left behind by a tap.*
 
 ### 3.2 It stands over the prose, and keeps no room of its own
 
-Standing over the reading is the whole of what the mark is for, so the prose runs under it and [the fade at the foot](lane.md#45-a-fade-at-the-edges) is what keeps that readable. The room it was given to stand in was room taken from the reading, which on a phone is the thing there is least of.
+Standing over the reading is the whole of what the row is for, so the prose runs under it and [the fade at the foot](lane.md#45-a-fade-at-the-edges) is what keeps that readable. The room it was given to stand in was room taken from the reading, which on a phone is the thing there is least of.
 
 Wide this does not hold: the row spans the page, so it keeps its room and the prose ends above it.
 
@@ -92,7 +90,9 @@ Wide this does not hold: the row spans the page, so it keeps its room and the pr
 
 ## 4. What stands on a phone
 
-The chooser holds the prose, the canvas, the rail and the settings. Four, and [the help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
+The row holds three: the pane the reader is not in, which is one press to the other; the rail, while the prose stands; and the settings. [The help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
+
+Each is a press that does something at once, rather than a choice among choices. The rail leaves the row while the canvas stands or the settings are open, since it belongs to the prose.
 
 [The ahead](widgets.md#4-the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
 
@@ -100,7 +100,11 @@ The chooser holds the prose, the canvas, the rail and the settings. Four, and [t
 
 ### 4.1 A figure opens whole, and a going dismisses it
 
-A figure the phone holds opens whole over the reading, since there is no wing to stand it in: it takes the band the prose reads in, on the page's own ground, and the lane stays laid beneath it, since the rail and the reading line both measure it. Pressing its icon again dismisses it, and so does going to a brief from inside it, since the jump is what it was opened for.
+A figure the phone holds opens whole, since there is no wing to stand it in: it takes the page, top to bottom, on the page's own ground, with the row of choices standing over it.
+
+Standing in the band the prose read in left the prose showing above and below it, which read as something hanging over a reading the reader had left rather than as the mode it is. The lane stays laid beneath it all the same, since the rail and the reading line both measure it.
+
+Pressing its icon again dismisses it, and so does going to a brief from inside it, since the jump is what it was opened for.
 
 The settings are the one figure that stands that way now. The outline was built to it and taken out again, [beneath](#42-the-outline-and-the-radial-are-not-ready-for-a-finger).
 
@@ -118,7 +122,9 @@ What is wanted is not a bigger target but a different gesture, and the radial ha
 
 The middle holds one pane where the lane stands alone, so pressing a pane sets it rather than standing a second one beside it, and the pane standing cannot be taken away.
 
-*As built, 2026-09-16, from [the middle's rule](framework.md#27-the-middle-holds-one-pane-or-two) read at a width that holds one.*
+Coming back to the prose settles it at the brief the reader stands on. The lane is laid out of sight while they are away, so its scroll says nothing when it comes back, and without settling it the reader arrived at a place they had not chosen with nothing lit as the brief they had.
+
+*As built, 2026-09-16, from [the middle's rule](framework.md#27-the-middle-holds-one-pane-or-two) read at a width that holds one; the settling on the author's reading, who chose a brief on the canvas and came back to the prose to find it elsewhere and everything dim.*
 
 ### 4.4 The canvas takes the page whole
 
@@ -174,9 +180,11 @@ So the rail is its own drawing rather than the shape squeezed. A brief's blocks 
 
 What it does not give up is its marks. Beside a folded row they stand in whatever room that row has left, a tick per paragraph and the tail as long as the level beneath is heavy, and where a deep row leaves none, none are drawn. Without them the rail was rows and waste.
 
-What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
+The band that says what of the lane is on the screen stands the same clear of the rail's rows as of its edge, since it was pressed against the side of the page on one side and floating on the other.
 
-The rail stands at the left edge of the page and takes the space that stood there, so the lane gives it its room rather than the page growing one. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
+What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge the rail stands on, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
+
+The rail stands at whichever edge the reader put the shape on, and takes the space that stood there, so the lane gives it its room rather than the page growing one. The side is a press in [the foot's row](#3-one-chooser-in-two-grains), cycling left, right and away as the strip cycles a widget on a desk, since a reader scrubbing with the hand they have wants the rail under that hand and [the callout](#5-the-minimap-is-a-rail-not-a-mode) away from it; the reset's direction follows the side. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
 *The author's, 2026-09-16; the callout his, the marks his on reading a rail without them, and the narrowing his, from a rail nothing is ever aimed at. Measured as built the same day: the rail stands 74 on this body and leaves the lane 268 of a 390 screen, against 104 and 238 before it. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
 

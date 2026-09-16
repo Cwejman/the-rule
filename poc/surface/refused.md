@@ -149,3 +149,9 @@ The author found it ugly the same day. [The meter](widgets.md#61-the-meters) rep
 Five rows, one per area, each centred under the area it chose for, a closed gutter's row at the lane's edge, and a tight side's two rows joined past a thin divider.
 
 Surveyed across eighteen widths and seven configurations: the same seven figures were offered twice, once per wing; the foot was busiest when the reader had closed everything; the offer changed with leftover room and differed by side; below about 840 no row stood at all, so nothing could be reached; and the middle's row wandered up to 291 pixels off the prose it belonged to. [One row](framework.md#3-the-strip) has none of these, and the rules that placed the five go with them.
+
+## y. A mark at the foot that opens the row
+
+Where the lane stood alone, one round mark at the foot of the page, which a press opened as a wide pill of the choices and a second press closed.
+
+The author's verdict on reading it: every choice is two presses away, and while the pill stands open it hides [the acts of what was chosen](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it), which stand in the same place. A mark and a pill also read as two different things, one sheer and one solid. [One row that always stands](touch.md#3-one-chooser-in-two-grains), of the few choices a phone has, has none of that, and it is short enough to need no opening.
