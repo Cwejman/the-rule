@@ -1705,6 +1705,13 @@ function chooseNarrow(k: string): void {
       drawAll();
       return void settle(state.focus);
     }
+    // taking the canvas, it is fitted again: the view it was left at was measured under a way down that may have said
+    // something else then, and the entry would be drawn under it
+    if (taking && k === "canvas") {
+      drawAll();
+      fitCanvas();
+      return void applyView(false);
+    }
   } else if (k === "shape") {
     // the rail cycles through the sides as the strip does on a desk, since a reader scrubbing with the hand they have
     // wants the rail under that hand and the callout away from it
