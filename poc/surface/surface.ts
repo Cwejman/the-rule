@@ -3982,7 +3982,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .strip { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; pointer-events: auto; }
 .strip .group { display: flex; gap: 7px; }
 .strip .group + .group { margin-left: 20px; }
-.strip .pick { position: relative; width: 26px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); opacity: .2; transition: opacity .15s, color .15s; }
+.strip .pick { position: relative; width: 30px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); opacity: .2; transition: opacity .15s, color .15s; }
 /* the whole row lifts a little while the pointer is on it, so what cannot be had is still seen when a reader looks */
 .strip:hover .pick { opacity: .34; }
 .strip .pick.off, .strip .pick.off:hover { opacity: .1; cursor: default; }
@@ -3994,10 +3994,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .strip .pick.on:hover { color: var(--ink); }
 .strip .pick.fixed { cursor: default; }
 /* a widget in use says which side holds it, as a dot beside its icon, level with the middle of it so it balances the
-   round forms the icons are made of */
-.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .55; }
-.strip .pick.side-l::after { left: 2px; }
-.strip .pick.side-r::after { right: 2px; }
+   round forms the icons are made of. It is the icon's own ink, three pixels across and three clear of the glyph */
+.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+.strip .pick.side-l::after { left: 1px; }
+.strip .pick.side-r::after { right: 1px; }
 .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 
 .opening { margin-bottom: 40px; }
