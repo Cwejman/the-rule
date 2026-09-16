@@ -1205,6 +1205,9 @@ const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name
 function badgeHtml(id: string, a?: string, tight = false): string {
   const act = ACTIONS[id];
   if (!act) return "";
+  // a badge keeps its room when it cannot be taken so that no row shifts under the pointer; with no pointer there is
+  // nothing to shift under, and the room is wanted for the words, so a phone draws only what can be taken
+  if (touch && !act.can(a)) return "";
   // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
   if (touch)
@@ -1925,6 +1928,15 @@ const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4 };
 
 /** The width the shape stands in: its deepest possible row, whatever the lane is scoped to, with the marks beside it. */
 const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
+/**
+ * The rail: where the lane stands alone the shape keeps standing beside it, narrow, since it does not need much width
+ * to make itself clear. What it gives up at that width is the room for its marks and its tail, so it is its rows and
+ * nothing else; and the lane gives it its room, taking the edge's space for it.
+ */
+const RAIL = { least: 100, most: 140, lane: 200 };
+const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar, RAIL.least, RAIL.most);
+/** Whether the shape stands as the rail now, which is what takes its marks away. */
+const onRail = (): boolean => fits().rail > 0;
 /** The width the ahead stands in: its deepest possible row with its tail. */
 const aheadWidth = (): number => SHAPE.pad * 2 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + SHAPE.tail;
 
@@ -1960,6 +1972,9 @@ function shapeSvg(W: number, H: number): string {
   const total = Math.max(1, box.scrollHeight);
   const k = (H - 8) / total;
   const ix = state.index!;
+  // as the rail the shape gives up the room for its marks and its tail, so it is its rows and nothing else; and a
+  // finger cannot find a row six pixels tall, so the rail takes no presses either and answers a scrub instead
+  const rail = onRail();
   // the levels above the scope stand to the left of the opening's row, a tick per ancestor, outermost leftmost
   const anc = prefixesOf(state.scope).slice(0, -1);
   const L = anc.length ? anc.length * 8 + 4 : 0;
@@ -1985,7 +2000,7 @@ function shapeSvg(W: number, H: number): string {
     const t0 = x + SHAPE.bar + 4;
     let tx = t0;
     const ticks =
-      face && b
+      face && b && !rail
         ? beyond
             .map((t) => {
               const image = t.type === "image";
@@ -1998,7 +2013,7 @@ function shapeSvg(W: number, H: number): string {
         : "";
     tx += paras ? 2 : 0;
     const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, SHAPE.tail) : 0;
-    const tail = hidden > 0 && face ? `<rect class="hidden${ghost}" x="${tx}" y="${y}" width="${tailW.toFixed(1)}" height="${h}" rx="1"/>` : "";
+    const tail = hidden > 0 && face && !rail ? `<rect class="hidden${ghost}" x="${tx}" y="${y}" width="${tailW.toFixed(1)}" height="${h}" rx="1"/>` : "";
     const marksEnd = tx + tailW + (paras || hidden ? 8 : 0);
     // the opening's row carries the levels above to its left, each a press that scopes out to it
     const first = l.blocks[0];
@@ -2016,8 +2031,8 @@ function shapeSvg(W: number, H: number): string {
     const fh = (Math.max(1, l.height * k) + 2 * grow).toFixed(1);
     return (
       `<g class="cell${l.a === state.focus ? " here" : ""}" data-a="${esc(l.a)}" ${hued(l.a)}>` +
-      `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${SHAPE.bar + 5}" height="${height}"/>` +
-      (paras || hidden ? `<rect class="hit" data-press="fold" x="${x + SHAPE.bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - SHAPE.bar - 2)}" height="${fh}"/>` : "") +
+      (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${SHAPE.bar + 5}" height="${height}"/>`) +
+      (!rail && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + SHAPE.bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - SHAPE.bar - 2)}" height="${fh}"/>` : "") +
       `${bars}${ticks}${tail}</g>` +
       above
     );
@@ -2476,10 +2491,10 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * always allowed, since all it shows is its strip.
  */
 /** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number };
+type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0 };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0, rail: 0 };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
   // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
   const panes = panesHeld(held.middle);
@@ -2503,6 +2518,17 @@ function fitsWith(held: Held): Fit {
     if (each >= GUTTER.least) {
       on.gutter = each;
       wanted.forEach((a) => (on[a] = true));
+    }
+  }
+  // the exception at the end of the order of giving way: where every area has gone and the lane would stand alone, the
+  // shape keeps standing as a narrow rail, if the reader has asked for it and the lane is left room enough to read in
+  const stands = (a: AreaName) => on[a] && held[a].length > 0;
+  const asked = [...held.wingL, ...held.wingR].includes("shape");
+  if (on.lane && asked && !(["wingL", "wingR", "gutterL", "gutterR"] as AreaName[]).some(stands)) {
+    const w = railWidth();
+    if (ui.areas.clientWidth - w - 2 * s.gap >= RAIL.lane) {
+      on.rail = w;
+      on.wingL = true;
     }
   }
   return on;
@@ -2539,8 +2565,9 @@ function drawLayout(): void {
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
   const on = fits();
-  // a viewport narrower than the measure gives the lane what there is
-  const measure = Math.min(s.measure, ui.areas.clientWidth - 2 * s.gap);
+  // a viewport narrower than the measure gives the lane what there is, less what the rail takes: the rail stands at the
+  // edge of the page, so it takes the space that stood there rather than a space of its own
+  const measure = Math.min(s.measure, ui.areas.clientWidth - 2 * s.gap - on.rail);
   root.setProperty("--measure", `${measure}px`);
   // the gutters hug the lane at the gap, since what stands in them is aligned to its lines; only what the width allows
   // takes a column, since an absent element leaves the grid and would pull the lane into the empty track it left
@@ -2551,12 +2578,13 @@ function drawLayout(): void {
   // among the spaces evenly, so no area carries room it does not use
   // with the canvas standing, the spaces are the gap exactly and the canvas takes what is left; without it they share what is left
   const space = on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
-  const tracks = [space];
+  const tracks = [on.rail ? "0px" : space];
   const place = (el: HTMLElement, width: string) => {
     tracks.push(width, space);
     el.style.gridColumn = `${tracks.length - 1}`;
   };
-  if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
+  if (on.rail) place(ui.parts.wingL, `${on.rail}px`);
+  else if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
   // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
   if (on.canvas) place(ui.canvas, `minmax(${CANVAS_MIN}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
   if (on.lane) place(ui.scroll, `${mid}px`);
@@ -2569,7 +2597,7 @@ function drawLayout(): void {
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
   ui.scroll.style.width = on.lane ? "" : `${mid}px`;
-  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !on[name] || !takesRoom(name)));
+  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(name === "wingL" && on.rail) && (!on[name] || !takesRoom(name))));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
 }
@@ -2694,7 +2722,9 @@ const said = (h: Hop): string => ({ go: "went to", in: "scoped into", out: "scop
  */
 function drawCrumb(): void {
   const S = state.scope;
-  const trail = state.trail.filter((h) => brief(h.to));
+  // the trail's cells are small targets, and every move a reader makes is already in the browser's history, so where
+  // the lane stands alone the platform's own back gesture is the trail and a better one
+  const trail = narrow() ? [] : state.trail.filter((h) => brief(h.to));
   const depth = depthHtml();
   ui.crumb.hidden = S === "" && trail.length === 0 && depth === "";
   const place = prefixesOf(S)
@@ -2726,8 +2756,9 @@ function placeCanvas(): void {
  * its right, so the cells keep their place as moves are added. With the lane alone it is as wide as the prose.
  */
 function placeCrumb(): void {
-  // the bar stands flush with the prose's edges and with the canvas's rim
-  const edges = panesShown().map((el) => {
+  // the bar stands flush with the prose's edges and with the canvas's rim, and with the rail's edge where one stands,
+  // so the placement has the whole row to read in and the depth stands over the rail
+  const edges = [...panesShown(), ...(fits().rail ? [ui.parts.wingL] : [])].map((el) => {
     const r = el.getBoundingClientRect();
     return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
   });
@@ -2847,7 +2878,9 @@ const FIGURE_FLOOR = 48;
 function drawWing(area: "wingL" | "wingR"): void {
   const el = ui.parts[area];
   const s = state.settings;
-  const names = fits()[area] ? figureNames(area) : [];
+  const on = fits();
+  // the rail is the shape and nothing else, whichever wing the reader had it in
+  const names = on.rail ? (area === "wingL" ? ["shape"] : []) : on[area] ? figureNames(area) : [];
   const figures = names.map((n) => WIDGETS[n] as Figure);
   el.innerHTML = "";
   Array.from(slots.keys())
@@ -3386,12 +3419,55 @@ function drawPull(ease: boolean): void {
   else g.hidden = true;
 }
 
+// ### 3.14.2 The rail answers a finger
+//
+// A finger is only a fatter pointer, so the rail answers it as the shape
+// answers a pointer, in a touch grain. The finger comes down and the lane is
+// laid where it stands, live, so a reader sees what they are scrubbing past
+// rather than a preview of it, and the callout says beside the thumb what
+// stands there, on the side away from the edge, so the hand never covers the
+// answer. Sliding away from the rail's own edge past a threshold arms a reset:
+// the callout says so, and letting go there lays the lane back where it stood.
+// Coming back onto the rail takes up the scrub again, so nothing is committed
+// until the finger lifts. The reset is the undo the lane already keeps with a
+// direction given to it: touching down records the lane, as every change does.
+
+/** How far past the rail the thumb slides before letting go lays the lane back. */
+const RESET = 60;
+/** Whether the thumb has slid off the rail far enough that letting go would lay the lane back. */
+let armed = false;
+
+/** Lays the lane where the finger stands on the rail, the viewport centred on it, unless the reset is armed. */
+function railScrub(x: number, y: number): void {
+  const svg = ui.parts.wingL.querySelector<SVGSVGElement>("svg.shape");
+  if (!svg) return;
+  const r = svg.getBoundingClientRect();
+  armed = x > r.right + RESET;
+  if (!armed) {
+    const k = Number(svg.dataset.k);
+    ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
+  }
+  railCallout(y, r.right);
+}
+
+/** The callout: what the finger is over, drawn as the tooltip draws a brief, or what letting go will do once the reset is armed. */
+function railCallout(y: number, right: number): void {
+  const t = ui.tip;
+  const b = brief(focusUnderLine());
+  t.classList.add("callout");
+  t.innerHTML = armed ? `<span class="name plain">let go to lay the lane back</span>` : b ? `${pathHtml(b.address)}<span class="name">${esc(b.title || state.body!.title)}</span>` : "";
+  t.hidden = false;
+  t.style.left = `${Math.round(right + 14)}px`;
+  t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
+}
+
 /** Where the pointer last moved, and whether a scroll has come under it since. */
 const pointer = { x: -1, y: -1, still: false };
 
 /** Scrolling moves the focus and nothing else; the address follows without entering the history. */
 function onScroll(): void {
-  hideTip();
+  // a scroll takes the tooltip away, except the callout, which is the finger's own answer to the scrubbing it caused
+  if (!ui.tip.classList.contains("callout")) hideTip();
   drawShapeCursor();
   drawFade();
   pointer.still = true;
@@ -3607,19 +3683,27 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape" | "canvas"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
+  let drag: { kind: "knob" | "shape" | "rail" | "canvas"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
     const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
     if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
-    else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
+    // on the rail a finger lays the lane where it stands at once, since there is where the reader means to be, and the
+    // lane as it stood is recorded so that letting go past the rail's edge lays it back
+    else if (map && onRail() && touch) {
+      record();
+      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: true };
+      state.scrubbing = true;
+      railScrub(e.clientX, e.clientY);
+    } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
     else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
     if (drag) (e.target as Element).setPointerCapture?.(e.pointerId);
   });
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
+    if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
     // up or right turns a meter up; the shape scrubs by height alone
     const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
     if (!drag.moved && Math.abs(dy) < 3) return;
@@ -3643,6 +3727,12 @@ function wire(): void {
   });
   const release = () => {
     if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
+    if (drag?.kind === "rail") {
+      ui.tip.classList.remove("callout");
+      hideTip();
+      if (armed) undo();
+      armed = false;
+    }
     drag = null;
     setTimeout(() => (state.scrubbing = false), 0);
   };
@@ -4367,6 +4457,13 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
    pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
 body.touch .tree .row { padding-top: 9px; padding-bottom: 9px; }
 body.touch .switches .pick { padding: 9px 8px; }
+/* the depth strip is scrubbed rather than aimed at, so its cells grow for a finger without taking the whole line */
+body.touch #depth { gap: 4px; }
+body.touch #depth .dc { width: 28px; height: 28px; font-size: 12px; }
+/* the rail takes the gesture whole, so the page does not scroll under a finger that is scrubbing it */
+svg.shape { touch-action: none; }
+/* the tooltip in a touch grain: the callout beside the thumb, on the side away from the edge the rail stands on */
+#tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
 body.touch .act .acts { gap: 2px; margin-right: -10px; }
 body.touch .badge.worded { padding: 10px; border-radius: 8px; }
