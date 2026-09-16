@@ -1102,7 +1102,7 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "ArrowLeft", shift: true }],
     help: () => "Folds the scope back a level, so one level less stands unfolded. Holding shift and the space bar folds it whole.",
     also: "Pressing or scrubbing the depth strip.",
-    can: () => unfoldedDepth() > 0,
+    can: () => unfoldedDepth() > 1,
     run: () => unfoldTo(Math.max(0, unfoldedDepth() - 1)),
   },
   next: {
@@ -1178,10 +1178,13 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
 };
 
-const cap = (glyph: string): string => `<span class="cap"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
+const cap = (glyph: string, kind = ""): string => `<span class="cap${kind ? " " + kind : ""}"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
+
+/** The pointer, drawn for a badge beside a brief the keys do not act on, so every line keeps a cap and one edge. */
+const MOUSE = `<path d="M5 6.4a3 3 0 0 1 6 0v3.8a3 3 0 0 1-6 0z"/><path d="M8 4.4v2.2"/><path d="M5 7.6h6"/>`;
 
 /** A chord as caps: shift first, then the key, so a row of caps reads as it is pressed. */
-const capsOf = (c: Chord): string => (c.shift ? cap(KEY.Shift.glyph) : "") + cap(KEY[c.key]?.glyph ?? "");
+const capsOf = (c: Chord, aimed = false): string => (c.shift ? cap(KEY.Shift.glyph, aimed ? "key" : "") : "") + cap(KEY[c.key]?.glyph ?? "", aimed ? "key" : "");
 
 /** A chord in words, for the tooltip: "shift and space, held". */
 const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name}` : (KEY[c.key]?.name ?? c.key)) + (c.hold ? ", held" : "");
@@ -1197,8 +1200,21 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
   const held = act.keys[0].hold ? `<span class="held">held</span>` : "";
+  // a badge beside a brief carries both caps: the key, inked on the brief a key acts on, and the pointer on every other
+  // brief, where a press is the only way to it. The two take the same room, so no line shifts as the reading moves
+  const aimed = a !== undefined;
+  const chord = `<span class="chord">${capsOf(act.keys[0], aimed)}${aimed ? cap(MOUSE, "pointer") : ""}</span>`;
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="chord">${capsOf(act.keys[0])}</span>${said}${held}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
+}
+
+/** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
+function badgePair(first: string, second: string): string {
+  const [x, y] = [ACTIONS[first], ACTIONS[second]];
+  if (!x || !y || !x.keys[0].shift || !y.keys[0].shift) return badgeHtml(first, undefined, true) + badgeHtml(second, undefined, true);
+  const one = (id: string, act: Action) =>
+    `<span class="badge tight bare${act.can() ? "" : " off"}" data-act="${esc(id)}">${cap(KEY[act.keys[0].key]?.glyph ?? "")}</span>`;
+  return `<span class="pair">${cap(KEY.Shift.glyph, "lead")}${one(first, x)}${one(second, y)}</span>`;
 }
 
 // ## 3.2 Prose is drawn from tokens
@@ -1393,14 +1409,14 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   // per image, and how many briefs lie beneath; the badge for opening it as the scope stands at the end of the line
   const more =
     g === "face" && (rest.length > 0 || beneath > 0)
-      ? `<div class="act more chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}` +
+      ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        (ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : "") +
+        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span>` +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span></div>` : "";
   // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
@@ -2245,7 +2261,7 @@ function depthHtml(): string {
   if (n === 0) return "";
   const unfolded = unfoldedDepth();
   const cells = Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("");
-  return `<div id="depth" data-tip="how far the scope is unfolded">${badgeHtml("shallower", undefined, true)}${cells}${badgeHtml("deeper", undefined, true)}</div>`;
+  return `<div id="depth" data-tip="how far the scope is unfolded">${cells}${badgePair("shallower", "deeper")}</div>`;
 }
 
 /** Unfolds every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
@@ -2602,7 +2618,7 @@ function drawCrumb(): void {
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}</span>${depth}${way}`;
+  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}`;
   placeCrumb();
 }
 
@@ -3233,16 +3249,16 @@ function scrollToFocus(smooth: boolean): void {
 // applications refresh when pulled past their top. A pull that stops drains.
 
 /** How far a pull must go before it takes the reader up. */
-const PULL = 420;
+const PULL = 300;
 /** How much of a pull passes unseen, so the tail of a scroll that only just reached the top does not flash the gauge. */
-const PULL_DEAD = 0.15;
+const PULL_DEAD = 0.08;
 let pulled = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
 /** When the last wheel event came, and whether a push has been felt: momentum is an unbroken stream, a new swipe begins after a gap. */
 let lastWheelAt = 0;
 let pushing = false;
 /** The gap in the stream that means a gesture has begun: momentum never pauses this long, and a finger touching the pad stops it dead. */
-const PULL_GAP = 80;
+const PULL_GAP = 50;
 
 /**
  * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
@@ -4011,13 +4027,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the badge: the key drawn as a cap, and what it does beside it. Its room is kept on every line, and it inks only on
    the brief the reading line stands on, which is the brief a key acts on, so nothing reflows as the reader moves */
 .badge { display: inline-flex; align-items: center; gap: 6px; }
-/* what the act is called stands on every line, since it is what says the line can be pressed; the key is inked only on
-   the brief the reading line stands on, which is the brief a key acts on, and its room is kept so nothing reflows */
-.badge .cap { visibility: hidden; }
-.brief.here .badge .cap, .badge.tight .cap { visibility: visible; }
+/* beside a brief a badge carries two caps in the same room: the key, on the brief the reading line stands on, since
+   that is the brief a key acts on, and the pointer on every other, where a press is the only way to it */
+.badge.aimed .cap.key { display: none; }
+.brief.here .badge.aimed .cap.key { display: grid; }
+.brief.here .badge.aimed .cap.pointer { display: none; }
 .badge .chord { display: inline-flex; gap: 2px; }
-.badge .cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
-.badge .cap svg { width: 11px; height: 11px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+/* the acts stand together at the right of the line, so the figures of every line begin at one edge */
+.act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
+.cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
+.cap svg { width: 12px; height: 12px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .badge .label { color: var(--ink); }
 .act:hover .badge .cap, .badge:hover .cap { background: var(--track); color: var(--ink); }
 .badge:hover .label { color: var(--on); }
@@ -4034,13 +4053,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .keys .badge .chord { width: 40px; justify-content: flex-end; }
 .keys .badge .cap { visibility: visible; }
 .keys .badge:hover .cap { background: var(--track); color: var(--ink); }
-/* on the depth strip the badge is its keys alone, standing a little apart from the cells it moves */
-#depth .badge { cursor: pointer; }
-#depth .badge.tight .chord { gap: 2px; }
-#depth .badge.tight:first-child { margin-right: 5px; }
-#depth .badge.tight:last-child { margin-left: 5px; }
-#depth .badge .cap { background: none; }
-#depth .badge:hover .cap { background: var(--wash); color: var(--ink); }
+/* on a strip the badge is its keys alone; two acts that share a modifier stand as one unit, the modifier drawn once */
+.pair { display: inline-flex; align-items: center; gap: 1px; }
+.pair .cap.lead { margin-right: 1px; }
+#depth .badge, .pair .badge { cursor: pointer; }
+#depth .pair { margin-left: 8px; }
+#depth .cap, #crumb .cap { width: 18px; height: 18px; border-radius: 5px; background: none; }
+#depth .cap svg, #crumb .cap svg { width: 13px; height: 13px; }
+#depth .badge:hover .cap, #crumb .badge:hover .cap { background: var(--track); color: var(--ink); }
+/* widening the scope stands at the right of the placement, which is the run it acts on */
+#crumb .place .badge { margin-left: 6px; }
 /* the figure on the line: the paragraphs a press gives, then the level that waits beyond them */
 svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }

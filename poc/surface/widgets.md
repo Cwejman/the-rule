@@ -56,7 +56,9 @@ It is one element on the page's own ground, never under the pointer, and it goes
 
 An act the reader can take stands on the page as a badge: its key drawn as a cap, and what the act does beside it in a word. It stands where the act's object stands, [on the brief's own line](lane.md#61-the-action-line-is-the-press) or on the strip it moves, so a reader meets the few acts that are at hand rather than a bar of every act there is.
 
-The keys are drawn rather than set in type, since a shift, a return and an arrow taken from three faces sit at three heights and no two weigh the same. Each is one path in one box, so a row of caps reads level. Where the room is tight the badge is its keys alone, since a badge that stands on the very thing it acts on has its place to say what it does.
+The keys are drawn rather than set in type, since a shift, a return and an arrow taken from three faces sit at three heights and no two weigh the same. Each is one path in one box, so a row of caps reads level. Where the room is tight the badge is its keys alone, since a badge that stands on the very thing it acts on has its place to say what it does, and two acts that share a modifier stand as one unit with the modifier drawn once, so a pair reads as the pair it is.
+
+Beside a brief the cap says how that brief is reached. On the brief the reading line stands on it shows the key, since that is the brief a key acts on; on every other it shows the pointer, which is the only way to that one. The two take the same room, so no line shifts as the reading moves.
 
 A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
 
