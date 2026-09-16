@@ -1650,12 +1650,17 @@ function pickNarrowHtml(k: string): string {
  */
 const FOOT_ACTS = ["unfold", "open"];
 
+/** What the reader has chosen on the canvas, and how tall the card telling of it stands. */
+const card = { a: null as string | null, h: 0 };
+
+/** The brief the card tells of: what the reader chose, unless that is the scope's own root, which the entry takes no press to be. */
+const chosen = (): Brief | undefined => (card.a !== null && card.a !== state.scope ? brief(card.a) : undefined);
+
 /**
  * Whether the foot carries those acts: the canvas is the pane standing, the reader has chosen a brief on it, and that
- * brief has something to act on. The scope's own root is not a choice, since the entry takes no press, so arriving at
- * the canvas offers nothing until the reader has picked something.
+ * brief has something to act on.
  */
-const actingOnCanvas = (): boolean => narrow() && !fits().lane && fits().canvas && state.focus !== state.scope && FOOT_ACTS.some((id) => ACTIONS[id].can(state.focus));
+const actingOnCanvas = (): boolean => narrow() && !fits().lane && fits().canvas && !!chosen() && FOOT_ACTS.some((id) => ACTIONS[id].can(card.a!));
 
 /**
  * A press in the pill: a pane takes the middle, since the middle holds one; the shape stands as the rail or leaves it,
@@ -2499,7 +2504,7 @@ function recallView(): void {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -2855,10 +2860,10 @@ function placeCrumb(): void {
   const a0 = ui.areas.getBoundingClientRect();
   // the rail hugs the page's edge, but the way down is chrome and stands clear of it, so it keeps the same margin on
   // both sides rather than running into the left edge while the right one is a gap in from it
-  const left = Math.max(Math.min(...edges.map((r) => r.left)), fits().rail ? a0.left + state.settings.gap : -Infinity);
+  const left = Math.max(Math.min(...edges.map((r) => r.left)), narrow() ? a0.left + state.settings.gap : -Infinity);
   const right = Math.max(...edges.map((r) => r.right));
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
-  ui.crumb.style.width = `${Math.round(right - left)}px`;
+  ui.crumb.style.width = `${Math.round(Math.min(right, narrow() ? a0.right - state.settings.gap : Infinity) - left)}px`;
   // the pull's gauge lies over the top of the prose, just under the way down
   const lane = ui.lane.getBoundingClientRect();
   ui.pull.style.left = `${Math.round(lane.left - a0.left)}px`;
@@ -2866,7 +2871,12 @@ function placeCrumb(): void {
   ui.pull.style.top = `${ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4}px`;
   placeCanvas();
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
-  ui.scroll.style.setProperty("--rim-crumb", ui.crumb.hidden ? "0px" : `${ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`);
+  // narrow, the fade begins above the way down rather than below it: the prose is never clear behind the line, so the
+  // two read as one page and the reading keeps the room the clearance would have taken
+  ui.scroll.style.setProperty(
+    "--rim-crumb",
+    ui.crumb.hidden ? "0px" : `${narrow() ? Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight / 2) : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`,
+  );
 }
 
 /** Adjuncts stand in the gutter columns at the height of the line they belong to, pushed down where two would meet. */
@@ -3049,7 +3059,7 @@ function drawChooser(): void {
     const row = chooser.pill
       ? `<div class="pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
       : actingOnCanvas()
-        ? `<div class="pill glass acts">${FOOT_ACTS.map((id) => badgeHtml(id, state.focus)).join("")}</div>`
+        ? `<div class="pill glass acts">${FOOT_ACTS.map((id) => badgeHtml(id, card.a!)).join("")}</div>`
         : "";
     ui.strips.innerHTML = `<div class="strip foot">${row}${mark}</div>`;
     return;
@@ -3059,6 +3069,54 @@ function drawChooser(): void {
   chooser.pill = false;
   const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
   ui.strips.innerHTML = `<div class="strip">${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
+}
+
+// ### 3.12.1 The card at the foot
+//
+// A node on the canvas is a heading and a few marks, and pressing one told a
+// reader nothing of what it held. So what they choose raises a card at the foot:
+// its path, its heading and its face, with its acts standing on it, which is the
+// least that says whether to go there. It rises to what it has to say and no
+// further, and the reader draws it up for more: dragging up grows it to half the
+// screen and then scrolls its prose, dragging down does the reverse and lets it
+// go. What it draws is what the lane would draw, so nothing is written twice.
+
+/** The card's heights: what it stands at when it is raised, the least it is held at before a release lets it go, and the most, as a share of the page. */
+const CARD = { base: 210, least: 120, most: 0.52 };
+/** How tall the card would be with none of its prose cut off. */
+const cardFull = (): number => {
+  const hold = ui.card.querySelector<HTMLElement>(".hold");
+  return hold ? card.h + Math.max(0, hold.scrollHeight - hold.clientHeight) : CARD.base;
+};
+/** The most the card stands at: half the page, or what it has to say, whichever is less. */
+const cardMost = (): number => Math.max(CARD.least, Math.min(Math.round(ui.areas.clientHeight * CARD.most), cardFull()));
+
+/** Draws the card for what the reader chose, and takes it away when they have chosen nothing. */
+function drawCard(): void {
+  const b = chosen();
+  const was = ui.card.dataset.a;
+  ui.card.hidden = !b || !narrow() || fits().lane;
+  if (ui.card.hidden || !b) {
+    ui.card.innerHTML = "";
+    delete ui.card.dataset.a;
+    card.h = 0;
+    return;
+  }
+  if (was !== b.address) {
+    ui.card.dataset.a = b.address;
+    card.h = CARD.base;
+    ui.card.className = "glass";
+    ui.card.innerHTML = `<div class="hold"><div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${blocks(blocksOf(b).slice(0, 1))}</div></div>`;
+  }
+  ui.card.style.height = `${Math.round(clamp(card.h, CARD.least, cardMost()))}px`;
+}
+
+/** Lets the card go, with what was chosen. */
+function dropCard(): void {
+  if (card.a === null) return;
+  card.a = null;
+  drawCard();
+  drawChooser();
 }
 
 /**
@@ -3096,6 +3154,7 @@ function drawAll(): void {
   drawChooser();
   drawWingsAligned();
   drawSheet();
+  drawCard();
   light();
 }
 
@@ -3176,6 +3235,9 @@ function tipHtml(el: HTMLElement): string {
 
 /** Follows the pointer: a new element under it hides the tooltip and starts the moment before the next shows. */
 function tip(e: PointerEvent): void {
+  // a finger has no rest, so a press would raise a tooltip nobody asked for; what a touch reading tells, it tells in
+  // the callout on the rail and in the card at the foot
+  if (touch) return;
   const el = (e.target as Element | null)?.closest?.<HTMLElement>(TIP_SEL) ?? null;
   if (el === tipped) return;
   hideTip();
@@ -3765,11 +3827,20 @@ function wire(): void {
       // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
       return void (badge.closest(".strip") && drawChooser());
     }
-    // on the canvas a row goes, and only the ground of a zone folds
+    // on the canvas a row goes, and where there is no room to read it, it also raises the card that says what it holds
     const crow = t.closest<HTMLElement>(".crow");
-    if (crow) return void (state.scrubbing || crow.classList.contains("root") || goTo(crow.dataset.a!));
+    if (crow) {
+      if (state.scrubbing || crow.classList.contains("root")) return;
+      const a = crow.dataset.a!;
+      if (narrow() && !fits().lane) card.a = a;
+      goTo(a);
+      drawCard();
+      return void drawChooser();
+    }
     const pc = t.closest<HTMLElement>(".pc[data-a]");
     if (pc) return void goTo(pc.dataset.a!);
+    // a press on the canvas that is not a row lets the card go, as pressing away from a thing lets it go anywhere
+    if (t.closest("#canvas") && !t.closest("#card") && card.a !== null && !state.scrubbing) dropCard();
     const dc = t.closest<HTMLElement>("[data-depth]");
     if (dc) return void unfoldTo(Number(dc.dataset.depth));
     if (t.closest("#canvas") && state.scrubbing) return;
@@ -3823,13 +3894,15 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape" | "rail" | "canvas"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
+  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
+    const held = (e.target as HTMLElement).closest<HTMLElement>("#card");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
     const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
-    if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
+    if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
+    else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
     // and the callout, beside the thumb, names it; the lane as it stood is recorded so the reset can lay it back
     else if (map && onRail() && touch) {
@@ -3846,6 +3919,25 @@ function wire(): void {
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
     if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
+    // the card takes the whole of the movement: it grows until it is as tall as it may stand, and what is left over
+    // scrolls its prose; going the other way the prose comes back first and then the card comes down
+    if (drag.kind === "card") {
+      const hold = ui.card.querySelector<HTMLElement>(".hold");
+      const up = drag.y - e.clientY;
+      drag.y = e.clientY;
+      if (Math.abs(up) > 1) drag.moved = true;
+      if (up > 0) {
+        const grow = Math.min(up, Math.max(0, cardMost() - card.h));
+        card.h += grow;
+        if (hold) hold.scrollTop += up - grow;
+      } else {
+        const back = Math.min(-up, hold?.scrollTop ?? 0);
+        if (hold) hold.scrollTop -= back;
+        card.h = Math.max(0, card.h - (-up - back));
+      }
+      ui.card.style.height = `${Math.round(card.h)}px`;
+      return;
+    }
     // up or right turns a meter up; the shape scrubs by height alone
     const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
     if (!drag.moved && Math.abs(dy) < 3) return;
@@ -3868,6 +3960,12 @@ function wire(): void {
     }
   });
   const release = () => {
+    // let down past the least it is held at, the card goes, with what was chosen; anywhere else it stays where the
+    // finger left it, since the reader put it there
+    if (drag?.kind === "card") {
+      if (card.h < CARD.least) dropCard();
+      else drawCard();
+    }
     if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
     if (drag?.kind === "rail") {
       document.body.classList.remove("scrubbing");
@@ -4114,6 +4212,7 @@ async function start(): Promise<void> {
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section class="wing" data-area="wingR"></section>
       <div id="sheet" hidden></div>
+      <div id="card" hidden></div>
       <div id="strips"></div>
     </main>
     <div id="tip" class="chrome" hidden></div>`;
@@ -4130,6 +4229,7 @@ async function start(): Promise<void> {
     lane: $("#lane"),
     notice: $("#header .notice"),
     sheet: $("#sheet"),
+    card: $("#card"),
     strips: $("#strips"),
     parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), middle: $("#scroll"), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
   };
@@ -4189,7 +4289,8 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   glow: ["oklch(80% 0.08 var(--h))", "oklch(47% 0.06 var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
-  glass: ["oklch(97.5% 0.002 60 / .74)", "oklch(26% 0.006 60 / .72)"],
+  glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
+  sheer: ["oklch(97.5% 0.002 60 / .6)", "oklch(26% 0.006 60 / .58)"],
   bezel: ["rgb(255 255 255 / .9)", "rgb(255 255 255 / .12)"],
 };
 
@@ -4601,7 +4702,10 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 #strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
 /* the foot is one row: what stands in it follows what the reader has chosen, with the mark always at its end */
 .strip.foot { bottom: 22px; gap: 8px; }
-.glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7); }
+/* two glasses, and the difference is deliberate: what a reader opened stands on the solid one, since they are looking
+   at it; the mark, which stands there the whole time they read, is sheerer and quieter */
+.glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8); }
+.strip .mark.glass { background: var(--sheer); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); }
 /* the fold chevron in a tree is also called a mark and stands absolutely, so this one says where it stands: left to
    itself it hung out of the strip, which is what put it off centre and below the foot */
 .strip .mark { position: relative; flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
@@ -4618,6 +4722,17 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 .strip .pill.acts { padding: 4px; }
 .strip .pill.acts .badge.worded { background: none; padding: 11px 15px; border-radius: 22px; }
 .strip .pill.acts .badge.worded:active { background: var(--wash); }
+
+/* the card at the foot: what the reader chose on the canvas, told as the lane tells it, on the same glass the foot
+   stands on. It is anchored to the foot and grows upward, and the row of acts stands over the room it keeps beneath */
+#card { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; overflow: hidden; border-radius: 18px 18px 0 0; touch-action: none; }
+#card .hold { height: 100%; overflow: hidden; padding: 16px var(--gap) 78px; }
+#card .said { font-family: var(--sans); }
+#card .path { display: block; margin-bottom: 2px; }
+#card h3 { margin: 0 0 6px; font-family: var(--head-face); font-size: var(--h4); font-weight: calc(600 - var(--thin)); line-height: 1.2; color: var(--ink); }
+#card .surface, #card p { font-family: var(--prose-face); font-size: calc(var(--body) * .94); line-height: 1.5; color: var(--muted); margin: 0 0 10px; }
+/* a hairline at the top says the card is a thing that can be drawn up, without a handle standing for it */
+#card::before { content: ""; position: absolute; top: 7px; left: 50%; transform: translateX(-50%); width: 36px; height: 4px; border-radius: 2px; background: var(--track); }
 
 /* a figure opened whole over the reading, where there is no wing to stand it in: it takes the band the prose reads in,
    on the page's own ground, and the reading stands where it stood beneath it */

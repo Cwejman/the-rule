@@ -38,7 +38,15 @@ Every press a phone offers has room a finger can find. What could not have it le
 
 *As built, 2026-09-16, the buttons on the author's reading of the first build.*
 
-### 2.2 The figure on the line yields to its words
+### 2.2 Nothing waits on hovering
+
+A finger has no rest, so a press raised a tooltip nobody asked for, in the middle of the canvas. There are none under a finger.
+
+What a pointer would have been told is told in their own places instead: [the callout on the rail](#51-the-point-touched-is-the-preview-and-sliding-off-lays-it-back) while a finger is on it, and [the card at the foot](#46-what-is-chosen-on-the-canvas-raises-a-card) for what is chosen on the canvas.
+
+*The author's, 2026-09-16, on meeting one on the canvas; as built the same day.*
+
+### 2.3 The figure on the line yields to its words
 
 [The figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives) is drawn in the room the line has left once the count of what lies beneath and the acts beside it have taken theirs, rather than in a room of its own. Wide, that is the room it always asked for and nothing changes; narrow, the marks scale together into what is left, which they are already made to do.
 
@@ -46,7 +54,7 @@ Without that the line ran past the prose: at a lane of 226 the figure kept its 1
 
 *Measured, 2026-09-16, at a lane of 226: the line asked 334 and had 242. As built the same day.*
 
-### 2.3 The acts take a row of their own
+### 2.4 The acts take a row of their own
 
 Even fitted, the figure and the acts on one line left neither room to read, so on a phone the acts stand on a row beneath: the figure and the count of what lies beneath first, then the buttons.
 
@@ -64,7 +72,9 @@ Where the pill can no longer hold what the row holds, the press may instead scat
 
 ### 3.1 The foot stands on a glass of its own
 
-The mark and the pill are not the page's ground with ink on it. They stand on a glass: a muted surface over whatever the prose is doing beneath, blurred, with a light rim and a soft shadow. A translucent grey without it read as a fade rather than as a thing, and the page is white, so a white surface alone would not have separated either.
+The mark, the pill and the card are not the page's ground with ink on it. They stand on a glass: a muted surface over whatever the prose is doing beneath, blurred, with a light rim and a soft shadow. A translucent grey without it read as a fade rather than as a thing, and the page is white, so a white surface alone would not have separated either.
+
+There are two of them, and the difference is meant. What a reader opened, the pill and the card, stands on the solid glass, since they are looking at it. The mark, which is there the whole time they read, stands sheerer and blurs less, since it is not what they came for.
 
 It carries a mark of the page and what stands beside it, not three dots, since the dots said nothing of what a press would open.
 
@@ -126,17 +136,33 @@ So it leaves only while the lane is the pane that stands.
 
 *The author's, 2026-09-16, who saw the mark on one press and not on the next; as built the same day.*
 
-### 4.6 The foot is one row, and holds the acts of what is chosen
+### 4.6 What is chosen on the canvas raises a card
 
-A reader can light a node on the canvas, and in the lane every act stands on the brief's own line. A node has no line, and the room around it is taken by the nodes beside it; the top of the page is out of a hand's reach; so the foot is where the acts belong, and the foot already held the mark.
+A node on the canvas is a heading and a few marks, and a reader who presses one learns nothing of what it holds. Acts alone at the foot did not sit right either: fold and open, with nothing said about what they would act on.
 
-So the foot is one row, and what stands in it follows what the reader has chosen. The mark alone, ordinarily. The pill of choices while the mark is pressed. The acts of the brief chosen on the canvas, as [the same buttons the action line draws](#23-the-acts-take-a-row-of-their-own), when one is chosen there.
+So what is chosen raises a card at the foot: its path, its heading and its face, with its acts standing on it. That is the least that says whether to go there, and it is what the lane would have said in the same place.
 
-The mark keeps its place at the row's end in each of the three, so the chooser is never lost and never has to be looked for. It carries a cross while the pill stands open, since there it is the way to close.
+*The author's, 2026-09-16, who asked for the card in place of the acts he had just been given; as built the same day.*
 
-The scope's own root is not a choice, since the entry on the canvas takes no press, so arriving offers nothing until the reader has picked something. Taking an act draws the row again, since what it has left to offer has changed: folding a brief leaves unfolding, and opening it makes it the scope, which leaves the mark alone.
+#### 4.6.1 The card is drawn up for more, and let down to be rid of
 
-*The want and the three bounds are the author's, 2026-09-16; the one row is the session's proposal, which he asked to have built rather than argued. As built the same day.*
+The card rises to what it has to say and no further, so a brief whose face is two lines raises two lines.
+
+A reader draws it up for the rest: the same finger grows it to half the page and then scrolls its prose, and going the other way the prose comes back first and then the card comes down. There is no step in that and nothing is committed, so the card is left where the finger left it.
+
+Let down past the least it is held at, it goes, and what was chosen goes with it; so does a press anywhere on the canvas that is not a node.
+
+*The author's, 2026-09-16, who asked whether it could be done without lag and doubted it; as built the same day, at half the page and what the card has to say, whichever is less.*
+
+#### 4.6.2 The foot is one row, and the card is what stands behind it
+
+The foot is one row, and what stands in it follows what the reader has chosen: the mark alone, ordinarily; the pill of choices while the mark is pressed; the acts of what was chosen, as [the same buttons the action line draws](#24-the-acts-take-a-row-of-their-own), when a card stands.
+
+The mark keeps its place at the row's end in each of the three, so the chooser is never lost and never has to be looked for. It carries a cross while the pill stands open, since there it is the way to close. With a card up the row stands on it, which is why the card keeps room beneath its prose.
+
+The scope's own root is not a choice, since the entry on the canvas takes no press. Taking an act draws the row again, since what it has left to offer has changed: folding a brief leaves unfolding, and opening it makes it the scope, which takes the card away.
+
+*The one row is the session's, 2026-09-16, which the author asked to have built rather than argued, and the card came of his reading it. As built the same day.*
 
 ## 5. The minimap is a rail, not a mode
 
@@ -183,6 +209,10 @@ So the rail is scrubbed and nothing else, and what the two presses gave is had e
 ## 6. What the phone drops, and what it keeps
 
 [The way down](lane.md#75-the-way-down-stands-over-the-lane) keeps its placement, which is one line and the cheapest orientation there is, and it spans the rail as well as the prose, so the placement has the whole row to read in.
+
+It keeps the same margin on both sides, whatever the middle holds, since it once ran into the left edge while standing a gap in from the right.
+
+The prose fades from the middle of the line rather than from beneath it, so the two read as one page and the reading keeps the room the clearance would have taken. That is a little earlier than it was, and not as early as above the line, which faded more of the prose than the author wanted.
 
 The run of levels is cut at its root rather than in every name. Four levels on a line of 226 left every name a letter and an ellipsis; now the level above the scope stands whole beside it and one mark stands for the rest, as the trail is cut at its root. What that takes away is the press that scopes out to a level far above, and widening a level at a time stands beside it.
 
