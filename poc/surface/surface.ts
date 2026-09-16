@@ -1523,29 +1523,42 @@ const panesPressed = (k: string): string[] => {
 };
 
 /**
- * What every area holds after an icon is pressed. A pane toggles. Everything else cycles: nowhere, the left, the right,
- * nowhere again, so one icon carries the whole choice of whether a widget stands and on which side. A wing holds two,
- * and a third takes the place at its foot; a gutter holds one.
+ * What every area holds with a widget put at one side, or at none. A pane toggles instead, since the middle holds its
+ * panes in one order. A wing holds two, and a third takes the place at its foot; a gutter holds one.
  */
-function cycled(k: string): Held {
+function placed(k: string, side: AreaName | null): Held {
   const w = WIDGETS[k];
   const held: Held = { ...state.settings.areas };
   if (w.kind === "pane") return { ...held, middle: panesPressed(k) };
-  const [left, right] = SIDES[w.kind];
-  const at = standsIn(k);
-  const next = at === null ? left : at === left ? right : null;
-  [left, right].forEach((s) => (held[s] = held[s].filter((x) => x !== k)));
-  if (next) held[next] = w.kind === "adjunct" ? [k] : held[next].length < 2 ? [...held[next], k] : [held[next][0], k];
+  SIDES[w.kind].forEach((s) => (held[s] = held[s].filter((x) => x !== k)));
+  if (side) held[side] = w.kind === "adjunct" ? [k] : held[side].length < 2 ? [...held[side], k] : [held[side][0], k];
   return held;
 }
+
+/** Whether a side would hold a widget at this width, reckoned with it taken off the side it stands on now. */
+const holds = (k: string, side: AreaName): boolean => fitsWith(placed(k, side))[side];
+
+/**
+ * Where the next press puts a widget: the next side of the cycle that can hold it at this width, or nowhere. A side the
+ * width denies is stepped over rather than offered, so a press never sends a widget somewhere it cannot stand.
+ * Undefined where a press would do nothing at all, which is what makes an icon quiet.
+ */
+function nextPlace(k: string): AreaName | null | undefined {
+  const [left, right] = SIDES[WIDGETS[k].kind];
+  const at = standsIn(k);
+  if (at === right) return null;
+  if (at === left) return holds(k, right) ? right : null;
+  return holds(k, left) ? left : holds(k, right) ? right : undefined;
+}
+
+const cycled = (k: string): Held => placed(k, nextPlace(k) ?? null);
 
 /** Whether pressing an icon would change anything a reader can see: a widget already standing can always be moved on. */
 function offered(k: string): boolean {
   const w = WIDGETS[k];
   const at = standsIn(k);
   if (w.kind === "pane") return at ? panesHeld().length > 1 : fitsWith({ ...state.settings.areas, middle: panesPressed(k) })[k as PaneName];
-  if (at) return true;
-  return SIDES[w.kind].some((s) => fitsWith({ ...state.settings.areas, [s]: w.kind === "adjunct" ? [k] : [...state.settings.areas[s], k].slice(-2) })[s]);
+  return nextPlace(k) !== undefined;
 }
 
 /** What the tooltip says of an icon: what it is, and what the next press would do with it. */
@@ -1553,11 +1566,13 @@ function pickTip(k: string): string {
   const w = WIDGETS[k];
   const at = standsIn(k);
   const said = (s: string) => `${w.name} — ${s}`;
-  if (at !== null && !fits()[at === "middle" ? (k as PaneName) : at]) return said("asked for, but there is no room at this width");
   if (!offered(k)) return said(w.kind === "pane" && at ? "the last pane cannot be taken away" : "no room for it at this width");
   if (w.kind === "pane") return said(at ? "press to take it away" : "press to stand it in the middle");
   const [left] = SIDES[w.kind];
-  return said(at === null ? "press to stand it at the left" : at === left ? "at the left; press for the right" : "at the right; press to take it away");
+  const where = (x: AreaName | null) => (x === null ? "take it away" : x === left ? "stand it at the left" : "stand it at the right");
+  // a widget the width denies says so, and still says what a press would do with it
+  const now = at === null ? "" : !fits()[at] ? "asked for, but there is no room at this width; " : at === left ? "at the left; " : "at the right; ";
+  return said(`${now}press to ${where(nextPlace(k) ?? null)}`);
 }
 
 // ## 3.5 The tree: the lane as an outline
