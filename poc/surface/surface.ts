@@ -1621,14 +1621,14 @@ function pickTip(k: string): string {
 /** Whether the lane stands alone: the width holds no wing at the width a figure declares, and no gutter beside it. */
 const narrow = (): boolean => ui.areas.clientWidth < state.settings.measure + 3 * state.settings.gap + GUTTER.least;
 
-/** What the chooser holds where the lane stands alone: the panes first, as the row lays them, then the figures a press opens whole; the keys only where there are keys to name. */
-const narrowChoices = (): string[] => ["lane", "canvas", "tree", "plate", "settings", ...(touch ? [] : ["keys"])];
+/** What the chooser holds where the lane stands alone: the panes first, as the row lays them, then the rail, then the figures a press opens whole; the keys only where there are keys to name. */
+const narrowChoices = (): string[] => ["lane", "canvas", "shape", "tree", "plate", "settings", ...(touch ? [] : ["keys"])];
 
 /** The figure standing open over the reading, and whether the pill stands open at the foot. Neither outlives a widening. */
 const foot = { sheet: null as string | null, pill: false };
 
-/** Whether a choice stands now: a pane in the middle, a figure opened whole. */
-const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : foot.sheet === k);
+/** Whether a choice stands now: a pane in the middle, the shape as the rail beside the prose, any other figure opened whole. */
+const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : foot.sheet === k);
 
 /** One choice in the pill: what it is, and whether it stands. No side, since the pill has none. */
 function pickNarrowHtml(k: string): string {
@@ -1639,7 +1639,10 @@ function pickNarrowHtml(k: string): string {
   return `<button class="pick${on ? " on" : ""}${quiet}" data-widget="${esc(k)}" data-tip="${esc(w.name)}">${icon(w.icon)}</button>`;
 }
 
-/** A press in the pill: a pane takes the middle, since the middle holds one; a figure opens whole, or closes if it stood. */
+/**
+ * A press in the pill: a pane takes the middle, since the middle holds one; the shape stands as the rail or leaves it,
+ * since it is not a mode but what stands beside the reading; any other figure opens whole, or closes if it stood.
+ */
 function chooseNarrow(k: string): void {
   foot.pill = false;
   if (WIDGETS[k].kind === "pane") {
@@ -1648,6 +1651,9 @@ function chooseNarrow(k: string): void {
       saveSettings();
     }
     foot.sheet = null;
+  } else if (k === "shape") {
+    state.settings.areas = placed(k, standsIn(k) ? null : "wingL");
+    saveSettings();
   } else foot.sheet = foot.sheet === k ? null : k;
   drawAll();
 }

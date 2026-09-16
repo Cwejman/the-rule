@@ -112,7 +112,7 @@ The room reaches only as far as the marks do, and keeps to its own row, since ro
 
 Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows what the brief hides before the press unfolds it, and the brief lights elsewhere as it would. In the shape itself its blocks stay unlit and only the marks answer: over a folded brief its ticks and tail light, and over an unfolded one they show as a grey ghost of what a fold would hide. So resting on the room reads apart from resting on the blocks.
 
-Neither press is there under a finger, where [the rail takes none](touch.md#52-the-rail-takes-no-presses) and is scrubbed instead.
+Neither press is there under a finger, where [the rail takes none](touch.md#53-the-rail-takes-no-presses) and is scrubbed instead.
 
 *Reasoned, the author's, 2026-09-13; the room pointing at its brief, 2026-09-14, so the ahead previews a fold from there too; the rail without presses, 2026-09-16.*
 

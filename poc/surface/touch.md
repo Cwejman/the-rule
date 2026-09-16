@@ -82,7 +82,7 @@ The middle holds one pane where the lane stands alone, so pressing a pane sets i
 
 ## 5. The minimap is a rail, not a mode
 
-[The shape](widgets.md#3-the-shape) is not in the chooser, because it is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, between a hundred and a hundred and forty against the two hundred it declares today.
+[The shape](widgets.md#3-the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, between a hundred and a hundred and forty against the two hundred it declares today.
 
 What it gives up at that width is the room for its marks and its tail. What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
 
@@ -100,7 +100,15 @@ The reset is [the undo the lane already keeps](lane.md#52-escape-is-an-undo) wit
 
 *The author's, 2026-09-16; that the reset is the undo is the session's, and the direction follows the side the rail stands on. As built the same day: the threshold is sixty past the rail's right edge, and the lane laid where the finger is, rather than by how far it moved, is the session's call.*
 
-### 5.2 The rail takes no presses
+### 5.2 The chooser holds it as a switch, not as a mode
+
+The rail is in the chooser all the same, and it is the one choice there that does not take the screen: a press stands it beside the reading or takes it away.
+
+Without it a reader who had closed the shape on a desk could never ask for it again on a phone, and [the strip's rule](framework.md#3-the-strip) is that no choice is ever out of reach at any width.
+
+*The session's, 2026-09-16, against the author's word that the shape is not in the chooser; the rule it stands on is the strip's own, and the author's word is wanted.*
+
+### 5.3 The rail takes no presses
 
 The shape gives a brief two presses, [read from where they land](widgets.md#34-two-presses-read-from-where-they-land): its blocks go to it, the room to their right folds it. Neither is there under a finger. A row of the rail is a few pixels tall, which no finger can aim at, and the room to the right went with the marks.
 
