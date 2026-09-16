@@ -112,9 +112,11 @@ So the rail is scrubbed and nothing else, and what the two presses gave is had e
 
 [The way down](lane.md#75-the-way-down-stands-over-the-lane) keeps its placement, which is one line and the cheapest orientation there is, and it spans the rail as well as the prose, so the placement has the whole row to read in.
 
+The run of levels is cut at its root rather than in every name. Four levels on a line of 226 left every name a letter and an ellipsis; now the level above the scope stands whole beside it and one mark stands for the rest, as the trail is cut at its root. What that takes away is the press that scopes out to a level far above, and widening a level at a time stands beside it.
+
 The trail goes. Its cells are small targets, and every move a reader makes already enters the browser's history, so the platform's own back gesture is the trail and a better one.
 
-*The author's, 2026-09-16; the trail dropped on the session's argument, and open. As built the same day.*
+*The author's, 2026-09-16; the trail dropped on the session's argument, and open. The cut is the session's, seen the same day at four levels on a phone.*
 
 ### 6.1 The depth did not move to the rail
 

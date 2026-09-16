@@ -1987,7 +1987,9 @@ function shapeSvg(W: number, H: number): string {
   // finger cannot find a row six pixels tall, so the rail takes no presses either and answers a scrub instead
   const rail = onRail();
   // the levels above the scope stand to the left of the opening's row, a tick per ancestor, outermost leftmost
-  const anc = prefixesOf(state.scope).slice(0, -1);
+  // the ticks for the levels above are marks like any other, so the rail gives up their room as well; the way down,
+  // which reaches over the rail, names those levels and is a press a finger can find
+  const anc = rail ? [] : prefixesOf(state.scope).slice(0, -1);
   const L = anc.length ? anc.length * 8 + 4 : 0;
   // the shape stands in its own width, never a wider figure's beside it in the same wing
   const w = Math.min(W, shapeWidth());
@@ -2740,9 +2742,16 @@ function drawCrumb(): void {
   const trail = narrow() ? [] : state.trail.filter((h) => brief(h.to));
   const depth = depthHtml();
   ui.crumb.hidden = S === "" && trail.length === 0 && depth === "";
-  const place = prefixesOf(S)
-    .map((a) => (a === S ? `<span class="step root" data-a="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>` : `<span class="step" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>`))
-    .join(CHEVRON);
+  // narrow, the whole run would cut every name to a letter, so it keeps the level above the scope and stands for the
+  // rest with one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
+  const run = prefixesOf(S);
+  const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
+  const above = run.length - kept.length;
+  const place =
+    (above ? `<span class="step more" data-tip="${above} level${above > 1 ? "s" : ""} above, cut at the root">…</span>${CHEVRON}` : "") +
+    kept
+      .map((a) => (a === S ? `<span class="step root" data-a="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>` : `<span class="step" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>`))
+      .join(CHEVRON);
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
