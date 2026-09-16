@@ -1030,6 +1030,8 @@ type Chord = { key: string; shift?: boolean; hold?: boolean };
 type Action = {
   /** what it is called on a badge, for the brief it is drawn beside; a word, lower case */
   label: (a?: string) => string;
+  /** its glyph, where it stands in a row of round buttons and a word would not fit; only the acts that stand there have one */
+  mark?: (a?: string) => string;
   /** the chords that fire it */
   keys: Chord[];
   /** what it does, in a sentence, for the tooltip; it takes the address so it can say which way the act goes */
@@ -1049,6 +1051,7 @@ const acts = (a?: string): string => a ?? state.focus;
 const ACTIONS: Record<string, Action> = {
   unfold: {
     label: (a) => (gradeOf(acts(a)) === "whole" ? "fold" : "unfold"),
+    mark: (a) => (gradeOf(acts(a)) === "whole" ? ICON.fold : ICON.unfold),
     keys: [{ key: " " }],
     help: (a) =>
       gradeOf(acts(a)) === "whole"
@@ -1084,6 +1087,7 @@ const ACTIONS: Record<string, Action> = {
   },
   open: {
     label: () => "open",
+    mark: () => ICON.open,
     keys: [{ key: "Enter" }],
     help: () => "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
     shifted: "Shift widens the scope by a level instead.",
@@ -1505,6 +1509,9 @@ const ICON: Record<string, string> = {
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
   lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
   close: `<path d="M4.6 4.6l6.8 6.8M11.4 4.6l-6.8 6.8"/>`,
+  unfold: `<path d="M5.4 6.6 8 4l2.6 2.6M5.4 9.4 8 12l2.6-2.6"/>`,
+  fold: `<path d="M5.4 4.4 8 7l2.6-2.6M5.4 11.6 8 9l2.6 2.6"/>`,
+  open: `<path d="M9.6 3.5h3v3M6.4 12.5h-3v-3M12.5 3.5 9 7M3.5 12.5 7 9"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
@@ -1649,6 +1656,16 @@ function pickNarrowHtml(k: string): string {
  * draws beside a brief in the lane, since a node on the canvas has no line of its own to carry them.
  */
 const FOOT_ACTS = ["unfold", "open"];
+
+/**
+ * An act in the foot's row: its glyph alone, in the round button the choices stand in, since the row is one grain and
+ * the card beside it already says what is being acted on.
+ */
+const footBadge = (id: string, a: string): string => {
+  const act = ACTIONS[id];
+  if (!act?.mark || !act.can(a)) return "";
+  return `<button class="pick" data-act="${esc(id)}" data-a="${esc(a)}" aria-label="${esc(act.label(a))}"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></button>`;
+};
 
 /** What the reader has chosen on the canvas, and how tall the card telling of it stands. */
 const card = { a: null as string | null, h: 0 };
@@ -1873,6 +1890,14 @@ function meterArc(t: number, r: number): string {
   return `M ${P(a0)} A ${r} ${r} 0 ${t * 270 > 180 ? 1 : 0} 1 ${P(a1)}`;
 }
 
+/**
+ * What a setting cannot change where the lane stands alone: the measure, which the width already sets; the canvas's
+ * greatest width, since it takes the page whole; the ahead, which does not stand there; and the flick, which reads a
+ * wheel no finger sends. They are not drawn, rather than drawn and idle.
+ */
+const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick"]);
+const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
+
 function settingsHtml(): string {
   const s = state.settings;
   const knob = (k: Knob) => {
@@ -1888,7 +1913,8 @@ function settingsHtml(): string {
     `<span class="name">${w.name}</span><span class="values">${w.values
       .map((v, i) => `<button class="pick${s[w.key] === v ? " on" : ""}" data-set="${w.key}" data-value="${v}">${w.labels?.[i] ?? v}</button>`)
       .join("")}</span>`;
-  return `<div class="settings">${(["type", "page", "canvas"] as const).map((r) => `<div class="knobs">${KNOBS.filter((k) => k.row === r).map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.map(row).join("")}</div></div>`;
+  const rows = (["type", "page", "canvas"] as const).map((r) => KNOBS.filter((k) => k.row === r && shownHere(k.key))).filter((ks) => ks.length);
+  return `<div class="settings">${rows.map((ks) => `<div class="knobs">${ks.map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.filter((w) => shownHere(w.key)).map(row).join("")}</div></div>`;
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
@@ -2803,23 +2829,29 @@ function drawCrumb(): void {
   // narrow, the depth leaves the line: its cells crowd the placement, and unfolding a scope six levels deep is not
   // something a phone wants offered
   const depth = narrow() ? "" : depthHtml();
-  // the way down stands where it has something to say: a placement, a trail, a depth, or a change to take back, which
-  // on a phone is the only home undo has
-  ui.crumb.hidden = S === "" && trail.length === 0 && depth === "" && !ACTIONS.undo.can();
-  // narrow, the whole run would cut every name to a letter, so it keeps the level above the scope and stands for the
-  // rest with one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
-  const run = prefixesOf(S);
+  // undo has no home on a phone, where a reader takes the platform's own back gesture rather than looking for a button
+  const back = narrow() ? "" : badgeHtml("undo", undefined, true);
+  // the run of levels goes down to the brief in focus, not only to the scope: a reader scrolling into a brief has its
+  // heading off the screen, and the address of where they stand is what the line is for
+  const run = prefixesOf(state.focus);
+  ui.crumb.hidden = run.length < 2 && S === "" && trail.length === 0 && depth === "" && back === "";
+  // narrow, the whole run would cut every name to a letter, so it keeps the level above and stands for the rest with
+  // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
   const above = run.length - kept.length;
+  // a step above the scope scopes out to it; one within it goes there; the brief in focus is where the reader stands
+  const step = (a: string): string => {
+    const cls = a === state.focus ? "step now" : a === S ? "step root" : "step";
+    const takes = a === state.focus ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
+    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${esc(brief(a)!.title)}</span>`;
+  };
   const place =
     (above ? `<span class="step more" data-tip="${above} level${above > 1 ? "s" : ""} above, cut at the root">…</span>${CHEVRON}` : "") +
-    kept
-      .map((a) => (a === S ? `<span class="step root" data-a="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>` : `<span class="step" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}>${esc(brief(a)!.title)}</span>`))
-      .join(CHEVRON);
+    kept.filter((a) => brief(a)).map(step).join(CHEVRON);
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}${badgeHtml("undo", undefined, true)}`;
+  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}${back}`;
   placeCrumb();
 }
 
@@ -3059,7 +3091,7 @@ function drawChooser(): void {
     const row = chooser.pill
       ? `<div class="pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
       : actingOnCanvas()
-        ? `<div class="pill glass acts">${FOOT_ACTS.map((id) => badgeHtml(id, card.a!)).join("")}</div>`
+        ? `<div class="pill glass">${FOOT_ACTS.map((id) => footBadge(id, card.a!)).join("")}</div>`
         : "";
     ui.strips.innerHTML = `<div class="strip foot">${row}${mark}</div>`;
     return;
@@ -3688,6 +3720,8 @@ function onScroll(): void {
   state.focus = f;
   if (!arriving) followHistory(hashFor(f));
   drawWings("focus");
+  // the way down says where the reader stands, so it follows the reading
+  drawCrumb();
   // on the canvas the focus is the brief the reader chose, and the foot carries its acts, so the row follows it
   if (narrow() && !fits().lane) drawChooser();
 }
@@ -3948,6 +3982,7 @@ function wire(): void {
       view.y = drag.vy! + (e.clientY - drag.y);
       applyView(false);
     } else if (drag.kind === "knob") {
+      drag.el.classList.add("turning");
       const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
       const v = clamp(drag.start - (dy / 150) * (k.max - k.min), k.min, k.max);
       state.settings[k.key] = Math.round(v / k.step) * k.step;
@@ -3966,6 +4001,7 @@ function wire(): void {
       if (card.h < CARD.least) dropCard();
       else drawCard();
     }
+    if (drag?.kind === "knob") drag.el.classList.remove("turning");
     if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
     if (drag?.kind === "rail") {
       document.body.classList.remove("scrubbing");
@@ -4352,7 +4388,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #crumb { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
 #crumb .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
 #crumb .step:hover, #crumb .step.lit { color: var(--on); }
-#crumb .step.root { flex: none; color: var(--muted); cursor: default; }
+#crumb .step.root { flex: none; color: var(--muted); }
+/* the last step is where the reader stands, so it is the one that is not faint */
+#crumb .step.now { flex: none; color: var(--ink); cursor: default; }
+#crumb .step.now.lit { color: var(--on); }
 #crumb .step.root.lit { color: var(--on); }
 #crumb .place, #crumb .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }
 /* how the reader came here stands spaced away from how here is placed, on the same line */
@@ -4688,6 +4727,9 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 .knob .glyph { fill: none; stroke: var(--muted); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .knob .hint { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 2px; white-space: nowrap; opacity: 0; transition: opacity .15s; pointer-events: none; }
 .knob:hover .hint { opacity: 1; }
+/* a finger covers the knob it turns, so the value stands above it while it is turning, where the hand is not */
+body.touch .knob .hint { top: auto; bottom: 100%; margin: 0 0 6px; }
+body.touch .knob.turning .hint { opacity: 1; }
 .switches { display: grid; grid-template-columns: auto auto; gap: 2px 8px; align-items: center; }
 .switches .name { justify-self: end; color: var(--faint); }
 .switches .values { display: flex; gap: 2px; }
@@ -4708,25 +4750,24 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 .strip .mark.glass { background: var(--sheer); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); }
 /* the fold chevron in a tree is also called a mark and stands absolutely, so this one says where it stands: left to
    itself it hung out of the strip, which is what put it off centre and below the foot */
-.strip .mark { position: relative; flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
+.strip .mark { position: relative; flex: none; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
 .strip .mark:active { transform: scale(.94); }
 .strip .mark:hover { color: var(--ink); }
 .strip .mark .icon { width: 19px; height: 19px; stroke-width: 1.2; }
-.strip .pill { display: flex; align-items: center; border-radius: 28px; padding: 5px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
+.strip .pill { display: flex; align-items: center; border-radius: 26px; padding: 3px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
 @keyframes pill-in { from { opacity: 0; transform: translateY(10px) scale(.92); } }
-.strip .pill .pick { width: 46px; height: 46px; border-radius: 23px; opacity: .5; }
+.strip .pill .pick { width: 40px; height: 40px; border-radius: 20px; opacity: .5; }
 .strip .pill .pick.on, .strip .pill:hover .pick.on { opacity: 1; color: var(--ink); background: var(--wash); }
 .strip .pill .pick:hover { opacity: .8; }
 .strip .pill .pick .icon { width: 18px; height: 18px; }
-/* the acts stand in the same row in the same grain: the words on the glass rather than each on a surface of its own */
-.strip .pill.acts { padding: 4px; }
-.strip .pill.acts .badge.worded { background: none; padding: 11px 15px; border-radius: 22px; }
-.strip .pill.acts .badge.worded:active { background: var(--wash); }
+/* an act in the row is a glyph in the same round button a choice stands in, and inks as one in use does */
+.strip .pill .pick[data-act] { opacity: .85; color: var(--ink); }
+.strip .pill .pick[data-act]:active { background: var(--wash); }
 
 /* the card at the foot: what the reader chose on the canvas, told as the lane tells it, on the same glass the foot
    stands on. It is anchored to the foot and grows upward, and the row of acts stands over the room it keeps beneath */
 #card { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; overflow: hidden; border-radius: 18px 18px 0 0; touch-action: none; }
-#card .hold { height: 100%; overflow: hidden; padding: 16px var(--gap) 78px; }
+#card .hold { height: 100%; overflow: hidden; padding: 16px var(--gap) 80px; }
 #card .said { font-family: var(--sans); }
 #card .path { display: block; margin-bottom: 2px; }
 #card h3 { margin: 0 0 6px; font-family: var(--head-face); font-size: var(--h4); font-weight: calc(600 - var(--thin)); line-height: 1.2; color: var(--ink); }
@@ -4760,8 +4801,8 @@ body.touch .badge.worded { padding: 9px 13px; border-radius: 9px; background: va
 body.touch .badge.worded .label { color: var(--ink); }
 body.touch .badge.worded.off { background: none; }
 /* and the acts take a row of their own beneath the figure, since sharing the line with it left neither room to read */
-body.touch .act { flex-wrap: wrap; row-gap: 4px; }
-body.touch .act .acts { flex-basis: 100%; margin-left: 0; gap: 8px; }
+body.touch .act { flex-wrap: wrap; row-gap: 9px; padding-bottom: 12px; }
+body.touch .act .acts { flex-basis: 100%; margin-left: -4px; gap: 10px; }
 body.touch .badge.worded .label { color: var(--muted); }
 body.touch #crumb { gap: 2px; }
 body.touch #crumb .step { padding: 10px 5px; }

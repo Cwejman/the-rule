@@ -63,7 +63,7 @@ A gutter narrows before it gives way, and comes back when a wing gives way and f
 
 An area given no room is gone from the row until the screen widens, and [its icon says so](#31-four-grades-of-ink) rather than leaving the foot.
 
-The order has one exception at its end, and it is written where it was found: where the lane would stand alone, [a touch reading](touch.md#8-what-this-asks-of-the-framework) keeps one narrow figure beside it, the shape as a rail.
+The order has one exception at its end, and it is written where it was found: where the lane would stand alone, [a touch reading](touch.md#9-what-this-asks-of-the-framework) keeps one narrow figure beside it, the shape as a rail.
 
 *Reasoned, the author's, 2026-09-13; the canvas first, 2026-09-15, since the lane is the reading. The exception is a trial, 2026-09-16, and waits on the author's word before it is written in here.*
 

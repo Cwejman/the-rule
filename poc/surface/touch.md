@@ -110,7 +110,7 @@ The settings are the one figure that stands that way now. The outline was built 
 
 Both were built into the pill and both were taken out on the author's reading. The outline read poorly whole on a phone, and he does not use it. The radial cannot be hit: a press on it goes to whatever cell the finger lands on, and no finger can land on a cell that small.
 
-What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#9-what-is-not-answered). Until each has its own touch reading, neither stands.
+What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#10-what-is-not-answered). Until each has its own touch reading, neither stands.
 
 *The author's, 2026-09-16, on reading the first build; taken out the same day.*
 
@@ -158,11 +158,13 @@ Let down past the least it is held at, it goes, and what was chosen goes with it
 
 The foot is one row, and what stands in it follows what the reader has chosen: the mark alone, ordinarily; the pill of choices while the mark is pressed; the acts of what was chosen, as [the same buttons the action line draws](#24-the-acts-take-a-row-of-their-own), when a card stands.
 
+Everything in the row is one size and one shape: round buttons of forty, in a pill of forty-eight beside a mark of forty-eight. Worded acts made the row taller than the mark beside it and read badly, so an act in the row is its glyph, which is [the badge's fourth grade](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands); what is being acted on is named on the card above it, so nothing is lost by dropping the word.
+
 The mark keeps its place at the row's end in each of the three, so the chooser is never lost and never has to be looked for. It carries a cross while the pill stands open, since there it is the way to close. With a card up the row stands on it, which is why the card keeps room beneath its prose.
 
 The scope's own root is not a choice, since the entry on the canvas takes no press. Taking an act draws the row again, since what it has left to offer has changed: folding a brief leaves unfolding, and opening it makes it the scope, which takes the card away.
 
-*The one row is the session's, 2026-09-16, which the author asked to have built rather than argued, and the card came of his reading it. As built the same day.*
+*The one row is the session's, 2026-09-16, which the author asked to have built rather than argued, and the card came of his reading it. The one size and the glyphs are his, on reading the worded row. As built the same day.*
 
 ## 5. The minimap is a rail, not a mode
 
@@ -212,6 +214,10 @@ So the rail is scrubbed and nothing else, and what the two presses gave is had e
 
 It keeps the same margin on both sides, whatever the middle holds, since it once ran into the left edge while standing a gap in from the right.
 
+[The run of levels reaches down to the brief in focus](lane.md#75-the-way-down-stands-over-the-lane), which is where the phone asked for it first: a reader scrolling has the heading off the screen and still wants the address of where they are.
+
+Undo goes with the trail. A reader on a phone reaches for the platform's own back gesture, not for a button, and the room is wanted for the run.
+
 The prose fades from the middle of the line rather than from beneath it, so the two read as one page and the reading keeps the room the clearance would have taken. That is a little earlier than it was, and not as early as above the line, which faded more of the prose than the author wanted.
 
 The run of levels is cut at its root rather than in every name. Four levels on a line of 226 left every name a letter and an ellipsis; now the level above the scope stands whole beside it and one mark stands for the rest, as the trail is cut at its root. What that takes away is the press that scopes out to a level far above, and widening a level at a time stands beside it.
@@ -238,7 +244,19 @@ That last is why it stands at all on a phone, since undo has no other home there
 
 *As built, 2026-09-16; the line was hiding the only way back until it was told to count that.*
 
-## 7. A badge without a key
+## 7. What the settings can say here
+
+A setting that cannot change anything is not drawn. The measure is set by the width, the canvas takes the page whole, the ahead does not stand and the flick reads a wheel no finger sends, so those four leave and the rest stand as they are.
+
+*The author's, 2026-09-16, on meeting settings that did nothing; as built the same day.*
+
+### 7.1 A knob says its value where the thumb is not
+
+A knob is turned by a finger that covers it, and the value it is turning to stands beneath it, under that finger. So under a finger it stands above the knob instead, and only while the knob is turning.
+
+*The author's, 2026-09-16; as built the same day.*
+
+## 8. A badge without a key
 
 [A badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) carries a key and a word. A phone has no key, so it carries the word alone, and the cap's room goes with the cap. That is the badge's third grade beside the worded and the tight, and a tight badge, which is its keys alone, falls back to the word, since its keys were all it had to show.
 
@@ -246,7 +264,7 @@ A badge that cannot be taken is not drawn at all. It keeps its room on a desk so
 
 *Reasoned, 2026-09-16, from what a phone takes away; the quiet badge dropped is the session's. As built the same day.*
 
-## 8. What this asks of the framework
+## 9. What this asks of the framework
 
 A phone holds the lane and one narrow rail, and [the order of giving way](framework.md#25-giving-way) says the wings go before the lane stands alone. So the order needs an exception: a narrow reading keeps one narrow figure where the reader has asked for one.
 
@@ -254,7 +272,7 @@ It is built as the last step of that order: the wings give way, then the gutters
 
 *A trial, 2026-09-16, as built; the author's word is wanted before the rule moves.*
 
-## 9. What is not answered
+## 10. What is not answered
 
 Which edge the rail stands on: the left, as built, where the shape has always stood, and the reset's direction follows from it. Whether it is the right edge, under the thumb of a hand holding the phone, is the author's to say.
 
