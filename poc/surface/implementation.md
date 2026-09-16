@@ -238,7 +238,7 @@ The canvas draws the scope as nodes from the same state the lane draws, so foldi
 
 Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone beneath its row, held by dashed edges that come out of the row's own sides, so no layout is computed by hand and nothing shifts. A borrowing node's zone is its home's level, named as such above it. One SVG over the nodes draws the arrows from each step to the next, and the links of the highlighted node as dashed curves from its ports to whatever of their targets stand on the canvas, measured after the nodes are laid and divided by the zoom, and drawn again on a fold, a resize, a change of focus or pointer, or the fonts landing.
 
-The ports stand outside the row, what points at the node to its left and what it points at to its right, a cell per brief in its hue, the rest collapsed into a count past five. The depth strip stands in the way down, a cell per level beneath the scope; a press or a scrub across it opens every brief of the scope to that depth and folds beyond, as one change the reader can undo.
+The ports stand outside the row, what points at the node to its left and what it points at to its right, a cell per brief in its hue, the rest collapsed into a count past five. The depth strip stands in the way down, a cell per level beneath the scope; a press or a scrub across it unfolds every brief of the scope to that depth and folds beyond, as one change the reader can undo.
 
 With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from the canvas alone.
 

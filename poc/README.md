@@ -31,7 +31,7 @@ The surface is the interface a document and a directory listing are missing, the
 
 Knowledge under the code stands in a shape, and neither of those lets a reader move by that shape or see it: a document makes you scroll past whatever you meant to skip, a listing gives names and nothing of the shape they stand in, and neither tells you what a part will cost before you have spent the reading on it.
 
-So the surface reads a body in one lane of prose, each brief folded or opened as the reader chooses, and it orients from the sides: where the reader came from, what lies beneath, what a brief points at, as headings and shape rather than as more text. It stands on the markdown and the directories rather than replacing them, and a session's own work is read the same way once it is written down there.
+So the surface reads a body in one lane of prose, each brief folded or unfolded as the reader chooses, and it orients from the sides: where the reader came from, what lies beneath, what a brief points at, as headings and shape rather than as more text. It stands on the markdown and the directories rather than replacing them, and a session's own work is read the same way once it is written down there.
 
 *In force, the author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use.*
 

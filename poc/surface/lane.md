@@ -16,7 +16,7 @@ The space between briefs steps down with depth, as [the design language's rhythm
 
 ## 2. Two grades
 
-Every brief in the lane stands at one of two grades: its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and the level beneath it laid at faces, unless the reader has already folded or opened there.
+Every brief in the lane stands at one of two grades: its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and the level beneath it laid at faces, unless the reader has already folded or unfolded there.
 
 A brief never folds past its face, so nothing in the lane is ever a bare name, and folding is one act with one inverse.
 
@@ -40,7 +40,7 @@ Its address is the page's address, so the place a reader stands can be handed to
 
 ### 4.1 Where the reading line stands
 
-Where the line stands is a setting with two values, the middle or easing to the ends, since a reader who opens a body wants its first prose at the top of the screen, and a reader deep in one wants the line in the middle. At the middle, it stays at the middle of the viewport, with half a screen of room above the first brief and below the last so both can reach it.
+Where the line stands is a setting with two values, the middle or easing to the ends, since a reader who arrives at a body wants its first prose at the top of the screen, and a reader deep in one wants the line in the middle. At the middle, it stays at the middle of the viewport, with half a screen of room above the first brief and below the last so both can reach it.
 
 Easing to the ends, which is where a reader starts, it stands on the opening at the top of the lane, the opening's heading level with the first row of [the shape](widgets.md#3-the-shape), so the first prose starts at the top of the screen and not halfway down. A third of a screen of scrolling eases it to the middle. The same holds at the foot, where it eases down onto the last brief and the last block stands level with the shape's last row, so the shape stands balanced at both ends.
 
@@ -86,7 +86,7 @@ Scrolling afterwards moves the focus and changes no grade, so nothing reflows un
 
 ### 5.1 Going from a figure is not an arrival
 
-Going to a brief from [the tree](widgets.md#2-the-tree) or another [figure](framework.md#1-three-kinds-of-widget) keeps every fold the reader has made, opens only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
+Going to a brief from [the tree](widgets.md#2-the-tree) or another [figure](framework.md#1-three-kinds-of-widget) keeps every fold the reader has made, unfolds only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
 
 A reload of the place the reader stood is not an arrival either. The lane as laid, its scope and every fold, is kept in the browser's storage as it changes, and a reload at the same address lays it again as it was left.
 
@@ -94,21 +94,21 @@ A reload of the place the reader stood is not an arrival either. The lane as lai
 
 ### 5.2 Escape is an undo
 
-Every change a reader makes to the lane, a fold or an opening, a change of scope, a going or an arrival, is recorded as the lane stood before it: its scope, every fold, the focus and the scroll. Escape lays the lane back as it was, exactly where the reader stood, and shift with escape makes the change again.
+Every change a reader makes to the lane, a fold or an unfolding, a change of scope, a going or an arrival, is recorded as the lane stood before it: its scope, every fold, the focus and the scroll. Escape lays the lane back as it was, exactly where the reader stood, and shift with escape makes the change again.
 
 Scrolling alone is not a change, and a new change clears what was undone.
 
 *Reasoned, the author's ask of 2026-09-14, after a step back through the history had not returned a reader from holding the space bar.*
 
-## 6. Folding and opening
+## 6. Folding and unfolding
 
-Folding takes a brief to its face and opening takes it whole, [the two grades](#2-two-grades), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
+Folding takes a brief to its face and unfolding takes it whole, [the two grades](#2-two-grades), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
 *Reasoned, the author's, 2026-09-13; pressing the face is the author's lean, and the best gesture is not yet known.*
 
 ### 6.1 The action line is the press
 
-A folded brief carries a line beneath its face that says open, with a small bar for every paragraph it hides, a small frame for every image, and a count of the briefs beneath it. A whole brief carries a line at its foot that says fold. What a press would give is known before it is pressed.
+A folded brief carries a line beneath its face that says unfold, with a small bar for every paragraph it hides, a small frame for every image, and a count of the briefs beneath it. A whole brief carries a line at its foot that says fold. What a press would give is known before it is pressed.
 
 The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line, and no key acts on it either, so nothing about it can ever change under the reader.
 
@@ -118,21 +118,21 @@ The line is the press, and nothing else in the brief is: the text stays text, no
 
 The tree is the lane's own outline, so folding a row there is folding the brief in the lane, one state and never two, and there the folder's triangle does it, since that is what a tree reader expects.
 
-In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press with the modifier key held folds or opens it in place. In the shape, the room to the right of a brief's blocks folds or opens it, [as the shape says](widgets.md#34-two-presses-read-from-where-they-land), and no modifier is needed.
+In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press with the modifier key held folds or unfolds it in place. In the shape, the room to the right of a brief's blocks folds or unfolds it, [as the shape says](widgets.md#34-two-presses-read-from-where-they-land), and no modifier is needed.
 
 *Reasoned, the author's, 2026-09-13.*
 
 ### 6.3 The keys
 
-The space bar folds or opens the brief in focus, and with shift held it folds the brief above, the parent of the focus, which takes the reader up to it. It acts when it is let go, so it can also be held: held a moment, it opens every brief in the scope, and with shift folds every brief in the scope to its face, and letting it go then does nothing more.
+The space bar folds or unfolds the brief in focus, and with shift held it folds the brief above, the parent of the focus, which takes the reader up to it. It acts when it is let go, so it can also be held: held a moment, it unfolds every brief in the scope, and with shift folds every brief in the scope to its face, and letting it go then does nothing more.
 
-The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right opens the scope one level less or one level more, as [the depth strip](canvas.md#32-scope-and-how-far-things-explode) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
+The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#32-scope-and-how-far-things-explode) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
 
-*Reasoned, the author's, 2026-09-13; the space bar acting on release and opening the scope when held, 2026-09-14.*
+*Reasoned, the author's, 2026-09-13; the space bar acting on release and unfolding the scope when held, 2026-09-14.*
 
 ### 6.4 The heading acted on keeps its place
 
-Whatever changes, the heading of the brief acted on keeps its place on the screen, so a press never moves what was pressed and the reader's place never scrolls away. Opening never scrolls, and folding a brief the reader is not inside never scrolls either.
+Whatever changes, the heading of the brief acted on keeps its place on the screen, so a press never moves what was pressed and the reader's place never scrolls away. Unfolding never scrolls, and folding a brief the reader is not inside never scrolls either.
 
 The one exception is a fold that takes away what stood under the reader: a long brief folded from inside it takes the reader up with it, its heading returning to the reading line. And when the brief in focus leaves the lane, because the brief above it was folded, the focus moves to that brief.
 
@@ -140,7 +140,7 @@ The one exception is a fold that takes away what stood under the reader: a long 
 
 ### 6.5 The flick, a trial
 
-A small reversal of the scroll, down then up then down within a moment, folds or opens the brief in focus. The fold it makes is a change like any other, though the scrolling is not. It costs nothing to a reader who never does it, and whether it fires by accident is what the trial measures. It is on by a setting.
+A small reversal of the scroll, down then up then down within a moment, folds or unfolds the brief in focus. The fold it makes is a change like any other, though the scrolling is not. It costs nothing to a reader who never does it, and whether it fires by accident is what the trial measures. It is on by a setting.
 
 *A trial, 2026-09-13.*
 
@@ -178,7 +178,7 @@ A pull that stops drains, so nothing happens by accident: it springs back after 
 
 ### 7.5 The way down stands over the lane
 
-The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is opened, [the depth](canvas.md#32-scope-and-how-far-things-explode), which moves the lane and the canvas alike; and how the reader came here, at the right.
+The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is unfolded, [the depth](canvas.md#32-scope-and-how-far-things-explode), which moves the lane and the canvas alike; and how the reader came here, at the right.
 
 How here is placed is the run of levels from the root to the scope. The levels above stand as faint names, each a press that scopes out to it, the scope root a step darker, and a small chevron between, each name lit in its branch's colour when pointed at. The prose is always clear beneath it, whatever the fade at the top is doing, and a wing's figures begin below it too.
 
@@ -196,7 +196,7 @@ The lane lays a level as a reading: the brief that gives the most understanding 
 
 ## 9. Following a link moves you
 
-A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3-the-shape) already shows it, open or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
+A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3-the-shape) already shows it, unfolded or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
 
 Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#75-the-way-down-stands-over-the-lane).
 

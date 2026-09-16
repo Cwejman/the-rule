@@ -22,7 +22,7 @@ The surface is going to have a few modes, chosen perhaps from a centred menu at 
 
 ## 3. Nodes and edges, drawn from the same state
 
-The canvas is nodes and edges, and it draws the same state the lane draws: the scope, every brief's grade, the focus and the pointer. A brief is a node, at its face when folded and open as a zone when whole, so folding on the canvas is folding in the lane, one state and never two, as [the tree](widgets.md#2-the-tree) already holds.
+The canvas is nodes and edges, and it draws the same state the lane draws: the scope, every brief's grade, the focus and the pointer. A brief is a node, at its face when folded and unfolded as a zone when whole, so folding on the canvas is folding in the lane, one state and never two, as [the tree](widgets.md#2-the-tree) already holds.
 
 Pointing at a node lights it wherever it is drawn, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn). The brief in focus, where the reading stands, is highlighted apart from that, and where the reader came from is marked apart from both.
 
@@ -38,9 +38,9 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 ### 3.2 Scope, and how far things explode
 
-As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels open, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
+As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels unfold, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
 
-As built, a strip in the way down holds a cell per level beneath the scope, the open ones marked, and a press or a scrub across it opens the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown.
+As built, a strip in the way down holds a cell per level beneath the scope, the unfolded ones marked, and a press or a scrub across it unfolds the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown.
 
 *The author's, 2026-09-15; the strip as built the same day.*
 
@@ -48,7 +48,7 @@ As built, a strip in the way down holds a cell per level beneath the scope, the 
 
 A level is laid as a column, since the lane reads down and a drawer's scroll maps straight onto a column, and steps are wide because they carry their headings.
 
-An unfolded step opens a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them. So a flow that branches spreads across, and one that does not stays a column.
+An unfolded step holds a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them. So a flow that branches spreads across, and one that does not stays a column.
 
 ```
  Onboarding                        the scope root, the entry at the top
@@ -118,7 +118,7 @@ What links to a node is the harder case, since there can be many, and a column g
 
 ## 7. The prose beside the nodes
 
-The first thought was a page of its own, with each node holding all of its prose. Now a brief is always its own node, and how the nodes compose depends on what is folded and opened, so two ways stand: the prose read in place in the nodes, or the nodes condensed and the prose in a drawer to one side.
+The first thought was a page of its own, with each node holding all of its prose. Now a brief is always its own node, and how the nodes compose depends on what is folded and unfolded, so two ways stand: the prose read in place in the nodes, or the nodes condensed and the prose in a drawer to one side.
 
 *The author's, 2026-09-15.*
 

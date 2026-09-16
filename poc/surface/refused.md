@@ -80,21 +80,21 @@ Refused with the panes; there is no row to move.
 
 ## m. The depth beneath a brief behind a pointer and a press
 
-The second program drew the level beneath a brief as a small band beside its heading, told it on pointing, and opened it on a press.
+The second program drew the level beneath a brief as a small band beside its heading, told it on pointing, and unfolded it on a press.
 
 That is not how a document reads: its subsections present themselves as you scroll. The lane lays the level beneath a whole brief [at faces](lane.md#3-one-step-ahead), and a reader folds what they do not want rather than asking for what they do.
 
-## n. Pressing a brief to open its level without entering it
+## n. Pressing a brief to unfold its level without entering it
 
-The second program's press opened the level under a brief in a new pane, on the ground that a reader had just read the brief and need not enter it.
+The second program's press unfolded the level under a brief in a new pane, on the ground that a reader had just read the brief and need not enter it.
 
-With the level laid in the lane there is nothing to open beside the brief. A press opens the brief itself, whole, in place, and [the action line folds it](lane.md#61-the-action-line-is-the-press).
+With the level laid in the lane there is nothing to unfold beside the brief. A press unfolds the brief itself, whole, in place, and [the action line folds it](lane.md#61-the-action-line-is-the-press).
 
 ## o. The path as columns of siblings, stacked
 
 The second model's first tree drew the root's level, then beneath it the level of the brief taken, then the next, each level a column under the last.
 
-The author found it strange: a brief's children stood at the bottom of the figure rather than beneath the brief, and nothing in it opened or closed. [The tree](widgets.md#2-the-tree) nests as a file tree does.
+The author found it strange: a brief's children stood at the bottom of the figure rather than beneath the brief, and nothing in it folded or unfolded. [The tree](widgets.md#2-the-tree) nests as a file tree does.
 
 ## p. A fade by distance from the focus
 
@@ -112,7 +112,7 @@ Refused by the author on the second reading as impractical and strange. A brief 
 
 A small chevron at the left of every heading in the lane, turning down when the brief was whole.
 
-The author's verdict: going for a small, not so pretty icon up top is absolutely not right. [The face is the fold](lane.md#6-folding-and-opening), pressed where the reader is already looking; the tree alone keeps the triangle, as a tree does.
+The author's verdict: going for a small, not so pretty icon up top is absolutely not right. [The face is the fold](lane.md#6-folding-and-unfolding), pressed where the reader is already looking; the tree alone keeps the triangle, as a tree does.
 
 ## s. The ahead as columns by depth
 
@@ -122,15 +122,15 @@ Superseded by [the shape's form](widgets.md#4-the-ahead) on the author's reading
 
 ## t. A tinted surface as the fold
 
-The heading and the first paragraph tinted under the pointer, and a press anywhere on them folding or opening the brief.
+The heading and the first paragraph tinted under the pointer, and a press anywhere on them folding or unfolding the brief.
 
-The author dropped the tint and made [the action line](lane.md#61-the-action-line-is-the-press) the press: open beneath a folded face, fold at the foot of a whole brief. The text stays text.
+The author dropped the tint and made [the action line](lane.md#61-the-action-line-is-the-press) the press: unfold beneath a folded face, fold at the foot of a whole brief. The text stays text.
 
-## u. A tree with an opening of its own
+## u. A tree with an unfolding of its own
 
-The tree's second build could open and close its rows apart from the lane.
+The tree's second build could unfold and fold its rows apart from the lane.
 
-The author found it strange again: opening there and opening in the text should be one thing. [The tree](widgets.md#2-the-tree) is the lane's own outline, one state and never two.
+The author found it strange again: unfolding there and unfolding in the text should be one thing. [The tree](widgets.md#2-the-tree) is the lane's own outline, one state and never two.
 
 ## v. A level merged into one block
 

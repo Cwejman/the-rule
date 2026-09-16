@@ -968,12 +968,12 @@ const nearestInLane = (a: string): string => prefixesOf(a).findLast((p) => inLan
 /** How many briefs stand beneath an address, at any depth. */
 const beneathCount = (a: string): number => level(a).reduce((s, k) => s + 1 + beneathCount(k.address), 0);
 
-/** The level a brief opens onto: its own, or the one it borrows. */
+/** The level a brief unfolds onto: its own, or the one it borrows. */
 const levelOf = (b: Brief): Brief[] => level(b.borrow ?? b.address);
-/** How many briefs a brief opens onto, its own or borrowed. */
+/** How many briefs a brief unfolds onto, its own or borrowed. */
 const beneathOf = (b: Brief): number => beneathCount(b.borrow ?? b.address);
-/** Whether a brief can open at all: paragraphs past its face, or a level, its own or borrowed. */
-const opens = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
+/** Whether a brief unfolds at all: paragraphs past its face, or a level, its own or borrowed. */
+const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 /** The number a heading shows in the lane: counted from the scope, as the canvas counts, since a reader stands in the substrate and not in a file. */
@@ -1046,7 +1046,7 @@ const ACTIONS: Record<string, Action> = {
     help: "Unfolds the brief the reading line stands on, and folds it again to its face.",
     also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
     shifted: "Shift folds the brief above instead, which takes you up to it.",
-    can: (a) => !!brief(acts(a)) && opens(brief(acts(a))!),
+    can: (a) => !!brief(acts(a)) && unfolds(brief(acts(a))!),
     run: (a) => cycle(acts(a)),
   },
   foldUp: {
@@ -1062,7 +1062,7 @@ const ACTIONS: Record<string, Action> = {
     help: "Unfolds every brief in the scope, held a moment.",
     also: "The depth strip, scrubbed to its end.",
     can: () => scopeDepth() > 0,
-    run: () => openAll(),
+    run: () => unfoldAll(),
   },
   foldAll: {
     label: () => "fold the scope",
@@ -1094,8 +1094,8 @@ const ACTIONS: Record<string, Action> = {
     help: "Unfolds every brief of the scope one level further, and folds what lies beyond it.",
     also: "Pressing or scrubbing the depth strip.",
     glyph: "deeper",
-    can: () => openDepth() < scopeDepth(),
-    run: () => openTo(Math.min(scopeDepth(), openDepth() + 1)),
+    can: () => unfoldedDepth() < scopeDepth(),
+    run: () => unfoldTo(Math.min(scopeDepth(), unfoldedDepth() + 1)),
   },
   shallower: {
     label: () => "a level less",
@@ -1103,8 +1103,8 @@ const ACTIONS: Record<string, Action> = {
     help: "Folds the scope back a level, so one level less stands unfolded.",
     also: "Pressing or scrubbing the depth strip.",
     glyph: "shallower",
-    can: () => openDepth() > 0,
-    run: () => openTo(Math.max(0, openDepth() - 1)),
+    can: () => unfoldedDepth() > 0,
+    run: () => unfoldTo(Math.max(0, unfoldedDepth() - 1)),
   },
   next: {
     label: () => "next",
@@ -1268,7 +1268,7 @@ const CHEVRON = `<svg viewBox="0 0 10 10"><path d="M3.2 1.8 6.6 5 3.2 8.2"/></sv
 
 /** A tree row's fold mark, the one place a mark folds: a chevron that turns down when whole and points right at a face. */
 const foldMark = (b: Brief): string =>
-  `<button class="mark ${gradeOf(b.address) ?? "none"}${b.door ? "" : " leaf"}" data-fold="${esc(b.address)}" data-tip="fold or open">${CHEVRON}</button>`;
+  `<button class="mark ${gradeOf(b.address) ?? "none"}${b.door ? "" : " leaf"}" data-fold="${esc(b.address)}" data-tip="fold or unfold">${CHEVRON}</button>`;
 
 /** The gap after a brief, by the depth of the level the next brief begins: tighter the deeper, so what lies beneath a brief sits together and its siblings stand apart. */
 const gapAfter = (nextDepth: number): number => [56, 56, 40, 28, 20][Math.min(4, nextDepth)] ?? 16;
@@ -1279,11 +1279,11 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
   const beneath = beneathOf(b);
-  // a folded brief says beneath its face that it opens: a bar per paragraph it hides, a frame per image, and how many
+  // a folded brief says beneath its face that it unfolds: a bar per paragraph it hides, a frame per image, and how many
   // briefs lie beneath
   const more =
     g === "face" && (rest.length > 0 || beneath > 0)
-      ? `<div class="act more chrome" data-fold="${esc(b.address)}">${CHEVRON}<span>open</span>` +
+      ? `<div class="act more chrome" data-fold="${esc(b.address)}">${CHEVRON}<span>unfold</span>` +
         (rest.length ? `<span class="bars">${rest.slice(0, 12).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${rest.length > 12 ? `<b>+${rest.length - 12}</b>` : ""}</span>` : "") +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
         `</div>`
@@ -1422,19 +1422,19 @@ function stripHtml(area: AreaName, kind: Widget["kind"]): string {
 // ## 3.5 The tree: the lane as an outline
 //
 // The lane's briefs as a file tree: a row per brief in the lane, nested under
-// its parent, open where the brief is whole. Opening in the tree is opening in
-// the lane, one state. The name goes; a line lies across the row of the focus.
+// its parent, unfolded where the brief is whole. Unfolding in the tree is
+// unfolding in the lane, one state. The name goes; a line lies across the row of the focus.
 
 function treeHtml(): string {
   const node = (b: Brief, d: number): string => {
     if (!inLane(b.address)) return "";
-    const open = gradeOf(b.address) === "whole";
+    const whole = gradeOf(b.address) === "whole";
     const on = prefixesOf(state.focus).includes(b.address);
     return (
       `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--d:${d}">` +
       foldMark(b) +
       `<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span></div>` +
-      (open ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
+      (whole ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
       `</div>`
     );
   };
@@ -1749,7 +1749,7 @@ function shapeSvg(W: number, H: number): string {
       .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(SHAPE.bar * 0.6) : Math.max(4, Math.round(SHAPE.bar * b.width)), Math.max(1.2, b.height * k - 1)))
       .join("");
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
-    // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when open
+    // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
     const b = brief(l.a);
     const folded = b !== undefined && gradeOf(l.a) === "face";
     const ghost = folded ? "" : " ghost";
@@ -1784,7 +1784,7 @@ function shapeSvg(W: number, H: number): string {
       l.a === state.scope && first
         ? anc.map((a, i) => `<g class="cell above" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}><rect class="hit" x="${SHAPE.pad + i * 8 - 1}" y="${(4 + first.top * k - 4).toFixed(1)}" width="8" height="${(Math.max(10, first.height * k) + 8).toFixed(1)}"/><rect class="head" x="${SHAPE.pad + i * 8}" y="${(4 + first.top * k).toFixed(1)}" width="6" height="${Math.max(10, first.height * k - 1).toFixed(1)}" rx="1.5"/></g>`).join("")
         : "";
-    // two presses: the blocks go to the brief; the room to their right, where what is hidden stands, folds or opens it,
+    // two presses: the blocks go to the brief; the room to their right, where what is hidden stands, folds or unfolds it,
     // the levels above are drawn last, so they take the press
     const top = (4 + l.top * k).toFixed(1);
     const height = Math.max(1, l.height * k).toFixed(1);
@@ -1944,7 +1944,7 @@ function plateSvg(W: number, H: number): string {
 //
 // The scope's root stands at the top as the entry, and its level beneath it as
 // a column, each brief a node. Folded, a node is its row, with marks for what
-// it hides. Whole, its row opens a zone beneath it holding its level as a
+// it hides. Whole, its row holds a zone beneath it holding its level as a
 // column again, or as a row of columns when the level is a set. The nodes are
 // HTML laid out by the browser; one SVG over them draws the arrows from each
 // step to the next once the nodes are measured; and pan and zoom are one
@@ -1994,7 +1994,7 @@ function canvasNodeHtml(b: Brief): string {
   const set = home ? home.set : b.set;
   const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
   // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
-  return `<div class="cnode${zone ? " open" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
+  return `<div class="cnode${zone ? " whole" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -2095,33 +2095,33 @@ function drawEdges(): void {
   svg.innerHTML = paths.join("");
 }
 
-// ### 3.11.1 The depth: every brief in the scope opened to a depth, and folded beyond it
+// ### 3.11.1 The depth: every brief in the scope unfolded to a depth, and folded beyond it
 
 /** The deepest level beneath the scope root, counted from it. */
 const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter((b) => within(b.address, state.scope)).map((b) => depthIn(b.address)));
 
-/** The depth the scope stands open to: the largest such that every brief with a level above it is whole. */
-function openDepth(): number {
+/** The depth the scope stands unfolded to: the largest such that every brief with a level above it is whole. */
+function unfoldedDepth(): number {
   let d = 0;
   while (d < scopeDepth() && state.body!.briefs.every((b) => !within(b.address, state.scope) || depthIn(b.address) !== d || levelOf(b).length === 0 || gradeOf(b.address) === "whole")) d++;
   return d;
 }
 
-/** The depth strip, in the way down: a cell per level beneath the scope, the open depth marked; pressing or scrubbing across sets it, in the lane as on the canvas. */
+/** The depth strip, in the way down: a cell per level beneath the scope, the unfolded depth marked; pressing or scrubbing across sets it, in the lane as on the canvas. */
 function depthHtml(): string {
   const n = scopeDepth();
   if (n === 0) return "";
-  const open = openDepth();
-  return `<div id="depth" data-tip="how far the scope is opened">${Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= open ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("")}</div>`;
+  const unfolded = unfoldedDepth();
+  return `<div id="depth" data-tip="how far the scope is unfolded">${Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("")}</div>`;
 }
 
-/** Opens every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
-function openTo(n: number): void {
+/** Unfolds every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
+function unfoldTo(n: number): void {
   const inScope = state.body!.briefs.filter((b) => b.address !== state.scope && within(b.address, state.scope));
   refold(() => {
     inScope.filter((b) => depthIn(b.address) === n && inLane(b.address)).forEach((b) => setGrade(b.address, "face"));
     inScope
-      .filter((b) => depthIn(b.address) < n && opens(b))
+      .filter((b) => depthIn(b.address) < n && unfolds(b))
       .sort((x, y) => depthOf(x.address) - depthOf(y.address))
       .forEach((b) => setGrade(b.address, "whole"));
   });
@@ -2904,7 +2904,7 @@ const sameSnapshot = (x: Snapshot, y: Snapshot): boolean =>
   x.scope === y.scope && x.focus === y.focus && x.scroll === y.scroll && JSON.stringify(x.grades) === JSON.stringify(y.grades) && JSON.stringify(x.trail) === JSON.stringify(y.trail);
 
 /**
- * Records the lane as it stands, before a change the reader makes: a fold or an opening, a change of scope, a going or
+ * Records the lane as it stands, before a change the reader makes: a fold or an unfolding, a change of scope, a going or
  * an arrival. Scrolling alone records nothing. A change made of two, a going that widens the scope first, records once.
  */
 function record(): void {
@@ -2947,7 +2947,7 @@ function redo(): void {
 
 /**
  * Follows a link in the lane. A local link, one whose target stands within the scope, so the shape already shows it,
- * open or folded, goes there as an arrival and scopes nothing; enter scopes once there. Any other link scopes the lane
+ * unfolded or folded, goes there as an arrival and scopes nothing; enter scopes once there. Any other link scopes the lane
  * to its target, or to the target's parent when the target has no level beneath it, and adds a hop to the trail: the
  * link followed, with the lane as it stood before.
  */
@@ -2991,7 +2991,7 @@ function goTo(a: string): void {
   settleTrail();
 }
 
-/** Settles on an address without laying the lane afresh: opens the way to it where it is folded, then scrolls. */
+/** Settles on an address without laying the lane afresh: unfolds the way to it where it is folded, then scrolls. */
 function settle(a: string): void {
   const target = brief(a) ? a : nearest(a);
   if (!inLane(target)) {
@@ -3031,8 +3031,8 @@ function recalledLane(): { scope: string; grades: [string, Grade][]; trail?: Hop
 
 /**
  * Lays the lane again as the reader left it: a reload of the same place is not an arrival, so its scope and every fold
- * come back. What no longer resolves is dropped, a brief whose parent is not open leaves with it, and the way to the
- * focus stands open.
+ * come back. What no longer resolves is dropped, a brief whose parent is not unfolded leaves with it, and the way to
+ * the focus stands unfolded.
  */
 function resume(a: string, kept: { scope: string; grades: [string, Grade][]; trail?: Hop[] }): void {
   arriving = true;
@@ -3203,11 +3203,11 @@ function refold(change: () => void, anchor: string = state.focus, jump = false):
   light();
 }
 
-/** A fold toggles one brief between its face and whole. Opening a brief not in the lane opens what leads to it. */
+/** A fold toggles one brief between its face and whole. Unfolding a brief not in the lane unfolds what leads to it. */
 function cycle(a: string): void {
   const b = brief(a);
-  if (a === "" || !b || !opens(b)) return;
-  // only a fold that takes away what stood under the reader moves them; opening, or folding elsewhere, never scrolls
+  if (a === "" || !b || !unfolds(b)) return;
+  // only a fold that takes away what stood under the reader moves them; unfolding, or folding elsewhere, never scrolls
   const jump = gradeOf(a) === "whole" && within(state.focus, a);
   refold(
     () => {
@@ -3255,10 +3255,10 @@ const popUp = (): void => void (state.scope !== "" && scopeTo(parentOf(state.sco
 /** How long the space bar is held before it acts on the whole scope rather than the brief in focus. */
 const HOLD = 450;
 
-/** Space held: every brief in the scope opened whole, the heading in focus kept where it stands. */
-function openAll(): void {
+/** Space held: every brief in the scope unfolded whole, the heading in focus kept where it stands. */
+function unfoldAll(): void {
   refold(() =>
-    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && opens(b) && setGrade(b.address, "whole")),
+    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && unfolds(b) && setGrade(b.address, "whole")),
   );
 }
 
@@ -3287,7 +3287,7 @@ function wire(): void {
     pointer.still = false;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would open
+    // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
     const el = named(e);
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
     if (el?.tagName === "A" && el.closest("#lane")) el.closest(".brief")?.classList.add("keep");
@@ -3312,7 +3312,7 @@ function wire(): void {
     const pc = t.closest<HTMLElement>(".pc[data-a]");
     if (pc) return void goTo(pc.dataset.a!);
     const dc = t.closest<HTMLElement>("[data-depth]");
-    if (dc) return void openTo(Number(dc.dataset.depth));
+    if (dc) return void unfoldTo(Number(dc.dataset.depth));
     if (t.closest("#canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
@@ -3346,7 +3346,7 @@ function wire(): void {
     if (go) return void goTo(go.dataset.go!);
     const cell = t.closest<HTMLElement>("svg.fig [data-a]");
     if (!cell || state.scrubbing) return;
-    // in the shape the blocks go and the room to their right folds or opens; in the other figures a press goes and the modifier folds
+    // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
     const press = t.closest<HTMLElement>("[data-press]")?.dataset.press;
     const folds = press ? press === "fold" : e.metaKey || e.ctrlKey;
     return void (folds ? cycle(cell.dataset.a!) : goTo(cell.dataset.a!));
@@ -3440,7 +3440,7 @@ function wire(): void {
   // the depth strip scrubs: with the button held, crossing a cell sets that depth
   ui.crumb.addEventListener("pointerover", (e) => {
     const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
-    if (dc && e.buttons & 1) openTo(Number(dc.dataset.depth));
+    if (dc && e.buttons & 1) unfoldTo(Number(dc.dataset.depth));
   });
   // Safari sends a pinch as a gesture of its own, with the scale so far
   let pinch = 1;
@@ -3808,7 +3808,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .pc:hover, .pc.lit, .pc.tie { background: var(--lit); }
 .pc.more { width: auto; height: 8px; display: grid; align-items: center; background: none; color: var(--faint); font-family: var(--sans); font-size: 8.5px; line-height: 1; letter-spacing: -.02em; cursor: default; }
 #edges path.link { stroke: var(--lit); stroke-dasharray: 3 3; }
-/* the depth strip stands in the way down, before the trail: a cell per level, the open ones marked */
+/* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--track); color: var(--ink); }

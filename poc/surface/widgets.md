@@ -54,13 +54,13 @@ It is one element on the page's own ground, never under the pointer, and it goes
 
 ## 2. The tree
 
-The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, open where the brief is whole. It is not a second state: folding a row folds the brief in the lane and opening one opens it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
+The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
 
 Pressing a row's name goes to the brief. A line lies across the highlighted row and glides as the highlight moves. The wing scrolls only to keep the focus in view, driven by the lane and never free.
 
 When the lane is [scoped](lane.md#7-scoping-the-lane), the levels above stand as dim rows over the root, each a way out.
 
-*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an opening of its own](refused.md#u-a-tree-with-an-opening-of-its-own) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an unfolding of its own](refused.md#u-a-tree-with-an-unfolding-of-its-own) were built first and refused.*
 
 ## 3. The shape
 
@@ -90,11 +90,11 @@ The viewport, the part of the lane on the screen, is drawn over the shape as a s
 
 ### 3.4 Two presses, read from where they land
 
-A brief has two presses, and what a press does is read from where it lands, so no modifier key is needed. Its blocks go to it. The room to their right, where its ticks and tail stand when it is folded and nothing stands when it is open, folds or opens it, and folding from there never scrolls the lane.
+A brief has two presses, and what a press does is read from where it lands, so no modifier key is needed. Its blocks go to it. The room to their right, where its ticks and tail stand when it is folded and nothing stands when it is unfolded, folds or unfolds it, and folding from there never scrolls the lane.
 
 The room reaches only as far as the marks do, and keeps to its own row, since rows touch and a room reaching into its neighbour would light one row while pointing at another. A row thinner than six pixels is given six there, so it can be hit.
 
-Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows what the brief hides before the press opens it, and the brief lights elsewhere as it would. In the shape itself its blocks stay unlit and only the marks answer: over a folded brief its ticks and tail light, and over an open one they show as a grey ghost of what a fold would hide. So resting on the room reads apart from resting on the blocks.
+Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows what the brief hides before the press unfolds it, and the brief lights elsewhere as it would. In the shape itself its blocks stay unlit and only the marks answer: over a folded brief its ticks and tail light, and over an unfolded one they show as a grey ghost of what a fold would hide. So resting on the room reads apart from resting on the blocks.
 
 *Reasoned, the author's, 2026-09-13; the room pointing at its brief, 2026-09-14, so the ahead previews a fold from there too.*
 
@@ -106,9 +106,9 @@ The ahead is the right wing's first widget: what the highlighted brief hides. It
 
 ### 4.1 It draws in the shape's form
 
-It draws [as the shape draws](#3-the-shape), so a reader learns one figure and not two: first the brief itself with the paragraphs its face hides, then everything beneath it, each brief a heading bar and its paragraphs as blocks, shifted right by nesting. So opening a brief that is only more paragraphs is understood as exactly that, before it is pressed.
+It draws [as the shape draws](#3-the-shape), so a reader learns one figure and not two: first the brief itself with the paragraphs its face hides, then everything beneath it, each brief a heading bar and its paragraphs as blocks, shifted right by nesting. So unfolding a brief that is only more paragraphs is understood as exactly that, before it is pressed.
 
-No names are drawn in the cells; the cell under the pointer is named beneath the figure, and above it the brief whose hidden part is drawn is named by its whole path, since the path is its address. The figure is only as large as what it draws needs, and it keeps its root while the pointer moves within it, so it does not redraw under the pointer. Pressing a cell goes there, which opens it.
+No names are drawn in the cells; the cell under the pointer is named beneath the figure, and above it the brief whose hidden part is drawn is named by its whole path, since the path is its address. The figure is only as large as what it draws needs, and it keeps its root while the pointer moves within it, so it does not redraw under the pointer. Pressing a cell goes there, which unfolds it.
 
 *Reasoned, the author's ask of 2026-09-13.*
 
@@ -170,7 +170,7 @@ The plate is a wing widget: the body whole in one square, drawn as droplets on a
 
 ### 7.1 Droplets meet without merging
 
-Each droplet is cut by its neighbours where they meet, so the plate is shared by what each brief [weighs](#62-the-switches), and a droplet stays compact however small it gets, where [a rectangle's cells degenerate](refused.md#f-a-rectangle-dividing-into-rectangles). Pressing a droplet goes there, and pressing with the modifier key held, command or control, folds or opens it in place, since a droplet has no room beside it for a second press.
+Each droplet is cut by its neighbours where they meet, so the plate is shared by what each brief [weighs](#62-the-switches), and a droplet stays compact however small it gets, where [a rectangle's cells degenerate](refused.md#f-a-rectangle-dividing-into-rectangles). Pressing a droplet goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place, since a droplet has no room beside it for a second press.
 
 *Reasoned, the author's, 2026-09-12.*
 
