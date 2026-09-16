@@ -72,6 +72,14 @@ And it comes and goes rather than appearing: it eases away and back over four te
 
 *The author's asks of 2026-09-16, on reading the first build on his phone: a surface with a border, blur and a light shadow, more expressive than three dots, and a coming and going that is not rigid.*
 
+### 3.2 It stands over the prose, and keeps no room of its own
+
+Standing over the reading is the whole of what the mark is for, so the prose runs under it and [the fade at the foot](lane.md#45-a-fade-at-the-edges) is what keeps that readable. The room it was given to stand in was room taken from the reading, which on a phone is the thing there is least of.
+
+Wide this does not hold: the row spans the page, so it keeps its room and the prose ends above it.
+
+*The author's, 2026-09-16, on reading a foot that had kept 78 clear of a screen 844 tall; as built the same day, the prose running 54 further down.*
+
 ## 4. What stands on a phone
 
 The chooser holds the prose, the canvas, the rail and the settings. Four, and [the help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.

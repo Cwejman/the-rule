@@ -2484,10 +2484,13 @@ const GUTTER = { want: 210, least: 132 };
 const STRIP = 34;
 /** The room the foot keeps clear: the strip's icons with as much above them as below. */
 const FOOT = STRIP + 10;
-/** The mark at the foot of a narrow reading stands taller than the row does, and keeps its own room clear beneath the prose. */
-const MARK = { size: 46, bottom: 22 };
-/** The room the foot keeps clear: the strip's room wide, the mark's room narrow. */
-const footRoom = (): number => (narrow() ? MARK.size + MARK.bottom + 10 : FOOT);
+/**
+ * The room the foot keeps clear of the prose. Wide, it is the strip's own room, since the row of icons spans the page
+ * and would otherwise sit on the text. Narrow, it is one gap: the mark is a single round thing over the middle of the
+ * prose, and standing over the reading is the whole of what it is for, so the fade is what keeps it readable and the
+ * prose keeps the room it would otherwise have lost.
+ */
+const footRoom = (): number => (narrow() ? state.settings.gap : FOOT);
 /** Where the prose's fade lies at each edge of the lane: clear from the edge to here, then fading in over the fade setting. */
 const RIM = { top: 3, foot: 6 };
 
@@ -2502,7 +2505,9 @@ const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hid
 function band(h: number): { top: number; height: number } {
   const s = state.settings;
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
-  const foot = Math.max(s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
+  // a wing's figures clear the strip wide; narrow, the rail stands at the edge and the mark at the middle, so they
+  // never meet and the rail reaches as far down as the prose does
+  const foot = Math.max(narrow() ? s.gap : s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
   return { top: Math.round(top), height: Math.max(0, Math.round(h - top - foot)) };
 }
 
