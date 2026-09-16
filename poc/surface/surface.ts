@@ -1023,8 +1023,8 @@ type Action = {
   label: (a?: string) => string;
   /** the chords that fire it */
   keys: Chord[];
-  /** what it does, in a sentence, for the tooltip */
-  help: string;
+  /** what it does, in a sentence, for the tooltip; it takes the address so it can say which way the act goes */
+  help: (a?: string) => string;
   /** the other ways to the same thing, named on the tooltip */
   also?: string;
   /** what the same key with shift does, named where the plain badge stands */
@@ -1043,7 +1043,10 @@ const ACTIONS: Record<string, Action> = {
   unfold: {
     label: (a) => (gradeOf(acts(a)) === "whole" ? "fold" : "unfold"),
     keys: [{ key: " " }],
-    help: "Unfolds the brief the reading line stands on, and folds it again to its face.",
+    help: (a) =>
+      gradeOf(acts(a)) === "whole"
+        ? "Folds the brief back to its face; the same key unfolds it again."
+        : "Unfolds the brief: the paragraphs its face hides, and the level beneath it.",
     also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
     shifted: "Shift folds the brief above instead, which takes you up to it.",
     can: (a) => !!brief(acts(a)) && unfolds(brief(acts(a))!),
@@ -1052,14 +1055,14 @@ const ACTIONS: Record<string, Action> = {
   foldUp: {
     label: () => "fold above",
     keys: [{ key: " ", shift: true }],
-    help: "Folds the brief above the one in focus, its parent, which takes you up to it.",
+    help: () => "Folds the brief above the one in focus, its parent, which takes you up to it.",
     can: () => state.focus !== state.scope && !!brief(parentOf(state.focus)),
     run: () => cycle(parentOf(state.focus)),
   },
   unfoldAll: {
     label: () => "unfold the scope",
     keys: [{ key: " ", hold: true }],
-    help: "Unfolds every brief in the scope, held a moment.",
+    help: () => "Unfolds every brief in the scope, held a moment.",
     also: "The depth strip, scrubbed to its end.",
     can: () => scopeDepth() > 0,
     run: () => unfoldAll(),
@@ -1067,7 +1070,7 @@ const ACTIONS: Record<string, Action> = {
   foldAll: {
     label: () => "fold the scope",
     keys: [{ key: " ", shift: true, hold: true }],
-    help: "Folds every brief in the scope to its face, held a moment.",
+    help: () => "Folds every brief in the scope to its face, held a moment.",
     also: "The depth strip, scrubbed back to its start.",
     can: () => scopeDepth() > 0,
     run: () => foldAll(),
@@ -1075,7 +1078,7 @@ const ACTIONS: Record<string, Action> = {
   open: {
     label: () => "open",
     keys: [{ key: "Enter" }],
-    help: "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
+    help: () => "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
     shifted: "Shift widens the scope by a level instead.",
     can: (a) => level(acts(a)).length > 0,
     run: (a) => scopeTo(acts(a)),
@@ -1083,7 +1086,7 @@ const ACTIONS: Record<string, Action> = {
   widen: {
     label: () => "widen",
     keys: [{ key: "Enter", shift: true }],
-    help: "Widens the scope to the level above, so what stood around this brief comes back.",
+    help: () => "Widens the scope to the level above, so what stood around this brief comes back.",
     also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
     can: () => state.scope !== "",
     run: () => popUp(),
@@ -1091,7 +1094,7 @@ const ACTIONS: Record<string, Action> = {
   deeper: {
     label: () => "a level more",
     keys: [{ key: "ArrowRight", shift: true }],
-    help: "Unfolds every brief of the scope one level further, and folds what lies beyond it.",
+    help: () => "Unfolds every brief of the scope one level further, and folds what lies beyond it.",
     also: "Pressing or scrubbing the depth strip.",
     glyph: "deeper",
     can: () => unfoldedDepth() < scopeDepth(),
@@ -1100,7 +1103,7 @@ const ACTIONS: Record<string, Action> = {
   shallower: {
     label: () => "a level less",
     keys: [{ key: "ArrowLeft", shift: true }],
-    help: "Folds the scope back a level, so one level less stands unfolded.",
+    help: () => "Folds the scope back a level, so one level less stands unfolded.",
     also: "Pressing or scrubbing the depth strip.",
     glyph: "shallower",
     can: () => unfoldedDepth() > 0,
@@ -1109,35 +1112,35 @@ const ACTIONS: Record<string, Action> = {
   next: {
     label: () => "next",
     keys: [{ key: "ArrowDown" }],
-    help: "Moves the reading on to the next brief in the lane, folding nothing.",
+    help: () => "Moves the reading on to the next brief in the lane, folding nothing.",
     can: () => true,
     run: () => step(1),
   },
   previous: {
     label: () => "previous",
     keys: [{ key: "ArrowUp" }],
-    help: "Moves the reading back to the brief before this one in the lane, folding nothing.",
+    help: () => "Moves the reading back to the brief before this one in the lane, folding nothing.",
     can: () => true,
     run: () => step(-1),
   },
   above: {
     label: () => "above",
     keys: [{ key: "ArrowLeft" }],
-    help: "Moves the reading up to the brief this one stands beneath, folding nothing.",
+    help: () => "Moves the reading up to the brief this one stands beneath, folding nothing.",
     can: () => state.focus !== state.scope,
     run: () => up(),
   },
   beneath: {
     label: () => "beneath",
     keys: [{ key: "ArrowRight" }],
-    help: "Moves the reading into the first brief beneath this one, when it stands in the lane.",
+    help: () => "Moves the reading into the first brief beneath this one, when it stands in the lane.",
     can: () => level(state.focus).length > 0,
     run: () => down(),
   },
   undo: {
     label: () => "undo",
     keys: [{ key: "Escape" }],
-    help: "Lays the lane back as it stood before the last change you made: a fold, a going, a change of scope.",
+    help: () => "Lays the lane back as it stood before the last change you made: a fold, a going, a change of scope.",
     also: "A cell of the trail, which goes back to before that move.",
     shifted: "Shift makes the change again.",
     can: () => true,
@@ -1146,7 +1149,7 @@ const ACTIONS: Record<string, Action> = {
   redo: {
     label: () => "redo",
     keys: [{ key: "Escape", shift: true }],
-    help: "Makes the change escape undid again.",
+    help: () => "Makes the change escape undid again.",
     can: () => true,
     run: () => redo(),
   },
@@ -1156,6 +1159,53 @@ const same = (x: Chord, y: Chord): boolean => x.key === y.key && !!x.shift === !
 
 /** The action a chord fires, if any. */
 const actionFor = (c: Chord): Action | undefined => Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)));
+
+// ### 3.1.2 The badge: a key and what it does
+//
+// An action stands on the page as a badge: the key drawn as a cap, and what it
+// does beside it, in a word or, where the room is tight, as a glyph. It stands
+// where the action's object stands, so a reader meets the few acts that are at
+// hand rather than a bar of every act there is, and the tooltip tells the rest.
+//
+// The keys are drawn rather than set in type, since a shift, a return and an
+// arrow taken from three faces sit at three heights and no two are the same
+// weight. Each is one path in a box of sixteen, so a row of caps reads level.
+
+const KEY: Record<string, { glyph: string; name: string }> = {
+  " ": { glyph: `<path d="M3.6 6.4v3.1h8.8V6.4"/>`, name: "space" },
+  Shift: { glyph: `<path d="M8 3.5 3.6 7.9h2.2v4.5h4.4V7.9h2.2z"/>`, name: "shift" },
+  Enter: { glyph: `<path d="M12.3 4.4v4.2H4.9M7.2 6.4 4.9 8.6l2.3 2.3"/>`, name: "return" },
+  Escape: { glyph: `<path d="M11.4 11.4 5.7 5.7M5.7 9.8V5.7h4.1"/>`, name: "escape" },
+  ArrowUp: { glyph: `<path d="M8 12.2V4.3M5 7.3 8 4.3l3 3"/>`, name: "up" },
+  ArrowDown: { glyph: `<path d="M8 3.8v7.9M5 8.7l3 3 3-3"/>`, name: "down" },
+  ArrowLeft: { glyph: `<path d="M12.2 8H4.3M7.3 11 4.3 8l3-3"/>`, name: "left" },
+  ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
+};
+
+/** The glyph a tight badge draws in place of its label, drawn in the same box as a key. */
+const GLYPH: Record<string, string> = {
+  deeper: `<path d="M4.5 4.9h7M5.6 8.4 8 10.8l2.4-2.4"/>`,
+  shallower: `<path d="M4.5 11.1h7M5.6 7.6 8 5.2l2.4 2.4"/>`,
+};
+
+const cap = (glyph: string): string => `<span class="cap"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
+
+/** A chord as caps: shift first, then the key, so a row of caps reads as it is pressed. */
+const capsOf = (c: Chord): string => (c.shift ? cap(KEY.Shift.glyph) : "") + cap(KEY[c.key]?.glyph ?? "");
+
+/** A chord in words, for the tooltip: "shift and space, held". */
+const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name}` : (KEY[c.key]?.name ?? c.key)) + (c.hold ? ", held" : "");
+
+/**
+ * One badge: the chord as caps and the action beside it, worded, or as a glyph where the room is tight. It carries the
+ * address it acts on, so a press acts on the brief it stands beside rather than on the brief in focus.
+ */
+function badgeHtml(id: string, a?: string, tight = false): string {
+  const act = ACTIONS[id];
+  if (!act || !act.can(a)) return "";
+  const said = tight && act.glyph ? cap(GLYPH[act.glyph] ?? "") : `<span class="label">${esc(act.label(a))}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="keys">${capsOf(act.keys[0])}</span>${said}</span>`;
+}
 
 // ## 3.2 Prose is drawn from tokens
 //
@@ -1279,17 +1329,18 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
   const beneath = beneathOf(b);
-  // a folded brief says beneath its face that it unfolds: a bar per paragraph it hides, a frame per image, and how many
-  // briefs lie beneath
+  // a folded brief says beneath its face that it unfolds: the badge for the key, a bar per paragraph it hides, a frame
+  // per image, and how many briefs lie beneath; the badge for opening it as the scope stands at the end of the line
   const more =
     g === "face" && (rest.length > 0 || beneath > 0)
-      ? `<div class="act more chrome" data-fold="${esc(b.address)}">${CHEVRON}<span>unfold</span>` +
+      ? `<div class="act more chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}` +
         (rest.length ? `<span class="bars">${rest.slice(0, 12).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${rest.length > 12 ? `<b>+${rest.length - 12}</b>` : ""}</span>` : "") +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
+        badgeHtml("open", b.address) +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${CHEVRON}<span>fold</span></div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</div>` : "";
   // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
@@ -2778,7 +2829,7 @@ function point(a: string | null): void {
 // draws one. It comes a moment after the pointer rests, beneath the element and
 // never under the pointer, and goes with any scroll or press.
 
-const TIP_SEL = "[data-tip], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .pc[data-a], .crow[data-a]";
+const TIP_SEL = "[data-tip], [data-act], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .pc[data-a], .crow[data-a]";
 let tipped: Element | null = null;
 let tipTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -2786,6 +2837,19 @@ let tipTimer: ReturnType<typeof setTimeout> | undefined;
 function tipHtml(el: HTMLElement): string {
   const name = (b: Brief) => `<span class="name">${esc(b.title || state.body!.title)}</span>`;
   if (el.dataset.tip !== undefined) return `<span class="name plain">${esc(el.dataset.tip)}</span>`;
+  // a badge tells what its action does, and the other ways to the same thing, since the badge itself has room for a word
+  if (el.dataset.act !== undefined) {
+    const act = ACTIONS[el.dataset.act];
+    if (!act) return "";
+    const said = (s?: string) => (s ? `<span class="gloss">${esc(s)}</span>` : "");
+    return (
+      `<span class="what">${esc(act.keys.map(chordName).join(", or "))}</span>` +
+      `<span class="name">${esc(act.label(el.dataset.a))}</span>` +
+      said(act.help(el.dataset.a)) +
+      said(act.shifted) +
+      (act.also ? `<span class="gloss also">Also: ${esc(act.also[0].toLowerCase() + act.also.slice(1))}</span>` : "")
+    );
+  }
   if (el.dataset.hop !== undefined) {
     const h = state.trail[Number(el.dataset.hop)];
     const b = h && brief(h.to);
@@ -3306,6 +3370,12 @@ function wire(): void {
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
     if (t.closest("a[href]") || window.getSelection()?.toString()) return;
+    // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
+    const badge = t.closest<HTMLElement>("[data-act]");
+    if (badge) {
+      const act = ACTIONS[badge.dataset.act!];
+      return void (act && act.can(badge.dataset.a) && act.run(badge.dataset.a));
+    }
     // on the canvas a row goes, and only the ground of a zone folds
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) return void (state.scrubbing || crow.classList.contains("root") || goTo(crow.dataset.a!));
@@ -3857,8 +3927,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .act { display: flex; align-items: center; gap: 10px; color: var(--ink); cursor: pointer; margin: -4px -8px 0; padding: 4px 8px; border-radius: 6px; transition: color .15s; }
 .act:hover { color: var(--on); }
 .act svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.act.more svg { transform: rotate(90deg); }
-.act.less svg { transform: rotate(-90deg); }
+/* the badge: the key drawn as a cap, and what it does beside it. Its room is kept on every line, and it inks only on
+   the brief the reading line stands on, which is the brief a key acts on, so nothing reflows as the reader moves */
+.badge { display: inline-flex; align-items: center; gap: 6px; visibility: hidden; }
+.brief.here .badge, .badge.tight { visibility: visible; }
+.badge .keys { display: inline-flex; gap: 2px; }
+.badge .cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
+.badge .cap svg { width: 11px; height: 11px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.badge .label { color: var(--ink); }
+.act:hover .badge .cap, .badge:hover .cap { background: var(--track); color: var(--ink); }
+.badge:hover .label { color: var(--on); }
 .act .bars { display: inline-flex; gap: 3px; align-items: center; }
 .act .bars i { display: block; width: 9px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .act .bars i.image { width: 9px; height: 7px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
