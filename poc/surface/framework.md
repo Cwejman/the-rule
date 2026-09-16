@@ -29,7 +29,7 @@ The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in 
 
 ### 2.1 Widths
 
-The lane keeps its measure, the width of its line of text, which is a setting. The gutters are as wide as an adjunct needs, wider than an editor's gutter, since what stands there is read.
+The lane keeps its measure, the width of its line of text, which is a setting. The gutters are wider than an editor's gutter, since what stands there is read, and they take the room the wings have left them rather than a width of their own: as wide as an adjunct reads best in where there is room, narrower where there is not, and out as a pair below the least it still reads in.
 
 A wing is as wide as the widest figure it holds, and every figure declares a width that never changes with what it draws, so nothing beside it moves as it redraws. A wing's [strip](#3-the-strip) is free to reach a little past it into the space beside.
 
@@ -57,7 +57,11 @@ Any area empties by hand, from [the strip](#3-the-strip), where a widget is cycl
 
 ### 2.5 Giving way
 
-As the screen narrows the areas give way in one order: the canvas first, when it stands beside the lane, then the gutters as a pair, then the right wing, then the left, until the lane stands alone. An area gives way when its width and one space no longer fit, and an area given no room is gone from the row, strip and all, until the screen widens.
+As the screen narrows the areas give way in one order: the canvas first, when it stands beside the lane, then the gutters as a pair, then the right wing, then the left, until the lane stands alone.
+
+A gutter narrows before it gives way, and comes back when a wing gives way and frees its room, since a narrower gutter is still a gutter, aligned to its lines and scrolling with them.
+
+An area given no room is gone from the row until the screen widens, and [its icon says so](#31-four-grades-of-ink) rather than leaving the foot.
 
 *Reasoned, the author's, 2026-09-13; the canvas first, 2026-09-15, since the lane is the reading.*
 

@@ -1487,7 +1487,6 @@ const WIDGETS: Record<string, Widget> = {
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
-  pointers: { kind: "figure", name: "links, for the brief in focus", icon: "links", draw: () => pointersHtml(), width: () => 240, grow: false, onFocus: true },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
 };
@@ -1504,21 +1503,12 @@ const panesHeld = (held: string[] = state.settings.areas.middle): PaneName[] => 
 /** The widgets an area holds, in order. */
 const widgetsOf = (area: AreaName): Widget[] => state.settings.areas[area].map((k) => WIDGETS[k]).filter((w): w is Widget => !!w);
 type WingName = "wingL" | "wingR";
-/** Whether a gutter holds an adjunct the width gives no room to. */
-const squeezed = (gutter: "gutterL" | "gutterR"): boolean => isOpen(gutter) && !fits()[gutter];
-/**
- * The figures a wing draws, in order: what it holds, and, while the gutter on its side is squeezed out, the links figure
- * carried in beneath them, so what stood beside the prose is still read. A wing already holding two carries nothing.
- */
-const figureNames = (area: WingName): string[] => {
-  const held = state.settings.areas[area].filter((k) => WIDGETS[k]?.kind === "figure");
-  const gutter = area === "wingL" ? "gutterL" : "gutterR";
-  return squeezed(gutter) && held.length === 1 && !held.includes("pointers") ? [...held, "pointers"] : held;
-};
+/** The figures a wing draws, in order. */
+const figureNames = (area: WingName): string[] => state.settings.areas[area].filter((k) => WIDGETS[k]?.kind === "figure");
 /** The first widget an area holds, which is all a gutter holds; nothing, where the area is closed. */
 const widgetOf = (area: AreaName): Widget | undefined => widgetsOf(area)[0];
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
-const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => WIDGETS[k].kind === kind && k !== "pointers");
+const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => WIDGETS[k].kind === kind);
 
 /** The two sides a widget of each kind can stand on; a pane has none, since the middle holds its panes in one order. */
 const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], adjunct: ["gutterL", "gutterR"], pane: [] };
@@ -1713,7 +1703,7 @@ function aheadSvg(W: number, H: number): string {
 /** What is told of a link's target: its title and the opening words of its face, or that it leads to the web, is owed, or leaves the body. */
 function adjHtml(to: string, detail: string): string {
   const target = brief(to);
-  if (target) return `<div class="adj" data-a="${esc(to)}" ${hued(to)}>${pathHtml(to)}<span class="name" data-go="${esc(to)}">${esc(target.title)}</span><span class="gloss">${esc(faceOf(target))}</span></div>`;
+  if (target) return `<div class="adj" data-a="${esc(to)}" ${hued(to)}>${pathHtml(to)}<span class="name" data-go="${esc(to)}">${esc(target.title)}</span><span class="gloss">${esc(faceOf(target, fits().gutter))}</span></div>`;
   if (to === "web") return `<div class="adj dim"><span class="gloss">${esc(trim(detail || "the web", 40))}</span></div>`;
   if (to === "owed") return `<div class="adj dim"><span class="gloss">a brief not yet written</span></div>`;
   return `<div class="adj dim"><span class="gloss">outside the body: ${esc(trim(detail, 40))}</span></div>`;
@@ -1725,8 +1715,8 @@ function pathHtml(to: string): string {
   return titles.length ? `<span class="path">${titles.map((t) => `<span>${esc(t)}</span>`).join(CHEVRON)}</span>` : "";
 }
 
-/** The opening words of a brief's face. */
-const faceOf = (b: Brief): string => trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), 90);
+/** The opening words of a brief's face, cut shorter where the gutter has been given less room to read them in. */
+const faceOf = (b: Brief, room = GUTTER.want): string => trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), room < 170 ? 56 : 90);
 
 /** What points at a brief, told at its foot. */
 function footHtml(b: Brief): string {
@@ -1734,26 +1724,10 @@ function footHtml(b: Brief): string {
   return refs.length ? `<div class="adj foot"><span class="gloss">pointed at by</span>${refs.map((r) => `<span class="name" data-a="${esc(r.address)}" data-go="${esc(r.address)}" ${hued(r.address)}>${esc(r.title)}</span>`).join("")}</div>` : "";
 }
 
-const hostOf = (href: string): string => {
-  try {
-    return new URL(href).hostname;
-  } catch {
-    return "";
-  }
-};
-
 function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null; html: string }[] {
   const beside = all<HTMLElement>("a[data-link]", article).map((a) => ({ at: a, html: adjHtml(a.dataset.link!, a.dataset.link === "web" ? (a as HTMLAnchorElement).hostname : a.dataset.href ?? "") }));
   const foot = footHtml(b);
   return [...beside, ...(foot ? [{ at: null, html: foot }] : [])];
-}
-
-/** The links figure: what the brief in focus points at and what points at it, drawn in a wing while the gutter has no room. */
-function pointersHtml(): string {
-  const b = brief(state.focus);
-  if (!b) return "";
-  const beside = linksIn(b.body).map((l) => adjHtml(l.to ?? l.out ?? "outside", l.out === "web" ? hostOf(l.href ?? "") : l.href ?? ""));
-  return `<div class="pointers"><div class="adj lead"><span class="gloss">${esc(b.title)}</span></div>${beside.join("")}${footHtml(b)}</div>`;
 }
 
 // ## 3.8 Settings: a row of meters
@@ -2383,7 +2357,8 @@ let ui: UI;
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
 const cssEsc = (s: string): string => s.replace(/["\\]/g, "\\$&");
 
-const GUTTER = 210;
+/** A gutter's width: what an adjunct reads best in, and the least it still reads in when the wings have taken their room. */
+const GUTTER = { want: 210, least: 132 };
 /** The room beneath a wing's figures that its strip stands in, above the space every area keeps. */
 const STRIP = 34;
 /** The room the foot keeps clear: the strip's icons with as much above them as below. */
@@ -2411,7 +2386,7 @@ type Held = Record<AreaName, string[]>;
 
 /** How wide an area stands with what it holds: closed, nothing; a gutter its column; a wing its widest figure, its strip free to reach a little past it; the middle is laid apart. */
 const widthIn = (held: Held, area: AreaName): number =>
-  held[area].length === 0 || area === "middle" ? 0 : area.startsWith("gutter") ? GUTTER : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
+  held[area].length === 0 || area === "middle" || area.startsWith("gutter") ? 0 : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
 const widthOf = (area: AreaName): number => widthIn(state.settings.areas, area);
 /** A closed area takes no room at all; its strip stands at the foot of where it would open. */
 const takesRoom = (area: AreaName): boolean => isOpen(area);
@@ -2423,10 +2398,10 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * always allowed, since all it shows is its strip.
  */
 /** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean };
+type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0 };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
   // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
   const panes = panesHeld(held.middle);
@@ -2434,13 +2409,23 @@ function fitsWith(held: Held): Fit {
   on.canvas = panes.includes("canvas");
   let used = (on.lane ? s.measure + 2 * s.gap : 0) + (on.canvas ? CANVAS_MIN + (on.lane ? s.gap : 2 * s.gap) : 0);
   if (on.lane && on.canvas && used > ui.areas.clientWidth) (on.canvas = false), (used = s.measure + 2 * s.gap);
-  for (const group of [["wingL"], ["wingR"], ["gutterL", "gutterR"]] as AreaName[][]) {
-    // the gutters belong to the lane and stand only beside it
-    if (group[0] === "gutterL" && !on.lane) break;
-    const need = group.reduce((x, a) => x + (held[a].length ? widthIn(held, a) + s.gap : 0), 0);
+  for (const wing of ["wingL", "wingR"] as AreaName[]) {
+    const need = held[wing].length ? widthIn(held, wing) + s.gap : 0;
     if (used + need > ui.areas.clientWidth) break;
     used += need;
-    group.forEach((a) => (on[a] = true));
+    on[wing] = true;
+  }
+  // the gutters belong to the lane and stand only beside it, and they take the room the wings left them rather than a
+  // width of their own: a narrower gutter is still a gutter, aligned to its lines and scrolling with them, where one
+  // carried somewhere else is not. Below the least a preview reads in they give way as a pair
+  const wanted = (["gutterL", "gutterR"] as const).filter((a) => held[a].length > 0);
+  if (on.lane && wanted.length) {
+    const room = ui.areas.clientWidth - used - wanted.length * s.gap;
+    const each = Math.min(GUTTER.want, Math.floor(room / wanted.length));
+    if (each >= GUTTER.least) {
+      on.gutter = each;
+      wanted.forEach((a) => (on[a] = true));
+    }
   }
   return on;
 }
@@ -2481,7 +2466,7 @@ function drawLayout(): void {
   root.setProperty("--measure", `${measure}px`);
   // the gutters hug the lane at the gap, since what stands in them is aligned to its lines; only what the width allows
   // takes a column, since an absent element leaves the grid and would pull the lane into the empty track it left
-  const inner = (["gutterL", "lane", "gutterR"] as const).flatMap((a) => (a === "lane" ? [measure] : on[a] && takesRoom(a) ? [widthOf(a)] : []));
+  const inner = (["gutterL", "lane", "gutterR"] as const).flatMap((a) => (a === "lane" ? [measure] : on[a] && takesRoom(a) ? [on.gutter] : []));
   const mid = inner.reduce((x, y) => x + y, 0) + s.gap * (inner.length - 1);
   // every area is as wide as what it holds, and the spaces beside them are one: at the two edges of the viewport as
   // between the wings and the lane. The gap is the least a space is given, and what the width leaves over is shared
@@ -2773,6 +2758,9 @@ function drawLaser(): void {
 /** Where each figure stands in its wing, keyed by the wing and the widget, measured as the wing is laid. */
 const slots = new Map<string, { top: number; height: number }>();
 
+/** The least height a growing figure is drawn into; below it the slot is left empty rather than drawn at no scale. */
+const FIGURE_FLOOR = 48;
+
 /**
  * Lays one wing whole. One figure has the wing's height; two stand at its top and its foot, with one space between. A
  * figure that takes only what it needs is drawn first and measured, and a figure that grows takes what is left, shared
@@ -2809,7 +2797,8 @@ function drawWing(area: "wingL" | "wingR"): void {
     x.div.style.top = `${Math.round(y)}px`;
     x.div.style.height = `${Math.round(height)}px`;
     slots.set(`${area}:${x.div.dataset.slot}`, { top: Math.round(y), height: Math.round(height) });
-    if (x.f.grow) x.div.innerHTML = x.f.draw(W, Math.round(height));
+    // a slot shorter than a figure can draw in is left empty rather than drawn at a scale below nothing
+    if (x.f.grow) x.div.innerHTML = height >= FIGURE_FLOOR ? x.f.draw(W, Math.round(height)) : "";
   });
 }
 
@@ -2970,7 +2959,7 @@ function showTip(el: Element, html: string): void {
   const w = t.offsetWidth;
   const h = t.offsetHeight;
   const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
-  const fig = el.closest("svg.fig, .tree, .pointers, .settings");
+  const fig = el.closest("svg.fig, .tree, .keys, .settings");
   const wing = el.closest<HTMLElement>(".wing");
   let left: number;
   let top: number;
@@ -4138,9 +4127,6 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .adj.foot .name { display: block; }
 .adj.foot .gloss { margin-bottom: 2px; }
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
-.pointers { width: 100%; max-width: 240px; display: flex; flex-direction: column; gap: 6px; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); }
-.pointers .adj.lead { border-left-color: transparent; color: var(--ink); }
-.pointers .adj.lead .gloss { color: var(--ink); }
 
 .tree { position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; max-width: 320px; }
 .tree .row { position: relative; display: flex; align-items: center; gap: 6px; padding: 2px 8px 2px calc(20px + var(--d) * 14px); border-radius: 6px; }

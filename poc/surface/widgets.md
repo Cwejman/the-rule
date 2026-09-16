@@ -140,9 +140,9 @@ The link itself is underlined in its target's branch hue, so the colour says whe
 
 This is what lets looking be free without [an overlay](refused.md#j-an-overlay-at-all). Everything an overlay told about a link now stands beside the link, and everything it told about a brief stands in the lane or in the wings.
 
-When the width [squeezes the gutters out](framework.md#25-giving-way), the same adjuncts are carried into the wing on the gutter's side, stacked under the name of the brief in focus, beneath the one figure the wing holds; a wing holding two carries nothing, and the strip offers the figure while the gutter has no room.
+As the width tightens [the gutter narrows](framework.md#25-giving-way) rather than moving anywhere, so what stands beside a link stays beside it, and only the opening words are cut shorter to keep the column a column.
 
-*Reasoned, the author's, 2026-09-13; the carry into the wing the author's ask of 2026-09-15.*
+*Reasoned, the author's, 2026-09-13; the narrowing the author's ask of 2026-09-16, which retired a figure that carried these into the wing as a list for the brief in focus.*
 
 ## 6. Settings
 
