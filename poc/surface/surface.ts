@@ -1139,14 +1139,14 @@ const ACTIONS: Record<string, Action> = {
     help: () => "Lays the lane back as it stood before the last change you made: a fold, a going, a change of scope.",
     also: "A cell of the trail, which goes back to before that move.",
     shifted: "Shift makes the change again.",
-    can: () => true,
+    can: () => undos.length > 0,
     run: () => undo(),
   },
   redo: {
     label: () => "redo",
     keys: [{ key: "Escape", shift: true }],
     help: () => "Makes the change escape undid again.",
-    can: () => true,
+    can: () => redos.length > 0,
     run: () => redo(),
   },
 };
@@ -2618,7 +2618,7 @@ function drawCrumb(): void {
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}`;
+  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}${badgeHtml("undo", undefined, true)}`;
   placeCrumb();
 }
 
@@ -4061,8 +4061,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #depth .cap, #crumb .cap { width: 18px; height: 18px; border-radius: 5px; background: none; }
 #depth .cap svg, #crumb .cap svg { width: 13px; height: 13px; }
 #depth .badge:hover .cap, #crumb .badge:hover .cap { background: var(--track); color: var(--ink); }
-/* widening the scope stands at the right of the placement, which is the run it acts on */
+/* widening the scope stands at the right of the placement, which is the run it acts on; undoing stands past the trail,
+   which is the record of what it takes back */
 #crumb .place .badge { margin-left: 6px; }
+#crumb > .badge { flex: none; margin-left: 10px; }
 /* the figure on the line: the paragraphs a press gives, then the level that waits beyond them */
 svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }
