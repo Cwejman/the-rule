@@ -62,6 +62,8 @@ Beside a brief the cap says how that brief is reached. On the brief the reading 
 
 A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
 
+Where there is no key to draw, the badge carries the word alone, which is [its third grade](touch.md#7-a-badge-without-a-key).
+
 *The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
 
 ## 2. The tree
@@ -80,7 +82,9 @@ The shape is the left wing's first widget: the lane as laid, drawn small, so the
 
 Each brief in the lane stands as its blocks, a heading a short bar and a paragraph a block as tall as it is drawn, shifted right by the brief's depth. Every block a brief has is drawn, a list or a table as readily as a paragraph, and an image as a frame as wide and as tall as it stands in the lane.
 
-*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting.*
+Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), and gives up the room for its marks and its tail.
+
+*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16.*
 
 ### 3.1 A folded brief tells what it hides
 
@@ -108,7 +112,9 @@ The room reaches only as far as the marks do, and keeps to its own row, since ro
 
 Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows what the brief hides before the press unfolds it, and the brief lights elsewhere as it would. In the shape itself its blocks stay unlit and only the marks answer: over a folded brief its ticks and tail light, and over an unfolded one they show as a grey ghost of what a fold would hide. So resting on the room reads apart from resting on the blocks.
 
-*Reasoned, the author's, 2026-09-13; the room pointing at its brief, 2026-09-14, so the ahead previews a fold from there too.*
+Neither press is there under a finger, where [the rail takes none](touch.md#52-the-rail-takes-no-presses) and is scrubbed instead.
+
+*Reasoned, the author's, 2026-09-13; the room pointing at its brief, 2026-09-14, so the ahead previews a fold from there too; the rail without presses, 2026-09-16.*
 
 ## 4. The ahead
 

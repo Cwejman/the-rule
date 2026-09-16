@@ -226,4 +226,4 @@ The reader is told where a link leads before they take it: its target stands bes
 
 On a narrow screen the sides give way, [the gutters first, then the right wing, then the left](framework.md#25-giving-way), and the lane stands alone, which it can, since orientation is help and never the reading. A reader may also close any area by hand, and a closed area [takes no room](framework.md#24-closing-by-hand), so the lane stands centred in what is left.
 
-*Reasoned, the author's, 2026-09-13; [a touch reading](touch.md) is talked through and not built.*
+*Reasoned, the author's, 2026-09-13; [a touch reading](touch.md) keeps one narrow rail there instead, 2026-09-16.*

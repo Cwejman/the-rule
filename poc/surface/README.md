@@ -76,9 +76,9 @@ The surface is going to have a few modes, and the second is a canvas: the body a
 
 A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size. What it leaves is the reading, with one narrow rail beside it and one mark at the foot that opens everything else.
 
-It is talked through and not built, and it is what comes next.
+Every rule it moves is written beneath, and most of them are built. What it still owes is the reading of a real phone, which nobody has given it.
 
-*The author's, 2026-09-16; open.*
+*The author's, 2026-09-16; built the same day, on a browser told to pretend, and what is still open stands at its foot.*
 
 [the level beneath](touch.md)
 
