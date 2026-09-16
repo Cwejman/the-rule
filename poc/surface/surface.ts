@@ -913,6 +913,15 @@ const state = {
   trail: [] as Hop[],
 };
 
+// A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than
+// only a size. One fact carries the first two: touch, what the browser says of the reader's own pointer. With it a key
+// names nothing, so a badge carries its word alone; nothing answers for what a pointer rests on, so a figure answers a
+// finger instead; and every press wants room a finger can find. The third, the room, is the width, and the areas
+// already read it as they give way.
+
+/** Whether the reader has a finger rather than a pointer, which is also to say no keyboard: read from the browser, and again at the first touch, since a machine may be both. */
+let touch = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+
 /** Characters to a line of the lane at the default measure, which is the unit the figures size prose in. */
 const LINE_CHARS = 72;
 
@@ -1196,6 +1205,10 @@ const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name
 function badgeHtml(id: string, a?: string, tight = false): string {
   const act = ACTIONS[id];
   if (!act) return "";
+  // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
+  // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
+  if (touch)
+    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
@@ -1211,6 +1224,8 @@ function badgeHtml(id: string, a?: string, tight = false): string {
 /** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
 function badgePair(first: string, second: string): string {
   const [x, y] = [ACTIONS[first], ACTIONS[second]];
+  // the pair is a modifier and two keys, so a phone has nothing of it to draw; the strip it stands on is the act's own picture
+  if (touch) return "";
   if (!x || !y || !x.keys[0].shift || !y.keys[0].shift) return badgeHtml(first, undefined, true) + badgeHtml(second, undefined, true);
   const one = (id: string, act: Action) =>
     `<span class="badge tight bare${act.can() ? "" : " off"}" data-act="${esc(id)}">${cap(KEY[act.keys[0].key]?.glyph ?? "")}</span>`;
@@ -1475,6 +1490,7 @@ const ICON: Record<string, string> = {
   keys: `<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h1M7.5 6.5h1M11 6.5h1M5 9.5h6"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
   lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
+  chooser: `<circle cx="3.6" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="12.4" cy="8" r="1.15" fill="currentColor" stroke="none"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -1573,6 +1589,53 @@ function pickTip(k: string): string {
   // a widget the width denies says so, and still says what a press would do with it
   const now = at === null ? "" : !fits()[at] ? "asked for, but there is no room at this width; " : at === left ? "at the left; " : "at the right; ";
   return said(`${now}press to ${where(nextPlace(k) ?? null)}`);
+}
+
+// ### 3.4.1 Where the lane stands alone
+//
+// The foot is not a second design: it is the strip in a second grain. Wide, it
+// is the row; narrow, the row folds into one round mark at the foot of the
+// page, and pressing it opens the row as a wide pill. One table, one set of
+// states, so a choice is never specified twice.
+//
+// What the pill holds is fewer choices, since there are no sides to stand on:
+// the panes, and the figures a reader opens whole over the reading and
+// dismisses. The shape is not among them, since it is not a mode a reader picks
+// but the rail beside the prose; nor is the ahead, which answers for a brief the
+// pointer rests on, and a phone has no pointer.
+
+/** Whether the lane stands alone: the width holds no wing at the width a figure declares, and no gutter beside it. */
+const narrow = (): boolean => ui.areas.clientWidth < state.settings.measure + 3 * state.settings.gap + GUTTER.least;
+
+/** What the chooser holds where the lane stands alone: the panes first, as the row lays them, then the figures a press opens whole; the keys only where there are keys to name. */
+const narrowChoices = (): string[] => ["lane", "canvas", "tree", "plate", "settings", ...(touch ? [] : ["keys"])];
+
+/** The figure standing open over the reading, and whether the pill stands open at the foot. Neither outlives a widening. */
+const foot = { sheet: null as string | null, pill: false };
+
+/** Whether a choice stands now: a pane in the middle, a figure opened whole. */
+const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : foot.sheet === k);
+
+/** One choice in the pill: what it is, and whether it stands. No side, since the pill has none. */
+function pickNarrowHtml(k: string): string {
+  const w = WIDGETS[k];
+  const on = narrowOn(k);
+  // the pane standing alone cannot be taken away, so its icon says it is in use and offers nothing
+  const quiet = w.kind === "pane" && on ? " fixed" : "";
+  return `<button class="pick${on ? " on" : ""}${quiet}" data-widget="${esc(k)}" data-tip="${esc(w.name)}">${icon(w.icon)}</button>`;
+}
+
+/** A press in the pill: a pane takes the middle, since the middle holds one; a figure opens whole, or closes if it stood. */
+function chooseNarrow(k: string): void {
+  foot.pill = false;
+  if (WIDGETS[k].kind === "pane") {
+    if (!narrowOn(k)) {
+      state.settings.areas = { ...state.settings.areas, middle: [k] };
+      saveSettings();
+    }
+    foot.sheet = null;
+  } else foot.sheet = foot.sheet === k ? null : k;
+  drawAll();
 }
 
 // ## 3.5 The tree: the lane as an outline
@@ -2366,7 +2429,7 @@ function recallView(): void {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -2850,8 +2913,36 @@ function drawWingsAligned(): void {
  * not five. It stands wherever the middle stands, which is always, so nothing is ever out of reach at any width.
  */
 function drawChooser(): void {
+  if (narrow()) {
+    // the mark gets out of the way as a reader reads, so it is drawn lifted or laid away by what the scrolling said
+    ui.strips.innerHTML = foot.pill
+      ? `<div class="strip pill">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
+      : `<div class="strip"><button class="mark" data-mark aria-label="what stands around the reading">${icon("chooser")}</button></div>`;
+    return;
+  }
+  // widened, the row comes back whole and nothing stands open over the reading
+  foot.sheet = null;
+  foot.pill = false;
   const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
   ui.strips.innerHTML = `<div class="strip">${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
+}
+
+/**
+ * A figure opened whole over the reading, where the lane stands alone: the outline, the radial or the settings, each
+ * standing in the band the prose reads in and dismissed by pressing its icon again. The lane stays laid beneath it,
+ * since the rail and the reading line measure it.
+ */
+function drawSheet(): void {
+  const w = foot.sheet ? WIDGETS[foot.sheet] : undefined;
+  const on = !!w && w.kind === "figure";
+  ui.sheet.hidden = !on;
+  if (!on) return void (ui.sheet.innerHTML = "");
+  const s = state.settings;
+  ui.sheet.style.top = `${Math.round(Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10))}px`;
+  ui.sheet.style.bottom = `${FOOT}px`;
+  ui.sheet.innerHTML = `<div class="slot"></div>`;
+  const slot = ui.sheet.firstElementChild as HTMLElement;
+  slot.innerHTML = (w as Figure).draw(slot.clientWidth, slot.clientHeight);
 }
 
 /** One icon: what it is, whether it stands and on which side, and whether it can be taken at all. */
@@ -2870,6 +2961,7 @@ function drawAll(): void {
   drawLane();
   drawChooser();
   drawWingsAligned();
+  drawSheet();
   light();
 }
 
@@ -3470,9 +3562,19 @@ function wire(): void {
     // the line of a borrowing brief follows to the home of what it borrows, as a link would
     const borrowed = t.closest<HTMLElement>("[data-borrow]");
     if (borrowed) return void follow(borrowed.dataset.borrow!);
+    // the mark opens the row as a wide pill, and the pill closes again on any press that is not one of its own
+    if (t.closest("[data-mark]")) {
+      foot.pill = true;
+      return void drawChooser();
+    }
+    if (foot.pill && !t.closest(".strip")) {
+      foot.pill = false;
+      drawChooser();
+    }
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
       const k = pick.dataset.widget!;
+      if (narrow()) return void chooseNarrow(k);
       if (!offered(k)) return;
       state.settings.areas = cycled(k);
       saveSettings();
@@ -3697,6 +3799,19 @@ function wire(): void {
     true,
   );
 
+  // a machine may hold both a pointer and a screen, so the first touch settles which the reader is using and the page
+  // is drawn again in that grain: the badges lose their caps, the presses gain their room
+  window.addEventListener(
+    "touchstart",
+    () => {
+      if (touch) return;
+      touch = true;
+      document.body.classList.add("touch");
+      drawAll();
+    },
+    { passive: true },
+  );
+
   ui.scroll.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
   // the browser's back and forward, or an address typed, arrive as a change the reader made
   window.addEventListener("hashchange", () => {
@@ -3763,6 +3878,7 @@ async function start(): Promise<void> {
       <section id="canvas" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section class="wing" data-area="wingR"></section>
+      <div id="sheet" hidden></div>
       <div id="strips"></div>
     </main>
     <div id="tip" class="chrome" hidden></div>`;
@@ -3778,9 +3894,11 @@ async function start(): Promise<void> {
     content: $("#content"),
     lane: $("#lane"),
     notice: $("#header .notice"),
+    sheet: $("#sheet"),
     strips: $("#strips"),
     parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), middle: $("#scroll"), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
   };
+  document.body.classList.toggle("touch", touch);
   wire();
   setBody(await load());
   // the web fonts land after the first draw and reflow the prose, so what stands beside it is laid again
@@ -4228,6 +4346,34 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 .switches .pick { padding: 2px 5px; border-radius: 6px; color: var(--muted); }
 .switches .pick.on { color: var(--ink); }
 .switches .pick:hover { background: var(--wash); }
+
+/* where the lane stands alone the row folds into one round mark at the foot, and a press opens it as a wide pill: the
+   same table in a second grain. The mark gets out of the way as a reader reads, and comes back on a scroll up */
+#strips { transition: transform .22s ease, opacity .22s ease; }
+#strips.away { transform: translateY(140%); opacity: 0; }
+.strip .mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--wash); color: var(--muted); }
+.strip .mark:hover { color: var(--ink); }
+.strip.pill { background: var(--wash); border-radius: 27px; padding: 5px 7px; gap: 2px; box-shadow: 0 1px 10px rgb(0 0 0 / .07); }
+.strip.pill .pick { width: 44px; height: 44px; border-radius: 22px; opacity: .45; }
+.strip.pill .pick.on, .strip.pill:hover .pick.on { opacity: 1; color: var(--ink); }
+.strip.pill .pick:hover { opacity: .8; }
+
+/* a figure opened whole over the reading, where there is no wing to stand it in: it takes the band the prose reads in,
+   on the page's own ground, and the reading stands where it stood beneath it */
+#sheet { position: absolute; left: 0; right: 0; z-index: 3; background: var(--ground); display: flex; justify-content: center; }
+#sheet .slot { width: 100%; padding: 0 var(--gap); overflow-y: auto; display: flex; justify-content: center; }
+
+/* A touch reading. A finger is a fatter pointer, so everything it presses is given room it can find, near the forty-four
+   pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
+body.touch .tree .row { padding-top: 9px; padding-bottom: 9px; }
+body.touch .switches .pick { padding: 9px 8px; }
+body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
+body.touch .act .acts { gap: 2px; margin-right: -10px; }
+body.touch .badge.worded { padding: 10px; border-radius: 8px; }
+body.touch .badge.worded .label { color: var(--muted); }
+body.touch #crumb { gap: 2px; }
+body.touch #crumb .step { padding: 10px 5px; }
+body.touch #crumb .place { gap: 2px; }
 `;
 
 // The run, last, so that everything it calls stands above it.
