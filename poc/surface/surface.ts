@@ -1630,14 +1630,22 @@ function pickTip(k: string): string {
 const narrow = (): boolean => ui.areas.clientWidth < state.settings.measure + 3 * state.settings.gap + GUTTER.least;
 
 /**
- * What the chooser holds where the lane stands alone: the panes, then the rail, then the figures a press opens whole.
+ * What the foot's row holds where the lane stands alone, which is always drawn and never opened: the pane the reader is
+ * not in, which is one press to the other; the rail, while the prose stands and nothing is open over it; and the
+ * settings. Three at most, and the acts of what is chosen stand beside them rather than behind a mark.
+ *
  * The outline and the radial are not among them. Both were built and read badly on a phone, the outline poor whole and
  * the radial impossible to hit, so they wait until each has a touch reading of its own.
  */
-const narrowChoices = (): string[] => ["lane", "canvas", "shape", "settings", ...(touch ? [] : ["keys"])];
+const narrowChoices = (): string[] => [
+  fits().lane ? "canvas" : "lane",
+  ...(fits().lane && chooser.sheet === null ? ["shape"] : []),
+  "settings",
+  ...(touch ? [] : ["keys"]),
+];
 
-/** The figure standing open over the reading, and whether the pill stands open at the foot. Neither outlives a widening. */
-const chooser = { sheet: null as string | null, pill: false };
+/** The figure standing open over the reading, which does not outlive a widening. */
+const chooser = { sheet: null as string | null };
 
 /** Whether a choice stands now: a pane in the middle, the shape as the rail beside the prose, any other figure opened whole. */
 const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : chooser.sheet === k);
@@ -1684,15 +1692,24 @@ const actingOnCanvas = (): boolean => narrow() && !fits().lane && fits().canvas 
  * since it is not a mode but what stands beside the reading; any other figure opens whole, or closes if it stood.
  */
 function chooseNarrow(k: string): void {
-  chooser.pill = false;
   if (WIDGETS[k].kind === "pane") {
-    if (!narrowOn(k)) {
+    const taking = !narrowOn(k);
+    if (taking) {
       state.settings.areas = { ...state.settings.areas, middle: [k] };
       saveSettings();
     }
     chooser.sheet = null;
+    // the lane was laid out of sight while the reader was away, so its scroll says nothing; coming back, it is settled
+    // at the brief they stand on, which is what lights it and everything that answers for it
+    if (taking && k === "lane") {
+      drawAll();
+      return void settle(state.focus);
+    }
   } else if (k === "shape") {
-    state.settings.areas = placed(k, standsIn(k) ? null : "wingL");
+    // the rail cycles through the sides as the strip does on a desk, since a reader scrubbing with the hand they have
+    // wants the rail under that hand and the callout away from it
+    const at = standsIn(k);
+    state.settings.areas = placed(k, at === "wingL" ? "wingR" : at === "wingR" ? null : "wingL");
     saveSettings();
   } else chooser.sheet = chooser.sheet === k ? null : k;
   drawAll();
@@ -2123,7 +2140,10 @@ function shapeSvg(W: number, H: number): string {
       above
     );
   });
-  return `<svg class="fig shape" data-k="${k}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}">${cells.join("")}<rect class="cursor" x="0" y="${(4 + box.scrollTop * k).toFixed(1)}" width="${w}" height="${(box.clientHeight * k).toFixed(1)}" rx="4"/></svg>`;
+  // the band stands half the rail's own inset clear of its rows, and the same clear of its edge, so it is not pressed
+  // against the side of the page on one side and floating on the other
+  const bx = rail ? SHAPE.pad / 2 : 0;
+  return `<svg class="fig shape" data-k="${k}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}">${cells.join("")}<rect class="cursor" x="${bx}" y="${(4 + box.scrollTop * k).toFixed(1)}" width="${w - 2 * bx}" height="${(box.clientHeight * k).toFixed(1)}" rx="4"/></svg>`;
 }
 
 function drawShapeCursor(): void {
@@ -2586,10 +2606,10 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * always allowed, since all it shows is its strip.
  */
 /** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number };
+type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0, rail: 0 };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0, rail: 0, railSide: "wingL" };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
   // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
   const panes = panesHeld(held.middle);
@@ -2618,12 +2638,14 @@ function fitsWith(held: Held): Fit {
   // the exception at the end of the order of giving way: where every area has gone and the lane would stand alone, the
   // shape keeps standing as a narrow rail, if the reader has asked for it and the lane is left room enough to read in
   const stands = (a: AreaName) => on[a] && held[a].length > 0;
-  const asked = [...held.wingL, ...held.wingR].includes("shape");
-  if (on.lane && asked && !(["wingL", "wingR", "gutterL", "gutterR"] as AreaName[]).some(stands)) {
+  // the rail stands on the side the reader put the shape on, as it does on a desk
+  const side: WingName | null = held.wingL.includes("shape") ? "wingL" : held.wingR.includes("shape") ? "wingR" : null;
+  if (on.lane && side && !(["wingL", "wingR", "gutterL", "gutterR"] as AreaName[]).some(stands)) {
     const w = railWidth();
     if (ui.areas.clientWidth - w - 2 * s.gap >= RAIL.lane) {
       on.rail = w;
-      on.wingL = true;
+      on.railSide = side;
+      on[side] = true;
     }
   }
   return on;
@@ -2676,19 +2698,23 @@ function drawLayout(): void {
   // any of it on a margin, and what falls outside is cut by the viewport as a map is
   const bleed = narrow() && on.canvas && !on.lane;
   const space = bleed ? "0px" : on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
-  const tracks = [on.rail ? "0px" : space];
+  // the rail hugs the edge it stands on, so the space at that edge is nothing and the rail takes it
+  const railL = on.rail > 0 && on.railSide === "wingL";
+  const railR = on.rail > 0 && on.railSide === "wingR";
+  const tracks = [railL ? "0px" : space];
   const place = (el: HTMLElement, width: string) => {
     tracks.push(width, space);
     el.style.gridColumn = `${tracks.length - 1}`;
   };
-  if (on.rail) place(ui.parts.wingL, `${on.rail}px`);
+  if (railL) place(ui.parts.wingL, `${on.rail}px`);
   else if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
   // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
   // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
   // there is nothing to give way to and a floor would only overflow the page
   if (on.canvas) place(ui.canvas, bleed ? "1fr" : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
   if (on.lane) place(ui.scroll, `${mid}px`);
-  if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
+  if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
+  else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
   ui.areas.style.columnGap = "0px";
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
@@ -2698,7 +2724,7 @@ function drawLayout(): void {
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
   ui.scroll.style.width = on.lane ? "" : `${mid}px`;
-  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(name === "wingL" && on.rail) && (!on[name] || !takesRoom(name))));
+  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !takesRoom(name))));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
 }
@@ -3034,7 +3060,7 @@ function drawWing(area: "wingL" | "wingR"): void {
   const s = state.settings;
   const on = fits();
   // the rail is the shape and nothing else, whichever wing the reader had it in
-  const names = on.rail ? (area === "wingL" ? ["shape"] : []) : on[area] ? figureNames(area) : [];
+  const names = on.rail ? (area === on.railSide ? ["shape"] : []) : on[area] ? figureNames(area) : [];
   const figures = names.map((n) => WIDGETS[n] as Figure);
   el.innerHTML = "";
   Array.from(slots.keys())
@@ -3103,22 +3129,15 @@ function drawChooser(): void {
   if (narrow()) {
     // the mark gets out of the way as a reader reads; opening it brings the foot back, since a pill laid away would
     // answer a press with nothing
-    if (chooser.pill || !fits().lane) ui.strips.classList.remove("away");
-    // the foot is one row, and what stands in it follows what the reader has chosen: the choices when they press the
-    // mark, the acts for the brief they have chosen on the canvas, and otherwise the mark alone. The mark keeps its
-    // place at the row's end in each, so the chooser is never lost and never has to be looked for
-    const mark = `<button class="mark glass" data-mark aria-label="${chooser.pill ? "close" : "what stands around the reading"}">${icon(chooser.pill ? "close" : "chooser")}</button>`;
-    const row = chooser.pill
-      ? `<div class="pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
-      : actingOnCanvas()
-        ? `<div class="pill glass">${FOOT_ACTS.map((id) => footBadge(id, card.a!)).join("")}</div>`
-        : "";
-    ui.strips.innerHTML = `<div class="strip foot">${row}${mark}</div>`;
+    if (!fits().lane) ui.strips.classList.remove("away");
+    // the foot is one row and it is always drawn: the choices stand in it, and the acts of what is chosen stand beside
+    // them, so nothing hides anything else and nothing is two presses away
+    const acts = actingOnCanvas() ? `<div class="pill glass">${FOOT_ACTS.map((id) => footBadge(id, card.a!)).join("")}</div>` : "";
+    ui.strips.innerHTML = `<div class="strip foot">${acts}<div class="pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div></div>`;
     return;
   }
   // widened, the row comes back whole and nothing stands open over the reading
   chooser.sheet = null;
-  chooser.pill = false;
   const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
   ui.strips.innerHTML = `<div class="strip">${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
 }
@@ -3182,8 +3201,12 @@ function drawSheet(): void {
   ui.sheet.hidden = !on;
   if (!on) return void (ui.sheet.innerHTML = "");
   const s = state.settings;
-  ui.sheet.style.top = `${Math.round(Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10))}px`;
-  ui.sheet.style.bottom = `${footRoom()}px`;
+  // narrow, a figure opened whole is the page: standing in a band left the prose showing above and below it, which
+  // read as an overlay over a reading the reader had left
+  const whole = narrow();
+  ui.sheet.classList.toggle("bleed", whole);
+  ui.sheet.style.top = whole ? "0px" : `${Math.round(Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10))}px`;
+  ui.sheet.style.bottom = whole ? "0px" : `${footRoom()}px`;
   ui.sheet.innerHTML = `<div class="slot"></div>`;
   const slot = ui.sheet.firstElementChild as HTMLElement;
   slot.innerHTML = (w as Figure).draw(slot.clientWidth, slot.clientHeight);
@@ -3410,6 +3433,7 @@ function restore(s: Snapshot): void {
   state.trail = s.trail.filter((h) => brief(h.to));
   drawAll();
   ui.scroll.scrollTop = s.scroll;
+  quiet();
   followHistory(hashFor(state.focus));
   arriving = false;
 }
@@ -3569,6 +3593,7 @@ function scrollToFocus(smooth: boolean): void {
     holdTimer = setTimeout(() => (state.holding = null), 1200);
   }
   ui.scroll.scrollTo({ top: target, behavior: smooth ? "smooth" : "auto" });
+  quiet();
 }
 
 // ### 3.14.1 Pull past the top
@@ -3665,25 +3690,28 @@ let armed = false;
  * lifts, which then lays it back.
  */
 function railScrub(x: number, y: number): void {
-  const svg = ui.parts.wingL.querySelector<SVGSVGElement>("svg.shape");
+  const svg = ui.parts[fits().railSide].querySelector<SVGSVGElement>("svg.shape");
   if (!svg) return;
   const r = svg.getBoundingClientRect();
-  armed = x > r.right + RESET;
+  // away from the rail's own edge: right of a rail at the left, left of one at the right
+  const right = fits().railSide === "wingL";
+  armed = right ? x > r.right + RESET : x < r.left - RESET;
   if (!armed) {
     const k = Number(svg.dataset.k);
     ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
   }
-  railCallout(y, r.right);
+  railCallout(y, right ? r.right : r.left);
 }
 
 /** The callout: what the finger is over, drawn as the tooltip draws a brief, or what letting go will do once the reset is armed. */
-function railCallout(y: number, right: number): void {
+function railCallout(y: number, edge: number): void {
   const t = ui.tip;
   const b = brief(focusUnderLine());
   t.classList.add("callout");
   t.innerHTML = armed ? `<span class="name plain">let go to lay the lane back</span>` : b ? `${pathHtml(b.address)}<span class="name">${esc(b.title || state.body!.title)}</span>` : "";
   t.hidden = false;
-  t.style.left = `${Math.round(right + 14)}px`;
+  // beside the thumb on the side away from the edge the rail stands on, so the hand never covers the answer
+  t.style.left = `${Math.round(fits().railSide === "wingL" ? edge + 14 : edge - 14 - t.offsetWidth)}px`;
   t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
 }
 
@@ -3697,6 +3725,13 @@ const scrolled = { at: 0, run: 0 };
  * scroll up. A run in one direction is what counts, never a single delta, since the pull already reads the scroll's
  * direction at the top and the two must not fight.
  */
+/** A scroll the page made is not the reader reading, so it neither hides the row nor counts towards hiding it. */
+function quiet(): void {
+  scrolled.at = ui.scroll.scrollTop;
+  scrolled.run = 0;
+  ui.strips.classList.remove("away");
+}
+
 function markAway(): void {
   const top = ui.scroll.scrollTop;
   const d = top - scrolled.at;
@@ -3705,7 +3740,7 @@ function markAway(): void {
   scrolled.run = Math.sign(scrolled.run) === Math.sign(d) ? scrolled.run + d : d;
   // the mark leaves while a reader is reading; on the canvas there is no reading to leave, and going to a node scrolls
   // the lane out of sight, which would have taken the mark with it
-  if (!narrow() || chooser.pill || !fits().lane) return void ui.strips.classList.remove("away");
+  if (!narrow() || !fits().lane) return void ui.strips.classList.remove("away");
   if (scrolled.run > AWAY.down) ui.strips.classList.add("away");
   else if (scrolled.run < -AWAY.up) ui.strips.classList.remove("away");
 }
@@ -3903,15 +3938,6 @@ function wire(): void {
     // the line of a borrowing brief follows to the home of what it borrows, as a link would
     const borrowed = t.closest<HTMLElement>("[data-borrow]");
     if (borrowed) return void follow(borrowed.dataset.borrow!);
-    // the mark opens the row as a wide pill, and the pill closes again on any press that is not one of its own
-    if (t.closest("[data-mark]")) {
-      chooser.pill = !chooser.pill;
-      return void drawChooser();
-    }
-    if (chooser.pill && !t.closest(".strip")) {
-      chooser.pill = false;
-      drawChooser();
-    }
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
       const k = pick.dataset.widget!;
@@ -4390,6 +4416,8 @@ const CSS = `
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
+/* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
+html { -webkit-tap-highlight-color: transparent; }
 body { display: flex; flex-direction: column; background: var(--ground); color: var(--ink); font-family: var(--prose-face); font-size: var(--body); font-weight: calc(400 - var(--thin)); line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .18em; }
 a:hover, a.lit { text-decoration-color: var(--lit); }
@@ -4510,7 +4538,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .gutter.closed { visibility: hidden; }
 #lane { min-width: 0; line-height: var(--leading); }
 
-#strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 5; pointer-events: none; }
+#strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 8; pointer-events: none; }
 /* one row, centred at the foot, holding every choice once: the panes, the adjuncts, the figures, three groups spaced
    apart by nothing but room. Four grades of ink: what cannot stand, what can, what is under the pointer, what is in use */
 .strip { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; pointer-events: auto; }
@@ -4799,6 +4827,9 @@ body.touch .knob.turning .hint { opacity: 1; }
    on the page's own ground, and the reading stands where it stood beneath it */
 #sheet { position: absolute; left: 0; right: 0; z-index: 3; background: var(--ground); display: flex; justify-content: center; }
 #sheet .slot { position: static; width: 100%; height: 100%; padding: 0 var(--gap); }
+/* taking the page whole it keeps the foot's room clear beneath, since the row of choices stands over it */
+#sheet.bleed { z-index: 6; }
+#sheet.bleed .slot { padding-bottom: 88px; }
 
 /* A touch reading. A finger is a fatter pointer, so everything it presses is given room it can find, near the forty-four
    pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
@@ -4822,7 +4853,7 @@ body.touch .badge.worded .label { color: var(--ink); }
 body.touch .badge.worded.off { background: none; }
 /* and the acts take a row of their own beneath the figure, since sharing the line with it left neither room to read */
 body.touch .act { flex-wrap: wrap; row-gap: 9px; padding-bottom: 12px; }
-body.touch .act .acts { flex-basis: 100%; margin-left: -4px; gap: 10px; }
+body.touch .act .acts { flex-basis: 100%; margin-left: 0; gap: 10px; }
 body.touch .badge.worded .label { color: var(--muted); }
 body.touch #crumb { gap: 2px; }
 body.touch #crumb .step { padding: 10px 5px; }
