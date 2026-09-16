@@ -1358,7 +1358,15 @@ const gapAfter = (nextDepth: number): number => [56, 56, 40, 28, 20][Math.min(4,
 // branch is heavy, with a tick beneath the ones that hold more; where that is too much it merges into one bar, which
 // still says how much waits even when it can no longer say what. So the answer to "only three paragraphs?" is never
 // compressed away, and the deeper structure yields first.
-const FIG = { h: 13, y: 3, bar: 5, tick: 1.8, gap: 3, split: 16, max: 176, shown: 12, level: 9 };
+const FIG = { h: 13, y: 3, bar: 5, tick: 1.8, gap: 3, split: 16, max: 176, floor: 28, shown: 12, level: 9 };
+
+/**
+ * The room the figure on the action line is drawn in. Wide, it is the room the figure asks for; where the lane is
+ * narrow, it is what the line has left once the count of what lies beneath and the acts beside it have taken theirs,
+ * since a figure that runs past the prose says nothing at all. The words are reckoned from what they are: two acts and
+ * a count, worded, in the chrome's own size.
+ */
+const figRoom = (): number => clamp((ui?.lane?.clientWidth ?? FIG.max + 200) - (touch ? 190 : 150), FIG.floor, FIG.max);
 
 /** A block's mark, as long as the block is tall in the lane: the shape's own reading, laid on its side. */
 const markLength = (t: Tok): number => {
@@ -1372,12 +1380,15 @@ const branchLength = (a: string): number => clamp(Math.sqrt(Math.max(1, (state.i
 
 /** The figure beside the action: what the press gives, then what lies further. */
 function actFigure(b: Brief, rest: Tok[]): string {
+  // the room is what the line has left once its count and its acts have taken theirs, so the figure yields to the words
+  // rather than running past the prose; the marks scale together into it and keep their lengths true against each other
+  const MAX = figRoom();
   const kids = levelOf(b);
   const blocks = rest.slice(0, FIG.shown).map((t) => ({ image: t.type === "image", w: markLength(t) }));
   const over = rest.length - blocks.length;
   const wide = (xs: { w: number }[]) => xs.reduce((n, x) => n + x.w + FIG.gap, 0);
   // the level merges into one bar when it holds too many to draw or the room has run out
-  const room = FIG.max - (blocks.length ? wide(blocks) + FIG.split : 0);
+  const room = Math.max(0, MAX - (blocks.length ? wide(blocks) + FIG.split : 0));
   const bars = kids.map((k) => ({ w: branchLength(k.address), deep: level(k.address).length > 0 }));
   const merged = kids.length > FIG.level || wide(bars) > room;
   // merged, the one bar is as long as the whole level is heavy, never as long as the room happens to be
@@ -1387,7 +1398,7 @@ function actFigure(b: Brief, rest: Tok[]): string {
   const cells = !kids.length ? [] : merged ? [{ w: whole, deep: false, all: true }] : bars.map((x) => ({ ...x, all: false }));
   // what the paragraphs ask for, scaled to the room they have, so their lengths stay true against each other
   const asked = wide(blocks);
-  const left = FIG.max - (cells.length ? Math.min(room, wide(cells)) + FIG.split : 0);
+  const left = Math.max(FIG.floor, MAX - (cells.length ? Math.min(room, wide(cells)) + FIG.split : 0));
   const k = asked > left ? left / asked : 1;
   let x = 0;
   const marks = blocks
@@ -3255,6 +3266,12 @@ function backTo(i: number): void {
 /** Goes to an address from the tree or a figure: enters the history, then settles there, keeping what the reader folded. */
 function goTo(a: string): void {
   record();
+  // a going from a figure opened whole dismisses it: the jump is what the reader opened it for
+  if (foot.sheet !== null) {
+    foot.sheet = null;
+    drawSheet();
+    drawChooser();
+  }
   move("go", a);
   // a target outside the scope widens the scope to the whole body first, laid afresh, and the step is on the way back
   if (!within(a, state.scope)) scopeTo("");
@@ -4480,6 +4497,8 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 /* A touch reading. A finger is a fatter pointer, so everything it presses is given room it can find, near the forty-four
    pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
 body.touch .tree .row { padding-top: 9px; padding-bottom: 9px; }
+/* the chevron that folds a row is the one small target in the outline, so a finger is given the room around it */
+body.touch .tree .row .mark { width: 30px; height: 34px; top: 0; left: calc(-5px + var(--d) * 14px); }
 body.touch .switches .pick { padding: 9px 8px; }
 /* the depth strip is scrubbed rather than aimed at, so its cells grow for a finger without taking the whole line */
 body.touch #depth { gap: 4px; }
@@ -4491,7 +4510,9 @@ svg.shape, #canvas { touch-action: none; }
 #tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
 body.touch .act .acts { gap: 2px; margin-right: -10px; }
-body.touch .badge.worded { padding: 10px; border-radius: 8px; }
+body.touch .badge.worded { padding: 10px 6px; border-radius: 8px; }
+/* where the words and the figure cannot share one row the acts take a row of their own rather than running past the prose */
+body.touch .act { flex-wrap: wrap; }
 body.touch .badge.worded .label { color: var(--muted); }
 body.touch #crumb { gap: 2px; }
 body.touch #crumb .step { padding: 10px 5px; }
