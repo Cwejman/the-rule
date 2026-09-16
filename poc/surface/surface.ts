@@ -1195,8 +1195,10 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   if (!act) return "";
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
+  // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
+  const held = act.keys[0].hold ? `<span class="held">held</span>` : "";
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="keys">${capsOf(act.keys[0])}</span>${said}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="chord">${capsOf(act.keys[0])}</span>${said}${held}</span>`;
 }
 
 // ## 3.2 Prose is drawn from tokens
@@ -1454,6 +1456,7 @@ const ICON: Record<string, string> = {
   ahead: `<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>`,
   plate: `<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/>`,
   settings: `<path d="M4 11.5a5.5 5.5 0 1 1 8 0"/><path d="M8 8v-3"/>`,
+  keys: `<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h1M7.5 6.5h1M11 6.5h1M5 9.5h6"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
   lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
@@ -1467,6 +1470,7 @@ const WIDGETS: Record<string, Widget> = {
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
+  keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   pointers: { kind: "figure", name: "links, for the brief in focus", icon: "links", draw: () => pointersHtml(), width: () => 240, grow: false, onFocus: true },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
@@ -1801,6 +1805,25 @@ function loadSettings(): void {
   if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
 }
 const saveSettings = (): void => void localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+
+// ### 3.8.1 The keys: every act and what fires it
+//
+// Most acts stand as a badge where their object stands, and a few have no
+// object on the page: the arrows that move the reading are the keys of a
+// cursor. So one figure holds the whole table, grouped by what each act works
+// on, drawn from the same entries, and every badge there is pressable and tells
+// the rest on hover. It answers for the focus, so what the space bar would do
+// now is what it says.
+
+const KEY_GROUPS: { of: string; acts: string[] }[] = [
+  { of: "the brief", acts: ["unfold", "foldUp", "open"] },
+  { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "widen"] },
+  { of: "the reading", acts: ["previous", "next", "above", "beneath"] },
+  { of: "the lane", acts: ["undo", "redo"] },
+];
+
+const keysHtml = (): string =>
+  `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
 
 // ## 3.9 The shape: the lane as laid
 //
@@ -3992,7 +4015,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
    the brief the reading line stands on, which is the brief a key acts on, and its room is kept so nothing reflows */
 .badge .cap { visibility: hidden; }
 .brief.here .badge .cap, .badge.tight .cap { visibility: visible; }
-.badge .keys { display: inline-flex; gap: 2px; }
+.badge .chord { display: inline-flex; gap: 2px; }
 .badge .cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
 .badge .cap svg { width: 11px; height: 11px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .badge .label { color: var(--ink); }
@@ -4000,9 +4023,20 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .badge:hover .label { color: var(--on); }
 /* a badge that cannot be taken keeps its room and goes quiet */
 .badge.off { opacity: .35; pointer-events: none; }
+.badge .held { color: var(--faint); font-size: 11px; }
+/* the keys: the whole table in a wing, grouped by what each act works on, its caps always inked */
+.keys { width: 216px; display: flex; flex-direction: column; gap: 14px; font-family: var(--sans); font-size: var(--small); }
+.keys .group { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+.keys .of { margin-bottom: 1px; }
+.keys .badge { cursor: pointer; }
+/* the caps are right-aligned in a fixed room, so every label in the column begins at one edge and the key nearest the
+   word is always the one that names the act */
+.keys .badge .chord { width: 40px; justify-content: flex-end; }
+.keys .badge .cap { visibility: visible; }
+.keys .badge:hover .cap { background: var(--track); color: var(--ink); }
 /* on the depth strip the badge is its keys alone, standing a little apart from the cells it moves */
 #depth .badge { cursor: pointer; }
-#depth .badge.tight .keys { gap: 2px; }
+#depth .badge.tight .chord { gap: 2px; }
 #depth .badge.tight:first-child { margin-right: 5px; }
 #depth .badge.tight:last-child { margin-left: 5px; }
 #depth .badge .cap { background: none; }
