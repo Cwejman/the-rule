@@ -54,7 +54,7 @@ Even fitted, the figure and the acts on one line left neither room to read, so o
 
 ## 3. One chooser, in two grains
 
-The foot is not a second design. It is [the strip](framework.md#3-the-strip) in a second grain: wide, it is the row; narrow, the row folds into one round mark at the foot of the page, and pressing it opens the row as a wide pill. One table, one set of states, one cycle, so a choice is never specified twice.
+The foot is not a second design. It is [the strip](framework.md#3-the-strip) in a second grain: wide, it is the row; narrow, the row folds into one round mark at the foot of the page, and pressing it opens the row as a wide pill beside it and presses again to close. One table, one set of states, one cycle, so a choice is never specified twice.
 
 The mark gets out of the way as a reader reads: it hides on a sustained scroll down and comes back on a scroll up. Sustained, not on any downward delta, since [the pull](lane.md#74-pull-past-the-top) already reads the scroll's direction at the top and the two must not fight.
 
@@ -114,7 +114,7 @@ The middle holds one pane where the lane stands alone, so pressing a pane sets i
 
 Standing alone on a phone the canvas takes the page edge to edge, with no margin, no rim and no corners. There is too little room to spend any of it on a frame, and a canvas is read by moving it rather than by seeing all of it at once, so its sides are simply cut by the viewport, as a map's are.
 
-What it keeps is a fade at its top and its foot, as the prose has, so the way down and the mark read as standing over one page rather than over a panel.
+What it keeps is a fade at its top and its foot, as the prose has, so the way down and the mark read as standing over one page rather than over a panel. Its nodes begin below the way down, since a page-wide canvas has no margin to stand them in and the entry would otherwise be drawn under it.
 
 *The author's, 2026-09-16, on reading a canvas that stood in a box; as built the same day.*
 
@@ -126,15 +126,17 @@ So it leaves only while the lane is the pane that stands.
 
 *The author's, 2026-09-16, who saw the mark on one press and not on the next; as built the same day.*
 
-### 4.6 A brief chosen on the canvas has nowhere to act
+### 4.6 The foot is one row, and holds the acts of what is chosen
 
-A reader can light a node on the canvas and then do nothing with it. In the lane every act stands on the brief's own line; a node has no line, and the room around it is taken by the nodes beside it.
+A reader can light a node on the canvas, and in the lane every act stands on the brief's own line. A node has no line, and the room around it is taken by the nodes beside it; the top of the page is out of a hand's reach; so the foot is where the acts belong, and the foot already held the mark.
 
-Three things bound where the acts could stand. Around the node there is no room. At the top of the page they are out of a hand's reach. The foot is left, and the foot already holds the mark.
+So the foot is one row, and what stands in it follows what the reader has chosen. The mark alone, ordinarily. The pill of choices while the mark is pressed. The acts of the brief chosen on the canvas, as [the same buttons the action line draws](#23-the-acts-take-a-row-of-their-own), when one is chosen there.
 
-The session's proposal is that the foot holds one row, and what the row holds depends on what the reader has chosen: the pill of choices when they press the mark, the acts for the brief in focus when one is chosen on the canvas, and the mark alone otherwise. The mark keeps its place at the row's end in each, so the chooser is never lost, and the acts are the same buttons the action line draws, in the same grain.
+The mark keeps its place at the row's end in each of the three, so the chooser is never lost and never has to be looked for. It carries a cross while the pill stands open, since there it is the way to close.
 
-*Open, 2026-09-16: the want is the author's, the three bounds are his, and the proposal is the session's, not built and awaiting his word.*
+The scope's own root is not a choice, since the entry on the canvas takes no press, so arriving offers nothing until the reader has picked something. Taking an act draws the row again, since what it has left to offer has changed: folding a brief leaves unfolding, and opening it makes it the scope, which leaves the mark alone.
+
+*The want and the three bounds are the author's, 2026-09-16; the one row is the session's proposal, which he asked to have built rather than argued. As built the same day.*
 
 ## 5. The minimap is a rail, not a mode
 

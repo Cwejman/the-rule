@@ -1504,6 +1504,7 @@ const ICON: Record<string, string> = {
   keys: `<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h1M7.5 6.5h1M11 6.5h1M5 9.5h6"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
   lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
+  close: `<path d="M4.6 4.6l6.8 6.8M11.4 4.6l-6.8 6.8"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
@@ -1642,6 +1643,19 @@ function pickNarrowHtml(k: string): string {
   const quiet = w.kind === "pane" && on ? " fixed" : "";
   return `<button class="pick${on ? " on" : ""}${quiet}" data-widget="${esc(k)}" data-tip="${esc(w.name)}">${icon(w.icon)}</button>`;
 }
+
+/**
+ * The acts the foot offers for a brief chosen on the canvas: the same two [the action line](lane.md#61-the-action-line-is-the-press)
+ * draws beside a brief in the lane, since a node on the canvas has no line of its own to carry them.
+ */
+const FOOT_ACTS = ["unfold", "open"];
+
+/**
+ * Whether the foot carries those acts: the canvas is the pane standing, the reader has chosen a brief on it, and that
+ * brief has something to act on. The scope's own root is not a choice, since the entry takes no press, so arriving at
+ * the canvas offers nothing until the reader has picked something.
+ */
+const actingOnCanvas = (): boolean => narrow() && !fits().lane && fits().canvas && state.focus !== state.scope && FOOT_ACTS.some((id) => ACTIONS[id].can(state.focus));
 
 /**
  * A press in the pill: a pane takes the middle, since the middle holds one; the shape stands as the rail or leaves it,
@@ -2429,7 +2443,7 @@ function fitCanvas(): void {
   const w = st.scrollWidth || 1;
   view.k = clamp((W - 2 * CANVAS_INSET) / w, 0.6, 1);
   view.x = Math.max(CANVAS_INSET, (W - w * view.k) / 2);
-  view.y = CANVAS_INSET;
+  view.y = canvasTop();
 }
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
@@ -2441,7 +2455,7 @@ function followFocus(): void {
   if (!row) return;
   const c = ui.canvas.getBoundingClientRect();
   const r = row.getBoundingClientRect();
-  const inside = r.top >= c.top + CANVAS_INSET && r.bottom <= c.bottom - CANVAS_INSET && r.left >= c.left && r.right <= c.right;
+  const inside = r.top >= c.top + canvasTop() && r.bottom <= c.bottom - CANVAS_INSET && r.left >= c.left && r.right <= c.right;
   if (inside) return;
   const s0 = st.getBoundingClientRect();
   const y = (r.top - s0.top) / view.k;
@@ -2809,6 +2823,8 @@ const panesShown = (): HTMLElement[] => [ui.canvas, ui.scroll].filter((el) => !e
 
 /** How far the nodes stand in from the canvas's rim. */
 const CANVAS_INSET = 24;
+/** How far in from the canvas's own top the nodes begin: past the way down where it stands over the canvas, since taking the page whole leaves no margin to stand it in. */
+const canvasTop = (): number => Math.max(CANVAS_INSET, ui.crumb.hidden || !ui.canvas.classList.contains("bleed") ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.getBoundingClientRect().top);
 
 /** The canvas stands in the band the figures stand in: below the way down, above the strip's room at the foot. */
 function placeCanvas(): void {
@@ -3026,9 +3042,16 @@ function drawChooser(): void {
     // the mark gets out of the way as a reader reads; opening it brings the foot back, since a pill laid away would
     // answer a press with nothing
     if (chooser.pill || !fits().lane) ui.strips.classList.remove("away");
-    ui.strips.innerHTML = chooser.pill
-      ? `<div class="strip foot pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
-      : `<div class="strip foot"><button class="mark glass" data-mark aria-label="what stands around the reading">${icon("chooser")}</button></div>`;
+    // the foot is one row, and what stands in it follows what the reader has chosen: the choices when they press the
+    // mark, the acts for the brief they have chosen on the canvas, and otherwise the mark alone. The mark keeps its
+    // place at the row's end in each, so the chooser is never lost and never has to be looked for
+    const mark = `<button class="mark glass" data-mark aria-label="${chooser.pill ? "close" : "what stands around the reading"}">${icon(chooser.pill ? "close" : "chooser")}</button>`;
+    const row = chooser.pill
+      ? `<div class="pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
+      : actingOnCanvas()
+        ? `<div class="pill glass acts">${FOOT_ACTS.map((id) => badgeHtml(id, state.focus)).join("")}</div>`
+        : "";
+    ui.strips.innerHTML = `<div class="strip foot">${row}${mark}</div>`;
     return;
   }
   // widened, the row comes back whole and nothing stands open over the reading
@@ -3603,6 +3626,8 @@ function onScroll(): void {
   state.focus = f;
   if (!arriving) followHistory(hashFor(f));
   drawWings("focus");
+  // on the canvas the focus is the brief the reader chose, and the foot carries its acts, so the row follows it
+  if (narrow() && !fits().lane) drawChooser();
 }
 
 /** Changes grades under a function, keeping the acted-on brief's heading where it stood on the screen. */
@@ -3736,7 +3761,9 @@ function wire(): void {
     const badge = t.closest<HTMLElement>("[data-act]");
     if (badge) {
       const act = ACTIONS[badge.dataset.act!];
-      return void (act && act.can(badge.dataset.a) && act.run(badge.dataset.a));
+      if (act && act.can(badge.dataset.a)) act.run(badge.dataset.a);
+      // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
+      return void (badge.closest(".strip") && drawChooser());
     }
     // on the canvas a row goes, and only the ground of a zone folds
     const crow = t.closest<HTMLElement>(".crow");
@@ -3753,7 +3780,7 @@ function wire(): void {
     if (borrowed) return void follow(borrowed.dataset.borrow!);
     // the mark opens the row as a wide pill, and the pill closes again on any press that is not one of its own
     if (t.closest("[data-mark]")) {
-      chooser.pill = true;
+      chooser.pill = !chooser.pill;
       return void drawChooser();
     }
     if (chooser.pill && !t.closest(".strip")) {
@@ -4572,20 +4599,25 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
    beneath, with a light rim and a soft shadow, since a translucent grey alone read as a fade rather than as a thing */
 #strips { transition: transform .42s cubic-bezier(.22,.9,.24,1), opacity .3s ease; }
 #strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
-.strip.foot { bottom: 22px; }
+/* the foot is one row: what stands in it follows what the reader has chosen, with the mark always at its end */
+.strip.foot { bottom: 22px; gap: 8px; }
 .glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7); }
 /* the fold chevron in a tree is also called a mark and stands absolutely, so this one says where it stands: left to
    itself it hung out of the strip, which is what put it off centre and below the foot */
-.strip .mark { position: relative; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
+.strip .mark { position: relative; flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
 .strip .mark:active { transform: scale(.94); }
 .strip .mark:hover { color: var(--ink); }
 .strip .mark .icon { width: 19px; height: 19px; stroke-width: 1.2; }
-.strip.pill { border-radius: 28px; padding: 5px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
-@keyframes pill-in { from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(.9); } }
-.strip.pill .pick { width: 46px; height: 46px; border-radius: 23px; opacity: .5; }
-.strip.pill .pick.on, .strip.pill:hover .pick.on { opacity: 1; color: var(--ink); background: var(--wash); }
-.strip.pill .pick:hover { opacity: .8; }
-.strip.pill .pick .icon { width: 18px; height: 18px; }
+.strip .pill { display: flex; align-items: center; border-radius: 28px; padding: 5px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
+@keyframes pill-in { from { opacity: 0; transform: translateY(10px) scale(.92); } }
+.strip .pill .pick { width: 46px; height: 46px; border-radius: 23px; opacity: .5; }
+.strip .pill .pick.on, .strip .pill:hover .pick.on { opacity: 1; color: var(--ink); background: var(--wash); }
+.strip .pill .pick:hover { opacity: .8; }
+.strip .pill .pick .icon { width: 18px; height: 18px; }
+/* the acts stand in the same row in the same grain: the words on the glass rather than each on a surface of its own */
+.strip .pill.acts { padding: 4px; }
+.strip .pill.acts .badge.worded { background: none; padding: 11px 15px; border-radius: 22px; }
+.strip .pill.acts .badge.worded:active { background: var(--wash); }
 
 /* a figure opened whole over the reading, where there is no wing to stand it in: it takes the band the prose reads in,
    on the page's own ground, and the reading stands where it stood beneath it */
