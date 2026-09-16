@@ -88,7 +88,7 @@ What it gives up at that width is the room for its marks and its tail. What it g
 
 The rail stands at the left edge of the page and takes the space that stood there, so the lane gives it its room rather than the page growing one. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
-*The author's, 2026-09-16; the width his, the callout his. Measured as built the same day: the rail stands 116 on this body and leaves the lane 226 of a 390 screen, which is the author's to judge.*
+*The author's, 2026-09-16; the width his, the callout his. Measured as built the same day, across six widths: the rail stands 116 on this body, and stands from 390 up, leaving the lane 226 there. Below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it. Where that floor belongs is the author's to judge.*
 
 ### 5.1 Scrubbing reads, and sliding off resets
 
