@@ -2586,7 +2586,9 @@ function drawLayout(): void {
   if (on.rail) place(ui.parts.wingL, `${on.rail}px`);
   else if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
   // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
-  if (on.canvas) place(ui.canvas, `minmax(${CANVAS_MIN}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
+  // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
+  // there is nothing to give way to and a floor would only overflow the page
+  if (on.canvas) place(ui.canvas, `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
   if (on.lane) place(ui.scroll, `${mid}px`);
   if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
@@ -3461,6 +3463,27 @@ function railCallout(y: number, right: number): void {
   t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
 }
 
+/** How far a reader scrolls down in one run before the mark gets out of the way, and how far back up before it returns. */
+const AWAY = { down: 140, up: 40 };
+/** Where the lane stood at the last scroll, and how far the scrolling has run in one direction. */
+const scrolled = { at: 0, run: 0 };
+
+/**
+ * The mark at the foot gets out of the way as a reader reads: it hides on a sustained scroll down and comes back on a
+ * scroll up. A run in one direction is what counts, never a single delta, since the pull already reads the scroll's
+ * direction at the top and the two must not fight.
+ */
+function markAway(): void {
+  const top = ui.scroll.scrollTop;
+  const d = top - scrolled.at;
+  scrolled.at = top;
+  if (d === 0) return;
+  scrolled.run = Math.sign(scrolled.run) === Math.sign(d) ? scrolled.run + d : d;
+  if (!narrow() || foot.pill) return void ui.strips.classList.remove("away");
+  if (scrolled.run > AWAY.down) ui.strips.classList.add("away");
+  else if (scrolled.run < -AWAY.up) ui.strips.classList.remove("away");
+}
+
 /** Where the pointer last moved, and whether a scroll has come under it since. */
 const pointer = { x: -1, y: -1, still: false };
 
@@ -3468,6 +3491,7 @@ const pointer = { x: -1, y: -1, still: false };
 function onScroll(): void {
   // a scroll takes the tooltip away, except the callout, which is the finger's own answer to the scrubbing it caused
   if (!ui.tip.classList.contains("callout")) hideTip();
+  markAway();
   drawShapeCursor();
   drawFade();
   pointer.still = true;
@@ -4451,7 +4475,7 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 /* a figure opened whole over the reading, where there is no wing to stand it in: it takes the band the prose reads in,
    on the page's own ground, and the reading stands where it stood beneath it */
 #sheet { position: absolute; left: 0; right: 0; z-index: 3; background: var(--ground); display: flex; justify-content: center; }
-#sheet .slot { width: 100%; padding: 0 var(--gap); overflow-y: auto; display: flex; justify-content: center; }
+#sheet .slot { position: static; width: 100%; height: 100%; padding: 0 var(--gap); }
 
 /* A touch reading. A finger is a fatter pointer, so everything it presses is given room it can find, near the forty-four
    pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
@@ -4460,8 +4484,9 @@ body.touch .switches .pick { padding: 9px 8px; }
 /* the depth strip is scrubbed rather than aimed at, so its cells grow for a finger without taking the whole line */
 body.touch #depth { gap: 4px; }
 body.touch #depth .dc { width: 28px; height: 28px; font-size: 12px; }
-/* the rail takes the gesture whole, so the page does not scroll under a finger that is scrubbing it */
-svg.shape { touch-action: none; }
+/* the rail and the canvas take their gestures whole, so the page does not scroll under a finger that is scrubbing the
+   one or panning the other */
+svg.shape, #canvas { touch-action: none; }
 /* the tooltip in a touch grain: the callout beside the thumb, on the side away from the edge the rail stands on */
 #tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
