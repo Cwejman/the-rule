@@ -1029,8 +1029,6 @@ type Action = {
   also?: string;
   /** what the same key with shift does, named where the plain badge stands */
   shifted?: string;
-  /** the glyph a tight badge draws in place of the label */
-  glyph?: string;
   /** whether it can be taken at all; a badge that cannot is not drawn */
   can: (a?: string) => boolean;
   run: (a?: string) => void;
@@ -1094,18 +1092,16 @@ const ACTIONS: Record<string, Action> = {
   deeper: {
     label: () => "a level more",
     keys: [{ key: "ArrowRight", shift: true }],
-    help: () => "Unfolds every brief of the scope one level further, and folds what lies beyond it.",
+    help: () => "Unfolds every brief of the scope one level further, and folds what lies beyond it. Holding the space bar unfolds the scope whole.",
     also: "Pressing or scrubbing the depth strip.",
-    glyph: "deeper",
     can: () => unfoldedDepth() < scopeDepth(),
     run: () => unfoldTo(Math.min(scopeDepth(), unfoldedDepth() + 1)),
   },
   shallower: {
     label: () => "a level less",
     keys: [{ key: "ArrowLeft", shift: true }],
-    help: () => "Folds the scope back a level, so one level less stands unfolded.",
+    help: () => "Folds the scope back a level, so one level less stands unfolded. Holding shift and the space bar folds it whole.",
     also: "Pressing or scrubbing the depth strip.",
-    glyph: "shallower",
     can: () => unfoldedDepth() > 0,
     run: () => unfoldTo(Math.max(0, unfoldedDepth() - 1)),
   },
@@ -1182,12 +1178,6 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
 };
 
-/** The glyph a tight badge draws in place of its label, drawn in the same box as a key. */
-const GLYPH: Record<string, string> = {
-  deeper: `<path d="M4.5 4.9h7M5.6 8.4 8 10.8l2.4-2.4"/>`,
-  shallower: `<path d="M4.5 11.1h7M5.6 7.6 8 5.2l2.4 2.4"/>`,
-};
-
 const cap = (glyph: string): string => `<span class="cap"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
 
 /** A chord as caps: shift first, then the key, so a row of caps reads as it is pressed. */
@@ -1202,9 +1192,11 @@ const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name
  */
 function badgeHtml(id: string, a?: string, tight = false): string {
   const act = ACTIONS[id];
-  if (!act || !act.can(a)) return "";
-  const said = tight && act.glyph ? cap(GLYPH[act.glyph] ?? "") : `<span class="label">${esc(act.label(a))}</span>`;
-  return `<span class="badge${tight ? " tight" : ""}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="keys">${capsOf(act.keys[0])}</span>${said}</span>`;
+  if (!act) return "";
+  // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
+  const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
+  // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
+  return `<span class="badge${tight ? " tight" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a === undefined ? "" : ` data-a="${esc(a)}"`}><span class="keys">${capsOf(act.keys[0])}</span>${said}</span>`;
 }
 
 // ## 3.2 Prose is drawn from tokens
@@ -1402,11 +1394,11 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        badgeHtml("open", b.address) +
+        (ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : "") +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</div>` : "";
   // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
@@ -2229,7 +2221,8 @@ function depthHtml(): string {
   const n = scopeDepth();
   if (n === 0) return "";
   const unfolded = unfoldedDepth();
-  return `<div id="depth" data-tip="how far the scope is unfolded">${Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("")}</div>`;
+  const cells = Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("");
+  return `<div id="depth" data-tip="how far the scope is unfolded">${badgeHtml("shallower", undefined, true)}${cells}${badgeHtml("deeper", undefined, true)}</div>`;
 }
 
 /** Unfolds every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
@@ -4005,6 +3998,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .badge .label { color: var(--ink); }
 .act:hover .badge .cap, .badge:hover .cap { background: var(--track); color: var(--ink); }
 .badge:hover .label { color: var(--on); }
+/* a badge that cannot be taken keeps its room and goes quiet */
+.badge.off { opacity: .35; pointer-events: none; }
+/* on the depth strip the badge is its keys alone, standing a little apart from the cells it moves */
+#depth .badge { cursor: pointer; }
+#depth .badge.tight .keys { gap: 2px; }
+#depth .badge.tight:first-child { margin-right: 5px; }
+#depth .badge.tight:last-child { margin-left: 5px; }
+#depth .badge .cap { background: none; }
+#depth .badge:hover .cap { background: var(--wash); color: var(--ink); }
 /* the figure on the line: the paragraphs a press gives, then the level that waits beyond them */
 svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }
