@@ -108,13 +108,27 @@ Folding takes a brief to its face and unfolding takes it whole, [the two grades]
 
 ### 6.1 The action line is the press
 
-A folded brief carries a line beneath its face that says unfold, with a small bar for every paragraph it hides, a small frame for every image, and a count of the briefs beneath it. A whole brief carries a line at its foot that says fold. What a press would give is known before it is pressed.
+A folded brief carries a line beneath its face that says unfold, with [a figure of what it hides](#62-the-figure-on-the-line-says-what-a-press-gives) and a count of the briefs beneath it. A whole brief carries a line at its foot that says fold. What a press would give is known before it is pressed.
+
+The line carries the acts that work on the brief as badges, [a key and the word for what it does](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands): unfold or fold, and, where the brief has a level beneath it, open, which makes it the scope. The word stands on every line, since it is what says the line can be pressed; the key is inked only on the brief the reading line stands on, which is the brief a key would act on, and its room is kept on the others so nothing moves as the reader reads.
 
 The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line, and no key acts on it either, so nothing about it can ever change under the reader.
 
-*Reasoned, the author's, 2026-09-13; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; the badges the author's ask of 2026-09-16; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused.*
 
-### 6.2 The same act wherever the brief is drawn
+### 6.2 The figure on the line says what a press gives
+
+The line draws what the press gives and what waits beyond it, and the two are compressed differently, since they answer different questions.
+
+What the press itself gives, the paragraphs beyond the face, is drawn exactly: a mark per block, as long as that block is tall in the lane, an image as a frame, so three short paragraphs read as three short marks. Where the run is too wide the marks scale together and keep their lengths true against each other.
+
+What lies further, the level beneath, is drawn as a bar per brief, as long as that brief's branch is heavy, with a tick beneath the ones that hold more. Where that is too much it merges into one bar as long as the whole level is heavy, which still says how much waits once it can no longer say what.
+
+So the deeper structure yields first, and whether unfolding gives only three paragraphs is never compressed away. The marks are drawn [as the shape draws a brief's blocks](widgets.md#3-the-shape), a paragraph and a heading each its own mark, so a reader who knows the shape reads the line without learning a second language.
+
+*The author's ask of 2026-09-16, that the figure say what is paragraphs and what is a nested level; the two compressions reasoned from it, and how far each rung stays legible is open until it has been read against real briefs.*
+
+### 6.3 The same act wherever the brief is drawn
 
 The tree is the lane's own outline, so folding a row there is folding the brief in the lane, one state and never two, and there the folder's triangle does it, since that is what a tree reader expects.
 
@@ -122,15 +136,17 @@ In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press wi
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 6.3 The keys
+### 6.4 The keys
 
 The space bar folds or unfolds the brief in focus, and with shift held it folds the brief above, the parent of the focus, which takes the reader up to it. It acts when it is let go, so it can also be held: held a moment, it unfolds every brief in the scope, and with shift folds every brief in the scope to its face, and letting it go then does nothing more.
 
 The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#32-scope-and-how-far-things-explode) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
 
-*Reasoned, the author's, 2026-09-13; the space bar acting on release and unfolding the scope when held, 2026-09-14.*
+Every key here is named where its act stands, [as a badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the few that have no object on the page, the arrows that move the reading, are met in [the keys](widgets.md#8-the-keys).
 
-### 6.4 The heading acted on keeps its place
+*Reasoned, the author's, 2026-09-13; the space bar acting on release and unfolding the scope when held, 2026-09-14; the badges, 2026-09-16.*
+
+### 6.5 The heading acted on keeps its place
 
 Whatever changes, the heading of the brief acted on keeps its place on the screen, so a press never moves what was pressed and the reader's place never scrolls away. Unfolding never scrolls, and folding a brief the reader is not inside never scrolls either.
 
@@ -138,7 +154,7 @@ The one exception is a fold that takes away what stood under the reader: a long 
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 6.5 The flick, a trial
+### 6.6 The flick, a trial
 
 A small reversal of the scroll, down then up then down within a moment, folds or unfolds the brief in focus. The fold it makes is a change like any other, though the scrolling is not. It costs nothing to a reader who never does it, and whether it fires by accident is what the trial measures. It is on by a setting.
 

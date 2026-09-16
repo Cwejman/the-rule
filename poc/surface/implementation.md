@@ -172,7 +172,7 @@ The page draws from [the shared state](framework.md#4-one-shared-state-and-four-
 
 The lane, the gutter on either side of it and the prose between are one scroll box, so the gutters scroll with the text for free. The prose is a column of articles in reading order, each drawn at its grade, and the gutters are columns beside it in which each [adjunct](framework.md#1-three-kinds-of-widget) is placed at the height of the line it belongs to, pushed down where two would overlap.
 
-Folding draws the lane again whole and then scrolls so that [the heading of the brief acted on stands where it stood](lane.md#64-the-heading-acted-on-keeps-its-place). [The way down to the scope](lane.md#75-the-way-down-stands-over-the-lane) stands over the scroll box rather than in it, and the prose's fade clears beneath it.
+Folding draws the lane again whole and then scrolls so that [the heading of the brief acted on stands where it stood](lane.md#65-the-heading-acted-on-keeps-its-place). [The way down to the scope](lane.md#75-the-way-down-stands-over-the-lane) stands over the scroll box rather than in it, and the prose's fade clears beneath it.
 
 *In force, the author's decision, 2026-09-13.*
 

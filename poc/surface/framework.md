@@ -101,6 +101,14 @@ Everything drawn that names a brief carries that brief's address. That one conve
 
 *Reasoned, carried from [the first program](README.md#9-what-was-tried-and-refused), 2026-09-12.*
 
+### 4.1 Every act is one entry in one table
+
+A key has to be named where it is drawn as well as where it is pressed, so the acts a reader can take are a table as the widgets are: each entry gives the chords that fire it, what it is called, the sentence that helps, the other ways to the same thing, and the doing. The keys are wired from it, [the badges](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) are drawn from it, and adding an act is adding an entry.
+
+An entry also says whether its act can be taken at all, so a badge for an act out of reach goes quiet rather than vanishing, and a key that would do nothing does nothing. And an act works on an address: the one a badge beside a brief passes, or, from a key, the focus, which is the brief the reading line stands on.
+
+*Reasoned, the author's ask of 2026-09-16, when the keys were named nowhere but in the branch of code that fired them.*
+
 ## 5. Settings are data, and a figure edits them
 
 The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6-settings), which is a wing widget like any other.

@@ -40,7 +40,7 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels unfold, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
 
-As built, a strip in the way down holds a cell per level beneath the scope, the unfolded ones marked, and a press or a scrub across it unfolds the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown.
+As built, a strip in the way down holds a cell per level beneath the scope, the unfolded ones marked, and a press or a scrub across it unfolds the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown. At each end stands the key that moves it that way, [as a badge of keys alone](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), since the strip is the act's own picture and needs no word beside it.
 
 *The author's, 2026-09-15; the strip as built the same day.*
 

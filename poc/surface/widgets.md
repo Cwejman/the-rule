@@ -52,6 +52,16 @@ It is one element on the page's own ground, never under the pointer, and it goes
 
 *Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#j-an-overlay-at-all) stays refused, and this tells only what is not in view.*
 
+### 1.7 A key stands as a badge where its act stands
+
+An act the reader can take stands on the page as a badge: its key drawn as a cap, and what the act does beside it in a word. It stands where the act's object stands, [on the brief's own line](lane.md#61-the-action-line-is-the-press) or on the strip it moves, so a reader meets the few acts that are at hand rather than a bar of every act there is.
+
+The keys are drawn rather than set in type, since a shift, a return and an arrow taken from three faces sit at three heights and no two weigh the same. Each is one path in one box, so a row of caps reads level. Where the room is tight the badge is its keys alone, since a badge that stands on the very thing it acts on has its place to say what it does.
+
+A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
+
+*The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
+
 ## 2. The tree
 
 The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
@@ -148,7 +158,7 @@ The first row sets the type: the zoom, the heading ratio, the line height and th
 
 ### 6.2 The switches
 
-Each switch is a setting's name and its few values, a row apiece. The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides). The reading line stands [at the middle or easing to the ends](lane.md#41-where-the-reading-line-stands). [The flick](lane.md#65-the-flick-a-trial) is on or off.
+Each switch is a setting's name and its few values, a row apiece. The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides). The reading line stands [at the middle or easing to the ends](lane.md#41-where-the-reading-line-stands). [The flick](lane.md#66-the-flick-a-trial) is on or off.
 
 The ahead answers for a brief that hides something, or always, for any highlighted brief with anything beneath it, so a reader may preview every level as they move. The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure.
 
@@ -185,3 +195,11 @@ Every level draws to the rim, however small its droplets, since the plate is for
 A body whose levels fill one side of the plate leaves the other empty, and that room is not kept, so the plate stands as wide and as tall as it draws.
 
 *Reasoned, the author's, 2026-09-13.*
+
+## 8. The keys
+
+The keys is a wing widget: every act with the key that fires it, grouped by what each works on, the brief, the scope, the reading and the lane. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading have no object on the page, and this is where a reader meets them.
+
+It answers for the focus, so what the space bar would do now is what it says, and an act out of reach stands quiet in its place. Every badge in it is pressable, and each tells what it does on pointing, so it is the help as well as the list.
+
+*The author's ask of 2026-09-16, that every act available as a shortcut be visible somewhere; a figure rather than an overlay, since [an overlay stays refused](refused.md#j-an-overlay-at-all) and a figure is one function and one name. Whether it earns its place once the badges stand where the acts are is open.*
