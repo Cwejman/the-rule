@@ -1003,6 +1003,160 @@ const hueOf = (address: string): number => {
 };
 const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
 
+// ### 3.1.1 The actions
+//
+// Every act a key fires is one entry in one table: the keys that fire it, what
+// it is called, the sentence that helps, the other ways to the same thing, and
+// the doing. The keys are wired from it, the badges are drawn from it, and the
+// tooltip reads its help from there, so an action is named in one place. Adding
+// one is adding an entry, as a widget is.
+//
+// An action acts on an address: the badge drawn beside a brief passes that
+// brief, and a key passes nothing, so the action reads the focus, which is the
+// brief the reading line stands on and the one every key acts on.
+
+/** A chord: the key, whether shift is held with it, and whether it acts on being held rather than on the press. */
+type Chord = { key: string; shift?: boolean; hold?: boolean };
+
+type Action = {
+  /** what it is called on a badge, for the brief it is drawn beside; a word, lower case */
+  label: (a?: string) => string;
+  /** the chords that fire it */
+  keys: Chord[];
+  /** what it does, in a sentence, for the tooltip */
+  help: string;
+  /** the other ways to the same thing, named on the tooltip */
+  also?: string;
+  /** what the same key with shift does, named where the plain badge stands */
+  shifted?: string;
+  /** the glyph a tight badge draws in place of the label */
+  glyph?: string;
+  /** whether it can be taken at all; a badge that cannot is not drawn */
+  can: (a?: string) => boolean;
+  run: (a?: string) => void;
+};
+
+/** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
+const acts = (a?: string): string => a ?? state.focus;
+
+const ACTIONS: Record<string, Action> = {
+  unfold: {
+    label: (a) => (gradeOf(acts(a)) === "whole" ? "fold" : "unfold"),
+    keys: [{ key: " " }],
+    help: "Unfolds the brief the reading line stands on, and folds it again to its face.",
+    also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
+    shifted: "Shift folds the brief above instead, which takes you up to it.",
+    can: (a) => !!brief(acts(a)) && opens(brief(acts(a))!),
+    run: (a) => cycle(acts(a)),
+  },
+  foldUp: {
+    label: () => "fold above",
+    keys: [{ key: " ", shift: true }],
+    help: "Folds the brief above the one in focus, its parent, which takes you up to it.",
+    can: () => state.focus !== state.scope && !!brief(parentOf(state.focus)),
+    run: () => cycle(parentOf(state.focus)),
+  },
+  unfoldAll: {
+    label: () => "unfold the scope",
+    keys: [{ key: " ", hold: true }],
+    help: "Unfolds every brief in the scope, held a moment.",
+    also: "The depth strip, scrubbed to its end.",
+    can: () => scopeDepth() > 0,
+    run: () => openAll(),
+  },
+  foldAll: {
+    label: () => "fold the scope",
+    keys: [{ key: " ", shift: true, hold: true }],
+    help: "Folds every brief in the scope to its face, held a moment.",
+    also: "The depth strip, scrubbed back to its start.",
+    can: () => scopeDepth() > 0,
+    run: () => foldAll(),
+  },
+  open: {
+    label: () => "open",
+    keys: [{ key: "Enter" }],
+    help: "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
+    shifted: "Shift widens the scope by a level instead.",
+    can: (a) => level(acts(a)).length > 0,
+    run: (a) => scopeTo(acts(a)),
+  },
+  widen: {
+    label: () => "widen",
+    keys: [{ key: "Enter", shift: true }],
+    help: "Widens the scope to the level above, so what stood around this brief comes back.",
+    also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
+    can: () => state.scope !== "",
+    run: () => popUp(),
+  },
+  deeper: {
+    label: () => "a level more",
+    keys: [{ key: "ArrowRight", shift: true }],
+    help: "Unfolds every brief of the scope one level further, and folds what lies beyond it.",
+    also: "Pressing or scrubbing the depth strip.",
+    glyph: "deeper",
+    can: () => openDepth() < scopeDepth(),
+    run: () => openTo(Math.min(scopeDepth(), openDepth() + 1)),
+  },
+  shallower: {
+    label: () => "a level less",
+    keys: [{ key: "ArrowLeft", shift: true }],
+    help: "Folds the scope back a level, so one level less stands unfolded.",
+    also: "Pressing or scrubbing the depth strip.",
+    glyph: "shallower",
+    can: () => openDepth() > 0,
+    run: () => openTo(Math.max(0, openDepth() - 1)),
+  },
+  next: {
+    label: () => "next",
+    keys: [{ key: "ArrowDown" }],
+    help: "Moves the reading on to the next brief in the lane, folding nothing.",
+    can: () => true,
+    run: () => step(1),
+  },
+  previous: {
+    label: () => "previous",
+    keys: [{ key: "ArrowUp" }],
+    help: "Moves the reading back to the brief before this one in the lane, folding nothing.",
+    can: () => true,
+    run: () => step(-1),
+  },
+  above: {
+    label: () => "above",
+    keys: [{ key: "ArrowLeft" }],
+    help: "Moves the reading up to the brief this one stands beneath, folding nothing.",
+    can: () => state.focus !== state.scope,
+    run: () => up(),
+  },
+  beneath: {
+    label: () => "beneath",
+    keys: [{ key: "ArrowRight" }],
+    help: "Moves the reading into the first brief beneath this one, when it stands in the lane.",
+    can: () => level(state.focus).length > 0,
+    run: () => down(),
+  },
+  undo: {
+    label: () => "undo",
+    keys: [{ key: "Escape" }],
+    help: "Lays the lane back as it stood before the last change you made: a fold, a going, a change of scope.",
+    also: "A cell of the trail, which goes back to before that move.",
+    shifted: "Shift makes the change again.",
+    can: () => true,
+    run: () => undo(),
+  },
+  redo: {
+    label: () => "redo",
+    keys: [{ key: "Escape", shift: true }],
+    help: "Makes the change escape undid again.",
+    can: () => true,
+    run: () => redo(),
+  },
+};
+
+const same = (x: Chord, y: Chord): boolean => x.key === y.key && !!x.shift === !!y.shift && !!x.hold === !!y.hold;
+
+/** The action a chord fires, if any. */
+const actionFor = (c: Chord): Action | undefined => Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)));
+
 // ## 3.2 Prose is drawn from tokens
 //
 // Each kind of token has one renderer, and the two tables are the whole of the
@@ -3095,9 +3249,6 @@ function scopeTo(S: string): void {
   settleTrail();
 }
 
-/** Enter: the brief in focus becomes the scope, when it has a level beneath it. */
-const enter = (): void => void (level(state.focus).length > 0 && scopeTo(state.focus));
-
 /** Shift and enter: the scope widens by one level, to the parent of the scope root. */
 const popUp = (): void => void (state.scope !== "" && scopeTo(parentOf(state.scope)));
 
@@ -3323,9 +3474,15 @@ function wire(): void {
   };
   ui.scroll.addEventListener("wheel", flick, { passive: true });
 
-  // the space bar acts when it is let go, so a reader who only scrolls never reaches for the pointer: a tap folds or opens
-  // the brief in focus, and with shift the parent, which takes the reader up to it; held a moment, it opens everything in
-  // the scope, or with shift folds it all to faces, and letting go then does nothing more
+  // Every key fires an action from the table, and nothing is named here: a chord is looked up, and taken only where the
+  // action says it can be. The space bar keeps its own discipline, since it acts when it is let go, so a reader who only
+  // scrolls never reaches for the pointer, and held a moment it acts on the whole scope instead.
+  const take = (c: Chord): boolean => {
+    const act = actionFor(c);
+    if (!act || !act.can()) return false;
+    act.run();
+    return true;
+  };
   let space: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } | null = null;
   const letGo = () => void (space && clearTimeout(space.timer), (space = null));
   window.addEventListener("blur", letGo);
@@ -3334,7 +3491,7 @@ function wire(): void {
     e.preventDefault();
     const { shift, held } = space;
     letGo();
-    if (!held) cycle(shift ? parentOf(state.focus) : state.focus);
+    if (!held) take({ key: " ", shift });
   });
 
   document.addEventListener("keydown", (e) => {
@@ -3343,24 +3500,15 @@ function wire(): void {
       e.preventDefault();
       if (space) return;
       const shift = e.shiftKey;
-      const hold: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } = { shift, held: false, timer: setTimeout(() => ((hold.held = true), shift ? foldAll() : openAll()), HOLD) };
+      const hold: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } = { shift, held: false, timer: setTimeout(() => ((hold.held = true), take({ key: " ", shift, hold: true })), HOLD) };
       space = hold;
       return;
     }
-    // the arrows move the focus and fold nothing: up and down along the lane, left to the parent, right into the level beneath
-    if (e.key === "ArrowUp") (e.preventDefault(), step(-1));
-    else if (e.key === "ArrowDown") (e.preventDefault(), step(1));
-    // shift with left and right opens the scope one level less or one level more, as the depth strip does
-    else if (e.key === "ArrowLeft" && e.shiftKey) (e.preventDefault(), openTo(Math.max(0, openDepth() - 1)));
-    else if (e.key === "ArrowRight" && e.shiftKey) (e.preventDefault(), openTo(Math.min(scopeDepth(), openDepth() + 1)));
-    else if (e.key === "ArrowLeft") (e.preventDefault(), up());
-    else if (e.key === "ArrowRight") (e.preventDefault(), down());
-    // scoping: enter makes the focus the root of the lane, shift and enter widens by a level
-    else if (e.key === "Enter" && e.shiftKey) (e.preventDefault(), popUp());
-    else if (e.key === "Enter") (e.preventDefault(), enter());
-    // escape undoes the last change the reader made to the lane, and with shift makes it again
-    else if (e.key === "Escape" && e.shiftKey) redo();
-    else if (e.key === "Escape") undo();
+    // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
+    const chord: Chord = { key: e.key, shift: e.shiftKey };
+    if (!actionFor(chord)) return;
+    if (e.key !== "Escape") e.preventDefault();
+    take(chord);
   });
 
   // an image whose size the trace could not read, or a remote one whose shape changed since, takes its own size once it
