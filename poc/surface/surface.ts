@@ -2853,6 +2853,26 @@ function drawCrumb(): void {
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
   ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}${back}`;
   placeCrumb();
+  trimPlace();
+}
+
+/**
+ * Cuts the run at its root until every name it still shows can be read whole. A name squeezed to a letter says nothing,
+ * where one mark says plainly that there is more above; and the brief in focus is never cut, since it is the answer the
+ * line is there to give.
+ */
+function trimPlace(): void {
+  const place = ui.crumb.querySelector<HTMLElement>(".place");
+  if (!place) return;
+  const cut = () => Array.from(place.querySelectorAll<HTMLElement>(".step:not(.more):not(.now)"));
+  for (let guard = 0; guard < 24; guard++) {
+    const steps = cut();
+    if (!steps.some((el) => el.scrollWidth > el.clientWidth + 1) || steps.length === 0) return;
+    // the chevron that followed the name goes with it
+    steps[0].nextElementSibling?.matches("svg") && steps[0].nextElementSibling.remove();
+    steps[0].remove();
+    if (!place.querySelector(".more")) place.insertAdjacentHTML("afterbegin", `<span class="step more">…</span>${CHEVRON}`);
+  }
 }
 
 /** The panes of the middle that stand on the screen. */

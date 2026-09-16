@@ -220,7 +220,7 @@ Undo goes with the trail. A reader on a phone reaches for the platform's own bac
 
 The prose fades from the middle of the line rather than from beneath it, so the two read as one page and the reading keeps the room the clearance would have taken. That is a little earlier than it was, and not as early as above the line, which faded more of the prose than the author wanted.
 
-The run of levels is cut at its root rather than in every name. Four levels on a line of 226 left every name a letter and an ellipsis; now the level above the scope stands whole beside it and one mark stands for the rest, as the trail is cut at its root. What that takes away is the press that scopes out to a level far above, and widening a level at a time stands beside it.
+[The run is cut at its root](lane.md#75-the-way-down-stands-over-the-lane) rather than in every name, which a phone needs first and a desk needs too: four levels on a line of 226 left every name a letter and an ellipsis. What the cut takes away is the press that scopes out to a level far above, and widening a level at a time stands beside it.
 
 The trail goes. Its cells are small targets, and every move a reader makes already enters the browser's history, so the platform's own back gesture is the trail and a better one.
 
