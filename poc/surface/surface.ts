@@ -1323,6 +1323,72 @@ const foldMark = (b: Brief): string =>
 /** The gap after a brief, by the depth of the level the next brief begins: tighter the deeper, so what lies beneath a brief sits together and its siblings stand apart. */
 const gapAfter = (nextDepth: number): number => [56, 56, 40, 28, 20][Math.min(4, nextDepth)] ?? 16;
 
+// The figure on the action line answers two questions, so it compresses in two ways. What the press itself gives, the
+// paragraphs beyond the face, is drawn exactly: a mark per block, as long as that block is tall in the lane, so three
+// short paragraphs read as three short marks. Where the run is too wide the marks scale together, keeping their lengths
+// true against each other. What lies further, the level beneath, is drawn as a bar per brief, as long as that brief's
+// branch is heavy, with a tick beneath the ones that hold more; where that is too much it merges into one bar, which
+// still says how much waits even when it can no longer say what. So the answer to "only three paragraphs?" is never
+// compressed away, and the deeper structure yields first.
+const FIG = { h: 13, y: 3, bar: 5, tick: 1.8, gap: 3, split: 16, max: 176, shown: 12, level: 9 };
+
+/** A block's mark, as long as the block is tall in the lane: the shape's own reading, laid on its side. */
+const markLength = (t: Tok): number => {
+  const s = state.settings;
+  const lines = t.type === "image" ? imageLines(t, s.measure, 17 * s.zoom * s.leading) : 0.55 + textOf([t]).length / LINE_CHARS;
+  return clamp(lines * 5.5, 5, 58);
+};
+
+/** A brief's bar in the level run, as long as its branch is heavy; the root of the scale is the branch in lines of the lane. */
+const branchLength = (a: string): number => clamp(Math.sqrt(Math.max(1, (state.index!.branch.get(a) ?? 0) / LINE_CHARS)) * 4.4, 4, 44);
+
+/** The figure beside the action: what the press gives, then what lies further. */
+function actFigure(b: Brief, rest: Tok[]): string {
+  const kids = levelOf(b);
+  const blocks = rest.slice(0, FIG.shown).map((t) => ({ image: t.type === "image", w: markLength(t) }));
+  const over = rest.length - blocks.length;
+  const wide = (xs: { w: number }[]) => xs.reduce((n, x) => n + x.w + FIG.gap, 0);
+  // the level merges into one bar when it holds too many to draw or the room has run out
+  const room = FIG.max - (blocks.length ? wide(blocks) + FIG.split : 0);
+  const bars = kids.map((k) => ({ w: branchLength(k.address), deep: level(k.address).length > 0 }));
+  const merged = kids.length > FIG.level || wide(bars) > room;
+  // merged, the one bar is as long as the whole level is heavy, never as long as the room happens to be
+  const home = b.borrow ?? b.address;
+  const heavy = (state.index!.branch.get(home) ?? 0) - (state.index!.own.get(home) ?? 0);
+  const whole = clamp(Math.sqrt(Math.max(1, heavy / LINE_CHARS)) * 4.4, 8, Math.max(8, Math.min(48, room)));
+  const cells = !kids.length ? [] : merged ? [{ w: whole, deep: false, all: true }] : bars.map((x) => ({ ...x, all: false }));
+  // what the paragraphs ask for, scaled to the room they have, so their lengths stay true against each other
+  const asked = wide(blocks);
+  const left = FIG.max - (cells.length ? Math.min(room, wide(cells)) + FIG.split : 0);
+  const k = asked > left ? left / asked : 1;
+  let x = 0;
+  const marks = blocks
+    .map((blk) => {
+      const w = Math.max(4, blk.w * k);
+      const r = blk.image
+        ? `<rect class="image" x="${(x + 0.5).toFixed(1)}" y="${FIG.y + 0.5}" width="${(w - 1).toFixed(1)}" height="${FIG.bar - 1}" rx="1.5"/>`
+        : `<rect class="para" x="${x.toFixed(1)}" y="${FIG.y}" width="${w.toFixed(1)}" height="${FIG.bar}" rx="1.5"/>`;
+      x += w + FIG.gap;
+      return r;
+    })
+    .join("");
+  const overMark = over > 0 ? `<text class="more" x="${x.toFixed(1)}" y="${FIG.y + FIG.bar}">+${over}</text>` : "";
+  if (over > 0) x += 16;
+  if (blocks.length && cells.length) x += FIG.split - FIG.gap;
+  const start = x;
+  const run = cells
+    .map((c) => {
+      const bar = `<rect class="head" x="${x.toFixed(1)}" y="${FIG.y}" width="${c.w.toFixed(1)}" height="${FIG.bar}" rx="1.5"/>`;
+      // a tick beneath a bar says that brief holds a level of its own; a merged bar carries one along its whole length
+      const tick = c.deep || c.all ? `<rect class="hidden" x="${x.toFixed(1)}" y="${FIG.y + FIG.bar + 2}" width="${c.w.toFixed(1)}" height="${FIG.tick}" rx="0.9"/>` : "";
+      x += c.w + FIG.gap;
+      return bar + tick;
+    })
+    .join("");
+  const w = Math.ceil(Math.max(x - FIG.gap, start));
+  return w <= 0 ? "" : `<svg class="fig marks" width="${w}" height="${FIG.h}" viewBox="0 0 ${w} ${FIG.h}">${marks}${overMark}${run}</svg>`;
+}
+
 /** One brief in the lane at its grade: its face, the heading and the first block, then the rest when whole; `after` is the gap beneath it. */
 function articleHtml(b: Brief, g: Grade, after: number): string {
   const d = Math.min(4, depthIn(b.address));
@@ -1334,7 +1400,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const more =
     g === "face" && (rest.length > 0 || beneath > 0)
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">${badgeHtml("unfold", b.address)}` +
-        (rest.length ? `<span class="bars">${rest.slice(0, 12).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${rest.length > 12 ? `<b>+${rest.length - 12}</b>` : ""}</span>` : "") +
+        actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
         badgeHtml("open", b.address) +
         `</div>`
@@ -3926,21 +3992,28 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .surface p { margin-bottom: 12px; }
 .act { display: flex; align-items: center; gap: 10px; color: var(--ink); cursor: pointer; margin: -4px -8px 0; padding: 4px 8px; border-radius: 6px; transition: color .15s; }
 .act:hover { color: var(--on); }
-.act svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 /* the badge: the key drawn as a cap, and what it does beside it. Its room is kept on every line, and it inks only on
    the brief the reading line stands on, which is the brief a key acts on, so nothing reflows as the reader moves */
-.badge { display: inline-flex; align-items: center; gap: 6px; visibility: hidden; }
-.brief.here .badge, .badge.tight { visibility: visible; }
+.badge { display: inline-flex; align-items: center; gap: 6px; }
+/* what the act is called stands on every line, since it is what says the line can be pressed; the key is inked only on
+   the brief the reading line stands on, which is the brief a key acts on, and its room is kept so nothing reflows */
+.badge .cap { visibility: hidden; }
+.brief.here .badge .cap, .badge.tight .cap { visibility: visible; }
 .badge .keys { display: inline-flex; gap: 2px; }
 .badge .cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
 .badge .cap svg { width: 11px; height: 11px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .badge .label { color: var(--ink); }
 .act:hover .badge .cap, .badge:hover .cap { background: var(--track); color: var(--ink); }
 .badge:hover .label { color: var(--on); }
-.act .bars { display: inline-flex; gap: 3px; align-items: center; }
-.act .bars i { display: block; width: 9px; height: 3px; border-radius: 1.5px; background: var(--rest); }
-.act .bars i.image { width: 9px; height: 7px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-.act .bars b { font-weight: calc(500 - var(--thin)); margin-left: 2px; }
+/* the figure on the line: the paragraphs a press gives, then the level that waits beyond them */
+svg.fig.marks { flex: none; overflow: visible; }
+svg.fig.marks .para { fill: var(--rest); }
+svg.fig.marks .image { fill: none; stroke: var(--rest); stroke-width: 1.1; }
+svg.fig.marks .head { fill: var(--door); }
+svg.fig.marks .hidden { fill: var(--grey); }
+svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 10px; }
+.act:hover svg.fig.marks .para, .act:hover svg.fig.marks .head { fill: var(--lit); }
+.act:hover svg.fig.marks .image { stroke: var(--lit); }
 .act.less { margin-top: -6px; }
 .act.borrow { flex-wrap: wrap; gap: 6px; color: var(--muted); }
 .act.borrow .icon { width: 12px; height: 12px; flex: none; }
