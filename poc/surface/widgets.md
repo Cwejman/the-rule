@@ -74,7 +74,7 @@ Pressing a row's name goes to the brief. A line lies across the highlighted row 
 
 When the lane is [scoped](lane.md#7-scoping-the-lane), the levels above stand as dim rows over the root, each a way out.
 
-*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an unfolding of its own](refused.md#u-a-tree-with-an-unfolding-of-its-own) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an unfolding of its own](refused.md#u-a-tree-with-an-unfolding-of-its-own) were built first and refused. It does not stand on a phone, where it [read poorly whole](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
 ## 3. The shape
 
@@ -82,7 +82,7 @@ The shape is the left wing's first widget: the lane as laid, drawn small, so the
 
 Each brief in the lane stands as its blocks, a heading a short bar and a paragraph a block as tall as it is drawn, shifted right by the brief's depth. Every block a brief has is drawn, a list or a table as readily as a paragraph, and an image as a frame as wide and as tall as it stands in the lane.
 
-Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), and gives up the room for its marks and its tail.
+Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), nesting a step tighter and giving its marks whatever room each row has left.
 
 *Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16.*
 
@@ -184,7 +184,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one square, drawn as droplets on a round plate. The root sits at the centre, its briefs are droplets around it, and each carries its own smaller droplets further out, level by level to the rim. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is grey at every depth.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#10-what-was-tried-and-refused).*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#10-what-was-tried-and-refused). It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
 ### 7.1 Droplets meet without merging
 

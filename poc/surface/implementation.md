@@ -262,7 +262,7 @@ And every change a reader makes is recorded as the lane stood before it, the sco
 
 [A touch reading](touch.md#1-what-a-phone-changes) is not a second page. It is the same drawing under two facts: whether the reader has a finger, which the browser answers and which the page asks again at the first touch, since a machine may hold both a pointer and a screen; and whether the width has given every area away, which the fit already reckons.
 
-The first is carried as a class on the body, so most of what a finger changes is style and not branches: the room around a press, the cells of the depth, the rows of the outline. What it cannot be is drawn differently: a badge without its cap, a shape without its marks.
+The first is carried as a class on the body, so most of what a finger changes is style and not branches: the room around a press, an act drawn as a button, the acts moved to a row of their own. What it cannot be is drawn differently: a badge without its cap, a rail that nests tighter and fits its marks to the room each row has left.
 
 The rail is the left wing at a width the fit hands it, whichever wing the reader had the shape in, and the lane's measure gives it its room by taking the page's own edge. A figure opened whole is one element over the areas, drawn into the band the prose reads in, with the lane left laid beneath it, since the rail and the reading line both measure it.
 

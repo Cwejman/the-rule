@@ -26,19 +26,17 @@ A press too small to hit is worse than no press at all, since the reader cannot 
 
 ### 2.1 What was given room
 
-Every press a phone offers was measured and given its room. One was not: the cells of [the depth](canvas.md#32-scope-and-how-far-things-explode), which are scrubbed across rather than aimed at, since six cells of forty-four would take the whole line.
+Every press a phone offers has room a finger can find. What could not have it left the phone rather than standing too small, which is why the roster beneath is short.
 
-- The action line stands forty-four tall, and each badge on it carries its own room around the word.
+- The action line stands forty-four tall.
 
-- A row of [the outline](widgets.md#2-the-tree) stands thirty-five, and the chevron that folds it, the one small target there, is given thirty by thirty-four.
+- An act on it is a button: the word on its own surface, with its room around it, since a word alone on a page does not read as a thing to press.
+
+- The mark at the foot is forty-six across, and every choice in the pill the same.
 
 - The switches in the settings take a row apiece, and the meters were already forty.
 
-- The mark at the foot is forty-four across, and every choice in the pill the same.
-
-- The depth's cells grow from eighteen to twenty-eight.
-
-*As built, 2026-09-16; the depth's cells are the one place the forty-four is not met, and it is the author's to judge.*
+*As built, 2026-09-16, the buttons on the author's reading of the first build.*
 
 ### 2.2 The figure on the line yields to its words
 
@@ -46,7 +44,13 @@ Every press a phone offers was measured and given its room. One was not: the cel
 
 Without that the line ran past the prose: at a lane of 226 the figure kept its 176 and the acts stood 100 past the edge, out of the reader's reach.
 
-*Measured, 2026-09-16, at a lane of 226: the line asked 334 and had 242. As built the same day; and where the words still cannot share the row, the acts take a row of their own rather than running out.*
+*Measured, 2026-09-16, at a lane of 226: the line asked 334 and had 242. As built the same day.*
+
+### 2.3 The acts take a row of their own
+
+Even fitted, the figure and the acts on one line left neither room to read, so on a phone the acts stand on a row beneath: the figure and the count of what lies beneath first, then the buttons.
+
+*The author's reading, 2026-09-16: the acts were the right size and the line was wrong. As built the same day.*
 
 ## 3. One chooser, in two grains
 
@@ -58,23 +62,41 @@ Where the pill can no longer hold what the row holds, the press may instead scat
 
 *The author's, 2026-09-16; as built the same day, the mark leaving after a hundred and forty of scrolling down and coming back after forty up. The scatter is held as a trial for later.*
 
+### 3.1 The foot stands on a glass of its own
+
+The mark and the pill are not the page's ground with ink on it. They stand on a glass: a muted surface over whatever the prose is doing beneath, blurred, with a light rim and a soft shadow. A translucent grey without it read as a fade rather than as a thing, and the page is white, so a white surface alone would not have separated either.
+
+It carries a mark of the page and what stands beside it, not three dots, since the dots said nothing of what a press would open.
+
+And it comes and goes rather than appearing: it eases away and back over four tenths of a second, lifting a little as it goes.
+
+*The author's asks of 2026-09-16, on reading the first build on his phone: a surface with a border, blur and a light shadow, more expressive than three dots, and a coming and going that is not rigid.*
+
 ## 4. What stands on a phone
 
-The chooser holds the prose, the canvas, the outline, the radial and the settings. Five, which a pill holds easily, and [the help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
+The chooser holds the prose, the canvas, the rail and the settings. Four, and [the help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
 
 [The ahead](widgets.md#4-the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
 
-*The author's, 2026-09-16; as built the same day.*
+*The author's, 2026-09-16, and narrowed by him the same day on reading it: five became four.*
 
 ### 4.1 A figure opens whole, and a going dismisses it
 
-[The outline](widgets.md#2-the-tree) becomes a thing of its own, opened whole and dismissed, since it is how a reader jumps deliberately. That splits the phone cleanly: the shape orients continuously, the outline jumps. [The radial](widgets.md#7-the-plate) and the settings stand the same way, since there is no wing to hold them.
+A figure the phone holds opens whole over the reading, since there is no wing to stand it in: it takes the band the prose reads in, on the page's own ground, and the lane stays laid beneath it, since the rail and the reading line both measure it. Pressing its icon again dismisses it, and so does going to a brief from inside it, since the jump is what it was opened for.
 
-A figure opened whole takes the band the prose reads in, on the page's own ground, and the lane stays laid beneath it, since the rail and the reading line both measure it. Pressing its icon again dismisses it, and so does going to a brief from inside it, since the jump is what it was opened for.
+The settings are the one figure that stands that way now. The outline was built to it and taken out again, [beneath](#42-the-outline-and-the-radial-are-not-ready-for-a-finger).
 
-*The author's, 2026-09-16, for the outline; the radial, the settings and the going that dismisses are the session's, as built the same day.*
+*The author's, 2026-09-16, for the outline; the way a figure stands and the going that dismisses are the session's, as built the same day.*
 
-### 4.2 A pane takes the middle rather than standing beside
+### 4.2 The outline and the radial are not ready for a finger
+
+Both were built into the pill and both were taken out on the author's reading. The outline read poorly whole on a phone, and he does not use it. The radial cannot be hit: a press on it goes to whatever cell the finger lands on, and no finger can land on a cell that small.
+
+What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#9-what-is-not-answered). Until each has its own touch reading, neither stands.
+
+*The author's, 2026-09-16, on reading the first build; taken out the same day.*
+
+### 4.3 A pane takes the middle rather than standing beside
 
 The middle holds one pane where the lane stands alone, so pressing a pane sets it rather than standing a second one beside it, and the pane standing cannot be taken away. The canvas then takes whatever width there is, where beside the lane it keeps a floor of its own.
 
@@ -84,21 +106,25 @@ The middle holds one pane where the lane stands alone, so pressing a pane sets i
 
 [The shape](widgets.md#3-the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, between a hundred and a hundred and forty against the two hundred it declares today.
 
-What it gives up at that width is the room for its marks and its tail. What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
+What it gives up at that width is not its marks. Beside a folded row they stand in whatever room that row has left of the rail's width, a tick per paragraph and the tail as long as the level beneath is heavy, and where a row is deep enough to leave none, none are drawn. Without them the rail was rows and waste. The nesting steps seven to a level rather than nine, so a level six deep still leaves a row room to say what it hides.
+
+What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
 
 The rail stands at the left edge of the page and takes the space that stood there, so the lane gives it its room rather than the page growing one. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
-*The author's, 2026-09-16; the width his, the callout his. Measured as built the same day, across six widths: the rail stands 116 on this body, and stands from 390 up, leaving the lane 226 there. Below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it. Where that floor belongs is the author's to judge.*
+*The author's, 2026-09-16; the width his, the callout his, and the marks his on reading a rail without them. Measured as built the same day: the rail stands 104 on this body and leaves the lane 238 of a 390 screen. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
 
 ### 5.1 Scrubbing reads, and sliding off resets
 
-Dragging the rail scrolls the prose live, so a reader sees what they are scrubbing past rather than a preview of it. Sliding the thumb away from the rail's own edge, past a threshold, arms a reset: the callout says so, and letting go there lays the lane back where it stood. Coming back onto the rail takes up the scrub again, so nothing is committed until the finger lifts.
+The finger takes hold of where the reader already stands rather than jumping to where it landed. Touching down moves nothing and the callout says at once what it has hold of; from there the lane follows the finger, live.
 
-The finger lays the lane where it stands, rather than moving it by how far it has travelled, since the callout answers for what the finger is over and a relative drag would make that a different place. So touching down is already a move, and the viewport stands centred on it.
+A finger covers what it lands on, so a rail that jumped left the reader looking at a place they had neither chosen nor seen. Taking hold instead shows the gesture before it commits to anything, and a reader sees what they are scrubbing past rather than a preview of it.
 
-The reset is [the undo the lane already keeps](lane.md#52-escape-is-an-undo) with a direction given to it, not a second mechanism: touching down records the lane as it stood, as every change does.
+Sliding the thumb away from the rail's own edge, past a threshold, arms a reset: the callout says so, and letting go there lays the lane back where it stood. Coming back onto the rail takes up the scrub again, so nothing is committed until the finger lifts.
 
-*The author's, 2026-09-16; that the reset is the undo is the session's, and the direction follows the side the rail stands on. As built the same day: the threshold is sixty past the rail's right edge, and the lane laid where the finger is, rather than by how far it moved, is the session's call.*
+The whole scrub is one change, recorded at the first movement rather than at the touch, so a finger that only rests on the rail leaves nothing to take back. The reset is then [the undo the lane already keeps](lane.md#52-escape-is-an-undo) with a direction given to it, and not a second mechanism.
+
+*The author's, 2026-09-16: that the finger should take hold rather than jump is his, on reading the first build; that the reset is the undo is the session's. As built the same day, the threshold sixty past the rail's right edge.*
 
 ### 5.2 The chooser holds it as a switch, not as a mode
 
@@ -126,13 +152,23 @@ The trail goes. Its cells are small targets, and every move a reader makes alrea
 
 *The author's, 2026-09-16; the trail dropped on the session's argument, and open. The cut is the session's, seen the same day at four levels on a phone.*
 
-### 6.1 The depth did not move to the rail
+### 6.1 The depth leaves the phone
 
-[The depth](canvas.md#32-scope-and-how-far-things-explode) belongs with the rail, the author said, since both are the shape of the whole. As built it stands where it stood, at the right of the way down, which now reaches over the rail; so it stands above the rail rather than beside it.
+[The depth](canvas.md#32-scope-and-how-far-things-explode) stood at the right of the way down, and on the author's reading it crowded the placement and offered something a phone should not offer: unfolding a scope six levels deep, which reads very wide and very long on a screen this narrow.
 
-What it would cost to move is a row of cells 123 wide in a rail of 116, or a column of cells standing for a depth that is not a height. Neither was worth building before the author has seen the line as it stands.
+So it is not drawn where the lane stands alone. A reader still unfolds brief by brief from the action line, which is the grain a phone reads in anyway.
 
-*The session's, 2026-09-16; open, and the author's word is wanted.*
+That a row of cells 123 wide would not have stood in a rail of 104 is why it did not move to the rail instead.
+
+*The author's, 2026-09-16, on reading the first build; as built the same day.*
+
+### 6.2 The line stands where it has something to say
+
+With the trail and the depth gone, the way down at the root of the body had nothing left to draw, so it stands only where it has something: a scope to place, a trail, a depth, or a change to take back.
+
+That last is why it stands at all on a phone, since undo has no other home there.
+
+*As built, 2026-09-16; the line was hiding the only way back until it was told to count that.*
 
 ## 7. A badge without a key
 
@@ -162,6 +198,8 @@ The flick is answered by the platform: it reads a wheel, and a finger sends none
 
 What a link leads to is not told on a phone. [The links](widgets.md#5-links) stand in a gutter, and the gutter is the first area to go, so the reader follows a link without being told where it goes — the one thing the reading loses outright.
 
-And everything a touch reading asks that has not been met yet: [the canvas](canvas.md) has no touch reading of its own beyond a drag that pans it, and the lane has still never been read on a real phone, only on a browser told to pretend.
+[The radial](widgets.md#7-the-plate) wants a gesture of its own before it comes back: a finger touches and holds and moves, a card beside it says what the cell under the finger is, and the card carries the press that goes there. So the finger chooses by scrubbing and commits by pressing a thing it can see, where today it commits by landing. The outline wants the same kind of answer, whatever it turns out to be.
 
-*Open, 2026-09-16.*
+And everything a touch reading asks that has not been met yet: [the canvas](canvas.md) has no touch reading of its own beyond a drag that pans it, and the lane has been read on a real phone once, which is where everything above that is dated the sixteenth twice over came from.
+
+*Open, 2026-09-16; the radial's card is the author's proposal, on his first reading from a phone.*

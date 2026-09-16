@@ -1504,7 +1504,7 @@ const ICON: Record<string, string> = {
   keys: `<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h1M7.5 6.5h1M11 6.5h1M5 9.5h6"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
   lane: `<path d="M4 3.5h8M4 6.5h8M4 9.5h6M4 12.5h7"/>`,
-  chooser: `<circle cx="3.6" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="12.4" cy="8" r="1.15" fill="currentColor" stroke="none"/>`,
+  chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -1621,14 +1621,18 @@ function pickTip(k: string): string {
 /** Whether the lane stands alone: the width holds no wing at the width a figure declares, and no gutter beside it. */
 const narrow = (): boolean => ui.areas.clientWidth < state.settings.measure + 3 * state.settings.gap + GUTTER.least;
 
-/** What the chooser holds where the lane stands alone: the panes first, as the row lays them, then the rail, then the figures a press opens whole; the keys only where there are keys to name. */
-const narrowChoices = (): string[] => ["lane", "canvas", "shape", "tree", "plate", "settings", ...(touch ? [] : ["keys"])];
+/**
+ * What the chooser holds where the lane stands alone: the panes, then the rail, then the figures a press opens whole.
+ * The outline and the radial are not among them. Both were built and read badly on a phone, the outline poor whole and
+ * the radial impossible to hit, so they wait until each has a touch reading of its own.
+ */
+const narrowChoices = (): string[] => ["lane", "canvas", "shape", "settings", ...(touch ? [] : ["keys"])];
 
 /** The figure standing open over the reading, and whether the pill stands open at the foot. Neither outlives a widening. */
-const foot = { sheet: null as string | null, pill: false };
+const chooser = { sheet: null as string | null, pill: false };
 
 /** Whether a choice stands now: a pane in the middle, the shape as the rail beside the prose, any other figure opened whole. */
-const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : foot.sheet === k);
+const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : chooser.sheet === k);
 
 /** One choice in the pill: what it is, and whether it stands. No side, since the pill has none. */
 function pickNarrowHtml(k: string): string {
@@ -1644,17 +1648,17 @@ function pickNarrowHtml(k: string): string {
  * since it is not a mode but what stands beside the reading; any other figure opens whole, or closes if it stood.
  */
 function chooseNarrow(k: string): void {
-  foot.pill = false;
+  chooser.pill = false;
   if (WIDGETS[k].kind === "pane") {
     if (!narrowOn(k)) {
       state.settings.areas = { ...state.settings.areas, middle: [k] };
       saveSettings();
     }
-    foot.sheet = null;
+    chooser.sheet = null;
   } else if (k === "shape") {
     state.settings.areas = placed(k, standsIn(k) ? null : "wingL");
     saveSettings();
-  } else foot.sheet = foot.sheet === k ? null : k;
+  } else chooser.sheet = chooser.sheet === k ? null : k;
   drawAll();
 }
 
@@ -1941,7 +1945,7 @@ const keysHtml = (): string =>
 // drawn, shifted right by the brief's depth, with the viewport drawn over it.
 // Dragging scrubs; pressing goes.
 
-const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4 };
+const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4, railIndent: 7 };
 
 /** The width the shape stands in: its deepest possible row, whatever the lane is scoped to, with the marks beside it. */
 const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
@@ -1951,7 +1955,7 @@ const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) *
  * nothing else; and the lane gives it its room, taking the edge's space for it.
  */
 const RAIL = { least: 100, most: 140, lane: 200 };
-const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar, RAIL.least, RAIL.most);
+const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.railIndent + SHAPE.bar, RAIL.least, RAIL.most);
 /** Whether the shape stands as the rail now, which is what takes its marks away. */
 const onRail = (): boolean => fits().rail > 0;
 /** The width the ahead stands in: its deepest possible row with its tail. */
@@ -1989,8 +1993,9 @@ function shapeSvg(W: number, H: number): string {
   const total = Math.max(1, box.scrollHeight);
   const k = (H - 8) / total;
   const ix = state.index!;
-  // as the rail the shape gives up the room for its marks and its tail, so it is its rows and nothing else; and a
-  // finger cannot find a row six pixels tall, so the rail takes no presses either and answers a scrub instead
+  // as the rail the shape stands narrow, so its marks take the room each row actually has left and no more, rather
+  // than the room the figure declares; and a finger cannot find a row six pixels tall, so the rail takes no presses
+  // under one and answers a scrub instead
   const rail = onRail();
   // the levels above the scope stand to the left of the opening's row, a tick per ancestor, outermost leftmost
   // the ticks for the levels above are marks like any other, so the rail gives up their room as well; the way down,
@@ -2000,7 +2005,8 @@ function shapeSvg(W: number, H: number): string {
   // the shape stands in its own width, never a wider figure's beside it in the same wing
   const w = Math.min(W, shapeWidth());
   const cells = laid.map((l) => {
-    const x = SHAPE.pad + L + depthIn(l.a) * SHAPE.indent;
+    // the rail nests a step tighter than the wing does, so a level six deep still leaves a row room for its marks
+    const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
       .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(SHAPE.bar * 0.6) : Math.max(4, Math.round(SHAPE.bar * b.width)), Math.max(1.2, b.height * k - 1)))
       .join("");
@@ -2015,15 +2021,18 @@ function shapeSvg(W: number, H: number): string {
     const face = l.blocks[1] ?? l.blocks[0];
     const y = face ? (4 + face.top * k).toFixed(1) : "0";
     const h = face ? Math.max(1.2, face.height * k - 1).toFixed(1) : "1";
-    // the marks keep to the room the shape declares for them, so a brief of many images stops where eight ticks would
+    // the marks keep to the room the shape declares for them, so a brief of many images stops where eight ticks would;
+    // on the rail the room is what the row has left of the rail's own width, since there is no more to give
     const t0 = x + SHAPE.bar + 4;
+    const room = rail ? Math.max(0, w - t0 - 2) : 24 + SHAPE.tail;
+    const tickRoom = rail ? Math.max(0, Math.min(24, room - 5)) : 24;
     let tx = t0;
     const ticks =
-      face && b && !rail
+      face && b
         ? beyond
             .map((t) => {
               const image = t.type === "image";
-              if (tx - t0 + (image ? 5 : 2) > 24) return "";
+              if (tx - t0 + (image ? 5 : 2) > tickRoom) return "";
               const tick = image ? `<rect class="tick image${ghost}" x="${tx + 0.5}" y="${y}" width="4" height="${h}" rx="1"/>` : `<rect class="tick${ghost}" x="${tx}" y="${y}" width="1.6" height="${h}"/>`;
               tx += image ? 7 : 3;
               return tick;
@@ -2031,8 +2040,8 @@ function shapeSvg(W: number, H: number): string {
             .join("")
         : "";
     tx += paras ? 2 : 0;
-    const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, SHAPE.tail) : 0;
-    const tail = hidden > 0 && face && !rail ? `<rect class="hidden${ghost}" x="${tx}" y="${y}" width="${tailW.toFixed(1)}" height="${h}" rx="1"/>` : "";
+    const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, rail ? Math.max(0, w - tx - 2) : SHAPE.tail) : 0;
+    const tail = hidden > 0 && face && tailW >= 3 ? `<rect class="hidden${ghost}" x="${tx}" y="${y}" width="${tailW.toFixed(1)}" height="${h}" rx="1"/>` : "";
     const marksEnd = tx + tailW + (paras || hidden ? 8 : 0);
     // the opening's row carries the levels above to its left, each a press that scopes out to it
     const first = l.blocks[0];
@@ -2051,7 +2060,7 @@ function shapeSvg(W: number, H: number): string {
     return (
       `<g class="cell${l.a === state.focus ? " here" : ""}" data-a="${esc(l.a)}" ${hued(l.a)}>` +
       (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${SHAPE.bar + 5}" height="${height}"/>`) +
-      (!rail && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + SHAPE.bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - SHAPE.bar - 2)}" height="${fh}"/>` : "") +
+      (!(rail && touch) && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + SHAPE.bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - SHAPE.bar - 2)}" height="${fh}"/>` : "") +
       `${bars}${ticks}${tail}</g>` +
       above
     );
@@ -2475,6 +2484,10 @@ const GUTTER = { want: 210, least: 132 };
 const STRIP = 34;
 /** The room the foot keeps clear: the strip's icons with as much above them as below. */
 const FOOT = STRIP + 10;
+/** The mark at the foot of a narrow reading stands taller than the row does, and keeps its own room clear beneath the prose. */
+const MARK = { size: 46, bottom: 22 };
+/** The room the foot keeps clear: the strip's room wide, the mark's room narrow. */
+const footRoom = (): number => (narrow() ? MARK.size + MARK.bottom + 10 : FOOT);
 /** Where the prose's fade lies at each edge of the lane: clear from the edge to here, then fading in over the fade setting. */
 const RIM = { top: 3, foot: 6 };
 
@@ -2489,7 +2502,7 @@ const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hid
 function band(h: number): { top: number; height: number } {
   const s = state.settings;
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
-  const foot = Math.max(s.gap + STRIP, FOOT + (h * s.fade) / 2 / 100);
+  const foot = Math.max(s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
   return { top: Math.round(top), height: Math.max(0, Math.round(h - top - foot)) };
 }
 
@@ -2579,7 +2592,7 @@ function drawLayout(): void {
   root.setProperty("--edge", `${s.fade}%`);
   root.setProperty("--rim-top", `${RIM.top}%`);
   // the prose clears the foot by the strip's room, as it clears the way down at the top, so the two fades balance
-  root.setProperty("--rim-foot", `${FOOT}px`);
+  root.setProperty("--rim-foot", `${footRoom()}px`);
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
@@ -2746,8 +2759,12 @@ function drawCrumb(): void {
   // the trail's cells are small targets, and every move a reader makes is already in the browser's history, so where
   // the lane stands alone the platform's own back gesture is the trail and a better one
   const trail = narrow() ? [] : state.trail.filter((h) => brief(h.to));
-  const depth = depthHtml();
-  ui.crumb.hidden = S === "" && trail.length === 0 && depth === "";
+  // narrow, the depth leaves the line: its cells crowd the placement, and unfolding a scope six levels deep is not
+  // something a phone wants offered
+  const depth = narrow() ? "" : depthHtml();
+  // the way down stands where it has something to say: a placement, a trail, a depth, or a change to take back, which
+  // on a phone is the only home undo has
+  ui.crumb.hidden = S === "" && trail.length === 0 && depth === "" && !ACTIONS.undo.can();
   // narrow, the whole run would cut every name to a letter, so it keeps the level above the scope and stands for the
   // rest with one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const run = prefixesOf(S);
@@ -2776,7 +2793,7 @@ function placeCanvas(): void {
   const s = state.settings;
   const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
-  ui.canvas.style.marginBottom = `${FOOT}px`;
+  ui.canvas.style.marginBottom = `${footRoom()}px`;
 }
 
 /**
@@ -2791,7 +2808,9 @@ function placeCrumb(): void {
     return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
   });
   const a0 = ui.areas.getBoundingClientRect();
-  const left = Math.min(...edges.map((r) => r.left));
+  // the rail hugs the page's edge, but the way down is chrome and stands clear of it, so it keeps the same margin on
+  // both sides rather than running into the left edge while the right one is a gap in from it
+  const left = Math.max(Math.min(...edges.map((r) => r.left)), fits().rail ? a0.left + state.settings.gap : -Infinity);
   const right = Math.max(...edges.map((r) => r.right));
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
   ui.crumb.style.width = `${Math.round(right - left)}px`;
@@ -2975,15 +2994,17 @@ function drawWingsAligned(): void {
  */
 function drawChooser(): void {
   if (narrow()) {
-    // the mark gets out of the way as a reader reads, so it is drawn lifted or laid away by what the scrolling said
-    ui.strips.innerHTML = foot.pill
-      ? `<div class="strip pill">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
-      : `<div class="strip"><button class="mark" data-mark aria-label="what stands around the reading">${icon("chooser")}</button></div>`;
+    // the mark gets out of the way as a reader reads; opening it brings the foot back, since a pill laid away would
+    // answer a press with nothing
+    if (chooser.pill) ui.strips.classList.remove("away");
+    ui.strips.innerHTML = chooser.pill
+      ? `<div class="strip foot pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
+      : `<div class="strip foot"><button class="mark glass" data-mark aria-label="what stands around the reading">${icon("chooser")}</button></div>`;
     return;
   }
   // widened, the row comes back whole and nothing stands open over the reading
-  foot.sheet = null;
-  foot.pill = false;
+  chooser.sheet = null;
+  chooser.pill = false;
   const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
   ui.strips.innerHTML = `<div class="strip">${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
 }
@@ -2994,13 +3015,13 @@ function drawChooser(): void {
  * since the rail and the reading line measure it.
  */
 function drawSheet(): void {
-  const w = foot.sheet ? WIDGETS[foot.sheet] : undefined;
+  const w = chooser.sheet ? WIDGETS[chooser.sheet] : undefined;
   const on = !!w && w.kind === "figure";
   ui.sheet.hidden = !on;
   if (!on) return void (ui.sheet.innerHTML = "");
   const s = state.settings;
   ui.sheet.style.top = `${Math.round(Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10))}px`;
-  ui.sheet.style.bottom = `${FOOT}px`;
+  ui.sheet.style.bottom = `${footRoom()}px`;
   ui.sheet.innerHTML = `<div class="slot"></div>`;
   const slot = ui.sheet.firstElementChild as HTMLElement;
   slot.innerHTML = (w as Figure).draw(slot.clientWidth, slot.clientHeight);
@@ -3282,8 +3303,8 @@ function backTo(i: number): void {
 function goTo(a: string): void {
   record();
   // a going from a figure opened whole dismisses it: the jump is what the reader opened it for
-  if (foot.sheet !== null) {
-    foot.sheet = null;
+  if (chooser.sheet !== null) {
+    chooser.sheet = null;
     drawSheet();
     drawChooser();
   }
@@ -3471,15 +3492,19 @@ const RESET = 60;
 /** Whether the thumb has slid off the rail far enough that letting go would lay the lane back. */
 let armed = false;
 
-/** Lays the lane where the finger stands on the rail, the viewport centred on it, unless the reset is armed. */
-function railScrub(x: number, y: number): void {
+/**
+ * Scrolls the lane by how far the finger has travelled along the rail, at the rail's own scale, so touching down moves
+ * nothing and the reader takes hold of where they already are. The lane is laid live as the finger goes, unless the
+ * thumb has slid off far enough to arm the reset.
+ */
+function railScrub(x: number, y: number, from: { y: number; scroll: number }): void {
   const svg = ui.parts.wingL.querySelector<SVGSVGElement>("svg.shape");
   if (!svg) return;
   const r = svg.getBoundingClientRect();
   armed = x > r.right + RESET;
   if (!armed) {
     const k = Number(svg.dataset.k);
-    ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
+    ui.scroll.scrollTop = from.scroll + (y - from.y) / k;
   }
   railCallout(y, r.right);
 }
@@ -3511,7 +3536,7 @@ function markAway(): void {
   scrolled.at = top;
   if (d === 0) return;
   scrolled.run = Math.sign(scrolled.run) === Math.sign(d) ? scrolled.run + d : d;
-  if (!narrow() || foot.pill) return void ui.strips.classList.remove("away");
+  if (!narrow() || chooser.pill) return void ui.strips.classList.remove("away");
   if (scrolled.run > AWAY.down) ui.strips.classList.add("away");
   else if (scrolled.run < -AWAY.up) ui.strips.classList.remove("away");
 }
@@ -3696,11 +3721,11 @@ function wire(): void {
     if (borrowed) return void follow(borrowed.dataset.borrow!);
     // the mark opens the row as a wide pill, and the pill closes again on any press that is not one of its own
     if (t.closest("[data-mark]")) {
-      foot.pill = true;
+      chooser.pill = true;
       return void drawChooser();
     }
-    if (foot.pill && !t.closest(".strip")) {
-      foot.pill = false;
+    if (chooser.pill && !t.closest(".strip")) {
+      chooser.pill = false;
       drawChooser();
     }
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
@@ -3746,20 +3771,26 @@ function wire(): void {
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
     const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
     if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
-    // on the rail a finger lays the lane where it stands at once, since there is where the reader means to be, and the
-    // lane as it stood is recorded so that letting go past the rail's edge lays it back
+    // on the rail a finger takes hold of where the reader already stands: nothing moves until it does, and the callout
+    // says at once what it has hold of, so the gesture shows itself before it commits to anything
     else if (map && onRail() && touch) {
-      record();
-      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: true };
+      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
       state.scrubbing = true;
-      railScrub(e.clientX, e.clientY);
+      document.body.classList.add("scrubbing");
+      railScrub(e.clientX, e.clientY, { y: e.clientY, scroll: ui.scroll.scrollTop });
     } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
     else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
     if (drag) (e.target as Element).setPointerCapture?.(e.pointerId);
   });
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
-    if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
+    if (drag.kind === "rail") {
+      // the lane as it stood is recorded at the first movement, not at the touch, so a finger that only rests on the
+      // rail leaves nothing to take back; from there the whole scrub is one change, ended when the finger lifts
+      if (!drag.moved && Math.abs(e.clientY - drag.y) < 2) return;
+      if (!drag.moved) (drag.moved = true), record();
+      return void railScrub(e.clientX, e.clientY, { y: drag.y, scroll: drag.start });
+    }
     // up or right turns a meter up; the shape scrubs by height alone
     const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
     if (!drag.moved && Math.abs(dy) < 3) return;
@@ -3784,9 +3815,10 @@ function wire(): void {
   const release = () => {
     if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
     if (drag?.kind === "rail") {
+      document.body.classList.remove("scrubbing");
       ui.tip.classList.remove("callout");
       hideTip();
-      if (armed) undo();
+      if (armed && drag.moved) undo();
       armed = false;
     }
     drag = null;
@@ -4100,6 +4132,8 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   glow: ["oklch(80% 0.08 var(--h))", "oklch(47% 0.06 var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
+  glass: ["oklch(97.5% 0.002 60 / .74)", "oklch(26% 0.006 60 / .72)"],
+  bezel: ["rgb(255 255 255 / .9)", "rgb(255 255 255 / .12)"],
 };
 
 /** The palette as declarations: the roles without a hue, or the roles that take one. */
@@ -4465,6 +4499,10 @@ svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .image { stroke: var(--o
 svg.shape .hidden { fill: var(--grey); }
 svg.shape .cell.lit .hidden { fill: var(--glow); }
 svg.shape .cursor { fill: var(--veil); pointer-events: none; }
+/* under a finger the rail is taken hold of rather than aimed at, so the band the reader holds says so: a stronger fill
+   with a rim around it, and a step darker while the finger is down */
+body.touch svg.shape .cursor { fill: var(--wash); stroke: var(--track); stroke-width: 1; rx: 5; }
+body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
 svg.shape { cursor: grab; }
 
 svg.plate .cell path, svg.plate .cell circle { fill: var(--rest); }
@@ -4494,15 +4532,24 @@ svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: 
 .switches .pick:hover { background: var(--wash); }
 
 /* where the lane stands alone the row folds into one round mark at the foot, and a press opens it as a wide pill: the
-   same table in a second grain. The mark gets out of the way as a reader reads, and comes back on a scroll up */
-#strips { transition: transform .22s ease, opacity .22s ease; }
-#strips.away { transform: translateY(140%); opacity: 0; }
-.strip .mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--wash); color: var(--muted); }
+   same table in a second grain. Both stand on a glass of their own, a muted surface over whatever the prose is doing
+   beneath, with a light rim and a soft shadow, since a translucent grey alone read as a fade rather than as a thing */
+#strips { transition: transform .42s cubic-bezier(.22,.9,.24,1), opacity .3s ease; }
+#strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
+.strip.foot { bottom: 22px; }
+.glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7); }
+/* the fold chevron in a tree is also called a mark and stands absolutely, so this one says where it stands: left to
+   itself it hung out of the strip, which is what put it off centre and below the foot */
+.strip .mark { position: relative; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
+.strip .mark:active { transform: scale(.94); }
 .strip .mark:hover { color: var(--ink); }
-.strip.pill { background: var(--wash); border-radius: 27px; padding: 5px 7px; gap: 2px; box-shadow: 0 1px 10px rgb(0 0 0 / .07); }
-.strip.pill .pick { width: 44px; height: 44px; border-radius: 22px; opacity: .45; }
-.strip.pill .pick.on, .strip.pill:hover .pick.on { opacity: 1; color: var(--ink); }
+.strip .mark .icon { width: 19px; height: 19px; stroke-width: 1.2; }
+.strip.pill { border-radius: 28px; padding: 5px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
+@keyframes pill-in { from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(.9); } }
+.strip.pill .pick { width: 46px; height: 46px; border-radius: 23px; opacity: .5; }
+.strip.pill .pick.on, .strip.pill:hover .pick.on { opacity: 1; color: var(--ink); background: var(--wash); }
 .strip.pill .pick:hover { opacity: .8; }
+.strip.pill .pick .icon { width: 18px; height: 18px; }
 
 /* a figure opened whole over the reading, where there is no wing to stand it in: it takes the band the prose reads in,
    on the page's own ground, and the reading stands where it stood beneath it */
@@ -4525,9 +4572,13 @@ svg.shape, #canvas { touch-action: none; }
 #tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
 body.touch .act .acts { gap: 2px; margin-right: -10px; }
-body.touch .badge.worded { padding: 10px 6px; border-radius: 8px; }
-/* where the words and the figure cannot share one row the acts take a row of their own rather than running past the prose */
-body.touch .act { flex-wrap: wrap; }
+/* a press with no key to draw is a word alone, so under a finger it is given a surface and reads as the button it is */
+body.touch .badge.worded { padding: 9px 13px; border-radius: 9px; background: var(--wash); }
+body.touch .badge.worded .label { color: var(--ink); }
+body.touch .badge.worded.off { background: none; }
+/* and the acts take a row of their own beneath the figure, since sharing the line with it left neither room to read */
+body.touch .act { flex-wrap: wrap; row-gap: 4px; }
+body.touch .act .acts { flex-basis: 100%; margin-left: 0; gap: 8px; }
 body.touch .badge.worded .label { color: var(--muted); }
 body.touch #crumb { gap: 2px; }
 body.touch #crumb .step { padding: 10px 5px; }
