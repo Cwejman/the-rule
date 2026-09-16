@@ -881,7 +881,7 @@ const DEFAULTS: Settings = {
   measure: 600,
   gap: 24,
   dim: 0.4,
-  fade: 8,
+  fade: 12,
   leading: 1.6,
   canvas: 720,
   line: "ends",
@@ -1902,6 +1902,9 @@ function loadSettings(): void {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "null");
     if (saved) state.settings = { ...DEFAULTS, ...saved, areas: { ...DEFAULTS.areas, ...(saved.areas ?? {}) } };
     if (saved && typeof saved.fade === "number" && saved.fade <= 1 && saved.dim === undefined) (state.settings.dim = saved.fade), (state.settings.fade = DEFAULTS.fade);
+    // the fade was lengthened on 2026-09-16, and a reader holding exactly the value it had before never chose it, so
+    // they take the new one. This is the last such line: what is written from here on keeps only what a reader set
+    if (saved && saved.fade === 8) state.settings.fade = DEFAULTS.fade;
   } catch {}
   // an area once held one name, "none" when closed; it now holds a list, and anything it cannot hold is dropped
   AREAS.forEach(({ name, kind }) => {
@@ -1918,7 +1921,16 @@ function loadSettings(): void {
   if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
   if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
 }
-const saveSettings = (): void => void localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+/**
+ * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
+ * turned a meter then follows the default when it changes, rather than being pinned for good to the value it had the
+ * first time they pressed anything at all.
+ */
+const saveSettings = (): void =>
+  void localStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify(Object.fromEntries(Object.entries(state.settings).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(DEFAULTS[k as keyof Settings])))),
+  );
 
 // ### 3.8.1 The keys: every act and what fires it
 //
@@ -1945,7 +1957,7 @@ const keysHtml = (): string =>
 // drawn, shifted right by the brief's depth, with the viewport drawn over it.
 // Dragging scrubs; pressing goes.
 
-const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4, railIndent: 7 };
+const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4, railIndent: 5, railBar: 28 };
 
 /** The width the shape stands in: its deepest possible row, whatever the lane is scoped to, with the marks beside it. */
 const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
@@ -1954,8 +1966,8 @@ const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) *
  * to make itself clear. What it gives up at that width is the room for its marks and its tail, so it is its rows and
  * nothing else; and the lane gives it its room, taking the edge's space for it.
  */
-const RAIL = { least: 100, most: 140, lane: 200 };
-const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.railIndent + SHAPE.bar, RAIL.least, RAIL.most);
+const RAIL = { least: 72, most: 110, lane: 200 };
+const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.railIndent + SHAPE.railBar, RAIL.least, RAIL.most);
 /** Whether the shape stands as the rail now, which is what takes its marks away. */
 const onRail = (): boolean => fits().rail > 0;
 /** The width the ahead stands in: its deepest possible row with its tail. */
@@ -1997,6 +2009,7 @@ function shapeSvg(W: number, H: number): string {
   // than the room the figure declares; and a finger cannot find a row six pixels tall, so the rail takes no presses
   // under one and answers a scrub instead
   const rail = onRail();
+  const bar = rail ? SHAPE.railBar : SHAPE.bar;
   // the levels above the scope stand to the left of the opening's row, a tick per ancestor, outermost leftmost
   // the ticks for the levels above are marks like any other, so the rail gives up their room as well; the way down,
   // which reaches over the rail, names those levels and is a press a finger can find
@@ -2008,7 +2021,7 @@ function shapeSvg(W: number, H: number): string {
     // the rail nests a step tighter than the wing does, so a level six deep still leaves a row room for its marks
     const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
-      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(SHAPE.bar * 0.6) : Math.max(4, Math.round(SHAPE.bar * b.width)), Math.max(1.2, b.height * k - 1)))
+      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1)))
       .join("");
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
     // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
@@ -2023,7 +2036,7 @@ function shapeSvg(W: number, H: number): string {
     const h = face ? Math.max(1.2, face.height * k - 1).toFixed(1) : "1";
     // the marks keep to the room the shape declares for them, so a brief of many images stops where eight ticks would;
     // on the rail the room is what the row has left of the rail's own width, since there is no more to give
-    const t0 = x + SHAPE.bar + 4;
+    const t0 = x + bar + 4;
     const room = rail ? Math.max(0, w - t0 - 2) : 24 + SHAPE.tail;
     const tickRoom = rail ? Math.max(0, Math.min(24, room - 5)) : 24;
     let tx = t0;
@@ -2059,8 +2072,8 @@ function shapeSvg(W: number, H: number): string {
     const fh = (Math.max(1, l.height * k) + 2 * grow).toFixed(1);
     return (
       `<g class="cell${l.a === state.focus ? " here" : ""}" data-a="${esc(l.a)}" ${hued(l.a)}>` +
-      (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${SHAPE.bar + 5}" height="${height}"/>`) +
-      (!(rail && touch) && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + SHAPE.bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - SHAPE.bar - 2)}" height="${fh}"/>` : "") +
+      (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${bar + 5}" height="${height}"/>`) +
+      (!(rail && touch) && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - bar - 2)}" height="${fh}"/>` : "") +
       `${bars}${ticks}${tail}</g>` +
       above
     );
@@ -2614,7 +2627,10 @@ function drawLayout(): void {
   // between the wings and the lane. The gap is the least a space is given, and what the width leaves over is shared
   // among the spaces evenly, so no area carries room it does not use
   // with the canvas standing, the spaces are the gap exactly and the canvas takes what is left; without it they share what is left
-  const space = on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
+  // standing alone on a narrow screen the canvas takes the page whole, edge to edge: there is too little room to spend
+  // any of it on a margin, and what falls outside is cut by the viewport as a map is
+  const bleed = narrow() && on.canvas && !on.lane;
+  const space = bleed ? "0px" : on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
   const tracks = [on.rail ? "0px" : space];
   const place = (el: HTMLElement, width: string) => {
     tracks.push(width, space);
@@ -2625,7 +2641,7 @@ function drawLayout(): void {
   // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
   // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
   // there is nothing to give way to and a floor would only overflow the page
-  if (on.canvas) place(ui.canvas, `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
+  if (on.canvas) place(ui.canvas, bleed ? "1fr" : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
   if (on.lane) place(ui.scroll, `${mid}px`);
   if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
@@ -2633,6 +2649,7 @@ function drawLayout(): void {
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
   ui.content.style.columnGap = `${s.gap}px`;
   ui.canvas.hidden = !on.canvas;
+  ui.canvas.classList.toggle("bleed", bleed);
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
   ui.scroll.style.width = on.lane ? "" : `${mid}px`;
@@ -2796,6 +2813,13 @@ const CANVAS_INSET = 24;
 /** The canvas stands in the band the figures stand in: below the way down, above the strip's room at the foot. */
 function placeCanvas(): void {
   const s = state.settings;
+  // taking the page whole it keeps no margin either: the way down stands over it and the fade at its ends is what
+  // keeps both readable, as the prose's fade does
+  if (ui.canvas.classList.contains("bleed")) {
+    ui.canvas.style.marginTop = "0px";
+    ui.canvas.style.marginBottom = "0px";
+    return;
+  }
   const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
   ui.canvas.style.marginBottom = `${footRoom()}px`;
@@ -3001,7 +3025,7 @@ function drawChooser(): void {
   if (narrow()) {
     // the mark gets out of the way as a reader reads; opening it brings the foot back, since a pill laid away would
     // answer a press with nothing
-    if (chooser.pill) ui.strips.classList.remove("away");
+    if (chooser.pill || !fits().lane) ui.strips.classList.remove("away");
     ui.strips.innerHTML = chooser.pill
       ? `<div class="strip foot pill glass">${narrowChoices().map(pickNarrowHtml).join("")}</div>`
       : `<div class="strip foot"><button class="mark glass" data-mark aria-label="what stands around the reading">${icon("chooser")}</button></div>`;
@@ -3498,18 +3522,19 @@ const RESET = 60;
 let armed = false;
 
 /**
- * Scrolls the lane by how far the finger has travelled along the rail, at the rail's own scale, so touching down moves
- * nothing and the reader takes hold of where they already are. The lane is laid live as the finger goes, unless the
- * thumb has slid off far enough to arm the reset.
+ * Lays the lane at the point of the rail the finger is on, since that point is the place the reader is asking to see.
+ * It is a preview while the finger is down: the lane follows it, the callout names what is there, and letting go
+ * leaves it. Sliding off past the threshold arms the reset instead, and the lane is left where it is until the finger
+ * lifts, which then lays it back.
  */
-function railScrub(x: number, y: number, from: { y: number; scroll: number }): void {
+function railScrub(x: number, y: number): void {
   const svg = ui.parts.wingL.querySelector<SVGSVGElement>("svg.shape");
   if (!svg) return;
   const r = svg.getBoundingClientRect();
   armed = x > r.right + RESET;
   if (!armed) {
     const k = Number(svg.dataset.k);
-    ui.scroll.scrollTop = from.scroll + (y - from.y) / k;
+    ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
   }
   railCallout(y, r.right);
 }
@@ -3541,7 +3566,9 @@ function markAway(): void {
   scrolled.at = top;
   if (d === 0) return;
   scrolled.run = Math.sign(scrolled.run) === Math.sign(d) ? scrolled.run + d : d;
-  if (!narrow() || chooser.pill) return void ui.strips.classList.remove("away");
+  // the mark leaves while a reader is reading; on the canvas there is no reading to leave, and going to a node scrolls
+  // the lane out of sight, which would have taken the mark with it
+  if (!narrow() || chooser.pill || !fits().lane) return void ui.strips.classList.remove("away");
   if (scrolled.run > AWAY.down) ui.strips.classList.add("away");
   else if (scrolled.run < -AWAY.up) ui.strips.classList.remove("away");
 }
@@ -3776,26 +3803,22 @@ function wire(): void {
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
     const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
     if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
-    // on the rail a finger takes hold of where the reader already stands: nothing moves until it does, and the callout
-    // says at once what it has hold of, so the gesture shows itself before it commits to anything
+    // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
+    // and the callout, beside the thumb, names it; the lane as it stood is recorded so the reset can lay it back
     else if (map && onRail() && touch) {
-      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
+      e.preventDefault();
+      record();
+      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: true };
       state.scrubbing = true;
       document.body.classList.add("scrubbing");
-      railScrub(e.clientX, e.clientY, { y: e.clientY, scroll: ui.scroll.scrollTop });
+      railScrub(e.clientX, e.clientY);
     } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
     else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
     if (drag) (e.target as Element).setPointerCapture?.(e.pointerId);
   });
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
-    if (drag.kind === "rail") {
-      // the lane as it stood is recorded at the first movement, not at the touch, so a finger that only rests on the
-      // rail leaves nothing to take back; from there the whole scrub is one change, ended when the finger lifts
-      if (!drag.moved && Math.abs(e.clientY - drag.y) < 2) return;
-      if (!drag.moved) (drag.moved = true), record();
-      return void railScrub(e.clientX, e.clientY, { y: drag.y, scroll: drag.start });
-    }
+    if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
     // up or right turns a meter up; the shape scrubs by height alone
     const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
     if (!drag.moved && Math.abs(dy) < 3) return;
@@ -3823,7 +3846,9 @@ function wire(): void {
       document.body.classList.remove("scrubbing");
       ui.tip.classList.remove("callout");
       hideTip();
-      if (armed && drag.moved) undo();
+      if (armed) undo();
+      // a scrub drags the pointer across the prose, and the browser takes that for a selection
+      getSelection?.()?.removeAllRanges();
       armed = false;
     }
     drag = null;
@@ -4229,6 +4254,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
 #canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
+/* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
+   the viewport, since a map is read by moving it rather than by seeing all of it at once */
+#canvas.bleed { border-radius: 0; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); }
+#canvas.bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
 #canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
 #stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; }
@@ -4508,6 +4537,8 @@ svg.shape .cursor { fill: var(--veil); pointer-events: none; }
    with a rim around it, and a step darker while the finger is down */
 body.touch svg.shape .cursor { fill: var(--wash); stroke: var(--track); stroke-width: 1; rx: 5; }
 body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
+/* a scrub drags across the prose, and a drag over text is a selection unless the page says otherwise */
+body.scrubbing, body.scrubbing #lane { user-select: none; -webkit-user-select: none; }
 svg.shape { cursor: grab; }
 
 svg.plate .cell path, svg.plate .cell circle { fill: var(--rest); }

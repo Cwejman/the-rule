@@ -106,33 +106,61 @@ What is wanted is not a bigger target but a different gesture, and the radial ha
 
 ### 4.3 A pane takes the middle rather than standing beside
 
-The middle holds one pane where the lane stands alone, so pressing a pane sets it rather than standing a second one beside it, and the pane standing cannot be taken away. The canvas then takes whatever width there is, where beside the lane it keeps a floor of its own.
+The middle holds one pane where the lane stands alone, so pressing a pane sets it rather than standing a second one beside it, and the pane standing cannot be taken away.
 
 *As built, 2026-09-16, from [the middle's rule](framework.md#27-the-middle-holds-one-pane-or-two) read at a width that holds one.*
 
+### 4.4 The canvas takes the page whole
+
+Standing alone on a phone the canvas takes the page edge to edge, with no margin, no rim and no corners. There is too little room to spend any of it on a frame, and a canvas is read by moving it rather than by seeing all of it at once, so its sides are simply cut by the viewport, as a map's are.
+
+What it keeps is a fade at its top and its foot, as the prose has, so the way down and the mark read as standing over one page rather than over a panel.
+
+*The author's, 2026-09-16, on reading a canvas that stood in a box; as built the same day.*
+
+### 4.5 The mark does not leave while the canvas stands
+
+The mark [gets out of the way while a reader reads](#3-one-chooser-in-two-grains), which it reckons from the lane's own scrolling. On the canvas there is no reading to leave, and going to a node scrolls the lane out of sight, which took the mark with it and left a reader on the canvas with no way to anything.
+
+So it leaves only while the lane is the pane that stands.
+
+*The author's, 2026-09-16, who saw the mark on one press and not on the next; as built the same day.*
+
+### 4.6 A brief chosen on the canvas has nowhere to act
+
+A reader can light a node on the canvas and then do nothing with it. In the lane every act stands on the brief's own line; a node has no line, and the room around it is taken by the nodes beside it.
+
+Three things bound where the acts could stand. Around the node there is no room. At the top of the page they are out of a hand's reach. The foot is left, and the foot already holds the mark.
+
+The session's proposal is that the foot holds one row, and what the row holds depends on what the reader has chosen: the pill of choices when they press the mark, the acts for the brief in focus when one is chosen on the canvas, and the mark alone otherwise. The mark keeps its place at the row's end in each, so the chooser is never lost, and the acts are the same buttons the action line draws, in the same grain.
+
+*Open, 2026-09-16: the want is the author's, the three bounds are his, and the proposal is the session's, not built and awaiting his word.*
+
 ## 5. The minimap is a rail, not a mode
 
-[The shape](widgets.md#3-the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, between a hundred and a hundred and forty against the two hundred it declares today.
+[The shape](widgets.md#3-the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, and it is only ever scrubbed, so the width its briefs are drawn in can go too.
 
-What it gives up at that width is not its marks. Beside a folded row they stand in whatever room that row has left of the rail's width, a tick per paragraph and the tail as long as the level beneath is heavy, and where a row is deep enough to leave none, none are drawn. Without them the rail was rows and waste. The nesting steps seven to a level rather than nine, so a level six deep still leaves a row room to say what it hides.
+So the rail is its own drawing rather than the shape squeezed. A brief's blocks are drawn twenty-eight wide against the wing's forty-six, and the nesting steps five to a level against nine, since nothing there is aimed at and no width is needed to hit. What that leaves over goes to the prose.
+
+What it does not give up is its marks. Beside a folded row they stand in whatever room that row has left, a tick per paragraph and the tail as long as the level beneath is heavy, and where a deep row leaves none, none are drawn. Without them the rail was rows and waste.
 
 What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
 
 The rail stands at the left edge of the page and takes the space that stood there, so the lane gives it its room rather than the page growing one. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
-*The author's, 2026-09-16; the width his, the callout his, and the marks his on reading a rail without them. Measured as built the same day: the rail stands 104 on this body and leaves the lane 238 of a 390 screen. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
+*The author's, 2026-09-16; the callout his, the marks his on reading a rail without them, and the narrowing his, from a rail nothing is ever aimed at. Measured as built the same day: the rail stands 74 on this body and leaves the lane 268 of a 390 screen, against 104 and 238 before it. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
 
-### 5.1 Scrubbing reads, and sliding off resets
+### 5.1 The point touched is the preview, and sliding off lays it back
 
-The finger takes hold of where the reader already stands rather than jumping to where it landed. Touching down moves nothing and the callout says at once what it has hold of; from there the lane follows the finger, live.
+The point a finger lands on is the place the reader is asking to see, so the lane goes there at once and the callout, beside the thumb, names what is there. The finger moves and the preview follows it; letting go leaves the reader where the preview stood.
 
-A finger covers what it lands on, so a rail that jumped left the reader looking at a place they had neither chosen nor seen. Taking hold instead shows the gesture before it commits to anything, and a reader sees what they are scrubbing past rather than a preview of it.
+Sliding the thumb away from the rail's own edge, past a threshold, arms a reset instead: the callout says so, and letting go there lays the lane back where it stood before the finger came down. Coming back onto the rail takes up the preview again, so a reader can always change their mind.
 
-Sliding the thumb away from the rail's own edge, past a threshold, arms a reset: the callout says so, and letting go there lays the lane back where it stood. Coming back onto the rail takes up the scrub again, so nothing is committed until the finger lifts.
+The whole scrub is one change, so the reset is [the undo the lane already keeps](lane.md#52-escape-is-an-undo) with a direction given to it, and not a second mechanism.
 
-The whole scrub is one change, recorded at the first movement rather than at the touch, so a finger that only rests on the rail leaves nothing to take back. The reset is then [the undo the lane already keeps](lane.md#52-escape-is-an-undo) with a direction given to it, and not a second mechanism.
+A drag that moves the lane also drags the pointer across the prose, and a browser reads that as selecting text, so nothing is selectable while a finger is scrubbing.
 
-*The author's, 2026-09-16: that the finger should take hold rather than jump is his, on reading the first build; that the reset is the undo is the session's. As built the same day, the threshold sixty past the rail's right edge.*
+*The author's, 2026-09-16, twice: the session read his first word as taking hold of where the reader already stood and built that, and he said plainly that the point he touches is where he wants the preview. As built the same day, the threshold sixty past the rail's right edge.*
 
 ### 5.2 The chooser holds it as a switch, not as a mode
 

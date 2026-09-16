@@ -74,7 +74,7 @@ The prose fades out a little in from the top and the bottom of the viewport, ove
 
 The fade at the top comes in with the reading line, since nothing stands above the opening to fade, and the same holds at the foot; what a gutter hangs below the last brief would then meet the box's hard edge, so the lane keeps room beneath its end for it. The run is the fade setting, kept apart from the dim since the author turned one expecting the other.
 
-*Reasoned, the author's, 2026-09-13; the edge fade was shortened and moved in on the author's second reading.*
+*Reasoned, the author's, 2026-09-13; the edge fade was shortened and moved in on the author's second reading, and lengthened again on 2026-09-16, when a short fade made the way down read as a surface laid over the page rather than as part of it.*
 
 ## 5. Arriving lays the lane
 

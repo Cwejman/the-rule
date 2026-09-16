@@ -256,7 +256,7 @@ The lane as laid, its scope and every grade, is kept there too, keyed by the pag
 
 And every change a reader makes is recorded as the lane stood before it, the scope, the grades, the focus and the scroll, for [escape to undo](lane.md#52-escape-is-an-undo) and shift with escape to redo. That record lives only in memory, holds the last two hundred changes, and is gone with a reload.
 
-*In force, 2026-09-14, as built.*
+*In force, 2026-09-14, as built; keeping only what differs from the defaults, 2026-09-16, when a lengthened fade could not reach a reader whose browser held the old one.*
 
 ### 6.7 The touch grain is two facts and a class
 
