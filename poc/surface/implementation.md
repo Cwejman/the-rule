@@ -194,7 +194,9 @@ When the line eases to the ends, the room above and below the lane is set each t
 
 ### 6.2 Wings are drawn whole, as HTML or SVG
 
-A wing lays its figures in slots: a figure of fixed size is drawn first and measured, a growing figure is drawn into what is left, and a figure that answers the focus or the pointer is drawn again in its own slot alone. Each figure is drawn whole from the state whenever the state it reads changes: [the tree](widgets.md#2-the-tree) and [the settings](widgets.md#6-settings) as HTML, [the ahead](widgets.md#4-the-ahead), [the shape](widgets.md#3-the-shape) and [the plate](widgets.md#7-the-plate) as SVG.
+A wing lays its figures in slots: a figure of fixed size is drawn first and measured, a growing figure is drawn into what is left, and a figure that answers the focus or the pointer is drawn again in its own slot alone.
+
+Each figure is drawn whole from the state whenever the state it reads changes: [the tree](widgets.md#2-the-tree) and [the settings](widgets.md#6-settings) as HTML, [the ahead](widgets.md#4-the-ahead), [the shape](widgets.md#3-the-shape) and [the plate](widgets.md#7-the-plate) as SVG. A slot too short to draw a figure in is left empty, since a figure scaled to nothing draws marks of no size.
 
 The lane's ends and the shape's slot depend on each other, so they are settled in a few steps: the wings are laid, the lane's ends are set to the shape's slot, and the wings are drawn again if that moved them. [The strips](framework.md#3-the-strip) are laid over the foot of the row from the areas' own geometry, so a closed area's rail stands where the area stood.
 

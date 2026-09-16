@@ -190,7 +190,7 @@ At the top of a scope, scrolling up beyond where the lane can go fills a gauge, 
 
 A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-where-only-the-lane-fits).
 
-*The author's ask of 2026-09-15; as built the same day.*
+*The author's ask of 2026-09-15; as built the same day, and eased on 2026-09-16, when the author could not reach it by hand: a shorter way, a shorter dead zone, and a gap a quick second swipe can make.*
 
 ### 7.5 The way down stands over the lane
 
@@ -226,4 +226,4 @@ The reader is told where a link leads before they take it: its target stands bes
 
 On a narrow screen the sides give way, [the gutters first, then the right wing, then the left](framework.md#25-giving-way), and the lane stands alone, which it can, since orientation is help and never the reading. A reader may also close any area by hand, and a closed area [takes no room](framework.md#24-closing-by-hand), so the lane stands centred in what is left.
 
-*Reasoned, the author's, 2026-09-13; nothing about a touch reading is taken up, and that is open.*
+*Reasoned, the author's, 2026-09-13; [a touch reading](touch.md) is talked through and not built.*

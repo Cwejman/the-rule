@@ -178,7 +178,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one square, drawn as droplets on a round plate. The root sits at the centre, its briefs are droplets around it, and each carries its own smaller droplets further out, level by level to the rim. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is grey at every depth.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#9-what-was-tried-and-refused).*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#10-what-was-tried-and-refused).*
 
 ### 7.1 Droplets meet without merging
 

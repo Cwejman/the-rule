@@ -100,7 +100,7 @@ The markdown does not say whether a level is a sequence or a set, and only a set
 
 A number claims that a brief stands on the ones before it. A letter claims that no brief of the level stands on another: each is readable alone, in any order, and the parent stands on the set rather than on a chain. That is all the substrate says. What a reader makes of independence is the domain's reading: a flow reads a lettered level under a step as alternatives, take one, which [toolmaking](../../tool-making/README.md) can say for itself; a body of knowledge reads it as a set, take any or all, looked up rather than read through.
 
-The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#9-what-was-tried-and-refused) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
+The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#10-what-was-tried-and-refused) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
 
 A choice as a list, one item per condition, each with a link to its path, was the session's own proposal and was set aside: it takes every path out of the reading and gives a condition no address.
 

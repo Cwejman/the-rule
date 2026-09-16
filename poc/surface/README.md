@@ -72,7 +72,17 @@ The surface is going to have a few modes, and the second is a canvas: the body a
 
 [the level beneath](canvas.md)
 
-## 8. What this does not answer
+## 8. A touch reading
+
+A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size. What it leaves is the reading, with one narrow rail beside it and one mark at the foot that opens everything else.
+
+It is talked through and not built, and it is what comes next.
+
+*The author's, 2026-09-16; open.*
+
+[the level beneath](touch.md)
+
+## 9. What this does not answer
 
 Four things the surface does not answer cross the levels beneath, so they stand here rather than at one level's foot.
 
@@ -86,7 +96,7 @@ What stands beside a brief in the left gutter. Commits and people belong there, 
 
 *Open, 2026-09-13.*
 
-## 9. What was tried and refused
+## 10. What was tried and refused
 
 What the programs before this model reached for is kept beneath, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. That level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another, and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
 
