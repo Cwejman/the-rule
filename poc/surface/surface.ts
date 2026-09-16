@@ -3993,10 +3993,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .strip .pick.on.denied, .strip:hover .pick.on.denied { opacity: .45; }
 .strip .pick.on:hover { color: var(--ink); }
 .strip .pick.fixed { cursor: default; }
-/* a widget in use says which side holds it, as a short bar at the foot of its icon, aligned to that side */
-.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; bottom: 1px; height: 2px; width: 9px; border-radius: 1px; background: currentColor; opacity: .5; }
-.strip .pick.side-l::after { left: 3px; }
-.strip .pick.side-r::after { right: 3px; }
+/* a widget in use says which side holds it, as a dot beside its icon, level with the middle of it so it balances the
+   round forms the icons are made of */
+.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .55; }
+.strip .pick.side-l::after { left: 2px; }
+.strip .pick.side-r::after { right: 2px; }
 .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 
 .opening { margin-bottom: 40px; }

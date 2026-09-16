@@ -83,7 +83,7 @@ With both standing, the lane keeps its measure and the canvas takes what is left
 
 One row of icons stands at the foot of the page, centred, holding every choice once: the panes first, then the adjuncts, then the figures, three groups spaced apart by room alone. A reader's question at the foot is one question, what stands around the reading, so it is asked in one place rather than in five.
 
-An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A pane toggles instead, since the middle holds its panes in one order and the last one cannot be taken away. A widget in use carries a short bar at the foot of its icon, at the side that holds it, so the row shows the whole arrangement at a glance.
+An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A pane toggles instead, since the middle holds its panes in one order and the last one cannot be taken away. A widget in use carries a dot beside its icon, at the side that holds it and level with the middle of it, so the row shows the whole arrangement at a glance.
 
 The row stands where the middle stands, which is always, so no choice is ever out of reach at any width.
 
