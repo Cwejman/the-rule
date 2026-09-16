@@ -114,7 +114,7 @@ The acts that work on the brief stand at the right of the figure as badges, [a k
 
 The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line, and no key acts on it either, so nothing about it can ever change under the reader.
 
-*Reasoned, the author's, 2026-09-13; the badges the author's ask of 2026-09-16; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused.*
+*Reasoned, the author's, 2026-09-13; the badges the author's ask of 2026-09-16; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused. Open: whether the badge for opening stands on every brief with a level or only on one already unfolded, and whether the line at a whole brief's foot, which has no figure before its badges, should keep a figure's room so that both kinds of line begin at one edge.*
 
 ### 6.2 The figure on the line says what a press gives
 
