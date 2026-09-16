@@ -1480,7 +1480,6 @@ const ICON: Record<string, string> = {
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
 
 const WIDGETS: Record<string, Widget> = {
-  none: { kind: "figure", name: "close", icon: "none", draw: () => "", width: () => 0, grow: false },
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
   tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => 240, grow: true, onFocus: true },
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
@@ -1516,36 +1515,59 @@ const figureNames = (area: WingName): string[] => {
   const gutter = area === "wingL" ? "gutterL" : "gutterR";
   return squeezed(gutter) && held.length === 1 && !held.includes("pointers") ? [...held, "pointers"] : held;
 };
-/** The first widget an area holds, which is all a gutter holds. */
-const widgetOf = (area: AreaName): Widget => widgetsOf(area)[0] ?? WIDGETS.none;
+/** The first widget an area holds, which is all a gutter holds; nothing, where the area is closed. */
+const widgetOf = (area: AreaName): Widget | undefined => widgetsOf(area)[0];
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
-const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => (k === "none" && kind !== "pane") || WIDGETS[k].kind === kind);
-/** A strip's width: its icons laid in a row. */
-const stripWidth = (kind: Widget["kind"]): number => choicesFor(kind).length * 30 - 4;
+const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => WIDGETS[k].kind === kind && k !== "pointers");
 
-/** What an area holds once an icon on its strip is pressed: close empties it, a widget held is let go, a wing holds two, a third taking the place at the foot. */
-function pressed(area: AreaName, k: string): string[] {
-  const held = state.settings.areas[area];
-  // the middle toggles a pane and is never left empty, its panes in their fixed order
-  if (area === "middle") return held.includes(k) ? (held.length > 1 ? panesHeld(held.filter((x) => x !== k)) : held) : panesHeld([...held, k]);
-  const wing = area.startsWith("wing");
-  return k === "none" ? [] : held.includes(k) ? held.filter((x) => x !== k) : !wing ? [k] : held.length < 2 ? [...held, k] : [held[0], k];
-}
+/** The two sides a widget of each kind can stand on; a pane has none, since the middle holds its panes in one order. */
+const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], adjunct: ["gutterL", "gutterR"], pane: [] };
+
+/** The area holding a widget now, or null when it stands nowhere. */
+const standsIn = (k: string): AreaName | null => AREAS.find(({ name }) => state.settings.areas[name].includes(k))?.name ?? null;
+
+/** The panes the middle holds after one is pressed: a toggle, and the last pane cannot be taken away. */
+const panesPressed = (k: string): string[] => {
+  const held = state.settings.areas.middle;
+  return held.includes(k) ? (held.length > 1 ? panesHeld(held.filter((x) => x !== k)) : held) : panesHeld([...held, k]);
+};
 
 /**
- * The strip of an area: a light icon per widget, the ones in use a little darker. It offers only what can stand: a
- * widget whose pressing would leave the area without room is not shown, and a closed area with nothing it could open
- * shows no strip at all, so no press ever makes a strip vanish from under the pointer.
+ * What every area holds after an icon is pressed. A pane toggles. Everything else cycles: nowhere, the left, the right,
+ * nowhere again, so one icon carries the whole choice of whether a widget stands and on which side. A wing holds two,
+ * and a third takes the place at its foot; a gutter holds one.
  */
-function stripHtml(area: AreaName, kind: Widget["kind"]): string {
-  const held = state.settings.areas[area];
-  const offered = choicesFor(kind).filter(
-    (k) => k === "none" || kind === "pane" || held.includes(k) || ((k !== "pointers" || squeezed("gutterL") || squeezed("gutterR")) && fitsWith({ ...state.settings.areas, [area]: pressed(area, k) })[area]),
-  );
-  if (!isOpen(area) && offered.length <= 1) return "";
-  return `<div class="strip" data-strip="${area}">${offered
-    .map((k) => `<button class="pick${(k === "none" ? !isOpen(area) : held.includes(k)) ? " on" : ""}" data-area="${area}" data-widget="${k}" data-tip="${esc(WIDGETS[k].name)}">${icon(WIDGETS[k].icon)}</button>`)
-    .join("")}</div>`;
+function cycled(k: string): Held {
+  const w = WIDGETS[k];
+  const held: Held = { ...state.settings.areas };
+  if (w.kind === "pane") return { ...held, middle: panesPressed(k) };
+  const [left, right] = SIDES[w.kind];
+  const at = standsIn(k);
+  const next = at === null ? left : at === left ? right : null;
+  [left, right].forEach((s) => (held[s] = held[s].filter((x) => x !== k)));
+  if (next) held[next] = w.kind === "adjunct" ? [k] : held[next].length < 2 ? [...held[next], k] : [held[next][0], k];
+  return held;
+}
+
+/** Whether pressing an icon would change anything a reader can see: a widget already standing can always be moved on. */
+function offered(k: string): boolean {
+  const w = WIDGETS[k];
+  const at = standsIn(k);
+  if (w.kind === "pane") return at ? panesHeld().length > 1 : fitsWith({ ...state.settings.areas, middle: panesPressed(k) })[k as PaneName];
+  if (at) return true;
+  return SIDES[w.kind].some((s) => fitsWith({ ...state.settings.areas, [s]: w.kind === "adjunct" ? [k] : [...state.settings.areas[s], k].slice(-2) })[s]);
+}
+
+/** What the tooltip says of an icon: what it is, and what the next press would do with it. */
+function pickTip(k: string): string {
+  const w = WIDGETS[k];
+  const at = standsIn(k);
+  const said = (s: string) => `${w.name} — ${s}`;
+  if (at !== null && !fits()[at === "middle" ? (k as PaneName) : at]) return said("asked for, but there is no room at this width");
+  if (!offered(k)) return said(w.kind === "pane" && at ? "the last pane cannot be taken away" : "no room for it at this width");
+  if (w.kind === "pane") return said(at ? "press to take it away" : "press to stand it in the middle");
+  const [left] = SIDES[w.kind];
+  return said(at === null ? "press to stand it at the left" : at === left ? "at the left; press for the right" : "at the right; press to take it away");
 }
 
 // ## 3.5 The tree: the lane as an outline
@@ -2669,7 +2691,7 @@ function drawAdjuncts(): void {
     const col = ui.parts[area];
     const widget = widgetOf(area);
     col.innerHTML = "";
-    if (!on[area] || widget.kind !== "adjunct") return;
+    if (!on[area] || widget?.kind !== "adjunct") return;
     // measured from the column itself, which starts below the room the reading line sets above the lane
     const top0 = col.getBoundingClientRect().top;
     let floor = 0;
@@ -2819,73 +2841,30 @@ function drawWingsAligned(): void {
 }
 
 /**
- * The strips stand at the foot of their areas, laid over the row by the areas' own geometry. Each side of the lane has a
- * wing's row and a gutter's row. They stand apart when both fit where they belong without touching; where they would
- * touch, the gutter's icons join the wing's row, nearest the lane, past a thin divider, so one row offers both.
+ * The strip: one row at the foot of the page, centred, holding every choice once. The panes stand first, then the
+ * adjuncts, then the figures, in three groups spaced apart, since a reader's question at the foot is one question and
+ * not five. It stands wherever the middle stands, which is always, so nothing is ever out of reach at any width.
  */
-function drawStrips(): void {
-  const on = fits();
-  const a0 = ui.areas.getBoundingClientRect();
-  const gap = state.settings.gap;
-  const apart = 8;
-  ui.strips.innerHTML = AREAS.filter(({ name }) => on[name])
-    .map(({ name, kind }) => stripHtml(name, kind))
-    .join("");
-  const stripOf = (name: AreaName) => ui.strips.querySelector<HTMLElement>(`[data-strip="${name}"]`);
-  /** Where a row of a given width would stand on its own: its left edge on the screen. */
-  const anchor = (name: AreaName, width: number): number => {
-    // the middle's row is centred under whatever panes stand
-    if (name === "middle") {
-      const shown = panesShown().map((el) => el.getBoundingClientRect());
-      const left = Math.min(...shown.map((r) => r.left));
-      const right = Math.max(...shown.map((r) => r.right));
-      return (left + right) / 2 - width / 2;
-    }
-    // an open area's row is centred under it
-    if (takesRoom(name)) {
-      const r = ui.parts[name].getBoundingClientRect();
-      return r.left + r.width / 2 - width / 2;
-    }
-    // a closed gutter's row stands at the foot of the lane, at the edge the gutter would open on
-    const lane = ui.lane.getBoundingClientRect();
-    if (name === "gutterL") return lane.left;
-    if (name === "gutterR") return lane.right - width;
-    // a closed wing's row stands centred in the space beside the lane where the wing would open
-    const block = ui.scroll.getBoundingClientRect();
-    const [from, to] = name === "wingL" ? [a0.left, block.left] : [block.right, a0.right];
-    return clamp((from + to) / 2 - width / 2, a0.left + gap, a0.right - gap - width);
-  };
-  // a row keeps a gap from the edges of the screen
-  const place = (el: HTMLElement, left: number) => void (el.style.left = `${Math.round(clamp(left, a0.left + gap, a0.right - gap - el.offsetWidth) - a0.left)}px`);
-  (["L", "R"] as const).forEach((side) => {
-    const wingName = `wing${side}` as AreaName;
-    const gutterName = `gutter${side}` as AreaName;
-    const wing = stripOf(wingName);
-    const gutter = stripOf(gutterName);
-    const wingAt = wing ? anchor(wingName, wing.offsetWidth) : 0;
-    const gutterAt = gutter ? anchor(gutterName, gutter.offsetWidth) : 0;
-    const touch = !!wing && !!gutter && (side === "L" ? wingAt + wing.offsetWidth + apart > gutterAt : gutterAt + gutter.offsetWidth + apart > wingAt);
-    if (wing && gutter && touch) {
-      const divider = document.createElement("span");
-      divider.className = "divider";
-      const icons = Array.from(gutter.children);
-      if (side === "L") wing.append(divider, ...icons);
-      else wing.prepend(...icons, divider);
-      gutter.remove();
-      return place(wing, anchor(wingName, wing.offsetWidth));
-    }
-    if (wing) place(wing, wingAt);
-    if (gutter) place(gutter, gutterAt);
-  });
-  const middle = stripOf("middle");
-  if (middle) place(middle, anchor("middle", middle.offsetWidth));
+function drawChooser(): void {
+  const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
+  ui.strips.innerHTML = `<div class="strip">${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
+}
+
+/** One icon: what it is, whether it stands and on which side, and whether it can be taken at all. */
+function pickHtml(k: string): string {
+  const at = standsIn(k);
+  const side = at === null || WIDGETS[k].kind === "pane" ? "" : at.endsWith("L") ? " side-l" : " side-r";
+  // in use but with no room at this width: the choice stands and the width denies it, which is neither in use nor out of reach
+  const denied = at !== null && !fits()[at === "middle" ? (k as PaneName) : at] ? " denied" : "";
+  const quiet = offered(k) ? "" : at ? " fixed" : " off";
+  return `<button class="pick${at ? " on" : ""}${side}${denied}${quiet}" data-widget="${esc(k)}" data-tip="${esc(pickTip(k))}">${icon(WIDGETS[k].icon)}</button>`;
 }
 
 function drawAll(): void {
   if (!state.body) return;
   drawLayout();
   drawLane();
-  drawStrips();
+  drawChooser();
   drawWingsAligned();
   light();
 }
@@ -3489,8 +3468,9 @@ function wire(): void {
     if (borrowed) return void follow(borrowed.dataset.borrow!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
-      const area = pick.dataset.area as AreaName;
-      state.settings.areas[area] = pressed(area, pick.dataset.widget!);
+      const k = pick.dataset.widget!;
+      if (!offered(k)) return;
+      state.settings.areas = cycled(k);
       saveSettings();
       return void drawAll();
     }
@@ -3556,7 +3536,7 @@ function wire(): void {
     }
   });
   const release = () => {
-    if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawStrips(), drawWingsAligned());
+    if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
     drag = null;
     setTimeout(() => (state.scrubbing = false), 0);
   };
@@ -3726,7 +3706,7 @@ function wire(): void {
     alignEnds();
     drawAdjuncts();
     drawCanvas();
-    drawStrips();
+    drawChooser();
     drawWingsAligned();
   });
 }
@@ -4008,11 +3988,26 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #lane { min-width: 0; line-height: var(--leading); }
 
 #strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 5; pointer-events: none; }
-.strip { position: absolute; bottom: 10px; display: flex; gap: 4px; justify-content: center; pointer-events: auto; }
-.strip .pick { width: 26px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); opacity: .22; transition: opacity .15s, color .15s; }
-.strip .pick:hover { opacity: .7; }
-.strip .divider { width: 1px; height: 12px; align-self: center; margin: 0 4px; background: var(--track); }
-.strip .pick.on { opacity: 1; color: var(--muted); }
+/* one row, centred at the foot, holding every choice once: the panes, the adjuncts, the figures, three groups spaced
+   apart by nothing but room. Four grades of ink: what cannot stand, what can, what is under the pointer, what is in use */
+.strip { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; pointer-events: auto; }
+.strip .group { display: flex; gap: 7px; }
+.strip .group + .group { margin-left: 20px; }
+.strip .pick { position: relative; width: 26px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); opacity: .2; transition: opacity .15s, color .15s; }
+/* the whole row lifts a little while the pointer is on it, so what cannot be had is still seen when a reader looks */
+.strip:hover .pick { opacity: .34; }
+.strip .pick.off, .strip .pick.off:hover { opacity: .1; cursor: default; }
+.strip:hover .pick.off { opacity: .17; }
+.strip .pick:hover { opacity: .6; }
+.strip .pick.on, .strip:hover .pick.on { opacity: .9; color: var(--muted); }
+/* asked for, but the width denies it: it stands between what is in use and what is not */
+.strip .pick.on.denied, .strip:hover .pick.on.denied { opacity: .45; }
+.strip .pick.on:hover { color: var(--ink); }
+.strip .pick.fixed { cursor: default; }
+/* a widget in use says which side holds it, as a short bar at the foot of its icon, aligned to that side */
+.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; bottom: 1px; height: 2px; width: 9px; border-radius: 1px; background: currentColor; opacity: .5; }
+.strip .pick.side-l::after { left: 3px; }
+.strip .pick.side-r::after { right: 3px; }
 .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 
 .opening { margin-bottom: 40px; }

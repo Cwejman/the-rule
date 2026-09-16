@@ -143,3 +143,9 @@ The author found it incomprehensible. [The ladder](widgets.md#42-a-ladder-down-w
 The settings' first control was a dial.
 
 The author found it ugly the same day. [The meter](widgets.md#61-the-meters) replaced it: an arc with the value drawn over a faint track and the icon in the middle.
+
+## x. A row of icons at the foot of every area
+
+Five rows, one per area, each centred under the area it chose for, a closed gutter's row at the lane's edge, and a tight side's two rows joined past a thin divider.
+
+Surveyed across eighteen widths and seven configurations: the same seven figures were offered twice, once per wing; the foot was busiest when the reader had closed everything; the offer changed with leftover room and differed by side; below about 840 no row stood at all, so nothing could be reached; and the middle's row wandered up to 291 pixels off the prose it belonged to. [One row](framework.md#3-the-strip) has none of these, and the rules that placed the five go with them.

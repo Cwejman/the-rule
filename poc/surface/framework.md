@@ -51,9 +51,9 @@ Vertically a wing's figures reach no further up or down than the prose does. The
 
 ### 2.4 Closing by hand
 
-Any area closes by hand, from its own [strip](#3-the-strip). A closed area takes no room at all: only its strip stays, the same icons standing where [the strip's rule](#31-a-row-offers-only-what-can-stand) puts them, so the area opens again from there.
+Any area empties by hand, from [the strip](#3-the-strip), where a widget is cycled off the side that held it. An area holding nothing takes no room at all, and the strip stands where it always stands, so the area fills again from there.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13; the cycle, 2026-09-16.*
 
 ### 2.5 Giving way
 
@@ -77,19 +77,21 @@ With both standing, the lane keeps its measure and the canvas takes what is left
 
 ## 3. The strip
 
-At the foot of each area stands a low row of icons, one per widget the area can hold and one to close it, and a row always lies in one line, never stacked. They are light, not buttons: no ground, no border, the ones in use a little darker than the rest. Pointing at one names it.
+One row of icons stands at the foot of the page, centred, holding every choice once: the panes first, then the adjuncts, then the figures, three groups spaced apart by room alone. A reader's question at the foot is one question, what stands around the reading, so it is asked in one place rather than in five.
 
-On a gutter, pressing an icon makes its adjunct the gutter's. On a wing, pressing an icon not in use adds its figure, at the foot when one already stands at the top; pressing one in use takes its figure away; and when both places are taken, pressing a third takes the place at the foot.
+An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A pane toggles instead, since the middle holds its panes in one order and the last one cannot be taken away. A widget in use carries a short bar at the foot of its icon, at the side that holds it, so the row shows the whole arrangement at a glance.
 
-*Reasoned, the author's, 2026-09-13; the rows in one line the author's ask of 2026-09-14.*
+The row stands where the middle stands, which is always, so no choice is ever out of reach at any width.
 
-### 3.1 A row offers only what can stand
+*Reasoned, the author's decision of 2026-09-16, from a survey of [the row per area](refused.md#x-a-row-of-icons-at-the-foot-of-every-area) across eighteen widths and seven configurations.*
 
-An icon whose press would leave its area without room is not shown, and a closed area with nothing it could open shows no row, so a press never makes the row it was made on vanish.
+### 3.1 Four grades of ink
 
-An open area's row is centred under it. A closed gutter's row stands at the foot of the lane, at the edge the gutter would open on, where the lane's text has already faded; a closed wing's row stands in the space beside the lane where the wing would open. Each side of the lane has a wing's row and a gutter's row, and they stand apart when both fit where they belong without touching. Where they would touch, the gutter's icons join the wing's row, nearest the lane and past a thin divider, so a tight side offers one row with the choice of either.
+The row is light at rest, so the page stays the prose and what orients it. Four grades say what a reader may do: what cannot stand at this width is quietest, what can stand is light, what the pointer rests on is darker, and what is in use is darkest.
 
-*Reasoned, the author's asks of 2026-09-14, when opening a gutter the width could not hold made its row disappear.*
+Every choice is always drawn, so the row never changes length as the screen does, and one that cannot be had says why on pointing. The whole row lifts a step while the pointer is on it, so what is out of reach is still seen by whoever looks for it. A widget the reader has asked for that the width denies stands between the two grades, since the choice holds and only the room is missing.
+
+*Reasoned, the author's asks of 2026-09-16.*
 
 ## 4. One shared state, and four verbs
 
