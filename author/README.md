@@ -22,3 +22,11 @@ The author's thinking of one day, dictated and typed prompt by prompt and ratifi
 *The author's, ratified 2026-09-16; the wording is a session's purification of speech, cut nowhere.*
 
 [the level beneath](ideas-2026-09-16.md)
+
+## 3. Ideas of 2026-09-17
+
+The next day's, begun with one: a sketch or an image as a substrate-native presentation, for heroing what matters.
+
+*The author's, ratified 2026-09-17.*
+
+[the level beneath](ideas-2026-09-17.md)
