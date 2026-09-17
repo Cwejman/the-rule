@@ -14,7 +14,6 @@
 //   bun surface.ts <path> --port 8080      serve on another port
 //   bun surface.ts <path> --build [out]    write the page, default ./surface.html
 //   bun surface.ts <path> --check          trace only, print the warnings
-//   bun surface.ts <path> --history        trace, then print every brief's span of lines and its age in commits
 //
 // <path> is a stamped README.md, a folder holding one, or a single stamped file.
 // The surface never reads above it: the root is the body.
@@ -43,7 +42,7 @@ async function run(): Promise<void> {
   const flag = (f: string) => args.indexOf(f);
   const root = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--port" && args[i - 1] !== "--build");
   if (!root) {
-    console.error("usage: bun surface.ts <path> [--port N | --build [out.html] | --check | --history]");
+    console.error("usage: bun surface.ts <path> [--port N | --build [out.html] | --check]");
     process.exit(2);
   }
   if (flag("--check") >= 0) {
@@ -60,41 +59,6 @@ async function run(): Promise<void> {
       return face > FACE_FLAG ? [`${b.file} ${b.number || "·"} "${b.title}": a face of ${face}`] : [];
     });
     if (long.length) console.log(`${long.length} face${long.length === 1 ? "" : "s"} past ${FACE_FLAG} characters, to be read:\n${long.map((l) => "  " + l).join("\n")}`);
-    return;
-  }
-  if (flag("--history") >= 0) {
-    const body = await trace(root);
-    const rootDir = dirname(rootFileOf(root));
-    const spans = spansOf(body, rootDir);
-    withHistory(body, rootDir);
-    const history = body.history;
-    if (!history) return void console.log(`${body.briefs.length} briefs traced from ${body.root}; no history: the root is not in a repository git can read`);
-    history.commits.forEach((c, i) => console.log(`${String(i).padStart(2)}  ${c.short}  ${c.date}  ${c.subject}`));
-    const real = body.briefs.filter((b) => b.virtual === undefined);
-    real.forEach((b) => {
-      const span = spans.get(b.address);
-      const age = history.age[b.address];
-      console.log(`${(b.address || "(the root)").padEnd(72)} ${b.file.padEnd(40)} ${span ? `[${span[0]}, ${span[1]}]`.padEnd(12) : "no span".padEnd(12)} ${age === null ? "older" : age}`);
-    });
-    const aged = real.filter((b) => history.age[b.address] !== null).length;
-    console.log(`${real.length} briefs, ${aged} with an age in the last ${history.commits.length} commits, ${real.length - aged} with none`);
-    // the commits as briefs: the first three and the widest, each with what it touched, to be checked against git show --stat
-    const commits = body.briefs.filter((b) => b.virtual === "commit");
-    const widest = commits.reduce((x, y) => ((tokensIn("list_item", y.body).length > tokensIn("list_item", x.body).length) ? y : x), commits[0]);
-    [...commits.slice(0, 3), ...(widest && !commits.slice(0, 3).includes(widest) ? [widest] : [])].forEach((b) => {
-      const items = tokensIn("list_item", b.body).map((i) => textOf(i.tokens));
-      const files = new Set((touched.get(history.commits[b.rank!].hash) ?? []).map((t) => t.file)).size;
-      console.log(`\n${b.address} ${b.number} "${b.title}"\n  ${textOf([b.body[0]])}\n  touched ${items.length} in ${files} files:\n${items.map((i) => `    ${i}`).join("\n")}`);
-    });
-    // the blocks against their lines: how many briefs aligned, and one brief written across commits, block by block
-    console.log(`\nblocks: ${alignment.aligned} briefs aligned to their lines, ${alignment.whole} took the brief's age whole`);
-    const shown = real.find((b) => b.address.endsWith("the-step-lies-on-a-way-of-life")) ?? real.find((b) => b.address.endsWith("the-rename-breaks-dependents"));
-    if (shown && spans.get(shown.address)) {
-      const lines = readFileSync(join(rootDir, shown.file), "utf8").split(/\r?\n/);
-      const src = sourceBlocks(lines, ...spans.get(shown.address)!);
-      console.log(`${shown.address} (${shown.file} ${spans.get(shown.address)!.join("-")}, age ${history.age[shown.address]})`);
-      shown.body.filter((t) => t.type !== "space").forEach((t, i) => console.log(`  block ${i + 1} ${t.type.padEnd(10)} lines ${src[i] ? `[${src[i][0]}, ${src[i][1]}]`.padEnd(11) : "?".padEnd(11)} rank ${t.age === null ? "older" : t.age}`));
-    }
     return;
   }
   if (flag("--build") >= 0) {
@@ -193,7 +157,6 @@ async function serve(rootArg: string, port: number): Promise<void> {
     const b = await trace(rootArg);
     b.warnings.forEach((w) => console.warn("  " + w));
     held = new Set(assetsOf(b));
-    withHistory(b, rootDir);
     return b;
   };
   const body = async () => Response.json(await retrace());
@@ -230,7 +193,6 @@ async function build(rootArg: string, out: string): Promise<void> {
   // path it has in the body, and its address carries a hash of its bytes, so a changed image is fetched again. A remote
   // image stays remote, since it may change after the build
   const rootDir = dirname(rootFileOf(rootArg));
-  withHistory(body, rootDir);
   const outDir = dirname(resolve(out));
   const images = body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.asset && !t.svg);
   const written = new Set<string>();
@@ -293,8 +255,6 @@ type Tok = {
   soft?: boolean;
   /** set by the trace on a sketch: its markup, cleaned of anything that could run, to be set into the page */
   svg?: string;
-  /** set by the history on a block: the rank of the newest commit that touched its lines, null where none of the listed commits did */
-  age?: number | null;
 };
 
 /** One brief: its place, its face and its own prose. */
@@ -319,27 +279,15 @@ type Brief = {
   set?: boolean;
   /** set by the trace when the brief's lone link names a level already placed elsewhere: the address of its home */
   borrow?: string;
-  /** set on a brief that stands in no file: the history level read from git, or one commit of it, with its rank from the head */
-  virtual?: "history" | "commit";
-  rank?: number;
 };
 
-/** One commit among the last on the root, as git tells it: who, when, the subject, and the message beneath it. */
-type Commit = { hash: string; short: string; date: string; author: string; subject: string; message: string };
-/**
- * The history: the last commits on the root, newest first, and for every brief the rank of the newest commit that
- * touched a line of its own prose, the head ranking zero; null where none of the listed commits did.
- */
-type History = { commits: Commit[]; age: Record<string, number | null> };
-
-/** The body: every brief in reading order, what the trace had to say, and its history where git could tell it. */
+/** The body: every brief in reading order, and what the trace had to say. */
 type Body = {
   title: string;
   root: string;
   briefs: Brief[];
   warnings: string[];
   traced: string;
-  history?: History;
 };
 
 /** GitHub's anchor for a heading, which is also how an address segment is written. */
@@ -850,339 +798,6 @@ function cleanSketch(src: string): string {
 /** Every image the body holds as a file, by its path from the root's directory. */
 const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.flatMap((t) => (t.type === "image" && t.asset ? [t.asset] : [])));
 
-// ## 2.8 History is read from git
-//
-// The files are the working tree, and git holds which commit last changed each
-// line of them. So after the trace every brief is given its span of lines, its
-// heading to the line before the next heading of any depth, which is its own
-// prose and not its level's; and each line of the span is asked of git blame
-// where it came from. A brief's age is the rank of the newest of those commits
-// among the last commits on the root, the head ranking zero, and a line not yet
-// committed ranks zero too, since it is newer than the head. A root outside a
-// repository, or a machine without git, leaves the history undefined, and the
-// page then offers nothing of it. The trace itself is not touched: this reads
-// the files a second time, by line, and git a first.
-
-/** How many commits back the history reaches. */
-const HISTORY_DEPTH = 60;
-
-/** A file's heading lines, one-based, each with its depth; a fenced block is skipped, since a line of code may open with a hash. */
-function headingLines(src: string): { line: number; depth: number }[] {
-  let fenced = false;
-  return src.split(/\r?\n/).flatMap((text, i) => {
-    if (/^ {0,3}(```|~~~)/.test(text)) fenced = !fenced;
-    const m = fenced ? null : /^ {0,3}(#{1,6}) /.exec(text);
-    return m ? [{ line: i + 1, depth: m[1].length }] : [];
-  });
-}
-
-/**
- * Every brief's span of lines in its file. The trace lists a file's briefs in its heading order, and the cut takes the
- * first title as the file's name and a second one as prose, so the headings of depth two and deeper are the briefs, in
- * order; the root's opening is the one brief a title starts, so the root file's first heading is its first brief. A
- * span runs from the heading to the line before the next heading of any depth, or to the file's end.
- */
-function spansOf(body: Body, rootDir: string): Map<string, [from: number, to: number]> {
-  const spans = new Map<string, [number, number]>();
-  const byFile = Map.groupBy(body.briefs.filter((b) => b.virtual === undefined), (b) => b.file);
-  byFile.forEach((briefs, file) => {
-    const abs = join(rootDir, file);
-    if (!existsSync(abs)) return;
-    const src = readFileSync(abs, "utf8");
-    const heads = headingLines(src);
-    const last = src.split(/\r?\n/).length;
-    const titled = heads.findIndex((h) => h.depth === 1);
-    const own = heads.filter((h, i) => h.depth >= 2 || (i === titled && file === body.root));
-    briefs.forEach((b, i) => {
-      const h = own[i];
-      if (!h) return;
-      const next = heads.find((x) => x.line > h.line);
-      spans.set(b.address, [h.line, next ? next.line - 1 : last]);
-    });
-  });
-  return spans;
-}
-
-/**
- * The blocks of a brief's source as ranges of lines after its heading: runs of lines parted by blank lines, save inside
- * a fence, or where a list goes on past a blank line into another item or an indented line. They stand in the order the
- * brief's blocks do, so each block of prose is given the lines it was written on.
- */
-function sourceBlocks(lines: string[], from: number, to: number): [from: number, to: number][] {
-  const out: [number, number][] = [];
-  const blank = (x: string) => /^\s*$/.test(x);
-  const item = (x: string) => /^ {0,3}([-*+]|\d+[.)])\s/.test(x);
-  let open: [number, number] | null = null;
-  let fenced = false;
-  let list = false;
-  for (let n = from + 1; n <= to; n++) {
-    const x = lines[n - 1] ?? "";
-    if (/^ {0,3}(```|~~~)/.test(x)) fenced = !fenced;
-    if (blank(x) && !fenced) {
-      const k = lines.slice(n, to).findIndex((y) => !blank(y));
-      if (open && list && k >= 0 && (item(lines[n + k]) || /^ {2,}\S/.test(lines[n + k]))) continue;
-      if (open) out.push(open);
-      open = null;
-      continue;
-    }
-    if (open) open[1] = n;
-    else (open = [n, n]), (list = item(x));
-  }
-  if (open) out.push(open);
-  return out;
-}
-
-/** How the blocks fell against their lines on the last reading of history: the briefs whose blocks aligned, and those that took the brief's age whole. */
-const alignment = { aligned: 0, whole: 0 };
-
-/** What git says to a question asked in the root's directory, or null where it cannot answer: no git, no repository, no such path. */
-function git(rootDir: string, args: string[]): string | null {
-  try {
-    const r = Bun.spawnSync(["git", ...args], { cwd: rootDir, stdout: "pipe", stderr: "pipe" });
-    return r.exitCode === 0 ? r.stdout.toString() : null;
-  } catch {
-    return null;
-  }
-}
-
-/** The commit each line of a file came from, one-based, an all-zero hash where the line is not yet committed; null where git holds no such file. */
-function blameOf(rootDir: string, file: string): (string | undefined)[] | null {
-  const out = git(rootDir, ["blame", "--line-porcelain", "--", file]);
-  if (out === null) return null;
-  const lines: (string | undefined)[] = [];
-  out.split("\n").forEach((l) => {
-    const m = /^([0-9a-f]{40}) \d+ (\d+)/.exec(l);
-    if (m) lines[Number(m[2])] = m[1];
-  });
-  return lines;
-}
-
-/** The body's history, or undefined where the root has none git can tell. */
-function historyOf(body: Body, rootDir: string): History | undefined {
-  const log = git(rootDir, ["log", `-n${HISTORY_DEPTH}`, "--format=%H%x1f%h%x1f%ad%x1f%an%x1f%s%x1f%b%x1e", "--date=short", "--", "."]);
-  if (log === null) return undefined;
-  const commits: Commit[] = log
-    .split("\x1e")
-    .filter((l) => l.includes("\x1f"))
-    .map((l) => l.trim().split("\x1f"))
-    .map(([hash, short, date, author, subject, message]) => ({ hash, short, date, author, subject, message: (message ?? "").trim() }));
-  const rank = new Map(commits.map((c, i) => [c.hash, i]));
-  rank.set("0".repeat(40), 0);
-  const spans = spansOf(body, rootDir);
-  const blames = new Map<string, (string | undefined)[] | null>();
-  const sources = new Map<string, string[]>();
-  const age: Record<string, number | null> = {};
-  alignment.aligned = alignment.whole = 0;
-  body.briefs.forEach((b) => {
-    const span = spans.get(b.address);
-    if (b.virtual !== undefined) return void (age[b.address] = b.rank ?? null);
-    if (!span) return void (age[b.address] = null);
-    if (!blames.has(b.file)) blames.set(b.file, blameOf(rootDir, b.file));
-    if (!sources.has(b.file)) sources.set(b.file, readFileSync(join(rootDir, b.file), "utf8").split(/\r?\n/));
-    const blame = blames.get(b.file)!;
-    // a file git does not hold yet is all new, so every line of it ranks with the head
-    const rankOf = ([from, to]: [number, number]): number | null => {
-      const ranks = blame === null ? [0] : blame.slice(from, to + 1).flatMap((h) => (h !== undefined && rank.has(h) ? [rank.get(h)!] : []));
-      return ranks.length ? Math.min(...ranks) : null;
-    };
-    age[b.address] = rankOf(span);
-    // each block takes the age of its own lines, where the source's blocks fall one to one against the brief's; a mount
-    // paragraph the trace took off is allowed to stand last in the source. Where they do not fall so, every block takes
-    // the brief's age rather than a guess
-    const toks = b.body.filter((t) => t.type !== "space");
-    const src = sourceBlocks(sources.get(b.file)!, span[0], span[1]);
-    const mount = src.length === toks.length + 1 && /^\s*\[[^\]]*\]\([^)]*\)\s*$/.test(sources.get(b.file)![src[src.length - 1][0] - 1] ?? "");
-    const aligned = src.length === toks.length || mount;
-    alignment[aligned ? "aligned" : "whole"]++;
-    toks.forEach((t, i) => (t.age = aligned ? rankOf(src[i]) : age[b.address]));
-  });
-  return { commits, age };
-}
-
-// ### 2.8.1 The commits are briefs
-//
-// The history is not a widget but a level: one brief for the history itself,
-// standing last among the root's, and beneath it one brief per commit, newest
-// first, so the lane, the shape, the plate, the rail and the way down draw
-// commits as they draw everything else. A commit's brief opens with who and
-// when, carries its message, and ends with every brief the commit touched,
-// each a link with a line of what changed there, so a commit leads to what it
-// changed and the foot of each of those briefs leads back. What a commit
-// touched is read from the commit itself and never changes, so it is read
-// from git once and kept for the process's life.
-
-/** One change a commit made to a file, on the new side: where it stands, what it added and what it took out. */
-type Hunk = { from: number; count: number; oldFrom: number; oldCount: number; added: string[]; removed: string[] };
-/** A heading as it stood in a file at a commit, its title without its number, and which of that title's headings in the file it is. */
-type Head = { line: number; depth: number; title: string; nth: number };
-/** One place a commit changed: a heading of a file, or the file's own opening, and a line of what changed there. */
-type Touch = { file: string; title: string | null; nth: number; excerpt: string };
-
-const touched = new Map<string, Touch[]>();
-
-/** A file's title as the trace reads it: the heading's text without its syntax and its number. */
-const titleOf = (line: string): string => splitHeading(textOf((marked.lexer(line.trim())[0] as Tok | undefined)?.tokens)).title;
-
-/** Every heading of every stamped-looking file at a commit, by the file's path from the root. */
-function headsAt(rootDir: string, rev: string, prefix: string): Map<string, Head[]> {
-  const out = git(rootDir, ["grep", "-n", "--full-name", "-E", "^ {0,3}#{1,6} ", rev, "--", "*.md"]) ?? "";
-  const heads = new Map<string, Head[]>();
-  out.split("\n").forEach((l) => {
-    const m = /^[^:]+:([^:]+):(\d+):( {0,3}(#{1,6}) .*)$/.exec(l);
-    if (!m || !m[1].startsWith(prefix)) return;
-    const file = m[1].slice(prefix.length);
-    const list = heads.get(file) ?? [];
-    const title = titleOf(m[3]);
-    list.push({ line: Number(m[2]), depth: m[4].length, title, nth: list.filter((h) => h.title === title).length });
-    heads.set(file, list);
-  });
-  return heads;
-}
-
-/** The hunks a commit made to the stamped-looking files, by file, with the paths from the root. */
-function hunksAt(rootDir: string, hash: string, prefix: string): { file: string; oldFile: string; hunks: Hunk[] }[] {
-  const out = git(rootDir, ["show", "--format=", "--unified=0", "-M", hash, "--", "*.md"]) ?? "";
-  const changes: { file: string; oldFile: string; hunks: Hunk[] }[] = [];
-  const path = (p: string) => (p.startsWith("/dev/null") ? "" : p.replace(/^[ab]\//, "").slice(prefix.length));
-  let inHunk = false;
-  out.split("\n").forEach((l) => {
-    const c = changes[changes.length - 1];
-    const h = c?.hunks[c.hunks.length - 1];
-    if (l.startsWith("diff --git ")) return void ((inHunk = false), changes.push({ file: "", oldFile: "", hunks: [] }));
-    if (!inHunk && l.startsWith("--- ")) return void (c.oldFile = path(l.slice(4)));
-    if (!inHunk && l.startsWith("+++ ")) return void (c.file = path(l.slice(4)));
-    const m = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(l);
-    if (m) return void ((inHunk = true), c.hunks.push({ oldFrom: Number(m[1]), oldCount: m[2] === undefined ? 1 : Number(m[2]), from: Number(m[3]), count: m[4] === undefined ? 1 : Number(m[4]), added: [], removed: [] }));
-    if (inHunk && h && l.startsWith("+")) h.added.push(l.slice(1));
-    else if (inHunk && h && l.startsWith("-")) h.removed.push(l.slice(1));
-  });
-  return changes;
-}
-
-/** A line of a change, cut to what a list item can carry. */
-const EXCERPT = 120;
-const excerptOf = (added: string[], removed: string[]): string => {
-  const line = (xs: string[]) => xs.map((x) => x.trim()).find((x) => x !== "");
-  const a = line(added);
-  const r = line(removed);
-  const text = a !== undefined ? a : r !== undefined ? `− ${r}` : "";
-  return text.length > EXCERPT ? text.slice(0, EXCERPT - 1).trimEnd() + "…" : text;
-};
-
-/**
- * Where a commit changed the body, from the commit itself: each hunk on the new side falls under the headings whose
- * spans it crosses, or under the file's opening before its first section, which is the brief that mounts the file. A
- * hunk that only takes lines out stands between two lines on the new side, so it is placed by where the lines stood on
- * the old side. Read once per commit and kept.
- */
-function touchesOf(rootDir: string, hash: string, prefix: string): Touch[] {
-  if (touched.has(hash)) return touched.get(hash)!;
-  const heads = headsAt(rootDir, hash, prefix);
-  let olds: Map<string, Head[]> | null = null;
-  const out: Touch[] = [];
-  hunksAt(rootDir, hash, prefix).forEach((c) => {
-    const file = c.file || c.oldFile;
-    c.hunks.forEach((h) => {
-      if (h.count === 0) {
-        // the lines are gone from the new side; the heading they stood under is on the old side, by the file's old name
-        olds ??= headsAt(rootDir, `${hash}^`, prefix);
-        const under = (olds.get(c.oldFile) ?? []).filter((x) => x.depth >= 2 && x.line <= h.oldFrom + Math.max(0, h.oldCount - 1));
-        const sections = under.filter((x, i) => i === under.length - 1 || under[i + 1].line > h.oldFrom);
-        const hit = sections.length ? sections : [null];
-        hit.forEach((x) => out.push({ file, title: x?.title ?? null, nth: x?.nth ?? 0, excerpt: excerptOf([], h.removed) }));
-        return;
-      }
-      const to = h.from + h.count - 1;
-      const sections = (heads.get(file) ?? []).filter((x) => x.depth >= 2);
-      // the sections the hunk crosses: the one its first line falls under, and every one that opens before its last
-      const first = sections.findLastIndex((x) => x.line <= h.from);
-      const crossed = sections.filter((x, i) => i === first || (x.line > h.from && x.line <= to));
-      const lead = first < 0 ? [null] : [];
-      const places = [...lead, ...crossed];
-      places.forEach((x) => {
-        const start = x === null ? h.from : Math.max(h.from, x.line);
-        const next = x === null ? (sections[0]?.line ?? Infinity) : (sections[sections.indexOf(x) + 1]?.line ?? Infinity);
-        const added = h.added.filter((_, k) => h.from + k >= start && h.from + k < next);
-        const excerpt = excerptOf(added, x === places[0] ? h.removed : []);
-        // a hunk that crosses into a section with nothing but blank lines did not change it
-        if (excerpt !== "" || places.length === 1) out.push({ file, title: x?.title ?? null, nth: x?.nth ?? 0, excerpt });
-      });
-    });
-  });
-  touched.set(hash, out);
-  return out;
-}
-
-/** The history as a level of briefs, appended to the body, and the age of every brief with the commits' own set. */
-function historyLevel(body: Body, rootDir: string, history: History): void {
-  const prefix = (git(rootDir, ["rev-parse", "--show-prefix"]) ?? "").trim();
-  const taken = new Set(body.briefs.map((b) => b.address));
-  const home = ["the-history", ...Array.from({ length: 9 }, (_, k) => `the-history-${k + 2}`)].find((a) => !taken.has(a))!;
-  const roots = body.briefs.filter((b) => depthOf(b.address) === 1).length;
-  const at = new Map(body.briefs.map((b, i) => [b.address, i]));
-  const byTitle = Map.groupBy(body.briefs.filter((b) => b.virtual === undefined), (b) => `${b.file}\u0000${b.title}`);
-  const ownerOf = (file: string): Brief | undefined => {
-    const first = body.briefs.find((b) => b.file === file && b.virtual === undefined);
-    return first && body.briefs.find((b) => b.address === parentOf(first.address));
-  };
-  const text = (t: string): Tok => ({ type: "text", text: t });
-  const para = (toks: Tok[]): Tok => ({ type: "paragraph", text: textOf(toks), tokens: toks });
-  const link = (b: Brief): Tok => ({ type: "link", href: `#/${b.address}`, to: b.address, text: b.title || body.title, tokens: [text(b.title || body.title)] });
-  const entry: Brief = {
-    address: home,
-    title: "The history",
-    number: `${roots + 1}`,
-    written: "",
-    file: "",
-    kind: "record",
-    body: [para([text(`The last ${history.commits.length} commits on the root, newest first, each with the briefs it touched. This level is read from git and stands in no file; a commit's brief leads to what it changed, and the foot of each of those leads back.`)])],
-    door: true,
-    virtual: "history",
-  };
-  body.briefs.push(entry);
-  history.commits.forEach((c, rank) => {
-    const address = `${home}/${c.short}`;
-    // one item per brief, in the body's order, the first line of change standing for the brief; what no longer stands
-    // in the body is named and not linked
-    const items = new Map<string, { b: Brief | null; lost: string; excerpt: string; order: number }>();
-    touchesOf(rootDir, c.hash, prefix).forEach((t) => {
-      const b = t.title === null ? ownerOf(t.file) : (byTitle.get(`${t.file}\u0000${t.title}`) ?? [])[t.nth];
-      const key = b ? b.address : `${t.file}#${t.title ?? ""}`;
-      if (!items.has(key)) items.set(key, { b: b ?? null, lost: t.title === null ? `the opening of ${t.file}` : `"${t.title}" in ${t.file}`, excerpt: t.excerpt, order: b ? (at.get(b.address) ?? Infinity) : Infinity });
-    });
-    const list = Array.from(items.values()).sort((x, y) => x.order - y.order);
-    const item = (x: { b: Brief | null; lost: string; excerpt: string }): Tok => ({
-      type: "list_item",
-      tokens: [{ type: "text", tokens: [...(x.b ? [link(x.b)] : [text(`${x.lost}, no longer in the body`)]), ...(x.excerpt ? [text(` — ${x.excerpt}`)] : [])] }],
-    });
-    const message = c.message.split(/\n\s*\n/).map((s) => s.trim()).filter((s) => s !== "");
-    body.briefs.push({
-      address,
-      title: c.subject,
-      number: `${roots + 1}.${rank + 1}`,
-      written: "",
-      file: "",
-      kind: "record",
-      body: [
-        para([text(`${c.short} · ${c.date} · ${c.author}`)]),
-        ...message.map((m) => para([text(m)])),
-        list.length ? { type: "list", ordered: false, start: "", loose: false, items: list.map(item) } : para([text("Touched no brief: the change stood outside the stamped files.")]),
-      ],
-      door: false,
-      virtual: "commit",
-      rank,
-    });
-    history.age[address] = rank;
-  });
-  history.age[home] = null;
-}
-
-/** The body with its history: the ages of its briefs, and the commits as a level of their own, where git can tell them. */
-function withHistory(body: Body, rootDir: string): void {
-  body.history = historyOf(body, rootDir);
-  if (body.history) historyLevel(body, rootDir, body.history);
-}
-
 // # 3. How it is drawn
 //
 // The page draws from a small shared state and nothing else: the body and its
@@ -1258,8 +873,6 @@ type Settings = {
   prose: Face;
   /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
   areas: Record<AreaName, string[]>;
-  /** how many commits back the reading is of history: a brief changed within them takes its commit's hue and the rest go grey; 0 reads the body as it stands */
-  back: number;
 };
 
 const DEFAULTS: Settings = {
@@ -1279,7 +892,6 @@ const DEFAULTS: Settings = {
   headings: "serif",
   prose: "serif",
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
-  back: 0,
 };
 
 const state = {
@@ -1390,38 +1002,15 @@ function spread(weights: number[], span: number, floor: number): number[] {
   return raw.map((x) => (x < floor ? floor : large > 0 ? x - (owed * x) / large : x));
 }
 
-/** How many commits back the reading is of history: what the reader set, where the body has a history at all. */
-const backing = (): number => (state.body?.history ? state.settings.back : 0);
-/** The rank of the commit that last changed a brief's own prose, null where none of the listed commits did. */
-const ageOf = (address: string): number | null => state.body?.history?.age[address] ?? null;
-/**
- * The section of the wheel the commits take when the reading is of history: the newest warmest, at twenty degrees, the
- * oldest asked for coolest, at three hundred, and the ranks between spread evenly from one end to the other through
- * the yellows and the greens, so two commits apart read as two hues apart.
- */
-const WHEEL = { from: 20, to: 300 };
-const wheelHue = (rank: number, back: number): number => Math.round(WHEEL.from + ((WHEEL.to - WHEEL.from) * rank) / Math.max(1, back - 1));
 /**
  * The hue of a branch: every brief carries the hue of the root-level brief it stands under, so colour says
- * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ. Reading
- * history, a brief changed within the commits asked for carries its commit's hue instead, so colour then says when.
+ * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ.
  */
 const hueOf = (address: string): number => {
-  const back = backing();
-  const r = back > 0 ? ageOf(address) : null;
-  if (r !== null && r < back) return wheelHue(r, back);
   const i = level("").findIndex((b) => b.address === address.split("/")[0]);
   return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
 };
-/** Whether a brief is drawn without colour: the reading is of history, and no commit asked for changed it. */
-const greyed = (address: string): boolean => {
-  const back = backing();
-  const r = ageOf(address);
-  return back > 0 && (r === null || r >= back);
-};
-/** The declarations that colour an element for its brief: the hue, and no chroma where history leaves it grey. The chroma is said either way, since a brief drawn inside an older one, as the canvas nests them, must not inherit its grey. */
-const tint = (address: string): string => `--h:${hueOf(address)};--c:${greyed(address) ? 0 : 1}`;
-const hued = (address: string): string => `style="${tint(address)}"`;
+const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
 
 // ### 3.1.1 The actions
 //
@@ -1453,20 +1042,12 @@ type Action = {
   shifted?: string;
   /** whether it can be taken at all; a badge that cannot is not drawn */
   can: (a?: string) => boolean;
-  /** whether it is taken now, for an act that holds a state; its badge is marked so */
-  on?: (a?: string) => boolean;
   run: (a?: string) => void;
 };
 
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
 /** The brief an act falls on when none is named: the one under the pointer while one is pointed at, else the focus, since [pointing overrides the focus](lane.md#43-pointing-overrides-the-focus) for the acts as for the highlight. */
 const acts = (a?: string): string => a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : state.focus);
-
-/** Whether the reading stands at a commit's brief: the history reaches back to exactly that commit. */
-const readsBackTo = (a: string): boolean => {
-  const b = brief(a);
-  return b?.rank !== undefined && state.settings.back === b.rank + 1;
-};
 
 const ACTIONS: Record<string, Action> = {
   unfold: {
@@ -1513,24 +1094,6 @@ const ACTIONS: Record<string, Action> = {
     shifted: "Shift widens the scope by a level instead.",
     can: (a) => level(acts(a)).length > 0,
     run: (a) => scopeTo(acts(a)),
-  },
-  backTo: {
-    label: (a) => (readsBackTo(acts(a)) ? "read as now" : "back to here"),
-    keys: [{ key: "h" }],
-    help: (a) =>
-      readsBackTo(acts(a))
-        ? "Reads the body as it stands again, with no commit coloured."
-        : "Reads the body as a diff against this commit: every brief and every block changed since, this commit included, takes its commit's hue, and the rest goes grey.",
-    also: "The swatch or the hash of the commit's row in the history widget, and the history switch in the settings, by count.",
-    can: (a) => brief(acts(a))?.virtual === "commit",
-    on: (a) => readsBackTo(acts(a)),
-    run: (a) => {
-      const b = brief(acts(a));
-      if (b?.rank === undefined) return;
-      state.settings.back = readsBackTo(b.address) ? 0 : b.rank + 1;
-      saveSettings();
-      drawAll();
-    },
   },
   widen: {
     label: () => "widen",
@@ -1627,7 +1190,6 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowDown: { glyph: `<path d="M8 3.8v7.9M5 8.7l3 3 3-3"/>`, name: "down" },
   ArrowLeft: { glyph: `<path d="M12.2 8H4.3M7.3 11 4.3 8l3-3"/>`, name: "left" },
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
-  h: { glyph: `<path d="M4.6 3.6v8.8M11.4 3.6v8.8M4.6 8h6.8"/>`, name: "h" },
 };
 
 const cap = (glyph: string, kind = ""): string => `<span class="cap${kind ? " " + kind : ""}"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
@@ -1654,7 +1216,7 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
   if (touch)
-    return `<span class="badge worded${act.can(a) ? "" : " off"}${act.on?.(a) ? " on" : ""}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
+    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
@@ -1664,7 +1226,7 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   const aimed = a !== undefined;
   const chord = `<span class="chord">${capsOf(act.keys[0], aimed)}${aimed ? cap(MOUSE, "pointer") : ""}</span>`;
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}${act.on?.(a) ? " on" : ""}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
 }
 
 /** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
@@ -1686,13 +1248,7 @@ function badgePair(first: string, second: string): string {
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const inline = (toks: Tok[] = []): string => toks.map((t) => (INLINE[t.type] ?? INLINE.text)(t)).join("");
-const blocks = (toks: Tok[] = []): string => toks.map((t) => aged(t, (BLOCK[t.type] ?? BLOCK.other)(t))).join("");
-
-/** A block a commit within the reading touched stands in that commit's hue, a wash behind it and a rule at its left, its text kept ink; every other block stands as it is. */
-const aged = (t: Tok, html: string): string => {
-  const back = backing();
-  return back > 0 && t.age !== undefined && t.age !== null && t.age < back && html ? `<div class="aged" style="--h:${wheelHue(t.age, back)}">${html}</div>` : html;
-};
+const blocks = (toks: Tok[] = []): string => toks.map((t) => (BLOCK[t.type] ?? BLOCK.other)(t)).join("");
 
 const INLINE: Record<string, (t: Tok) => string> = {
   text: (t) => (t.tokens ? inline(t.tokens) : esc(t.text ?? "")),
@@ -1890,16 +1446,16 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}${ACTIONS.backTo.can(b.address) ? badgeHtml("backTo", b.address) : ""}</span>` +
+        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span>` +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}${ACTIONS.backTo.can(b.address) ? badgeHtml("backTo", b.address) : ""}</span></div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span></div>` : "";
   // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
   return (
-    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${tint(b.address)};--after:${after}px">` +
+    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
     `<h2 class="head d${d}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
@@ -1958,7 +1514,6 @@ const ICON: Record<string, string> = {
   fold: `<path d="M5.4 4.4 8 7l2.6-2.6M5.4 11.6 8 9l2.6 2.6"/>`,
   open: `<path d="M9.6 3.5h3v3M6.4 12.5h-3v-3M12.5 3.5 9 7M3.5 12.5 7 9"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
-  history: `<circle cx="8" cy="3.6" r="1.7"/><circle cx="8" cy="12.4" r="1.7"/><path d="M8 5.3v5.4"/><path d="M9.7 12.4h1.8a2 2 0 0 0 2-2V8"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -1970,7 +1525,6 @@ const WIDGETS: Record<string, Widget> = {
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
-  history: { kind: "figure", name: "the history: the commits' level small, a row per commit in its hue", icon: "history", draw: () => historyHtml(), width: () => 264, grow: true, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
@@ -2181,7 +1735,7 @@ function treeHtml(): string {
     const whole = gradeOf(b.address) === "whole";
     const on = prefixesOf(state.focus).includes(b.address);
     return (
-      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${tint(b.address)};--d:${d}">` +
+      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--d:${d}">` +
       foldMark(b) +
       `<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span></div>` +
       (whole ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
@@ -2191,9 +1745,9 @@ function treeHtml(): string {
   const S = state.scope;
   const above = prefixesOf(S)
     .slice(0, -1)
-    .map((a) => `<div class="row above" data-a="${esc(a)}" style="${tint(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
+    .map((a) => `<div class="row above" data-a="${esc(a)}" style="--h:${hueOf(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
     .join("");
-  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="${tint(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
+  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="--h:${hueOf(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
   return `<div class="tree">${above}${root}${level(S)
     .map((b) => node(b, depthOf(S) + 1))
     .join("")}<div class="laser"></div></div>`;
@@ -2367,8 +1921,7 @@ function meterArc(t: number, r: number): string {
  * wheel no finger sends. They are not drawn, rather than drawn and idle.
  */
 const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick"]);
-/** A setting that cannot act where the lane stands alone is not drawn, and the history is not offered where the body has none. */
-const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key)) && (key !== "back" || !!state.body?.history);
+const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
 function settingsHtml(): string {
   const s = state.settings;
@@ -2390,7 +1943,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "back"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -2399,7 +1952,6 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
-  { key: "back", name: "history", values: [0, 1, 3, 5, 10, 20], labels: ["off", "1", "3", "5", "10", "20"] },
 ];
 
 /** Turns one meter to its setting's value in place, so a drag never redraws the wing under the pointer. */
@@ -2438,7 +1990,6 @@ function loadSettings(): void {
   if (state.settings.line !== "middle" && state.settings.line !== "ends") state.settings.line = DEFAULTS.line;
   if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
   if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
-  if (!Number.isInteger(state.settings.back) || state.settings.back < 0) state.settings.back = DEFAULTS.back;
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -2461,7 +2012,7 @@ const saveSettings = (): void =>
 // now is what it says.
 
 const KEY_GROUPS: { of: string; acts: string[] }[] = [
-  { of: "the brief", acts: ["unfold", "foldUp", "open", "backTo"] },
+  { of: "the brief", acts: ["unfold", "foldUp", "open"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "widen"] },
   { of: "the reading", acts: ["previous", "next", "above", "beneath"] },
   { of: "the lane", acts: ["undo", "redo"] },
@@ -2469,32 +2020,6 @@ const KEY_GROUPS: { of: string; acts: string[] }[] = [
 
 const keysHtml = (): string =>
   `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
-
-// ### 3.8.2 The history: the level's miniature
-//
-// The commits stand in the body as briefs of their own level, and this figure
-// is that level small, as the shape is the lane small: a row per commit, its
-// swatch in the hue the commit takes, its short hash, its date and its subject
-// cut to the row. Each row is the commit's brief, so pointing lights it
-// wherever it is drawn; the name goes to it in the lane, and the swatch or the
-// hash takes the brief's own act, back to here. The row the reading stands at
-// is marked.
-
-function historyHtml(): string {
-  const h = state.body?.history;
-  const home = state.body?.briefs.find((b) => b.virtual === "history");
-  if (!h || !home) return `<div class="history chrome"><span class="none dim">no history: the root is not in a repository git can read</span></div>`;
-  const back = state.settings.back;
-  const row = (c: Commit, i: number) => {
-    const a = `${home.address}/${c.short}`;
-    return (
-      `<div class="commit${i === back - 1 ? " on" : ""}${i < back ? " in" : ""}${a === state.focus ? " here" : ""}" data-a="${esc(a)}" ${hued(a)}>` +
-      `<span class="when" data-back="${i}" data-tip="${i === back - 1 ? "read as now" : "back to here"}"><i class="swatch"></i><span class="hash">${esc(c.short)}</span><span class="date">${esc(c.date)}</span></span>` +
-      `<span class="name" data-go="${esc(a)}" data-tip="${esc(c.subject)}">${esc(c.subject)}</span></div>`
-    );
-  };
-  return `<div class="history chrome">${h.commits.map(row).join("")}</div>`;
-}
 
 // ## 3.9 The shape: the lane as laid
 //
@@ -2820,7 +2345,7 @@ function canvasNodeHtml(b: Brief): string {
   const set = home ? home.set : b.set;
   const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
   // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
-  return `<div class="cnode${zone ? " whole" : ""}" style="${tint(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
+  return `<div class="cnode${zone ? " whole" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -3820,7 +3345,7 @@ function showTip(el: Element, html: string): void {
   const w = t.offsetWidth;
   const h = t.offsetHeight;
   const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
-  const fig = el.closest("svg.fig, .tree, .keys, .settings, .history");
+  const fig = el.closest("svg.fig, .tree, .keys, .settings");
   const wing = el.closest<HTMLElement>(".wing");
   let left: number;
   let top: number;
@@ -4430,9 +3955,6 @@ function wire(): void {
       saveSettings();
       return void drawAll();
     }
-    // a commit's row in the history figure takes the commit brief's own act
-    const back = t.closest<HTMLElement>("[data-back]");
-    if (back) return void ACTIONS.backTo.run(back.closest<HTMLElement>("[data-a]")?.dataset.a);
     const set = t.closest<HTMLElement>("[data-set]");
     if (set) {
       const v = set.dataset.value!;
@@ -4837,11 +4359,8 @@ if (typeof document !== "undefined") start();
 
 /**
  * The palette: every colour's role once, with its light value and its dark value side by side. A role whose value takes
- * the branch hue reads it from --h, so it is set on every element and follows the branch the element stands under; its
- * chroma is scaled by --c, one unless an element sets it to nothing, which is how a brief goes grey at its own lightness
- * when the reading is of history and no commit asked for changed it. What is folded or out of the lane takes a breath of
- * the hue, so a folded cell still says which branch or which commit it is; grey itself is left to the sketches. A sketch
- * imports this and falls back to the light side where no page supplies the roles.
+ * the branch hue reads it from --h, so it is set on every element and follows the branch the element stands under. A
+ * sketch imports this and falls back to the light side where no page supplies the roles.
  */
 export const PALETTE: Record<string, [light: string, dark: string]> = {
   ground: ["#ffffff", "oklch(18.5% 0.005 60)"],
@@ -4853,13 +4372,12 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   track: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .13)"],
   meter: ["oklch(62% 0.19 28)", "oklch(70% 0.14 28)"],
   rim: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .1)"],
-  rest: ["oklch(88% calc(0.045 * var(--c, 1)) var(--h))", "oklch(35% calc(0.04 * var(--c, 1)) var(--h))"],
-  door: ["oklch(74% calc(0.085 * var(--c, 1)) var(--h))", "oklch(54% calc(0.07 * var(--c, 1)) var(--h))"],
-  on: ["oklch(42% calc(0.072 * var(--c, 1)) var(--h))", "oklch(84% calc(0.055 * var(--c, 1)) var(--h))"],
-  lit: ["oklch(60% calc(0.12 * var(--c, 1)) var(--h))", "oklch(74% calc(0.1 * var(--c, 1)) var(--h))"],
-  glow: ["oklch(80% calc(0.08 * var(--c, 1)) var(--h))", "oklch(47% calc(0.06 * var(--c, 1)) var(--h))"],
+  rest: ["oklch(88% 0.045 var(--h))", "oklch(35% 0.04 var(--h))"],
+  door: ["oklch(74% 0.085 var(--h))", "oklch(54% 0.07 var(--h))"],
+  on: ["oklch(42% 0.072 var(--h))", "oklch(84% 0.055 var(--h))"],
+  lit: ["oklch(60% 0.12 var(--h))", "oklch(74% 0.1 var(--h))"],
+  glow: ["oklch(80% 0.08 var(--h))", "oklch(47% 0.06 var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
-  folded: ["oklch(90% calc(0.035 * var(--c, 1)) var(--h))", "oklch(32% calc(0.035 * var(--c, 1)) var(--h))"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
   glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
   sheer: ["oklch(97.5% 0.002 60 / .6)", "oklch(26% 0.006 60 / .58)"],
@@ -5012,7 +4530,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--folded); }
+.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
 .crow .borrowed { flex: none; color: var(--door); }
 .crow .borrowed .icon { width: 11px; height: 11px; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
@@ -5084,28 +4602,8 @@ body.pointing .brief.lit .badge.aimed .cap.pointer { display: none; }
 .badge:hover .label { color: var(--on); }
 /* a badge that cannot be taken keeps its room and goes quiet */
 .badge.off { opacity: .35; pointer-events: none; }
-/* an act that holds a state is marked while it does */
-.badge.on .cap { background: var(--track); color: var(--ink); }
-.badge.on .label { color: var(--on); }
 .badge .held { color: var(--faint); font-size: 11px; }
 /* the keys: the whole table in a wing, grouped by what each act works on, its caps always inked */
-/* the history: a row per commit, the swatch its hue or grey, the subject cut to what the row leaves */
-.history { width: 264px; display: flex; flex-direction: column; gap: 1px; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); }
-.history .none { display: block; padding: 0 8px; }
-.history .commit { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 3px 8px; border-radius: 6px; transition: background .15s; }
-.history .commit:hover, .history .commit.lit { background: var(--wash); }
-.history .commit.on { background: var(--wash); color: var(--ink); }
-.history .when { flex: none; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
-.history .swatch { flex: none; width: 9px; height: 9px; border-radius: 3px; background: var(--lit); }
-.history .hash { flex: none; font-family: var(--mono); font-size: 11px; color: var(--faint); }
-.history .commit.in .hash, .history .when:hover .hash { color: var(--on); }
-.history .date { flex: none; color: var(--faint); font-size: 11px; }
-.history .name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-.history .commit.here .name, .history .commit.lit .name { color: var(--on); }
-/* a block a commit within the reading touched: a wash behind it and a rule at its left in that commit's hue, the text kept ink */
-.aged { position: relative; }
-.aged > * { background: var(--rest); box-shadow: 0 0 0 6px var(--rest); border-radius: 2px; }
-.aged::before { content: ""; position: absolute; left: -14px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--door); }
 .keys { width: 216px; display: flex; flex-direction: column; gap: 14px; font-family: var(--sans); font-size: var(--small); }
 .keys .group { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
 .keys .of { margin-bottom: 1px; }
@@ -5132,7 +4630,7 @@ svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }
 svg.fig.marks .image { fill: none; stroke: var(--rest); stroke-width: 1.1; }
 svg.fig.marks .head { fill: var(--door); }
-svg.fig.marks .hidden { fill: var(--folded); }
+svg.fig.marks .hidden { fill: var(--grey); }
 svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 10px; }
 .act:hover svg.fig.marks .para, .act:hover svg.fig.marks .head { fill: var(--lit); }
 .act:hover svg.fig.marks .image { stroke: var(--lit); }
@@ -5224,7 +4722,7 @@ svg.fig .cell { cursor: pointer; }
 svg.ahead .hit { fill: transparent; }
 svg.ahead .para { fill: var(--rest); }
 svg.ahead .head { fill: var(--door); }
-svg.ahead .hidden { fill: var(--folded); }
+svg.ahead .hidden { fill: var(--grey); }
 svg.ahead .cell.lit .para, svg.ahead .cell.lit .head { fill: var(--lit); }
 /* an image is a frame wherever a figure draws it, never a filled block that reads as prose */
 svg.fig .image { fill: none; stroke: var(--door); stroke-width: 1; }
@@ -5241,7 +4739,7 @@ svg.shape .head { fill: var(--door); }
 svg.shape .cell.here .para { fill: var(--door); }
 svg.shape .cell.here .head { fill: var(--on); }
 svg.shape .cell.lit .para, svg.shape .cell.lit .head { fill: var(--lit); }
-svg.shape .above .head { fill: var(--folded); }
+svg.shape .above .head { fill: var(--grey); }
 svg.shape .above.lit .head, svg.shape .above:hover .head { fill: var(--lit); }
 /* only the two regions take the pointer; the marks drawn over them never do */
 svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .tick, svg.shape .hidden { pointer-events: none; }
@@ -5255,12 +4753,12 @@ svg.shape .cell:has(.hit[data-press="fold"]:hover) .head { fill: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .para { fill: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .head { fill: var(--on); }
 svg.shape .hit[data-press="fold"] { cursor: pointer; }
-svg.shape .tick { fill: var(--folded); }
-svg.shape .tick.image { fill: none; stroke: var(--folded); stroke-width: 1; }
+svg.shape .tick { fill: var(--grey); }
+svg.shape .tick.image { fill: none; stroke: var(--grey); stroke-width: 1; }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .tick.image:not(.ghost) { fill: none; stroke: var(--lit); }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .image { stroke: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .image { stroke: var(--on); }
-svg.shape .hidden { fill: var(--folded); }
+svg.shape .hidden { fill: var(--grey); }
 svg.shape .cell.lit .hidden { fill: var(--glow); }
 svg.shape .cursor { fill: var(--veil); pointer-events: none; }
 /* under a finger the rail is taken hold of rather than aimed at, so the band the reader holds says so: a stronger fill
@@ -5276,7 +4774,7 @@ svg.plate .cell.centre circle { fill: var(--hub); }
 svg.plate .cell.on path { fill: var(--door); }
 svg.plate .cell.here path { fill: var(--on); }
 /* grey for anything not in the lane wins over the marks above, at every depth */
-svg.plate .cell.away path { fill: var(--folded); }
+svg.plate .cell.away path { fill: var(--grey); }
 svg.plate .cell.lit path, svg.plate .cell.lit circle { fill: var(--lit); }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
 svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: var(--ground); }

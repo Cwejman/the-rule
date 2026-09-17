@@ -211,13 +211,3 @@ The keys is a wing widget: every act with the key that fires it, grouped by what
 It answers for the focus, so what the space bar would do now is what it says, and an act out of reach stands quiet in its place. Every badge in it is pressable, and each tells what it does on pointing, so it is the help as well as the list.
 
 *The author's ask of 2026-09-16, that every act available as a shortcut be visible somewhere; a figure rather than an overlay, since [an overlay stays refused](refused.md#j-an-overlay-at-all) and a figure is one function and one name. Whether it earns its place once the badges stand where the acts are is open.*
-
-## 9. The history
-
-The history is a level of the body, not a widget: the last commits on the root stand as briefs beneath one brief, "The history", last among the root's, so the lane, the shape, the plate, the rail and the way down draw a commit as they draw anything else, and scoping in, folding and pressing need no code of their own. A commit's brief opens with its hash, date and author, carries its message, and ends with a list of every brief it touched, each a link with the first line of the change there, so a commit leads to what it changed and the foot of each of those briefs leads back. What no longer stands in the body is named without a link. The level is read from git and stands in no file.
-
-Each commit's brief carries one act of its own, back to here: the body is read as a diff against that commit, so every brief and every block a commit since then changed, this one included, takes its commit's hue, the newest warmest and the oldest asked for coolest across one section of the wheel, and the rest goes grey at its own lightness wherever it is drawn, folded cells included. In the prose a changed block takes a wash and a rule at its left in its commit's hue, the text kept ink. The badge reads as on where the reading stands at that commit, and pressing it again reads the body as it stands; [the history switch](framework.md#5-settings-are-data-and-a-figure-edits-them) sets the same thing by count.
-
-The widget is the level's miniature, as the shape is the lane's: a row per commit, its swatch, short hash, date and subject, each row the commit's brief, so pointing lights it wherever it is drawn and its name goes to it in the lane. Pressing the swatch or the hash is the same act as the brief's, and the chosen row stays marked.
-
-*Built 2026-09-17 from the author's ask to read the substrate as a diff of the head against a commit, and his direction the same day that commits are briefs themselves; the wheel section is the session's choice. Grouping commits under one colour, by day or otherwise, is wanted and not built.*
