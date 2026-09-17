@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: in force
 ---
@@ -28,7 +28,7 @@ The body is traced from a root and handed over as a flat list of briefs in readi
 
 ### 3.1 It is traced from a root, by its mounts
 
-The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-code), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the mounts](../practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry): every brief that ends with a lone link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
+The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-rule), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the mounts](../practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry): every brief that ends with a lone link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
 
 So the body is whatever the root connects, and nothing is scanned. A file no mount reaches is simply not in it. A mount that names a missing or unstamped file is skipped, and the process says so rather than failing silently. So is a brief that mounts a part and holds subsections of its own, which [the practice forbids](../practice.md#32-a-mounting-brief-has-no-subsections), so no brief the page receives has more than one level.
 
@@ -52,7 +52,7 @@ Titles rather than positions, because a reader's history and a sent link hold ad
 
 A markdown link names a file, and sometimes a heading's anchor in it. As the trace walks, it keeps a table from each to the address it holds: a file and an anchor to that section, and a file alone to the brief that mounts it, since the file is that brief's level. When the trace is done, every link in every brief's tokens is rewritten through that table.
 
-A web address is left as it is. A link to a file the trace never reached is marked as leaving the body. A link with no target is a brief not yet written, which [the code allows](../../code.md#43-work-in-progress), and is marked as owed.
+A web address is left as it is. A link to a file the trace never reached is marked as leaving the body. A link with no target is a brief not yet written, which [the rule allows](../../rule.md#43-work-in-progress), and is marked as owed.
 
 *In force, the author's decision, 2026-09-12.*
 
@@ -178,7 +178,7 @@ Folding draws the lane again whole and then scrolls so that [the heading of the 
 
 #### 6.1.1 An image in the lane
 
-An image stands at its own width, never wider than the measure, a little further from the prose above and below it than paragraphs stand from each other, with its caption beneath in the quieter type the chrome uses, rounded as the code blocks are.
+An image stands at its own width, never wider than the measure, a little further from the prose above and below it than paragraphs stand from each other, with its caption beneath in the quieter type the chrome uses, rounded as the rule blocks are.
 
 A faint rim is drawn just inside its edge so a light image keeps an edge on a light ground. The rim is an outline pulled inward, since it is painted over the image's pixels, where an inset shadow would lie beneath them and never show.
 
@@ -270,13 +270,13 @@ The rail is the left wing at a width the fit hands it, whichever wing the reader
 
 ## 7. One file, laid by the gradient
 
-The file is composed the way a brief is, so it is read by depth like anything else under the code. What it is and how it is run come first, then how the body is assembled, then how it is drawn, and the details beneath, with numbered headings in comments.
+The file is composed the way a brief is, so it is read by depth like anything else under the rule. What it is and how it is run come first, then how the body is assembled, then how it is drawn, and the details beneath, with numbered headings in comments.
 
 The drawing holds the lane, then the areas and their strip, then one section per widget, then what wires the gestures. Every widget is one entry in one table, so the day the file outgrows reading by depth, each entry becomes a file of its own and nothing else moves.
 
 *In force, the author's decision, 2026-09-12; the widget table 2026-09-13.*
 
-### 7.1 Taste in the code itself
+### 7.1 Taste in the rule itself
 
 The author's guidelines from the sister project are guidance for taste, not rules the check reads, and are not brought in here: [Hjulverkstan's principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-). They hold simplicity and coherence, data over logic, pure functions with their side effects kept apart, and flat data with a single source of truth.
 

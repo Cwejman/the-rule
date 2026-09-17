@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: record
 entries: newest first
 note: what cold readers found, one entry per read
@@ -15,9 +15,9 @@ A record: it amends the state, it is folded, and it retires when it is served. N
 
 Kept 2026-09-12 from the asks of 2026-09-11, when that record was retired to git. Not a cold read but the author's own, and like the entry beneath it, **proposed and not done.**
 
-**Effort and ease are one measure, and the edition does not say so.** A win is understanding against the effort it cost in [the gradient](../../code.md#31-the-gradient) and in the first two sections, while [the prose principle](../../code.md#41-the-prose-of-a-brief) names its measure ease and says the gradient set it. The author left open during the rewrite whether a win is counted against least reading or easiest reading, and holds that effort and ease are the same thing; the edition uses both words and never joins them.
+**Effort and ease are one measure, and the edition does not say so.** A win is understanding against the effort it cost in [the gradient](../../rule.md#31-the-gradient) and in the first two sections, while [the prose principle](../../rule.md#41-the-prose-of-a-brief) names its measure ease and says the gradient set it. The author left open during the rewrite whether a win is counted against least reading or easiest reading, and holds that effort and ease are the same thing; the edition uses both words and never joins them.
 
-**The order principle may not be explicit enough to keep an agent from the mistakes it names.** The author accepted [4.2](../../code.md#42-the-order-of-a-holarchy) as it stood, with that doubt said aloud.
+**The order principle may not be explicit enough to keep an agent from the mistakes it names.** The author accepted [4.2](../../rule.md#42-the-order-of-a-holarchy) as it stood, with that doubt said aloud.
 
 ## 2. The edition, read alone against its own conditions
 

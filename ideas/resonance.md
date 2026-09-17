@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -24,7 +24,7 @@ A bow does not read a string. The hairs and the string meet at a contact that st
 
 Each keeps its own space of resonance, the string's modes and the bow's tension and the stick's own ringing, and what crosses between them is force and motion at one point.
 
-That is why the bowed string is the right picture for the code. Two wholes, mutually driving, neither containing the other, joined at a boundary and separated by the time it takes to cross.
+That is why the bowed string is the right picture for the rule. Two wholes, mutually driving, neither containing the other, joined at a boundary and separated by the time it takes to cross.
 
 *Reasoned, the author's picture; the source named from memory.*
 
@@ -36,13 +36,13 @@ At each sample the string offers what its incoming waves imply, a straight relat
 
 The generalisation is older and stricter. In wave digital filters every element exposes a port, an arriving wave and a departing one, and the ports are given resistances chosen so that no loop without delay can form anywhere *[Fettweis 1986]*.
 
-The discipline is exactly the code's: nothing reaches into anything, each declares what leaves it and accepts what arrives.
+The discipline is exactly the rule's: nothing reaches into anything, each declares what leaves it and accepts what arrives.
 
 *Reasoned, from sources named from memory and not checked.*
 
-## 4. What this gives the code
+## 4. What this gives the rule
 
-Mutual driving is a third relation beside [nesting](../code.md#321-the-holarchy) and [the link](../code.md#322-the-link), and it costs two things. A port, where each holon says what leaves it and takes what arrives, and never the other's inside. And a delay, which is what keeps each one whole; remove it and the two collapse into one thing that cannot be solved.
+Mutual driving is a third relation beside [nesting](../rule.md#321-the-holarchy) and [the link](../rule.md#322-the-link), and it costs two things. A port, where each holon says what leaves it and takes what arrives, and never the other's inside. And a delay, which is what keeps each one whole; remove it and the two collapse into one thing that cannot be solved.
 
 The meeting itself is a holon of its own. The friction of the bow belongs neither to the bow nor to the string; it is where their two characteristics cross, and it has to be somewhere. So a substrate that lets parts drive each other needs a place for junctions, and they are parts like any other.
 
@@ -50,6 +50,6 @@ A junction can itself be amplified. Where the meeting between two holons needs j
 
 That is coordination as a unit of its own, and it is the same position the friction of the bow holds, one step up in kind.
 
-Whether the code should carry this, or whether it belongs only where signals flow, is open. It is stated here and not lifted.
+Whether the rule should carry this, or whether it belongs only where signals flow, is open. It is stated here and not lifted.
 
 *Reasoned, and grounded in methods that work in shipped instruments; the sources are named from the writer's memory, a model's, and none was checked in this session. [Their verification is owed to the grounds](../study/grounds.md).*

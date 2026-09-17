@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -69,7 +69,7 @@ The study began inside OpenLight, a project building a medium for knowledge, pro
 
 ## 8. Notes
 
-- **The law is not here.** [The code](../code.md) stands at the arc's root, with [the practice](../poc/practice.md) and [the skill](../poc/skill.md) in the proof of concept beneath it. Each lab ships the edition it ran under, and the ancestor those editions grew from is [the edition of 2026-08-30](code-2026-08-30.md). A claim matures in the labs, enters an edition, and its row retires from the notebook. Git keeps everything that leaves.
+- **The law is not here.** [The code](../rule.md) stands at the arc's root, with [the practice](../poc/practice.md) and [the skill](../poc/skill.md) in the proof of concept beneath it. Each lab ships the edition it ran under, and the ancestor those editions grew from is [the edition of 2026-08-30](code-2026-08-30.md). A claim matures in the labs, enters an edition, and its row retires from the notebook. Git keeps everything that leaves.
 
 - **The surface left the study** on 2026-09-12 and stands in [the proof of concept](../poc/surface/README.md), since it serves the whole arc rather than these labs. The program built here on 2026-09-11 was retired with it, so that the understanding is built before the program is.
 

@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: in force
 ---
@@ -8,7 +8,7 @@ status: in force
 
 ## 1. The body in the order a document reads
 
-The lane holds the body depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the code lays, since [a level's briefs stand on the ones before them](../../code.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the root's title and its first paragraph, stands first.
+The lane holds the body depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the root's title and its first paragraph, stands first.
 
 The space between briefs steps down with depth, as [the design language's rhythm](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice) asks: what lies beneath a brief sits together, and the briefs of a level stand further apart the higher the level, so the gap before a brief says which level it begins.
 
@@ -20,7 +20,7 @@ Every brief in the lane stands at one of two grades: its face, the heading and t
 
 A brief never folds past its face, so nothing in the lane is ever a bare name, and folding is one act with one inverse.
 
-Org-mode has cycled a heading between folded, children and whole for twenty years, so folding at a heading is a gesture readers already hold. The face is what it lacks, and it is the code's own unit; the bare heading is what this model leaves out.
+Org-mode has cycled a heading between folded, children and whole for twenty years, so folding at a heading is a gesture readers already hold. The face is what it lacks, and it is the rule's own unit; the bare heading is what this model leaves out.
 
 *Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third grade, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 

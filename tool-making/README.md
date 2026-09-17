@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: open
 ---
@@ -68,7 +68,7 @@ Then, when several pieces of work reuse another, where is that one placed, since
 
 ### 3.2 What the medium on the horizon would do, and why not now
 
-Before the rule the author worked on OpenLight, the medium [the code lays on the horizon](../code.md#6-how-far-this-goes), and the proof of concept is the deliberate choice not to build it, taking one step at a time with what exists.
+Before the rule the author worked on OpenLight, the medium [the rule lays on the horizon](../rule.md#6-how-far-this-goes), and the proof of concept is the deliberate choice not to build it, taking one step at a time with what exists.
 
 In such a substrate, ontological understanding builds archetypes: a typed structure that other holons are instances of. A piece of work, a role, a goal, a fact, a decision could each be one, and then the substrate is viewed from whatever angle is wanted. Doing that in the current substrate would be running ahead, and it is not done.
 

@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -7,9 +7,9 @@ kind: brief
 
 ## 1. Files, folders and commits
 
-The medium is what every tool and every practice already has, so nothing is built before the code is lived. A brief is a markdown file or a section in one, a folder is a holon whose brief is its entry file, `README.md`, and git is the history, every change a commit.
+The medium is what every tool and every practice already has, so nothing is built before the rule is lived. A brief is a markdown file or a section in one, a folder is a holon whose brief is its entry file, `README.md`, and git is the history, every change a commit.
 
-A folder without an entry file is a pile, and holds nothing the code can read.
+A folder without an entry file is a pile, and holds nothing the rule can read.
 
 *Reasoned, the author's; lived in [the study's labs](../study/README.md) and in [this arc](../README.md) since 2026-09-11.*
 
@@ -21,9 +21,9 @@ The writer judges what is right for the content, and the lean never excuses a fl
 
 *Preferred, the author's; not settled, and unmeasured.*
 
-## 2. A file says it is under the code
+## 2. A file says it is under the rule
 
-A repository holds more than knowledge, so a file declares itself: frontmatter at its head stamps it as written under the code, and a reader, a program or a published site digests only what carries the stamp. The writer's intent lives in the file rather than in a tool's guess, and what a repository holds as knowledge becomes countable.
+A repository holds more than knowledge, so a file declares itself: frontmatter at its head stamps it as written under the rule, and a reader, a program or a published site digests only what carries the stamp. The writer's intent lives in the file rather than in a tool's guess, and what a repository holds as knowledge becomes countable.
 
 The fields in use are what this arc's files carry: `under`, `kind`, `status`, which says whether a plan is in force, and `ratified`. Beyond that the stamp's form is not settled, and it is wanted before anything publishes a tree.
 
@@ -31,7 +31,7 @@ The fields in use are what this arc's files carry: `under`, `kind`, `status`, wh
 
 ### 2.1 The stamp says the kind
 
-Not everything under the code is a brief, and the stamp says which kind a file is.
+Not everything under the rule is a brief, and the stamp says which kind a file is.
 
 A record is an array of entries in time, newest first or oldest first, and reading it by the gradient is reading it wrongly: its order is chronology, not importance, and its sections are moments rather than parts of one understanding. A reader that knows the kind can show a record as the sequence it is and a brief as the holarchy it is, instead of conflating them.
 
@@ -45,7 +45,7 @@ A record is an event: a ratification, a review's findings, a feedback note each 
 
 ### 2.3 The stamped region is the boundary
 
-The stamped region is the boundary of the substrate, and knowledge does not leave it. A piece of the knowledge moved into an unstamped file is moved out of what any reader digests, so it stops being substrate whatever its content. Where the code has not yet reached, the knowledge waits for it rather than being filed there.
+The stamped region is the boundary of the substrate, and knowledge does not leave it. A piece of the knowledge moved into an unstamped file is moved out of what any reader digests, so it stops being substrate whatever its content. Where the rule has not yet reached, the knowledge waits for it rather than being filed there.
 
 *Reasoned, from moving a brief out of the stamped tree and back, 2026-09-12.*
 
@@ -57,11 +57,11 @@ The ratification covers the text as it stands, so a ratified file is edited only
 
 Files that stand on a ratified one are not bound by it, and may change as freely as before.
 
-*Preferred, the author's, 2026-09-14, when the code became the first file ratified whole.*
+*Preferred, the author's, 2026-09-14, when the rule became the first file ratified whole.*
 
 ## 3. Every part is mounted by one brief of its entry
 
-Everything under the code beside an entry is mounted by it, with [two exceptions](#35-what-stands-beside-an-entry-without-a-mount), and a mount is a brief of its own rather than a mention among others. Every file and folder beside the entry is mounted by one of its briefs and by no more than one, so the order a reader meets the parts in is the order those briefs stand in, and the entry has had to ask which part is biggest.
+Everything under the rule beside an entry is mounted by it, with [two exceptions](#35-what-stands-beside-an-entry-without-a-mount), and a mount is a brief of its own rather than a mention among others. Every file and folder beside the entry is mounted by one of its briefs and by no more than one, so the order a reader meets the parts in is the order those briefs stand in, and the entry has had to ask which part is biggest.
 
 *Reasoned, the author's, 2026-09-12, from an entry whose one section listed its five parts in five paragraphs, so it never had to ask.*
 
@@ -91,9 +91,9 @@ A mounted part has a level to hold. A file with no sections has nothing beneath 
 
 ### 3.5 What stands beside an entry without a mount
 
-Two kinds of file stand beside an entry without a mount, and a reader meets both. A file under the code that nothing mounts is an orphan: the root of a body of its own, so it keeps its own opening. Orphans are allowed for now, since a part can be worked on alone and connected when it is ready.
+Two kinds of file stand beside an entry without a mount, and a reader meets both. A file under the rule that nothing mounts is an orphan: the root of a body of its own, so it keeps its own opening. Orphans are allowed for now, since a part can be worked on alone and connected when it is ready.
 
-A file not under the code, one without [the stamp](#2-a-file-says-it-is-under-the-code), is not governed by it at all. A brief reaches it by a link and never by a mount, and it stays as it was written.
+A file not under the rule, one without [the stamp](#2-a-file-says-it-is-under-the-rule), is not governed by it at all. A brief reaches it by a link and never by a mount, and it stays as it was written.
 
 *Preferred, the author's, 2026-09-12; whether orphans stay allowed is open.*
 
@@ -137,7 +137,7 @@ The price of position is that it must be reliable, so a brief never opens with a
 
 A face says what the brief gives, in a sentence or two, with the why that makes it worth entering. The ground, the detail and the history of how the brief came to be go beneath it, so a reader deciding whether to enter reads only what decides it.
 
-A face grows without anyone deciding it should. A brief that is one paragraph and its confidence line, and whose face needs reading twice, is a brief whose break was never taken, the [level not broken down](../code.md#42-the-order-of-a-holarchy) that the code names.
+A face grows without anyone deciding it should. A brief that is one paragraph and its confidence line, and whose face needs reading twice, is a brief whose break was never taken, the [level not broken down](../rule.md#42-the-order-of-a-holarchy) that the rule names.
 
 *Reasoned, the author's; that faces grow by addition was seen across the arc on 2026-09-14.*
 
@@ -145,7 +145,7 @@ A face grows without anyone deciding it should. A brief that is one paragraph an
 
 A face past four hundred characters of visible text is listed by [the surface's](surface/README.md) check, and read: either broken, or left with the reason it holds. The figure is a flag for noticing, never a law a face is written to. It stands under the upper quartile so that a face is caught while it is still one paragraph too many, not once it is the whole brief.
 
-Whether the character counts earlier editions of the code used as red flags, five hundred for a paragraph and three hundred for a bullet, earn a place beside this one is open.
+Whether the character counts earlier editions of the rule used as red flags, five hundred for a paragraph and three hundred for a bullet, earn a place beside this one is open.
 
 *Preferred, the flag at four hundred. Measured, 2026-09-14: across 179 briefs outside the study the median face ran 322 characters and the upper quartile 457, and the 23 faces past 600 were the briefs that had grown by additions, each day's decision appended to the paragraph before it.*
 
@@ -157,7 +157,7 @@ Bulleted and numbered lists carry a blank line between items, so they read as ea
 
 ### 5.5 The confidence line stands last
 
-A brief closes with its confidence line, set apart in italics, so [what the code asks written](../code.md#33-the-ground) has one place and a reader finds it without reading for it.
+A brief closes with its confidence line, set apart in italics, so [what the rule asks written](../rule.md#33-the-ground) has one place and a reader finds it without reading for it.
 
 It carries the grade, measured, seen, reasoned or preferred, or the status, in force, fulfilled or superseded, with the date and the ground in a phrase. A question not yet answered carries open, and a thing tried by a setting, a trial; both are statuses the arc added.
 
@@ -167,9 +167,9 @@ Whose claim it is goes in the line too, the author's or the session's, since a p
 
 ## 6. Links and citations
 
-Links are relative markdown links. A link to a brief not yet written is written empty, `[the name]()`, and stands until the brief exists, as [the code allows](../code.md#43-work-in-progress). A link to an outside source goes to the source's address, and a source known by a number, an issue or a ticket, or a system known by its name, is cited that way, as a link to its address.
+Links are relative markdown links. A link to a brief not yet written is written empty, `[the name]()`, and stands until the brief exists, as [the rule allows](../rule.md#43-work-in-progress). A link to an outside source goes to the source's address, and a source known by a number, an issue or a ticket, or a system known by its name, is cited that way, as a link to its address.
 
-*Preferred, the author's; seen in every piece written under the code.*
+*Preferred, the author's; seen in every piece written under the rule.*
 
 ### 6.1 Citing a source in running text
 
@@ -205,7 +205,7 @@ They fail together in one place: each needs something that resolves a link again
 
 ## 7. A file is cut around one brief, and moves only where it is stood on
 
-A file has one root brief, unless it is [mounted](#33-a-mounted-file-is-a-level-not-a-brief), and it is cut so that its root is the brief that the most of the region it serves stands on. What follows is where a ground moves, and when a file may go. When a brief is central to two regions it lives in one file and the other links to it, never split, by the code's one home.
+A file has one root brief, unless it is [mounted](#33-a-mounted-file-is-a-level-not-a-brief), and it is cut so that its root is the brief that the most of the region it serves stands on. What follows is where a ground moves, and when a file may go. When a brief is central to two regions it lives in one file and the other links to it, never split, by the rule's one home.
 
 A ground moves down, never up. A brief one other brief stands on moves into that brief's holon. A brief many stand on moves to the level that covers them all, and never above it, since a ground held above its own readers is a ground they cannot keep.
 
@@ -215,13 +215,13 @@ What may be removed is what nothing living stands on, and the test reads from th
 
 ## 8. Visuals
 
-A body under the code carries two kinds of visual: a drawing where prose cannot show a shape, and an image where a page needs air. Both stand beside the prose as blocks of their own, and the prose reads whole without them, as it reads whole without a link it offers.
+A body under the rule carries two kinds of visual: a drawing where prose cannot show a shape, and an image where a page needs air. Both stand beside the prose as blocks of their own, and the prose reads whole without them, as it reads whole without a link it offers.
 
 *Reasoned, the author's.*
 
 ### 8.1 The sketch
 
-A sketch is a drawing of a structure or a flow, made from what the text says, so a reader is spared building the shape in their head from sentences. A session draws it as an SVG under [the sketching skill](sketching/README.md). Where no sketch is worth making, a shape drawn in characters inside a code block is still the least effort that shows one.
+A sketch is a drawing of a structure or a flow, made from what the text says, so a reader is spared building the shape in their head from sentences. A session draws it as an SVG under [the sketching skill](sketching/README.md). Where no sketch is worth making, a shape drawn in characters inside a rule block is still the least effort that shows one.
 
 Mermaid was refused: its syntax is nodes and edges, and its output is neither broad enough nor pleasing enough to live beside prose.
 
@@ -229,7 +229,7 @@ Mermaid was refused: its syntax is nodes and edges, and its output is neither br
 
 ### 8.2 The artful image
 
-The second use is the image in an artful sense, as a blog post uses one: breathing space, an art direction held across a body of writing, a painting placed where the text carries the meaning it shows, so the eye gets a visual aid and the page gets air. Not in the code, which is a manifesto and stays unlittered, but in the knowledge written under it, as projects take it up.
+The second use is the image in an artful sense, as a blog post uses one: breathing space, an art direction held across a body of writing, a painting placed where the text carries the meaning it shows, so the eye gets a visual aid and the page gets air. Not in the rule, which is a manifesto and stays unlittered, but in the knowledge written under it, as projects take it up.
 
 *Preferred, the author's.*
 
@@ -276,7 +276,7 @@ The tool proper comes later and does the same by address, following links as con
 
 ## 10. Reading a paragraph
 
-[The prose principle](../code.md#41-the-prose-of-a-brief) says a paragraph that reads heavy is the understanding not yet held. The practice adds the fault on the other side: a paragraph that reads as a crumb holds a claim cut from its reason. Both are the paragraph not matching the point, and the fix is the same, back to the understanding and not to the words.
+[The prose principle](../rule.md#41-the-prose-of-a-brief) says a paragraph that reads heavy is the understanding not yet held. The practice adds the fault on the other side: a paragraph that reads as a crumb holds a claim cut from its reason. Both are the paragraph not matching the point, and the fix is the same, back to the understanding and not to the words.
 
 *Seen, in the labs.*
 
@@ -290,6 +290,6 @@ A term the reader will need again is introduced: the term leads, and its plain e
 
 The practice was found in the labs, and their files stay as the finding left them.
 
-Their outputs, prompts and editions carry the stamp from when they were written, under editions of the code that are not the law now, and they are frozen. So they are reached by links rather than mounts, and nothing here is applied to them. Whether they keep the stamp, and so whether the substrate holds them at all, is open, and a first reader need not open them.
+Their outputs, prompts and editions carry the stamp from when they were written, under editions of the rule that are not the law now, and they are frozen. So they are reached by links rather than mounts, and nothing here is applied to them. Whether they keep the stamp, and so whether the substrate holds them at all, is open, and a first reader need not open them.
 
 *Open.*

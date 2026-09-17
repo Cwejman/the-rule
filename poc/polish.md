@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: in force
 ---
@@ -8,7 +8,7 @@ status: in force
 
 ## 1. Why the arc is polished now
 
-The knowledge arc, [everything its entry connects](../README.md), was written a decision at a time, and much of it grew by addition rather than being laid by the gradient. This plan brings it under [the code](../code.md) before it moves to [its own repository](../repository.md), and it is written for a session that starts with nothing but the files.
+The knowledge arc, [everything its entry connects](../README.md), was written a decision at a time, and much of it grew by addition rather than being laid by the gradient. This plan brings it under [the rule](../rule.md) before it moves to [its own repository](../repository.md), and it is written for a session that starts with nothing but the files.
 
 The sign is [the face](practice.md#52-a-face-is-short), a brief's heading and first paragraph. A brief that grows by addition lengthens its one paragraph until the face is the whole brief and nothing in it can be skipped, and its confidence line grows the same way, into a history of each ask. On 2026-09-14 sixty faces across the arc ran past [the flag](practice.md#53-the-check-flags-a-face-past-four-hundred-characters).
 
@@ -16,7 +16,7 @@ The sign is [the face](practice.md#52-a-face-is-short), a brief's heading and fi
 
 ## 2. What a session reads first
 
-A session starting the polish reads the arc's entry, the code whole, [the practice](practice.md) and [the skill](skill.md), then this plan. The code says what a brief is, the practice how one stands in markdown, and the skill how a session works on the files.
+A session starting the polish reads the arc's entry, the rule whole, [the practice](practice.md) and [the skill](skill.md), then this plan. The rule says what a brief is, the practice how one stands in markdown, and the skill how a session works on the files.
 
 It works from the arc's folder, `@md/spec/research/knowledge` in OpenLight's repository, and runs [the surface's check](skill.md#3-check-after-every-round) there. The check warns of mounts that miss, links whose file or heading no longer exists, and images that break the practice, and it lists apart every face past the flag.
 
@@ -24,7 +24,7 @@ It works from the arc's folder, `@md/spec/research/knowledge` in OpenLight's rep
 
 ## 3. What is in scope, and in what order
 
-In scope is every stamped file the arc's entry reaches, except [the code and the study](#5-what-is-left-alone). The files are taken in the order they stand on each other, since a change to a file moves the ground under every file that stands on it.
+In scope is every stamped file the arc's entry reaches, except [the rule and the study](#5-what-is-left-alone). The files are taken in the order they stand on each other, since a change to a file moves the ground under every file that stands on it.
 
 1. [The practice](practice.md), since every other file is written under it.
 
@@ -44,9 +44,9 @@ A stamped file the entry reaches that is missing from this list is added in its 
 
 ## 4. The method, one file at a time
 
-Each file is one round of [the code's making](../code.md#5-the-making), and nothing in it is written before the whole file is held. The steps beneath are taken in order, and a file is not done until the rounds end.
+Each file is one round of [the rule's making](../rule.md#5-the-making), and nothing in it is written before the whole file is held. The steps beneath are taken in order, and a file is not done until the rounds end.
 
-*Reasoned, the code's making applied to one file.*
+*Reasoned, the rule's making applied to one file.*
 
 ### 4.1 The outline
 
@@ -54,11 +54,11 @@ The file is read whole, with its line of the check. Then an outline, a few lines
 
 ### 4.2 The writing
 
-The file is written again whole from the outline, [a brief that held moved and never retyped](../code.md#53-the-rounds). Nothing the file claims is lost: every claim keeps its grade and every decision its date, and a refusal found inside a brief moves to its level's run of refusals, [the surface's](surface/refused.md) or a section of refusals where the level has one. Plain words, and no term used before it is given.
+The file is written again whole from the outline, [a brief that held moved and never retyped](../rule.md#53-the-rounds). Nothing the file claims is lost: every claim keeps its grade and every decision its date, and a refusal found inside a brief moves to its level's run of refusals, [the surface's](surface/refused.md) or a section of refusals where the level has one. Plain words, and no term used before it is given.
 
 ### 4.3 The fresh head
 
-A subagent holds only the code, the practice, the draft, and for a mounted file the brief that mounts it, since that is where the file's own brief is read. It is [the code's fresh head](../code.md#54-the-fresh-head): it writes nothing, and hands back what it did not understand, what came before its ground, and what it would cut. The file is written again from that, and the rounds end when a round changes only words.
+A subagent holds only the rule, the practice, the draft, and for a mounted file the brief that mounts it, since that is where the file's own brief is read. It is [the rule's fresh head](../rule.md#54-the-fresh-head): it writes nothing, and hands back what it did not understand, what came before its ground, and what it would cut. The file is written again from that, and the rounds end when a round changes only words.
 
 ### 4.4 The cascade
 
@@ -70,7 +70,7 @@ The check is run for the whole arc, since a renumbered heading breaks every link
 
 ## 5. What is left alone
 
-The code, since it is [ratified](practice.md#24-a-ratified-file-is-edited-only-in-review) and is edited only in review with the author. The session edits none of its faces, and writes any change it would make into [the record](#8-where-the-work-stands) as a proposal.
+The rule, since it is [ratified](practice.md#24-a-ratified-file-is-edited-only-in-review) and is edited only in review with the author. The session edits none of its faces, and writes any change it would make into [the record](#8-where-the-work-stands) as a proposal.
 
 The study, since its labs are frozen under the editions they were written in.
 
@@ -92,7 +92,7 @@ The faces past the flag are broken and a paragraph holding several points is spl
 
 ### 6.3 The flag
 
-Four hundred is kept as a flag to read at, and the code's seven faces past it stand as the author's judgment.
+Four hundred is kept as a flag to read at, and the rule's seven faces past it stand as the author's judgment.
 
 ### 6.4 The model
 
@@ -104,9 +104,9 @@ One commit at the end rather than one per file, since the author will not ratify
 
 ## 7. How it ends
 
-The polish is done when every file in scope has been through its rounds, and when the check lists no face past the flag outside the code and the study, except faces kept with a reason in the record.
+The polish is done when every file in scope has been through its rounds, and when the check lists no face past the flag outside the rule and the study, except faces kept with a reason in the record.
 
-The author then reads the record: the faces kept and the proposals for the code. This file retires to git, as a record does, and its brief in the proof of concept's entry goes with it.
+The author then reads the record: the faces kept and the proposals for the rule. This file retires to git, as a record does, and its brief in the proof of concept's entry goes with it.
 
 *In force, 2026-09-14.*
 
@@ -116,27 +116,27 @@ This is a record, newest first. A session that starts in the middle reads here w
 
 ### 8.1 The pass of 2026-09-14
 
-Every file in scope went through its rounds in one session, and the check lists no face past the flag outside the code and the study. No face was kept past it. The proposals for the code are beneath, and so is what the pass changed beyond faces.
+Every file in scope went through its rounds in one session, and the check lists no face past the flag outside the rule and the study. No face was kept past it. The proposals for the rule are beneath, and so is what the pass changed beyond faces.
 
-The practice took three rounds. The fresh heads found the stamp standing last while three earlier briefs reached forward to it, the mount rules nested under the medium while half the level stood on them, and six places where the code was restated rather than pointed at; all three moved. Its headings are renumbered, so every link into it was rewritten.
+The practice took three rounds. The fresh heads found the stamp standing last while three earlier briefs reached forward to it, the mount rules nested under the medium while half the level stood on them, and six places where the rule was restated rather than pointed at; all three moved. Its headings are renumbered, so every link into it was rewritten.
 
 The skill took two rounds. Its record briefs, the debrief, the account and the note per step, are marked as what a measured run keeps, and the practice's rules it had copied are pointed at instead.
 
 The surface took two rounds per file. The widgets now stand with the shape before the ahead, since the ahead draws in the shape's form; the framework with the two kinds of widget before the areas, since the areas are described in their terms; the implementation with the browser's page first and the lane's and the widgets' vocabulary linked rather than assumed. Four refusals that lived inside briefs, a tree with an opening of its own, a level merged into one block, a dial, and columns of siblings, stand in the refusals run.
 
-Sketching took two rounds. The tool file is titled the tool, since the code is the law's name. The design language has one home, the sketching skill, and the entry no longer repeats it.
+Sketching took two rounds. The tool file is titled the tool, since the rule is the law's name. The design language has one home, the sketching skill, and the entry no longer repeats it.
 
 The entries, the repository and the ideas took one round each. The repository no longer says the study moves and then asks whether it does. The ideas kept the author's wording; their paragraphs were broken at sentences, their confidence lines brought to one form, and a count of four over five sections corrected.
 
 *Seen, over one session on 2026-09-14; every fresh head ran on Opus.*
 
-### 8.2 Proposals for the code
+### 8.2 Proposals for the rule
 
-Each is a change the session would make to [the code](../code.md) and did not, since the code is ratified. They wait on review with the author.
+Each is a change the session would make to [the rule](../rule.md) and did not, since the rule is ratified. They wait on review with the author.
 
 Seven faces run past the flag: 2.2, 3.2.1, 4, 4.4, 5.2, 5.4 and 5.5. Each is one paragraph carrying its claim and its ground together, and each would break at a sentence into a face and the paragraph beneath, with no word changed.
 
-Section 3.3 gives the four grades and three statuses, and the arc uses two more marks everywhere: open, for a question not yet answered, and a trial, for a thing tried by a setting. The code could name open as the status of a question, since every level of the arc ends with one.
+Section 3.3 gives the four grades and three statuses, and the arc uses two more marks everywhere: open, for a question not yet answered, and a trial, for a thing tried by a setting. The rule could name open as the status of a question, since every level of the arc ends with one.
 
 Section 4 says the grounds are linked at the end, and no link stands at the end; the empty link in that sentence is the one there is.
 

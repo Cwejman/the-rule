@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: record
 entries: newest first
 note: one line per step, written before the step

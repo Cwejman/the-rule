@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -41,7 +41,7 @@ A harness's transcript is append-only, and no plugin can plant knowledge beside 
 
 But the model is stateless, so a thin harness over the model's SDK, the library a harness is written against, can assemble each turn's context from the field by depth, the root stable and cached, the rim changing.
 
-That is learning inside a session, a new understanding placed beside the ground it stands on, and it is the code applied to a context: a holarchy read by depth, one home per fact, coherence from a stable root.
+That is learning inside a session, a new understanding placed beside the ground it stands on, and it is the rule applied to a context: a holarchy read by depth, one home per fact, coherence from a stable root.
 
 ### 3.3 A context can be composed again at any point
 
@@ -69,7 +69,7 @@ The local-model direction in [the surface's](../poc/surface/README.md) sketch is
 
 The directory a harness opens on is already the most open-ended thing in use, and it could become a common standard the way a connector does for hardware: one shape everyone plugs into, so that what is built for one tool piggybacks on what another left.
 
-The code, the record, the step notes, the tucked-away raw, a surface that reads them: none of it is a harness's own, all of it is files under a shape, and a second harness opening the same folder stands on the same ground. A commons compounds only on a standard, and the standard here costs nothing to adopt, since it is a folder.
+The rule, the record, the step notes, the tucked-away raw, a surface that reads them: none of it is a harness's own, all of it is files under a shape, and a second harness opening the same folder stands on the same ground. A commons compounds only on a standard, and the standard here costs nothing to adopt, since it is a folder.
 
 *Reasoned, the author's.*
 
@@ -112,7 +112,7 @@ Open source has no social medium of its own. Its work happens in repositories an
 The author's question is where that medium is, and the answer under this stance is that a business would thrive by hosting it: the social environment of open source as the service, the connecting between contributors and the work as the glue a host carries. The choice at the centre of it is to not take money for a certain gain, so that the gain compounds among everyone, and the business earns on the compounding.
 
 Which market does not want that: a market where the work is shared by design, so that every wall on it is a loss to all and every connection a gain to all. 
-What the author wants for such a community is that it spread like wildfire, and the reason it could is [the code's first section](../code.md#1-why-there-is-a-code) turned outward: joining others is where value comes from, and a medium that unbinds the expressive side of joining, building on another's work as easily as reading it, gives that value nowhere to be stopped.
+What the author wants for such a community is that it spread like wildfire, and the reason it could is [the rule's first section](../rule.md#1-why-there-is-a-rule) turned outward: joining others is where value comes from, and a medium that unbinds the expressive side of joining, building on another's work as easily as reading it, gives that value nowhere to be stopped.
 
 *Reasoned, the author's.*
 

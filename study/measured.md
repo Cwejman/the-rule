@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: record
 entries: newest first
 note: one entry per measurement of the study against its own law

@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ratified: the author
 ---

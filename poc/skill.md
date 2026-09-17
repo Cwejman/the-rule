@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -7,21 +7,21 @@ kind: brief
 
 ## 1. Read by depth
 
-A file or a folder is read the way [the gradient](../code.md#31-the-gradient) is laid: the brief that mounts it, or the title and the first paragraph where nothing does, then each heading with its first paragraph, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
+A file or a folder is read the way [the gradient](../rule.md#31-the-gradient) is laid: the brief that mounts it, or the title and the first paragraph where nothing does, then each heading with its first paragraph, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
 
-The whole is held that way, by depth, and a brief is read in full only where the work will touch it. The session that just wrote a brief does not read it again; the fresh read belongs to [a fresh head](../code.md#54-the-fresh-head).
+The whole is held that way, by depth, and a brief is read in full only where the work will touch it. The session that just wrote a brief does not read it again; the fresh read belongs to [a fresh head](../rule.md#54-the-fresh-head).
 
 *Seen, in [the study's labs](../study/README.md).*
 
 ## 2. Address by number
 
-A brief is named by [its number](practice.md#4-headings-carry-numbers) and its file: `reading/professionals.md` §7. A script finds a brief by that address, prints it, cuts it, places it whole elsewhere, or swaps it for a new whole. That is how a brief that held is [moved and never retyped](../code.md#53-the-rounds), and how a rewrite touches only the brief named.
+A brief is named by [its number](practice.md#4-headings-carry-numbers) and its file: `reading/professionals.md` §7. A script finds a brief by that address, prints it, cuts it, places it whole elsewhere, or swaps it for a new whole. That is how a brief that held is [moved and never retyped](../rule.md#53-the-rounds), and how a rewrite touches only the brief named.
 
 *Seen, in the labs.*
 
 ## 3. Check after every round
 
-Inserting or moving a brief renumbers every heading after it, and every pointer written by number goes stale without any link breaking. So after every [round](../code.md#53-the-rounds) the tree is checked for what a move breaks, and a round is not done until every list beneath is empty, the orphans and the faces kept with a reason aside.
+Inserting or moving a brief renumbers every heading after it, and every pointer written by number goes stale without any link breaking. So after every [round](../rule.md#53-the-rounds) the tree is checked for what a move breaks, and a round is not done until every list beneath is empty, the orphans and the faces kept with a reason aside.
 
 [The surface's](surface/README.md) own check prints the links, the images, the mounts and the faces for a tree it traces, run from [the arc's](../README.md) folder:
 
@@ -65,7 +65,7 @@ Before a file is written, its stamp is read. A file stamped `ratified` is change
 
 ## 5. Keep the record as you go
 
-A session whose cost is counted, as every lab run was, keeps a debrief, `debrief.md`: one file, the record of its run, with an entry per round. It is opened when the work begins and appended after every round, never written at the end, so a session that is cut short still leaves its record whole up to the last round. That is [the code's debrief](../code.md#55-the-debrief), written as the work goes rather than at its close.
+A session whose cost is counted, as every lab run was, keeps a debrief, `debrief.md`: one file, the record of its run, with an entry per round. It is opened when the work begins and appended after every round, never written at the end, so a session that is cut short still leaves its record whole up to the last round. That is [the rule's debrief](../rule.md#55-the-debrief), written as the work goes rather than at its close.
 
 The account is a table inside the debrief of what the run cost, with the clock time each step began and whatever the harness shows of spend; what the harness does not show, the transcript does, and a script over it counts each API message once.
 
@@ -97,6 +97,6 @@ When the work is committed, the raw the run produced, its transcripts and snapsh
 
 ## 8. Amending in place is not drawn
 
-[The code draws the line](../code.md#53-the-rounds) at a word: every brief a change reaches is written whole, unless the fix is a word. Where the line falls between a word and the whole, when a change is smaller than the brief and larger than a word, is not drawn; the rounds so far wrote whole where the understanding changed and amended where it did not.
+[The rule draws the line](../rule.md#53-the-rounds) at a word: every brief a change reaches is written whole, unless the fix is a word. Where the line falls between a word and the whole, when a change is smaller than the brief and larger than a word, is not drawn; the rounds so far wrote whole where the understanding changed and amended where it did not.
 
 *Open; seen in five rounds of one run.*

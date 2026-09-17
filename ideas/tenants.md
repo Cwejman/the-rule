@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -15,11 +15,11 @@ The temporal buffers, MIDI and audio, are the raw beneath it, one link away from
 
 ### 1.1 The gradient runs from the piece to the note
 
-A listener or a collaborator enters at the piece and descends as far as their need takes them, stopping whole at any level. What the code asks of prose has its sound-shaped forms to be found: a patch that says what it sounds like before it is opened, a take marked as kept or superseded.
+A listener or a collaborator enters at the piece and descends as far as their need takes them, stopping whole at any level. What the rule asks of prose has its sound-shaped forms to be found: a patch that says what it sounds like before it is opened, a take marked as kept or superseded.
 
 ### 1.2 Every edit is a step
 
-[A step](../code.md#52-the-step) is the holon viewed by its change, so a session at the workstation leaves a record as a writing session does. A track can be branched on its own without the whole piece carrying the conflict, and the ways in are hospitable as anywhere: by instrument, by section, by the last change, by the session that made it.
+[A step](../rule.md#52-the-step) is the holon viewed by its change, so a session at the workstation leaves a record as a writing session does. A track can be branched on its own without the whole piece carrying the conflict, and the ways in are hospitable as anywhere: by instrument, by section, by the last change, by the session that made it.
 
 ### 1.3 People make a track together as they make knowledge together
 
@@ -27,7 +27,7 @@ Each lays down a group or a bus of their own, a holon that is theirs and a part 
 
 ### 1.4 The bounce is the debrief
 
-It still exists, for public listening: the surface handed to whoever only wants to hear it, with the whole beneath for whoever wants to build on it. That one distinction is the code's heart in sound. The walls come down, the glue goes, and building on another's work becomes first class.
+It still exists, for public listening: the surface handed to whoever only wants to hear it, with the whole beneath for whoever wants to build on it. That one distinction is the rule's heart in sound. The walls come down, the glue goes, and building on another's work becomes first class.
 
 ## 2. Image
 

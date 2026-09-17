@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -9,7 +9,7 @@ kind: brief
 
 Every rule in the code gets one entry, and the entry answers four questions in this order: what the rule says, where it came from, what it rests on, and how strongly.
 
-The fourth is the one that gets skipped. Its vocabulary is the code's own, measured, seen, reasoned or preferred, defined in [the code](../code.md); the grounds add nothing to it. A rule carrying no mark is not settled; it is unexamined, and a rule that cannot say how strongly it holds will be obeyed for the wrong reason.
+The fourth is the one that gets skipped. Its vocabulary is the code's own, measured, seen, reasoned or preferred, defined in [the code](../rule.md); the grounds add nothing to it. A rule carrying no mark is not settled; it is unexamined, and a rule that cannot say how strongly it holds will be obeyed for the wrong reason.
 
 ## 2. The duty is per session
 

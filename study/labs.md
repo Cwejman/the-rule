@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 ---
 
@@ -31,7 +31,7 @@ The lab that rewrote the law with the author rather than around a writer, and th
 
 Its edition was written section by section in dialog on 2026-09-10 and 11: the prose principle first, the gradient lifted to be the thesis, the two laws dropped as a frame, a section on what the code is for, the making raised from a principle to a section of its own, and a last section on the medium beyond prose, with every principle closing with how strongly it holds.
 
-That edition is no longer here. It became the arc's standing law and lives at [the root](../code.md), with [the practice](../poc/practice.md) and [the skill](../poc/skill.md) in the proof of concept beneath it, because they govern the whole arc and not this lab.
+That edition is no longer here. It became the arc's standing law and lives at [the root](../rule.md), with [the practice](../poc/practice.md) and [the skill](../poc/skill.md) in the proof of concept beneath it, because they govern the whole arc and not this lab.
 
 The run is three prompts rather than one, and two stages. [The first](10-comprehension/prompt-1.md) compressed forty-five raw reports into [a corpus](10-comprehension/corpus/README.md) under the code, with fresh heads asked after each round only what the corpus had lost, four rounds in one session that held the raw throughout. [The second](10-comprehension/prompt-2.md) ran a fifth round in the lean shape, an orchestrator that never holds the raw and sends heads for what needs it. [The third](10-comprehension/prompt-3.md) wrote [the piece](10-comprehension/output/README.md) from the corpus. Its input differs from labs 08 and 09 by that corpus stage, and any comparison to the baseline pair must say so.
 

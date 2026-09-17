@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: in force
 ---
@@ -10,15 +10,15 @@ status: in force
 
 The repository is named the rule, since what it holds is more than a way to lay knowledge out. It is how knowledge is built, and with it how one moves into what is not yet known.
 
-The code says it structures knowledge into brief wins, and that is where it was found. But the same step is taken wherever work goes into the unknown: what to research, what to build, what to put into the substrate, whom to meet. Each step takes the biggest win that can be reached from what is already held, and leaves it whole before the next. The code calls the balance of those two forces the gradient, a word that on its own says less than the code asks of it.
+The rule says it structures knowledge into brief wins, and that is where it was found. But the same step is taken wherever work goes into the unknown: what to research, what to build, what to put into the substrate, whom to meet. Each step takes the biggest win that can be reached from what is already held, and leaves it whole before the next. The rule calls the balance of those two forces the gradient, a word that on its own says less than the rule asks of it.
 
 *Preferred, the author's, 2026-09-14.*
 
 ### 1.1 Why not the code
 
-"The code" collides with where it lives. In a software repository the code means the source, and every project that takes this repository in is a software repository; the arc had already renamed its sketching tool's file to keep the two apart.
+"The code", the name the law carried until 2026-09-17, collides with where it lives. In a software repository the code means the source, and every project that takes this repository in is a software repository; the arc had already renamed its sketching tool's file to keep the two apart.
 
-The name also cannot be found from outside, and it says only law, where [the code's making](code.md#5-the-making) says it is embodied rather than obeyed.
+The name also cannot be found from outside, and it says only law, where [the rule's making](rule.md#5-the-making) says it is embodied rather than obeyed.
 
 *Seen, in the arc and in OpenLight, 2026-09-14.*
 
@@ -28,33 +28,33 @@ A rule, in the sense a monastery keeps one, governs a whole life: the work, the 
 
 *Preferred, the author's, 2026-09-14.*
 
-### 1.3 The code keeps its name until it is written again
+### 1.3 The file took the name
 
-`code.md` is ratified, so it is not renamed now: it is edited only [in review with the author](poc/practice.md#24-a-ratified-file-is-edited-only-in-review). The stamps keep `under: the code` with it, and the surface reads them as they are. The name moves into the text when the code is written again.
+`rule.md` is ratified, so it is edited only [in review with the author](poc/practice.md#24-a-ratified-file-is-edited-only-in-review). It was `code.md` until 2026-09-17, when the name moved into the text and onto the file in one commit, and every stamp went from `under: the code` to `under: the rule` with it, [the frozen labs'](poc/practice.md#12-the-labs-files-are-frozen) included; [the proof of concept](poc/README.md#6-the-rename-breaks-dependents) says what that breaks.
 
-*In force, 2026-09-14.*
+*In force, the author's decision, 2026-09-17; the study's own prose still says the code, as the record of what the labs ran under.*
 
 ## 2. A first step, taken by the rule
 
-The repository is a pragmatic first step. The arc was needed as a submodule before the code could be written again as its entry, so it moved whole, as it stands, with the code left as ratified.
+The repository is a pragmatic first step. The arc was needed as a submodule before the rule could be written again as its entry, so it moved whole, as it stands, with the rule left as ratified.
 
 *In force, the author's decision, 2026-09-14.*
 
 ### 2.1 The plan it steps toward
 
-The plan is for the code to become this repository's root entry, leading out to the proof of concept, the study and the ideas. That asks changes to how the code reads, and the author's full ratification of them, and neither is ready.
+The plan is for the rule to become this repository's root entry, leading out to the proof of concept, the study and the ideas. That asks changes to how the rule reads, and the author's full ratification of them, and neither is ready.
 
 *In force as the author's direction, 2026-09-14; not begun.*
 
 ### 2.2 Why it could not wait
 
-Hjulverkstan is taking the proof of concept up, and a closed-source client began with it the week of 2026-09-07 from a copy of the code. That is [the drift the code warns of](code.md#33-the-ground): a copy quietly becomes a second code. The biggest win within reach was the move itself, so it was taken first.
+Hjulverkstan is taking the proof of concept up, and a closed-source client began with it the week of 2026-09-07 from a copy of the rule. That is [the drift the rule warns of](rule.md#33-the-ground): a copy quietly becomes a second rule. The biggest win within reach was the move itself, so it was taken first.
 
 *Seen, in the three projects, 2026-09-14.*
 
 ## 3. What moved
 
-Everything the arc held moved, with its history: the code, the proof of concept, the study and the ideas. The study came because the code stands on it, and a repository without its grounds would state principles it cannot show the reason for.
+Everything the arc held moved, with its history: the rule, the proof of concept, the study and the ideas. The study came because the rule stands on it, and a repository without its grounds would state principles it cannot show the reason for.
 
 *In force, the author's decision, 2026-09-14.*
 
@@ -134,13 +134,13 @@ Each step stands on the ones before it.
 
 3. In OpenLight: replace the arc's folder with this repository as a submodule at the same path, in one commit.
 
-4. In Hjulverkstan and the closed-source client: replace the copy of `code.md` with the submodule.
+4. In Hjulverkstan and the closed-source client: replace the copy of the rule, taken as `code.md`, with the submodule, which holds it as `rule.md` since 2026-09-17.
 
 *In force, 2026-09-14; the first three steps were done that day, and the fourth waits on the two projects.*
 
 ## 7. What comes next
 
-The code is written again as this repository's root entry and takes the name, once the author has changed how it reads and ratified the change.
+The rule is written again as this repository's root entry, once the author has changed how it reads and ratified the change.
 
 OpenLight's root README becomes substrate. It mounts the rule, and declares the existing spec tree a legacy artefact, to be written again under the rule.
 

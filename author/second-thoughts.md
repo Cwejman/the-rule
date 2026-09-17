@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: open
 ---
@@ -26,9 +26,9 @@ The author does not know how to solve it either.
 
 The author is having second thoughts about how much of the body may be unfolded.
 
-Unfolding the code from the rule is asking for a preview of it: what is the code. But some of what stands inside the code are parts of the code, and a reader is meant to read them through. Entering it, you read it as one, and a brief of it standing folded while you are meant to read it reads strangely.
+Unfolding the rule from the rule is asking for a preview of it: what is the rule. But some of what stands inside the rule are parts of the rule, and a reader is meant to read them through. Entering it, you read it as one, and a brief of it standing folded while you are meant to read it reads strangely.
 
-Where that line falls is what is in doubt. A holon comes with a file today, and that may not be it: sometimes a level deeper than a file should still be entered rather than previewed. The code goes that deep in places, [the holarchy](../code.md#321-the-holarchy) and [the link](../code.md#322-the-link) beneath the brief, and those are details a reader may skip, which is the code working as the rule says. But [what knowledge is made of](../code.md#3-what-knowledge-is-made-of) and its three parts cannot be skipped by anyone who wants to understand it.
+Where that line falls is what is in doubt. A holon comes with a file today, and that may not be it: sometimes a level deeper than a file should still be entered rather than previewed. The rule goes that deep in places, [the holarchy](../rule.md#321-the-holarchy) and [the link](../rule.md#322-the-link) beneath the brief, and those are details a reader may skip, which is the rule working as the rule says. But [what knowledge is made of](../rule.md#3-what-knowledge-is-made-of) and its three parts cannot be skipped by anyone who wants to understand it.
 
 So what is owed is whether a level says somewhere that it is entered rather than unfolded, and on what that would be decided.
 

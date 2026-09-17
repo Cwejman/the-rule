@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: record
 entries: mixed
 note: stage two newest first above stage one oldest first

@@ -1,4 +1,4 @@
-// surface.ts — the surface: one page that reads knowledge written under the code.
+// surface.ts — the surface: one page that reads knowledge written under the rule.
 //
 // # 1. What it is and how it is run
 //
@@ -8,7 +8,7 @@
 // does on each commit. The file is laid by the gradient, as a brief is: what it
 // is and how it runs, then how the body is assembled, then how it is drawn,
 // with the details beneath each. Its sections carry numbered headings in
-// comments, so it is read by depth like anything else under the code.
+// comments, so it is read by depth like anything else under the rule.
 //
 //   bun surface.ts <path>                  serve live, http://localhost:4141
 //   bun surface.ts <path> --port 8080      serve on another port
@@ -363,7 +363,7 @@ const bare = (t: Tok | undefined): Tok[] => (t?.tokens ?? []).filter((x) => !(x.
 /** Whether a link's target is a web address: only the schemes a page may safely follow. */
 const isWeb = (href: string): boolean => /^(https?:|mailto:)/i.test(href);
 
-// ## 2.2 A file says it is under the code
+// ## 2.2 A file says it is under the rule
 
 /** Frontmatter as key: value lines between two rules, and the markdown after it. */
 function stamped(src: string): { front: Record<string, string>; rest: string } | null {
@@ -375,7 +375,7 @@ function stamped(src: string): { front: Record<string, string>; rest: string } |
       return kv ? [[kv[1], kv[2].trim()]] : [];
     }),
   );
-  return front["under"] === "the code" ? { front, rest: src.slice(m[0].length) } : null;
+  return front["under"] === "the rule" || front["under"] === "the code" ? { front, rest: src.slice(m[0].length) } : null;
 }
 
 /** A path as handed: a folder means its entry file. */
@@ -476,7 +476,7 @@ async function trace(rootArg: string): Promise<Body> {
     seen.add(abs);
     if (!existsSync(abs) || statSync(abs).isDirectory()) return { fault: "missing; the mount is skipped" };
     const st = stamped(readFileSync(abs, "utf8"));
-    return st ? { kind: st.front["kind"] ?? "brief", cut: cut(imageBlocks(lean(marked.lexer(st.rest) as unknown as Tok[]))) } : { fault: "not under the code; the mount is skipped" };
+    return st ? { kind: st.front["kind"] ?? "brief", cut: cut(imageBlocks(lean(marked.lexer(st.rest) as unknown as Tok[]))) } : { fault: "not under the rule; the mount is skipped" };
   };
 
   /** A free address for a title under a parent: the slug, suffixed when a sibling already took it. */

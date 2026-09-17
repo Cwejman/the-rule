@@ -1,5 +1,5 @@
 ---
-under: the code
+under: the rule
 kind: brief
 status: in force
 ---
@@ -8,7 +8,7 @@ status: in force
 
 ## 1. When a sketch earns its place
 
-A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the code's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.
+A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the rule's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.
 
 A sketch is [an image like any other](../practice.md#8-visuals) in where it stands and how it is captioned. What sets it apart is that it is drawn from the text, and drawn in [the surface's language](skill.md#3-the-design-language), so a reader meets one family in the page and in the pictures.
 
@@ -18,7 +18,7 @@ A sketch is [an image like any other](../practice.md#8-visuals) in where it stan
 
 What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#6-what-this-does-not-answer).
 
-What prose cannot give is geometry a model cannot measure, and a sight of what it drew. A label that overflows its room, two labels on one spot, a colour written as a value that no theme can reach: these are what make a generated drawing look cheap, and none of them is a matter of taste. So the code is thin, and it does only what prose cannot: it keeps the geometry exact and lets the session look.
+What prose cannot give is geometry a model cannot measure, and a sight of what it drew. A label that overflows its room, two labels on one spot, a colour written as a value that no theme can reach: these are what make a generated drawing look cheap, and none of them is a matter of taste. So the rule is thin, and it does only what prose cannot: it keeps the geometry exact and lets the session look.
 
 *Reasoned, the author's, 2026-09-14. Whether prose and this much code hold a sketch at the quality the surface sets is open, and the first sketches are what measure it.*
 
@@ -62,11 +62,11 @@ Whether a sketch set into the page takes the page's type and palette the same wa
 
 What keeps a sketch true when the text it draws changes. A sketch is a second statement of what its brief says, and nothing yet notices when the two part.
 
-Whether a session can art direct a sketch: find which understanding most needs a picture, and paint it so the win reads first. This is under review. The first sketches for [the code](../../code.md) were reasoned through outlines and fresh heads, and still drew one act of breaking where the gradient itself wanted painting, and the author was not sold on them.
+Whether a session can art direct a sketch: find which understanding most needs a picture, and paint it so the win reads first. This is under review. The first sketches for [the rule](../../rule.md) were reasoned through outlines and fresh heads, and still drew one act of breaking where the gradient itself wanted painting, and the author was not sold on them.
 
 So far the drawings that teach best, and carry the win first, come from the human mind, and inference has not yet shown the same level of design. It is [the split between what is told and what is shown](../../ideas/README.md#5-what-is-told-and-what-is-shown) met in practice, and it is to be explored further.
 
-*Open, 2026-09-14; the art direction seen in the author's reading of the first sketches for the code, 2026-09-15.*
+*Open, 2026-09-14; the art direction seen in the author's reading of the first sketches for the rule, 2026-09-15.*
 
 ## 7. What was tried and refused
 
