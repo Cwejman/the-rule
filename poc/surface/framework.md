@@ -123,7 +123,7 @@ The settings are one object of values. They apply as style variables and layout 
 
 The type: the zoom on the prose, the ratio by which each heading register grows over the body, the height of the prose's lines, and the lane's measure. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), and the fade at the edges. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the widget of each area, which by default is the shape in the left wing, nothing in the left gutter, the links in the right gutter and the ahead in the right wing.
 
-And the history: how many commits back the reading is of, off by default. Set, every brief a commit within that many last changed takes its commit's hue and every other goes grey, everywhere a brief's colour shows, so the body reads as a diff of the head against a commit; [the history widget](widgets.md#9-the-history) sets the same value by choosing the commit.
+And the history: how many commits back the reading is of, off by default. Set, every brief a commit within that many last changed, and every block of prose it touched, takes its commit's hue and every other goes grey, everywhere a brief's colour shows, so the body reads as a diff of the head against a commit; [a commit's own act](widgets.md#9-the-history), back to here, sets the same value by choosing the commit.
 
 *Built 2026-09-17 from the author's ask to read the substrate as a diff of the head against a commit; the counts offered, one to twenty, are the session's choice.*
 

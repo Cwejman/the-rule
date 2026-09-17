@@ -1419,8 +1419,8 @@ const greyed = (address: string): boolean => {
   const r = ageOf(address);
   return back > 0 && (r === null || r >= back);
 };
-/** The declarations that colour an element for its brief: the hue, and no chroma where history leaves it grey. */
-const tint = (address: string): string => `--h:${hueOf(address)}${greyed(address) ? ";--c:0" : ""}`;
+/** The declarations that colour an element for its brief: the hue, and no chroma where history leaves it grey. The chroma is said either way, since a brief drawn inside an older one, as the canvas nests them, must not inherit its grey. */
+const tint = (address: string): string => `--h:${hueOf(address)};--c:${greyed(address) ? 0 : 1}`;
 const hued = (address: string): string => `style="${tint(address)}"`;
 
 // ### 3.1.1 The actions
@@ -1453,11 +1453,19 @@ type Action = {
   shifted?: string;
   /** whether it can be taken at all; a badge that cannot is not drawn */
   can: (a?: string) => boolean;
+  /** whether it is taken now, for an act that holds a state; its badge is marked so */
+  on?: (a?: string) => boolean;
   run: (a?: string) => void;
 };
 
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
 const acts = (a?: string): string => a ?? state.focus;
+
+/** Whether the reading stands at a commit's brief: the history reaches back to exactly that commit. */
+const readsBackTo = (a: string): boolean => {
+  const b = brief(a);
+  return b?.rank !== undefined && state.settings.back === b.rank + 1;
+};
 
 const ACTIONS: Record<string, Action> = {
   unfold: {
@@ -1504,6 +1512,24 @@ const ACTIONS: Record<string, Action> = {
     shifted: "Shift widens the scope by a level instead.",
     can: (a) => level(acts(a)).length > 0,
     run: (a) => scopeTo(acts(a)),
+  },
+  backTo: {
+    label: (a) => (readsBackTo(acts(a)) ? "read as now" : "back to here"),
+    keys: [{ key: "h" }],
+    help: (a) =>
+      readsBackTo(acts(a))
+        ? "Reads the body as it stands again, with no commit coloured."
+        : "Reads the body as a diff against this commit: every brief and every block changed since, this commit included, takes its commit's hue, and the rest goes grey.",
+    also: "The swatch or the hash of the commit's row in the history widget, and the history switch in the settings, by count.",
+    can: (a) => brief(acts(a))?.virtual === "commit",
+    on: (a) => readsBackTo(acts(a)),
+    run: (a) => {
+      const b = brief(acts(a));
+      if (b?.rank === undefined) return;
+      state.settings.back = readsBackTo(b.address) ? 0 : b.rank + 1;
+      saveSettings();
+      drawAll();
+    },
   },
   widen: {
     label: () => "widen",
@@ -1600,6 +1626,7 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowDown: { glyph: `<path d="M8 3.8v7.9M5 8.7l3 3 3-3"/>`, name: "down" },
   ArrowLeft: { glyph: `<path d="M12.2 8H4.3M7.3 11 4.3 8l3-3"/>`, name: "left" },
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
+  h: { glyph: `<path d="M4.6 3.6v8.8M11.4 3.6v8.8M4.6 8h6.8"/>`, name: "h" },
 };
 
 const cap = (glyph: string, kind = ""): string => `<span class="cap${kind ? " " + kind : ""}"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
@@ -1626,7 +1653,7 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
   if (touch)
-    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
+    return `<span class="badge worded${act.can(a) ? "" : " off"}${act.on?.(a) ? " on" : ""}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
@@ -1636,7 +1663,7 @@ function badgeHtml(id: string, a?: string, tight = false): string {
   const aimed = a !== undefined;
   const chord = `<span class="chord">${capsOf(act.keys[0], aimed)}${aimed ? cap(MOUSE, "pointer") : ""}</span>`;
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}${act.on?.(a) ? " on" : ""}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
 }
 
 /** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
@@ -1658,7 +1685,13 @@ function badgePair(first: string, second: string): string {
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const inline = (toks: Tok[] = []): string => toks.map((t) => (INLINE[t.type] ?? INLINE.text)(t)).join("");
-const blocks = (toks: Tok[] = []): string => toks.map((t) => (BLOCK[t.type] ?? BLOCK.other)(t)).join("");
+const blocks = (toks: Tok[] = []): string => toks.map((t) => aged(t, (BLOCK[t.type] ?? BLOCK.other)(t))).join("");
+
+/** A block a commit within the reading touched stands in that commit's hue, a wash behind it and a rule at its left, its text kept ink; every other block stands as it is. */
+const aged = (t: Tok, html: string): string => {
+  const back = backing();
+  return back > 0 && t.age !== undefined && t.age !== null && t.age < back && html ? `<div class="aged" style="--h:${wheelHue(t.age, back)}">${html}</div>` : html;
+};
 
 const INLINE: Record<string, (t: Tok) => string> = {
   text: (t) => (t.tokens ? inline(t.tokens) : esc(t.text ?? "")),
@@ -1856,11 +1889,11 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span>` +
+        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}${ACTIONS.backTo.can(b.address) ? badgeHtml("backTo", b.address) : ""}</span>` +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span></div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}${ACTIONS.backTo.can(b.address) ? badgeHtml("backTo", b.address) : ""}</span></div>` : "";
   // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
@@ -1936,7 +1969,7 @@ const WIDGETS: Record<string, Widget> = {
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
-  history: { kind: "figure", name: "the history: the last commits, and the hue each takes when the reading is of them", icon: "history", draw: () => historyHtml(), width: () => 264, grow: true },
+  history: { kind: "figure", name: "the history: the commits' level small, a row per commit in its hue", icon: "history", draw: () => historyHtml(), width: () => 264, grow: true, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
@@ -2427,7 +2460,7 @@ const saveSettings = (): void =>
 // now is what it says.
 
 const KEY_GROUPS: { of: string; acts: string[] }[] = [
-  { of: "the brief", acts: ["unfold", "foldUp", "open"] },
+  { of: "the brief", acts: ["unfold", "foldUp", "open", "backTo"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "widen"] },
   { of: "the reading", acts: ["previous", "next", "above", "beneath"] },
   { of: "the lane", acts: ["undo", "redo"] },
@@ -2436,23 +2469,29 @@ const KEY_GROUPS: { of: string; acts: string[] }[] = [
 const keysHtml = (): string =>
   `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
 
-// ### 3.8.2 The history: the last commits, and the hue each takes
+// ### 3.8.2 The history: the level's miniature
 //
-// The commits on the root, newest first, a row apiece: a swatch of the hue the
-// commit takes when the reading reaches it and grey when it does not, its short
-// hash, its date and its subject cut to the row. Pressing a row reads back to
-// that commit, it included, so every brief changed since takes its commit's hue
-// and the rest of the body goes grey; pressing the row the reading stands at
-// turns the history off. The setting it sets is the one the settings widget
-// switches, so the two agree.
+// The commits stand in the body as briefs of their own level, and this figure
+// is that level small, as the shape is the lane small: a row per commit, its
+// swatch in the hue the commit takes, its short hash, its date and its subject
+// cut to the row. Each row is the commit's brief, so pointing lights it
+// wherever it is drawn; the name goes to it in the lane, and the swatch or the
+// hash takes the brief's own act, back to here. The row the reading stands at
+// is marked.
 
 function historyHtml(): string {
   const h = state.body?.history;
-  if (!h) return `<div class="history chrome"><span class="none dim">no history: the root is not in a repository git can read</span></div>`;
+  const home = state.body?.briefs.find((b) => b.virtual === "history");
+  if (!h || !home) return `<div class="history chrome"><span class="none dim">no history: the root is not in a repository git can read</span></div>`;
   const back = state.settings.back;
-  const row = (c: Commit, i: number) =>
-    `<div class="commit${i === back - 1 ? " on" : ""}${i < back ? " in" : ""}" data-back="${i}" data-tip="${esc(c.subject)}" style="--h:${wheelHue(i, back)}${i < back ? "" : ";--c:0"}">` +
-    `<i class="swatch"></i><span class="hash">${esc(c.short)}</span><span class="date">${esc(c.date)}</span><span class="subject">${esc(c.subject)}</span></div>`;
+  const row = (c: Commit, i: number) => {
+    const a = `${home.address}/${c.short}`;
+    return (
+      `<div class="commit${i === back - 1 ? " on" : ""}${i < back ? " in" : ""}${a === state.focus ? " here" : ""}" data-a="${esc(a)}" ${hued(a)}>` +
+      `<span class="when" data-back="${i}" data-tip="${i === back - 1 ? "read as now" : "back to here"}"><i class="swatch"></i><span class="hash">${esc(c.short)}</span><span class="date">${esc(c.date)}</span></span>` +
+      `<span class="name" data-go="${esc(a)}" data-tip="${esc(c.subject)}">${esc(c.subject)}</span></div>`
+    );
+  };
   return `<div class="history chrome">${h.commits.map(row).join("")}</div>`;
 }
 
@@ -4390,14 +4429,9 @@ function wire(): void {
       saveSettings();
       return void drawAll();
     }
-    // a commit's row reads back to it, that commit included; the row the reading stands at turns the history off
+    // a commit's row in the history figure takes the commit brief's own act
     const back = t.closest<HTMLElement>("[data-back]");
-    if (back) {
-      const rank = Number(back.dataset.back);
-      state.settings.back = state.settings.back === rank + 1 ? 0 : rank + 1;
-      saveSettings();
-      return void drawAll();
-    }
+    if (back) return void ACTIONS.backTo.run(back.closest<HTMLElement>("[data-a]")?.dataset.a);
     const set = t.closest<HTMLElement>("[data-set]");
     if (set) {
       const v = set.dataset.value!;
@@ -4804,8 +4838,9 @@ if (typeof document !== "undefined") start();
  * The palette: every colour's role once, with its light value and its dark value side by side. A role whose value takes
  * the branch hue reads it from --h, so it is set on every element and follows the branch the element stands under; its
  * chroma is scaled by --c, one unless an element sets it to nothing, which is how a brief goes grey at its own lightness
- * when the reading is of history and no commit asked for changed it. A sketch imports this and falls back to the light
- * side where no page supplies the roles.
+ * when the reading is of history and no commit asked for changed it. What is folded or out of the lane takes a breath of
+ * the hue, so a folded cell still says which branch or which commit it is; grey itself is left to the sketches. A sketch
+ * imports this and falls back to the light side where no page supplies the roles.
  */
 export const PALETTE: Record<string, [light: string, dark: string]> = {
   ground: ["#ffffff", "oklch(18.5% 0.005 60)"],
@@ -4823,6 +4858,7 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   lit: ["oklch(60% calc(0.12 * var(--c, 1)) var(--h))", "oklch(74% calc(0.1 * var(--c, 1)) var(--h))"],
   glow: ["oklch(80% calc(0.08 * var(--c, 1)) var(--h))", "oklch(47% calc(0.06 * var(--c, 1)) var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
+  folded: ["oklch(90% calc(0.035 * var(--c, 1)) var(--h))", "oklch(32% calc(0.035 * var(--c, 1)) var(--h))"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
   glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
   sheer: ["oklch(97.5% 0.002 60 / .6)", "oklch(26% 0.006 60 / .58)"],
@@ -4975,7 +5011,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
+.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--folded); }
 .crow .borrowed { flex: none; color: var(--door); }
 .crow .borrowed .icon { width: 11px; height: 11px; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
@@ -5042,19 +5078,28 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .badge:hover .label { color: var(--on); }
 /* a badge that cannot be taken keeps its room and goes quiet */
 .badge.off { opacity: .35; pointer-events: none; }
+/* an act that holds a state is marked while it does */
+.badge.on .cap { background: var(--track); color: var(--ink); }
+.badge.on .label { color: var(--on); }
 .badge .held { color: var(--faint); font-size: 11px; }
 /* the keys: the whole table in a wing, grouped by what each act works on, its caps always inked */
 /* the history: a row per commit, the swatch its hue or grey, the subject cut to what the row leaves */
 .history { width: 264px; display: flex; flex-direction: column; gap: 1px; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); }
 .history .none { display: block; padding: 0 8px; }
-.history .commit { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: background .15s; }
-.history .commit:hover { background: var(--wash); }
+.history .commit { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 3px 8px; border-radius: 6px; transition: background .15s; }
+.history .commit:hover, .history .commit.lit { background: var(--wash); }
 .history .commit.on { background: var(--wash); color: var(--ink); }
+.history .when { flex: none; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
 .history .swatch { flex: none; width: 9px; height: 9px; border-radius: 3px; background: var(--lit); }
 .history .hash { flex: none; font-family: var(--mono); font-size: 11px; color: var(--faint); }
-.history .commit.in .hash { color: var(--on); }
+.history .commit.in .hash, .history .when:hover .hash { color: var(--on); }
 .history .date { flex: none; color: var(--faint); font-size: 11px; }
-.history .subject { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history .name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.history .commit.here .name, .history .commit.lit .name { color: var(--on); }
+/* a block a commit within the reading touched: a wash behind it and a rule at its left in that commit's hue, the text kept ink */
+.aged { position: relative; }
+.aged > * { background: var(--rest); box-shadow: 0 0 0 6px var(--rest); border-radius: 2px; }
+.aged::before { content: ""; position: absolute; left: -14px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--door); }
 .keys { width: 216px; display: flex; flex-direction: column; gap: 14px; font-family: var(--sans); font-size: var(--small); }
 .keys .group { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
 .keys .of { margin-bottom: 1px; }
@@ -5081,7 +5126,7 @@ svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }
 svg.fig.marks .image { fill: none; stroke: var(--rest); stroke-width: 1.1; }
 svg.fig.marks .head { fill: var(--door); }
-svg.fig.marks .hidden { fill: var(--grey); }
+svg.fig.marks .hidden { fill: var(--folded); }
 svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 10px; }
 .act:hover svg.fig.marks .para, .act:hover svg.fig.marks .head { fill: var(--lit); }
 .act:hover svg.fig.marks .image { stroke: var(--lit); }
@@ -5173,7 +5218,7 @@ svg.fig .cell { cursor: pointer; }
 svg.ahead .hit { fill: transparent; }
 svg.ahead .para { fill: var(--rest); }
 svg.ahead .head { fill: var(--door); }
-svg.ahead .hidden { fill: var(--grey); }
+svg.ahead .hidden { fill: var(--folded); }
 svg.ahead .cell.lit .para, svg.ahead .cell.lit .head { fill: var(--lit); }
 /* an image is a frame wherever a figure draws it, never a filled block that reads as prose */
 svg.fig .image { fill: none; stroke: var(--door); stroke-width: 1; }
@@ -5190,7 +5235,7 @@ svg.shape .head { fill: var(--door); }
 svg.shape .cell.here .para { fill: var(--door); }
 svg.shape .cell.here .head { fill: var(--on); }
 svg.shape .cell.lit .para, svg.shape .cell.lit .head { fill: var(--lit); }
-svg.shape .above .head { fill: var(--grey); }
+svg.shape .above .head { fill: var(--folded); }
 svg.shape .above.lit .head, svg.shape .above:hover .head { fill: var(--lit); }
 /* only the two regions take the pointer; the marks drawn over them never do */
 svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .tick, svg.shape .hidden { pointer-events: none; }
@@ -5204,12 +5249,12 @@ svg.shape .cell:has(.hit[data-press="fold"]:hover) .head { fill: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .para { fill: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .head { fill: var(--on); }
 svg.shape .hit[data-press="fold"] { cursor: pointer; }
-svg.shape .tick { fill: var(--grey); }
-svg.shape .tick.image { fill: none; stroke: var(--grey); stroke-width: 1; }
+svg.shape .tick { fill: var(--folded); }
+svg.shape .tick.image { fill: none; stroke: var(--folded); stroke-width: 1; }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .tick.image:not(.ghost) { fill: none; stroke: var(--lit); }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .image { stroke: var(--door); }
 svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .image { stroke: var(--on); }
-svg.shape .hidden { fill: var(--grey); }
+svg.shape .hidden { fill: var(--folded); }
 svg.shape .cell.lit .hidden { fill: var(--glow); }
 svg.shape .cursor { fill: var(--veil); pointer-events: none; }
 /* under a finger the rail is taken hold of rather than aimed at, so the band the reader holds says so: a stronger fill
@@ -5225,7 +5270,7 @@ svg.plate .cell.centre circle { fill: var(--hub); }
 svg.plate .cell.on path { fill: var(--door); }
 svg.plate .cell.here path { fill: var(--on); }
 /* grey for anything not in the lane wins over the marks above, at every depth */
-svg.plate .cell.away path { fill: var(--grey); }
+svg.plate .cell.away path { fill: var(--folded); }
 svg.plate .cell.lit path, svg.plate .cell.lit circle { fill: var(--lit); }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
 svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: var(--ground); }
