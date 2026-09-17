@@ -60,7 +60,9 @@ In the lane a brief reaches down to the next, so the highlight moves from brief 
 
 The moment the lane scrolls, the highlight swings back to the reading line and what the pointer rested on is let go. After a scroll a pointer takes nothing back until it has travelled a little, since the browser reports a move of its own when the scroll comes to rest; at any other time every move counts, so the highlight never lags behind the pointer.
 
-*Reasoned, the author's, 2026-09-13; the still pointer after a scroll, 2026-09-14.*
+The build falls short of this in one place, reported by the author on 2026-09-17 and to be done: while a brief is pointed at, it takes the highlight but not the acts, so the row of acts still names the brief on the reading line and the space bar still folds that one rather than the one under the pointer.
+
+*Reasoned, the author's, 2026-09-13; the still pointer after a scroll, 2026-09-14; the fault of the acts under a pointer, 2026-09-17, open.*
 
 ### 4.4 One step dimmer
 
