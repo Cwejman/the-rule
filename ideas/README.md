@@ -59,3 +59,11 @@ Knowledge divides into what has to be told and what can be shown. The rule is to
 In that pair the human's role is the art direction. That is what a person does for a session in a sentence and cannot be computed, and the tools are what carry it. So the split is also a division of labour, and it says where a person's time is worth most as the work moves on.
 
 *Reasoned, the author's, and open; the reason [the surface](../poc/surface/README.md) was taken up before lab ten's piece was read.*
+
+## 6. Reading the substrate as a diff
+
+The surface was given git's history for a day, commits as briefs coloured by age, and it was taken out the same evening for its waiting time and for mixing a second substrate into the first. What was built, why it came out and what of it holds are kept here so the learning is not lost with the code.
+
+*Seen, 2026-09-17; postponed by the author.*
+
+[the level beneath](history.md)
