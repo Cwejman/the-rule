@@ -7,7 +7,7 @@ kind: brief
 
 The rule is how knowledge is built, and with it how one moves into what is not yet known: at every step, the biggest win within reach of what is already held, left whole before the next. Written knowledge is where it was found, and where it is lived first.
 
-This page says what stands here and in what order to take it. The first file still calls the rule the code, and [the last brief](#7-this-repository) says why.
+This page says what stands here and in what order to take it. The first file still calls the rule the code, and [the last brief](#6-this-repository) says why.
 
 ## 1. The code
 
@@ -17,25 +17,15 @@ The code is the law, and the place to start. It turns written knowledge into a m
 
 [the level beneath](code.md)
 
-## 2. Ideas of 2026-09-16
+## 2. The author's own
 
-The author's thinking of one day, dictated and typed prompt by prompt and ratified as said, each prompt whole in its own place: on styling the substrate expressively, on every prompt entering it, and on the business and governance of it. It stands early, beside the second thoughts, because it is his own and not yet read into the levels it bears on.
+What is the author's own and not yet read into the levels it bears on stands here, early: his second thoughts on what stands beneath the root, and the ideas of one day, dictated prompt by prompt and ratified as said. Neither is law, and nothing beneath has been changed by them yet.
 
-*The author's, ratified 2026-09-16.*
+*The author's, 2026-09-16.*
 
-[the level beneath](ideas-2026-09-16.md)
+[the level beneath](author/README.md)
 
-## 3. Second thoughts
-
-Where the author doubts what stands beneath this entry, the doubt is written at the root rather than at the level it is about. A large part of what stands here was written by sessions and has not been read or ratified by him, and a doubt filed deep in such a level is one that has disappeared.
-
-Two stand open now, both about folding: that nothing on the page folds what a reader has just read, and that some levels ought to be entered and read rather than unfolded for a preview.
-
-*The author's, 2026-09-16; open, and nothing beneath has been changed to answer them.*
-
-[the level beneath](second-thoughts.md)
-
-## 4. The proof of concept
+## 3. The proof of concept
 
 The proof of concept is the code put to use where we stand now, in the simplest medium there is: markdown files in folders, tracked in git, read by people and by sessions that begin by reading them. It is what can be done with the code before any medium beyond that is built, and it grows as the work does.
 
@@ -43,7 +33,7 @@ The proof of concept is the code put to use where we stand now, in the simplest 
 
 [the level beneath](poc/README.md)
 
-## 5. The study
+## 4. The study
 
 The study is where all of this is being found, and where it is still owed. It is the search for how knowledge is best structured, for people and AI alike, run as a series of labs on one shared corpus, a bounded set of research reports from a web sweep in August 2026. Each lab rewrites the same material under an edition of the code and [a fresh head](code.md#54-the-fresh-head) reads the result cold.
 
@@ -53,7 +43,7 @@ What the study produces is the grounds, the reasons behind each principle of the
 
 [the level beneath](study/README.md)
 
-## 6. The ideas
+## 5. The ideas
 
 Beside the code stand the author's ideas: positions on how a model and [a harness](code.md#22-beginning-today) should be offered, the domains the shape reaches into, and questions it raises on the way. They are held open. None of them is law, and nothing in the code depends on them.
 
@@ -61,7 +51,7 @@ Beside the code stand the author's ideas: positions on how a model and [a harnes
 
 [the level beneath](ideas/README.md)
 
-## 7. This repository
+## 6. This repository
 
 The rule has a repository of its own as a pragmatic first step. Projects needed it as a submodule before the code could be written again as its entry, so it moved whole, as it stands, with the code left as ratified. What comes next is that writing.
 
@@ -69,7 +59,7 @@ The rule has a repository of its own as a pragmatic first step. Projects needed 
 
 [the level beneath](repository.md)
 
-## 8. Toolmaking
+## 7. Toolmaking
 
 Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles. It began in a project that depends on the rule and is built here from 2026-09-15, since nothing in it is secret and what serves one project serves the others.
 
