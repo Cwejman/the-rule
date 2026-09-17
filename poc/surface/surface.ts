@@ -65,17 +65,36 @@ async function run(): Promise<void> {
   if (flag("--history") >= 0) {
     const body = await trace(root);
     const rootDir = dirname(rootFileOf(root));
-    const history = historyOf(body, rootDir);
-    if (!history) return void console.log(`${body.briefs.length} briefs traced from ${body.root}; no history: the root is not in a repository git can read`);
     const spans = spansOf(body, rootDir);
+    withHistory(body, rootDir);
+    const history = body.history;
+    if (!history) return void console.log(`${body.briefs.length} briefs traced from ${body.root}; no history: the root is not in a repository git can read`);
     history.commits.forEach((c, i) => console.log(`${String(i).padStart(2)}  ${c.short}  ${c.date}  ${c.subject}`));
-    body.briefs.forEach((b) => {
+    const real = body.briefs.filter((b) => b.virtual === undefined);
+    real.forEach((b) => {
       const span = spans.get(b.address);
       const age = history.age[b.address];
       console.log(`${(b.address || "(the root)").padEnd(72)} ${b.file.padEnd(40)} ${span ? `[${span[0]}, ${span[1]}]`.padEnd(12) : "no span".padEnd(12)} ${age === null ? "older" : age}`);
     });
-    const aged = Object.values(history.age).filter((a) => a !== null).length;
-    console.log(`${body.briefs.length} briefs, ${aged} with an age in the last ${history.commits.length} commits, ${body.briefs.length - aged} with none`);
+    const aged = real.filter((b) => history.age[b.address] !== null).length;
+    console.log(`${real.length} briefs, ${aged} with an age in the last ${history.commits.length} commits, ${real.length - aged} with none`);
+    // the commits as briefs: the first three and the widest, each with what it touched, to be checked against git show --stat
+    const commits = body.briefs.filter((b) => b.virtual === "commit");
+    const widest = commits.reduce((x, y) => ((tokensIn("list_item", y.body).length > tokensIn("list_item", x.body).length) ? y : x), commits[0]);
+    [...commits.slice(0, 3), ...(widest && !commits.slice(0, 3).includes(widest) ? [widest] : [])].forEach((b) => {
+      const items = tokensIn("list_item", b.body).map((i) => textOf(i.tokens));
+      const files = new Set((touched.get(history.commits[b.rank!].hash) ?? []).map((t) => t.file)).size;
+      console.log(`\n${b.address} ${b.number} "${b.title}"\n  ${textOf([b.body[0]])}\n  touched ${items.length} in ${files} files:\n${items.map((i) => `    ${i}`).join("\n")}`);
+    });
+    // the blocks against their lines: how many briefs aligned, and one brief written across commits, block by block
+    console.log(`\nblocks: ${alignment.aligned} briefs aligned to their lines, ${alignment.whole} took the brief's age whole`);
+    const shown = real.find((b) => b.address.endsWith("the-step-lies-on-a-way-of-life")) ?? real.find((b) => b.address.endsWith("the-rename-breaks-dependents"));
+    if (shown && spans.get(shown.address)) {
+      const lines = readFileSync(join(rootDir, shown.file), "utf8").split(/\r?\n/);
+      const src = sourceBlocks(lines, ...spans.get(shown.address)!);
+      console.log(`${shown.address} (${shown.file} ${spans.get(shown.address)!.join("-")}, age ${history.age[shown.address]})`);
+      shown.body.filter((t) => t.type !== "space").forEach((t, i) => console.log(`  block ${i + 1} ${t.type.padEnd(10)} lines ${src[i] ? `[${src[i][0]}, ${src[i][1]}]`.padEnd(11) : "?".padEnd(11)} rank ${t.age === null ? "older" : t.age}`));
+    }
     return;
   }
   if (flag("--build") >= 0) {
@@ -174,7 +193,7 @@ async function serve(rootArg: string, port: number): Promise<void> {
     const b = await trace(rootArg);
     b.warnings.forEach((w) => console.warn("  " + w));
     held = new Set(assetsOf(b));
-    b.history = historyOf(b, rootDir);
+    withHistory(b, rootDir);
     return b;
   };
   const body = async () => Response.json(await retrace());
@@ -211,7 +230,7 @@ async function build(rootArg: string, out: string): Promise<void> {
   // path it has in the body, and its address carries a hash of its bytes, so a changed image is fetched again. A remote
   // image stays remote, since it may change after the build
   const rootDir = dirname(rootFileOf(rootArg));
-  body.history = historyOf(body, rootDir);
+  withHistory(body, rootDir);
   const outDir = dirname(resolve(out));
   const images = body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.asset && !t.svg);
   const written = new Set<string>();
@@ -274,6 +293,8 @@ type Tok = {
   soft?: boolean;
   /** set by the trace on a sketch: its markup, cleaned of anything that could run, to be set into the page */
   svg?: string;
+  /** set by the history on a block: the rank of the newest commit that touched its lines, null where none of the listed commits did */
+  age?: number | null;
 };
 
 /** One brief: its place, its face and its own prose. */
@@ -298,10 +319,13 @@ type Brief = {
   set?: boolean;
   /** set by the trace when the brief's lone link names a level already placed elsewhere: the address of its home */
   borrow?: string;
+  /** set on a brief that stands in no file: the history level read from git, or one commit of it, with its rank from the head */
+  virtual?: "history" | "commit";
+  rank?: number;
 };
 
-/** One commit among the last on the root, as git tells it. */
-type Commit = { hash: string; short: string; date: string; subject: string };
+/** One commit among the last on the root, as git tells it: who, when, the subject, and the message beneath it. */
+type Commit = { hash: string; short: string; date: string; author: string; subject: string; message: string };
 /**
  * The history: the last commits on the root, newest first, and for every brief the rank of the newest commit that
  * touched a line of its own prose, the head ranking zero; null where none of the listed commits did.
@@ -860,7 +884,7 @@ function headingLines(src: string): { line: number; depth: number }[] {
  */
 function spansOf(body: Body, rootDir: string): Map<string, [from: number, to: number]> {
   const spans = new Map<string, [number, number]>();
-  const byFile = Map.groupBy(body.briefs, (b) => b.file);
+  const byFile = Map.groupBy(body.briefs.filter((b) => b.virtual === undefined), (b) => b.file);
   byFile.forEach((briefs, file) => {
     const abs = join(rootDir, file);
     if (!existsSync(abs)) return;
@@ -878,6 +902,38 @@ function spansOf(body: Body, rootDir: string): Map<string, [from: number, to: nu
   });
   return spans;
 }
+
+/**
+ * The blocks of a brief's source as ranges of lines after its heading: runs of lines parted by blank lines, save inside
+ * a fence, or where a list goes on past a blank line into another item or an indented line. They stand in the order the
+ * brief's blocks do, so each block of prose is given the lines it was written on.
+ */
+function sourceBlocks(lines: string[], from: number, to: number): [from: number, to: number][] {
+  const out: [number, number][] = [];
+  const blank = (x: string) => /^\s*$/.test(x);
+  const item = (x: string) => /^ {0,3}([-*+]|\d+[.)])\s/.test(x);
+  let open: [number, number] | null = null;
+  let fenced = false;
+  let list = false;
+  for (let n = from + 1; n <= to; n++) {
+    const x = lines[n - 1] ?? "";
+    if (/^ {0,3}(```|~~~)/.test(x)) fenced = !fenced;
+    if (blank(x) && !fenced) {
+      const k = lines.slice(n, to).findIndex((y) => !blank(y));
+      if (open && list && k >= 0 && (item(lines[n + k]) || /^ {2,}\S/.test(lines[n + k]))) continue;
+      if (open) out.push(open);
+      open = null;
+      continue;
+    }
+    if (open) open[1] = n;
+    else (open = [n, n]), (list = item(x));
+  }
+  if (open) out.push(open);
+  return out;
+}
+
+/** How the blocks fell against their lines on the last reading of history: the briefs whose blocks aligned, and those that took the brief's age whole. */
+const alignment = { aligned: 0, whole: 0 };
 
 /** What git says to a question asked in the root's directory, or null where it cannot answer: no git, no repository, no such path. */
 function git(rootDir: string, args: string[]): string | null {
@@ -903,28 +959,228 @@ function blameOf(rootDir: string, file: string): (string | undefined)[] | null {
 
 /** The body's history, or undefined where the root has none git can tell. */
 function historyOf(body: Body, rootDir: string): History | undefined {
-  const log = git(rootDir, ["log", `-n${HISTORY_DEPTH}`, "--format=%H%x09%h%x09%ad%x09%s", "--date=short", "--", "."]);
+  const log = git(rootDir, ["log", `-n${HISTORY_DEPTH}`, "--format=%H%x1f%h%x1f%ad%x1f%an%x1f%s%x1f%b%x1e", "--date=short", "--", "."]);
   if (log === null) return undefined;
   const commits: Commit[] = log
-    .split("\n")
-    .filter((l) => l.includes("\t"))
-    .map((l) => l.split("\t"))
-    .map(([hash, short, date, subject]) => ({ hash, short, date, subject }));
+    .split("\x1e")
+    .filter((l) => l.includes("\x1f"))
+    .map((l) => l.trim().split("\x1f"))
+    .map(([hash, short, date, author, subject, message]) => ({ hash, short, date, author, subject, message: (message ?? "").trim() }));
   const rank = new Map(commits.map((c, i) => [c.hash, i]));
   rank.set("0".repeat(40), 0);
   const spans = spansOf(body, rootDir);
   const blames = new Map<string, (string | undefined)[] | null>();
+  const sources = new Map<string, string[]>();
   const age: Record<string, number | null> = {};
+  alignment.aligned = alignment.whole = 0;
   body.briefs.forEach((b) => {
     const span = spans.get(b.address);
+    if (b.virtual !== undefined) return void (age[b.address] = b.rank ?? null);
     if (!span) return void (age[b.address] = null);
     if (!blames.has(b.file)) blames.set(b.file, blameOf(rootDir, b.file));
+    if (!sources.has(b.file)) sources.set(b.file, readFileSync(join(rootDir, b.file), "utf8").split(/\r?\n/));
     const blame = blames.get(b.file)!;
     // a file git does not hold yet is all new, so every line of it ranks with the head
-    const ranks = blame === null ? [0] : blame.slice(span[0], span[1] + 1).flatMap((h) => (h !== undefined && rank.has(h) ? [rank.get(h)!] : []));
-    age[b.address] = ranks.length ? Math.min(...ranks) : null;
+    const rankOf = ([from, to]: [number, number]): number | null => {
+      const ranks = blame === null ? [0] : blame.slice(from, to + 1).flatMap((h) => (h !== undefined && rank.has(h) ? [rank.get(h)!] : []));
+      return ranks.length ? Math.min(...ranks) : null;
+    };
+    age[b.address] = rankOf(span);
+    // each block takes the age of its own lines, where the source's blocks fall one to one against the brief's; a mount
+    // paragraph the trace took off is allowed to stand last in the source. Where they do not fall so, every block takes
+    // the brief's age rather than a guess
+    const toks = b.body.filter((t) => t.type !== "space");
+    const src = sourceBlocks(sources.get(b.file)!, span[0], span[1]);
+    const mount = src.length === toks.length + 1 && /^\s*\[[^\]]*\]\([^)]*\)\s*$/.test(sources.get(b.file)![src[src.length - 1][0] - 1] ?? "");
+    const aligned = src.length === toks.length || mount;
+    alignment[aligned ? "aligned" : "whole"]++;
+    toks.forEach((t, i) => (t.age = aligned ? rankOf(src[i]) : age[b.address]));
   });
   return { commits, age };
+}
+
+// ### 2.8.1 The commits are briefs
+//
+// The history is not a widget but a level: one brief for the history itself,
+// standing last among the root's, and beneath it one brief per commit, newest
+// first, so the lane, the shape, the plate, the rail and the way down draw
+// commits as they draw everything else. A commit's brief opens with who and
+// when, carries its message, and ends with every brief the commit touched,
+// each a link with a line of what changed there, so a commit leads to what it
+// changed and the foot of each of those briefs leads back. What a commit
+// touched is read from the commit itself and never changes, so it is read
+// from git once and kept for the process's life.
+
+/** One change a commit made to a file, on the new side: where it stands, what it added and what it took out. */
+type Hunk = { from: number; count: number; oldFrom: number; oldCount: number; added: string[]; removed: string[] };
+/** A heading as it stood in a file at a commit, its title without its number, and which of that title's headings in the file it is. */
+type Head = { line: number; depth: number; title: string; nth: number };
+/** One place a commit changed: a heading of a file, or the file's own opening, and a line of what changed there. */
+type Touch = { file: string; title: string | null; nth: number; excerpt: string };
+
+const touched = new Map<string, Touch[]>();
+
+/** A file's title as the trace reads it: the heading's text without its syntax and its number. */
+const titleOf = (line: string): string => splitHeading(textOf((marked.lexer(line.trim())[0] as Tok | undefined)?.tokens)).title;
+
+/** Every heading of every stamped-looking file at a commit, by the file's path from the root. */
+function headsAt(rootDir: string, rev: string, prefix: string): Map<string, Head[]> {
+  const out = git(rootDir, ["grep", "-n", "--full-name", "-E", "^ {0,3}#{1,6} ", rev, "--", "*.md"]) ?? "";
+  const heads = new Map<string, Head[]>();
+  out.split("\n").forEach((l) => {
+    const m = /^[^:]+:([^:]+):(\d+):( {0,3}(#{1,6}) .*)$/.exec(l);
+    if (!m || !m[1].startsWith(prefix)) return;
+    const file = m[1].slice(prefix.length);
+    const list = heads.get(file) ?? [];
+    const title = titleOf(m[3]);
+    list.push({ line: Number(m[2]), depth: m[4].length, title, nth: list.filter((h) => h.title === title).length });
+    heads.set(file, list);
+  });
+  return heads;
+}
+
+/** The hunks a commit made to the stamped-looking files, by file, with the paths from the root. */
+function hunksAt(rootDir: string, hash: string, prefix: string): { file: string; oldFile: string; hunks: Hunk[] }[] {
+  const out = git(rootDir, ["show", "--format=", "--unified=0", "-M", hash, "--", "*.md"]) ?? "";
+  const changes: { file: string; oldFile: string; hunks: Hunk[] }[] = [];
+  const path = (p: string) => (p.startsWith("/dev/null") ? "" : p.replace(/^[ab]\//, "").slice(prefix.length));
+  let inHunk = false;
+  out.split("\n").forEach((l) => {
+    const c = changes[changes.length - 1];
+    const h = c?.hunks[c.hunks.length - 1];
+    if (l.startsWith("diff --git ")) return void ((inHunk = false), changes.push({ file: "", oldFile: "", hunks: [] }));
+    if (!inHunk && l.startsWith("--- ")) return void (c.oldFile = path(l.slice(4)));
+    if (!inHunk && l.startsWith("+++ ")) return void (c.file = path(l.slice(4)));
+    const m = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(l);
+    if (m) return void ((inHunk = true), c.hunks.push({ oldFrom: Number(m[1]), oldCount: m[2] === undefined ? 1 : Number(m[2]), from: Number(m[3]), count: m[4] === undefined ? 1 : Number(m[4]), added: [], removed: [] }));
+    if (inHunk && h && l.startsWith("+")) h.added.push(l.slice(1));
+    else if (inHunk && h && l.startsWith("-")) h.removed.push(l.slice(1));
+  });
+  return changes;
+}
+
+/** A line of a change, cut to what a list item can carry. */
+const EXCERPT = 120;
+const excerptOf = (added: string[], removed: string[]): string => {
+  const line = (xs: string[]) => xs.map((x) => x.trim()).find((x) => x !== "");
+  const a = line(added);
+  const r = line(removed);
+  const text = a !== undefined ? a : r !== undefined ? `− ${r}` : "";
+  return text.length > EXCERPT ? text.slice(0, EXCERPT - 1).trimEnd() + "…" : text;
+};
+
+/**
+ * Where a commit changed the body, from the commit itself: each hunk on the new side falls under the headings whose
+ * spans it crosses, or under the file's opening before its first section, which is the brief that mounts the file. A
+ * hunk that only takes lines out stands between two lines on the new side, so it is placed by where the lines stood on
+ * the old side. Read once per commit and kept.
+ */
+function touchesOf(rootDir: string, hash: string, prefix: string): Touch[] {
+  if (touched.has(hash)) return touched.get(hash)!;
+  const heads = headsAt(rootDir, hash, prefix);
+  let olds: Map<string, Head[]> | null = null;
+  const out: Touch[] = [];
+  hunksAt(rootDir, hash, prefix).forEach((c) => {
+    const file = c.file || c.oldFile;
+    c.hunks.forEach((h) => {
+      if (h.count === 0) {
+        // the lines are gone from the new side; the heading they stood under is on the old side, by the file's old name
+        olds ??= headsAt(rootDir, `${hash}^`, prefix);
+        const under = (olds.get(c.oldFile) ?? []).filter((x) => x.depth >= 2 && x.line <= h.oldFrom + Math.max(0, h.oldCount - 1));
+        const sections = under.filter((x, i) => i === under.length - 1 || under[i + 1].line > h.oldFrom);
+        const hit = sections.length ? sections : [null];
+        hit.forEach((x) => out.push({ file, title: x?.title ?? null, nth: x?.nth ?? 0, excerpt: excerptOf([], h.removed) }));
+        return;
+      }
+      const to = h.from + h.count - 1;
+      const sections = (heads.get(file) ?? []).filter((x) => x.depth >= 2);
+      // the sections the hunk crosses: the one its first line falls under, and every one that opens before its last
+      const first = sections.findLastIndex((x) => x.line <= h.from);
+      const crossed = sections.filter((x, i) => i === first || (x.line > h.from && x.line <= to));
+      const lead = first < 0 ? [null] : [];
+      const places = [...lead, ...crossed];
+      places.forEach((x) => {
+        const start = x === null ? h.from : Math.max(h.from, x.line);
+        const next = x === null ? (sections[0]?.line ?? Infinity) : (sections[sections.indexOf(x) + 1]?.line ?? Infinity);
+        const added = h.added.filter((_, k) => h.from + k >= start && h.from + k < next);
+        const excerpt = excerptOf(added, x === places[0] ? h.removed : []);
+        // a hunk that crosses into a section with nothing but blank lines did not change it
+        if (excerpt !== "" || places.length === 1) out.push({ file, title: x?.title ?? null, nth: x?.nth ?? 0, excerpt });
+      });
+    });
+  });
+  touched.set(hash, out);
+  return out;
+}
+
+/** The history as a level of briefs, appended to the body, and the age of every brief with the commits' own set. */
+function historyLevel(body: Body, rootDir: string, history: History): void {
+  const prefix = (git(rootDir, ["rev-parse", "--show-prefix"]) ?? "").trim();
+  const taken = new Set(body.briefs.map((b) => b.address));
+  const home = ["the-history", ...Array.from({ length: 9 }, (_, k) => `the-history-${k + 2}`)].find((a) => !taken.has(a))!;
+  const roots = body.briefs.filter((b) => depthOf(b.address) === 1).length;
+  const at = new Map(body.briefs.map((b, i) => [b.address, i]));
+  const byTitle = Map.groupBy(body.briefs.filter((b) => b.virtual === undefined), (b) => `${b.file}\u0000${b.title}`);
+  const ownerOf = (file: string): Brief | undefined => {
+    const first = body.briefs.find((b) => b.file === file && b.virtual === undefined);
+    return first && body.briefs.find((b) => b.address === parentOf(first.address));
+  };
+  const text = (t: string): Tok => ({ type: "text", text: t });
+  const para = (toks: Tok[]): Tok => ({ type: "paragraph", text: textOf(toks), tokens: toks });
+  const link = (b: Brief): Tok => ({ type: "link", href: `#/${b.address}`, to: b.address, text: b.title || body.title, tokens: [text(b.title || body.title)] });
+  const entry: Brief = {
+    address: home,
+    title: "The history",
+    number: `${roots + 1}`,
+    written: "",
+    file: "",
+    kind: "record",
+    body: [para([text(`The last ${history.commits.length} commits on the root, newest first, each with the briefs it touched. This level is read from git and stands in no file; a commit's brief leads to what it changed, and the foot of each of those leads back.`)])],
+    door: true,
+    virtual: "history",
+  };
+  body.briefs.push(entry);
+  history.commits.forEach((c, rank) => {
+    const address = `${home}/${c.short}`;
+    // one item per brief, in the body's order, the first line of change standing for the brief; what no longer stands
+    // in the body is named and not linked
+    const items = new Map<string, { b: Brief | null; lost: string; excerpt: string; order: number }>();
+    touchesOf(rootDir, c.hash, prefix).forEach((t) => {
+      const b = t.title === null ? ownerOf(t.file) : (byTitle.get(`${t.file}\u0000${t.title}`) ?? [])[t.nth];
+      const key = b ? b.address : `${t.file}#${t.title ?? ""}`;
+      if (!items.has(key)) items.set(key, { b: b ?? null, lost: t.title === null ? `the opening of ${t.file}` : `"${t.title}" in ${t.file}`, excerpt: t.excerpt, order: b ? (at.get(b.address) ?? Infinity) : Infinity });
+    });
+    const list = Array.from(items.values()).sort((x, y) => x.order - y.order);
+    const item = (x: { b: Brief | null; lost: string; excerpt: string }): Tok => ({
+      type: "list_item",
+      tokens: [{ type: "text", tokens: [...(x.b ? [link(x.b)] : [text(`${x.lost}, no longer in the body`)]), ...(x.excerpt ? [text(` — ${x.excerpt}`)] : [])] }],
+    });
+    const message = c.message.split(/\n\s*\n/).map((s) => s.trim()).filter((s) => s !== "");
+    body.briefs.push({
+      address,
+      title: c.subject,
+      number: `${roots + 1}.${rank + 1}`,
+      written: "",
+      file: "",
+      kind: "record",
+      body: [
+        para([text(`${c.short} · ${c.date} · ${c.author}`)]),
+        ...message.map((m) => para([text(m)])),
+        list.length ? { type: "list", ordered: false, start: "", loose: false, items: list.map(item) } : para([text("Touched no brief: the change stood outside the stamped files.")]),
+      ],
+      door: false,
+      virtual: "commit",
+      rank,
+    });
+    history.age[address] = rank;
+  });
+  history.age[home] = null;
+}
+
+/** The body with its history: the ages of its briefs, and the commits as a level of their own, where git can tell them. */
+function withHistory(body: Body, rootDir: string): void {
+  body.history = historyOf(body, rootDir);
+  if (body.history) historyLevel(body, rootDir, body.history);
 }
 
 // # 3. How it is drawn
