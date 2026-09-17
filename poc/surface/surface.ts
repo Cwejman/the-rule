@@ -14,6 +14,7 @@
 //   bun surface.ts <path> --port 8080      serve on another port
 //   bun surface.ts <path> --build [out]    write the page, default ./surface.html
 //   bun surface.ts <path> --check          trace only, print the warnings
+//   bun surface.ts <path> --history        trace, then print every brief's span of lines and its age in commits
 //
 // <path> is a stamped README.md, a folder holding one, or a single stamped file.
 // The surface never reads above it: the root is the body.
@@ -42,7 +43,7 @@ async function run(): Promise<void> {
   const flag = (f: string) => args.indexOf(f);
   const root = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--port" && args[i - 1] !== "--build");
   if (!root) {
-    console.error("usage: bun surface.ts <path> [--port N | --build [out.html] | --check]");
+    console.error("usage: bun surface.ts <path> [--port N | --build [out.html] | --check | --history]");
     process.exit(2);
   }
   if (flag("--check") >= 0) {
@@ -59,6 +60,22 @@ async function run(): Promise<void> {
       return face > FACE_FLAG ? [`${b.file} ${b.number || "·"} "${b.title}": a face of ${face}`] : [];
     });
     if (long.length) console.log(`${long.length} face${long.length === 1 ? "" : "s"} past ${FACE_FLAG} characters, to be read:\n${long.map((l) => "  " + l).join("\n")}`);
+    return;
+  }
+  if (flag("--history") >= 0) {
+    const body = await trace(root);
+    const rootDir = dirname(rootFileOf(root));
+    const history = historyOf(body, rootDir);
+    if (!history) return void console.log(`${body.briefs.length} briefs traced from ${body.root}; no history: the root is not in a repository git can read`);
+    const spans = spansOf(body, rootDir);
+    history.commits.forEach((c, i) => console.log(`${String(i).padStart(2)}  ${c.short}  ${c.date}  ${c.subject}`));
+    body.briefs.forEach((b) => {
+      const span = spans.get(b.address);
+      const age = history.age[b.address];
+      console.log(`${(b.address || "(the root)").padEnd(72)} ${b.file.padEnd(40)} ${span ? `[${span[0]}, ${span[1]}]`.padEnd(12) : "no span".padEnd(12)} ${age === null ? "older" : age}`);
+    });
+    const aged = Object.values(history.age).filter((a) => a !== null).length;
+    console.log(`${body.briefs.length} briefs, ${aged} with an age in the last ${history.commits.length} commits, ${body.briefs.length - aged} with none`);
     return;
   }
   if (flag("--build") >= 0) {
@@ -157,6 +174,7 @@ async function serve(rootArg: string, port: number): Promise<void> {
     const b = await trace(rootArg);
     b.warnings.forEach((w) => console.warn("  " + w));
     held = new Set(assetsOf(b));
+    b.history = historyOf(b, rootDir);
     return b;
   };
   const body = async () => Response.json(await retrace());
@@ -193,6 +211,7 @@ async function build(rootArg: string, out: string): Promise<void> {
   // path it has in the body, and its address carries a hash of its bytes, so a changed image is fetched again. A remote
   // image stays remote, since it may change after the build
   const rootDir = dirname(rootFileOf(rootArg));
+  body.history = historyOf(body, rootDir);
   const outDir = dirname(resolve(out));
   const images = body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.asset && !t.svg);
   const written = new Set<string>();
@@ -281,13 +300,22 @@ type Brief = {
   borrow?: string;
 };
 
-/** The body: every brief in reading order, and what the trace had to say. */
+/** One commit among the last on the root, as git tells it. */
+type Commit = { hash: string; short: string; date: string; subject: string };
+/**
+ * The history: the last commits on the root, newest first, and for every brief the rank of the newest commit that
+ * touched a line of its own prose, the head ranking zero; null where none of the listed commits did.
+ */
+type History = { commits: Commit[]; age: Record<string, number | null> };
+
+/** The body: every brief in reading order, what the trace had to say, and its history where git could tell it. */
 type Body = {
   title: string;
   root: string;
   briefs: Brief[];
   warnings: string[];
   traced: string;
+  history?: History;
 };
 
 /** GitHub's anchor for a heading, which is also how an address segment is written. */
@@ -797,6 +825,107 @@ function cleanSketch(src: string): string {
 
 /** Every image the body holds as a file, by its path from the root's directory. */
 const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.flatMap((t) => (t.type === "image" && t.asset ? [t.asset] : [])));
+
+// ## 2.8 History is read from git
+//
+// The files are the working tree, and git holds which commit last changed each
+// line of them. So after the trace every brief is given its span of lines, its
+// heading to the line before the next heading of any depth, which is its own
+// prose and not its level's; and each line of the span is asked of git blame
+// where it came from. A brief's age is the rank of the newest of those commits
+// among the last commits on the root, the head ranking zero, and a line not yet
+// committed ranks zero too, since it is newer than the head. A root outside a
+// repository, or a machine without git, leaves the history undefined, and the
+// page then offers nothing of it. The trace itself is not touched: this reads
+// the files a second time, by line, and git a first.
+
+/** How many commits back the history reaches. */
+const HISTORY_DEPTH = 60;
+
+/** A file's heading lines, one-based, each with its depth; a fenced block is skipped, since a line of code may open with a hash. */
+function headingLines(src: string): { line: number; depth: number }[] {
+  let fenced = false;
+  return src.split(/\r?\n/).flatMap((text, i) => {
+    if (/^ {0,3}(```|~~~)/.test(text)) fenced = !fenced;
+    const m = fenced ? null : /^ {0,3}(#{1,6}) /.exec(text);
+    return m ? [{ line: i + 1, depth: m[1].length }] : [];
+  });
+}
+
+/**
+ * Every brief's span of lines in its file. The trace lists a file's briefs in its heading order, and the cut takes the
+ * first title as the file's name and a second one as prose, so the headings of depth two and deeper are the briefs, in
+ * order; the root's opening is the one brief a title starts, so the root file's first heading is its first brief. A
+ * span runs from the heading to the line before the next heading of any depth, or to the file's end.
+ */
+function spansOf(body: Body, rootDir: string): Map<string, [from: number, to: number]> {
+  const spans = new Map<string, [number, number]>();
+  const byFile = Map.groupBy(body.briefs, (b) => b.file);
+  byFile.forEach((briefs, file) => {
+    const abs = join(rootDir, file);
+    if (!existsSync(abs)) return;
+    const src = readFileSync(abs, "utf8");
+    const heads = headingLines(src);
+    const last = src.split(/\r?\n/).length;
+    const titled = heads.findIndex((h) => h.depth === 1);
+    const own = heads.filter((h, i) => h.depth >= 2 || (i === titled && file === body.root));
+    briefs.forEach((b, i) => {
+      const h = own[i];
+      if (!h) return;
+      const next = heads.find((x) => x.line > h.line);
+      spans.set(b.address, [h.line, next ? next.line - 1 : last]);
+    });
+  });
+  return spans;
+}
+
+/** What git says to a question asked in the root's directory, or null where it cannot answer: no git, no repository, no such path. */
+function git(rootDir: string, args: string[]): string | null {
+  try {
+    const r = Bun.spawnSync(["git", ...args], { cwd: rootDir, stdout: "pipe", stderr: "pipe" });
+    return r.exitCode === 0 ? r.stdout.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The commit each line of a file came from, one-based, an all-zero hash where the line is not yet committed; null where git holds no such file. */
+function blameOf(rootDir: string, file: string): (string | undefined)[] | null {
+  const out = git(rootDir, ["blame", "--line-porcelain", "--", file]);
+  if (out === null) return null;
+  const lines: (string | undefined)[] = [];
+  out.split("\n").forEach((l) => {
+    const m = /^([0-9a-f]{40}) \d+ (\d+)/.exec(l);
+    if (m) lines[Number(m[2])] = m[1];
+  });
+  return lines;
+}
+
+/** The body's history, or undefined where the root has none git can tell. */
+function historyOf(body: Body, rootDir: string): History | undefined {
+  const log = git(rootDir, ["log", `-n${HISTORY_DEPTH}`, "--format=%H%x09%h%x09%ad%x09%s", "--date=short", "--", "."]);
+  if (log === null) return undefined;
+  const commits: Commit[] = log
+    .split("\n")
+    .filter((l) => l.includes("\t"))
+    .map((l) => l.split("\t"))
+    .map(([hash, short, date, subject]) => ({ hash, short, date, subject }));
+  const rank = new Map(commits.map((c, i) => [c.hash, i]));
+  rank.set("0".repeat(40), 0);
+  const spans = spansOf(body, rootDir);
+  const blames = new Map<string, (string | undefined)[] | null>();
+  const age: Record<string, number | null> = {};
+  body.briefs.forEach((b) => {
+    const span = spans.get(b.address);
+    if (!span) return void (age[b.address] = null);
+    if (!blames.has(b.file)) blames.set(b.file, blameOf(rootDir, b.file));
+    const blame = blames.get(b.file)!;
+    // a file git does not hold yet is all new, so every line of it ranks with the head
+    const ranks = blame === null ? [0] : blame.slice(span[0], span[1] + 1).flatMap((h) => (h !== undefined && rank.has(h) ? [rank.get(h)!] : []));
+    age[b.address] = ranks.length ? Math.min(...ranks) : null;
+  });
+  return { commits, age };
+}
 
 // # 3. How it is drawn
 //
