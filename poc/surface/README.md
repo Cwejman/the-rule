@@ -92,7 +92,7 @@ Whether the harness can be modified after all. Its SDK could assemble a context 
 
 What a session keeps. The lane and the widgets read any substrate, so they read a session's record once it is written down, but nothing here says what a session should write, or how it is made to write it while it works rather than at its close.
 
-What stands beside a brief in the left gutter. Commits and people belong there, and both wait for git, which [the implementation](implementation.md#9-git-waits-for-history) leaves for history.
+What stands beside a brief in the left gutter. Commits and people belong there; the commits are now read from git, as [the implementation](implementation.md#9-git-is-asked-for-history-not-for-files) says, and the people wait.
 
 *Open, 2026-09-13.*
 

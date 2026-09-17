@@ -290,13 +290,13 @@ Whether the functions grow into components is left until their use asks for it.
 
 *In force, the author's decision, 2026-09-12; the components open.*
 
-## 9. Git waits for history
+## 9. Git is asked for history, not for files
 
-Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), and drawing where a reader has been. When those are taken up, the live process asking the git CLI is the likely road.
+Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git is asked for history: since 2026-09-17 the live process asks the git CLI for the last sixty commits and blames every stamped file, so each brief carries the commit that last touched its lines and [the history widget](widgets.md#9-the-history) can colour the body by it. The same road serves what is still to be taken up, [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open) and drawing where a reader has been; the author's direction is that commits become briefs themselves, read in the lane like anything else.
 
 A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and three things make it the harder road here. It carries commits and not the working tree, so a live reading would lag behind a session's writing until the next commit. A static host serves no smart HTTP, and the client cannot read a `.git` folder served as plain files. And it brings a library, a filesystem in the browser, and a clone of the whole repository where the surface wants only the stamped files under one path.
 
-*Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day.*
+*Reasoned, 2026-09-12, and lived from 2026-09-17 when the CLI road was taken. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day.*
 
 ## 10. What is not settled yet
 
