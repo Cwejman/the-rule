@@ -1459,7 +1459,8 @@ type Action = {
 };
 
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
-const acts = (a?: string): string => a ?? state.focus;
+/** The brief an act falls on when none is named: the one under the pointer while one is pointed at, else the focus, since [pointing overrides the focus](lane.md#43-pointing-overrides-the-focus) for the acts as for the highlight. */
+const acts = (a?: string): string => a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : state.focus);
 
 /** Whether the reading stands at a commit's brief: the history reaches back to exactly that commit. */
 const readsBackTo = (a: string): boolean => {
@@ -5068,6 +5069,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .badge.aimed .cap.key { display: none; }
 .brief.here .badge.aimed .cap.key { display: grid; }
 .brief.here .badge.aimed .cap.pointer { display: none; }
+/* while a brief is pointed at, the key moves to it: the pointed brief inks the key, and the focus goes back to the pointer's cap */
+body.pointing .brief.here:not(.lit) .badge.aimed .cap.key { display: none; }
+body.pointing .brief.here:not(.lit) .badge.aimed .cap.pointer { display: grid; }
+body.pointing .brief.lit .badge.aimed .cap.key { display: grid; }
+body.pointing .brief.lit .badge.aimed .cap.pointer { display: none; }
 .badge .chord { display: inline-flex; gap: 2px; }
 /* the acts stand together at the right of the line, so the figures of every line begin at one edge */
 .act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
