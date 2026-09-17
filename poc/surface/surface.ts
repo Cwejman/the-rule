@@ -1002,6 +1002,8 @@ type Settings = {
   prose: Face;
   /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
   areas: Record<AreaName, string[]>;
+  /** how many commits back the reading is of history: a brief changed within them takes its commit's hue and the rest go grey; 0 reads the body as it stands */
+  back: number;
 };
 
 const DEFAULTS: Settings = {
@@ -1021,6 +1023,7 @@ const DEFAULTS: Settings = {
   headings: "serif",
   prose: "serif",
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
+  back: 0,
 };
 
 const state = {
@@ -1131,15 +1134,38 @@ function spread(weights: number[], span: number, floor: number): number[] {
   return raw.map((x) => (x < floor ? floor : large > 0 ? x - (owed * x) / large : x));
 }
 
+/** How many commits back the reading is of history: what the reader set, where the body has a history at all. */
+const backing = (): number => (state.body?.history ? state.settings.back : 0);
+/** The rank of the commit that last changed a brief's own prose, null where none of the listed commits did. */
+const ageOf = (address: string): number | null => state.body?.history?.age[address] ?? null;
+/**
+ * The section of the wheel the commits take when the reading is of history: the newest warmest, at twenty degrees, the
+ * oldest asked for coolest, at three hundred, and the ranks between spread evenly from one end to the other through
+ * the yellows and the greens, so two commits apart read as two hues apart.
+ */
+const WHEEL = { from: 20, to: 300 };
+const wheelHue = (rank: number, back: number): number => Math.round(WHEEL.from + ((WHEEL.to - WHEEL.from) * rank) / Math.max(1, back - 1));
 /**
  * The hue of a branch: every brief carries the hue of the root-level brief it stands under, so colour says
- * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ.
+ * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ. Reading
+ * history, a brief changed within the commits asked for carries its commit's hue instead, so colour then says when.
  */
 const hueOf = (address: string): number => {
+  const back = backing();
+  const r = back > 0 ? ageOf(address) : null;
+  if (r !== null && r < back) return wheelHue(r, back);
   const i = level("").findIndex((b) => b.address === address.split("/")[0]);
   return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
 };
-const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
+/** Whether a brief is drawn without colour: the reading is of history, and no commit asked for changed it. */
+const greyed = (address: string): boolean => {
+  const back = backing();
+  const r = ageOf(address);
+  return back > 0 && (r === null || r >= back);
+};
+/** The declarations that colour an element for its brief: the hue, and no chroma where history leaves it grey. */
+const tint = (address: string): string => `--h:${hueOf(address)}${greyed(address) ? ";--c:0" : ""}`;
+const hued = (address: string): string => `style="${tint(address)}"`;
 
 // ### 3.1.1 The actions
 //
@@ -1583,7 +1609,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
   const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
   return (
-    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
+    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${tint(b.address)};--after:${after}px">` +
     `<div class="surface">` +
     `<h2 class="head d${d}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
@@ -1642,6 +1668,7 @@ const ICON: Record<string, string> = {
   fold: `<path d="M5.4 4.4 8 7l2.6-2.6M5.4 11.6 8 9l2.6 2.6"/>`,
   open: `<path d="M9.6 3.5h3v3M6.4 12.5h-3v-3M12.5 3.5 9 7M3.5 12.5 7 9"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
+  history: `<circle cx="8" cy="3.6" r="1.7"/><circle cx="8" cy="12.4" r="1.7"/><path d="M8 5.3v5.4"/><path d="M9.7 12.4h1.8a2 2 0 0 0 2-2V8"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -1653,6 +1680,7 @@ const WIDGETS: Record<string, Widget> = {
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
+  history: { kind: "figure", name: "the history: the last commits, and the hue each takes when the reading is of them", icon: "history", draw: () => historyHtml(), width: () => 264, grow: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
@@ -1863,7 +1891,7 @@ function treeHtml(): string {
     const whole = gradeOf(b.address) === "whole";
     const on = prefixesOf(state.focus).includes(b.address);
     return (
-      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--d:${d}">` +
+      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${tint(b.address)};--d:${d}">` +
       foldMark(b) +
       `<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span></div>` +
       (whole ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
@@ -1873,9 +1901,9 @@ function treeHtml(): string {
   const S = state.scope;
   const above = prefixesOf(S)
     .slice(0, -1)
-    .map((a) => `<div class="row above" data-a="${esc(a)}" style="--h:${hueOf(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
+    .map((a) => `<div class="row above" data-a="${esc(a)}" style="${tint(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
     .join("");
-  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="--h:${hueOf(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
+  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="${tint(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
   return `<div class="tree">${above}${root}${level(S)
     .map((b) => node(b, depthOf(S) + 1))
     .join("")}<div class="laser"></div></div>`;
@@ -2049,7 +2077,8 @@ function meterArc(t: number, r: number): string {
  * wheel no finger sends. They are not drawn, rather than drawn and idle.
  */
 const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick"]);
-const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
+/** A setting that cannot act where the lane stands alone is not drawn, and the history is not offered where the body has none. */
+const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key)) && (key !== "back" || !!state.body?.history);
 
 function settingsHtml(): string {
   const s = state.settings;
@@ -2071,7 +2100,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "back"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -2080,6 +2109,7 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
+  { key: "back", name: "history", values: [0, 1, 3, 5, 10, 20], labels: ["off", "1", "3", "5", "10", "20"] },
 ];
 
 /** Turns one meter to its setting's value in place, so a drag never redraws the wing under the pointer. */
@@ -2118,6 +2148,7 @@ function loadSettings(): void {
   if (state.settings.line !== "middle" && state.settings.line !== "ends") state.settings.line = DEFAULTS.line;
   if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
   if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
+  if (!Number.isInteger(state.settings.back) || state.settings.back < 0) state.settings.back = DEFAULTS.back;
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -2148,6 +2179,26 @@ const KEY_GROUPS: { of: string; acts: string[] }[] = [
 
 const keysHtml = (): string =>
   `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
+
+// ### 3.8.2 The history: the last commits, and the hue each takes
+//
+// The commits on the root, newest first, a row apiece: a swatch of the hue the
+// commit takes when the reading reaches it and grey when it does not, its short
+// hash, its date and its subject cut to the row. Pressing a row reads back to
+// that commit, it included, so every brief changed since takes its commit's hue
+// and the rest of the body goes grey; pressing the row the reading stands at
+// turns the history off. The setting it sets is the one the settings widget
+// switches, so the two agree.
+
+function historyHtml(): string {
+  const h = state.body?.history;
+  if (!h) return `<div class="history chrome"><span class="none dim">no history: the root is not in a repository git can read</span></div>`;
+  const back = state.settings.back;
+  const row = (c: Commit, i: number) =>
+    `<div class="commit${i === back - 1 ? " on" : ""}${i < back ? " in" : ""}" data-back="${i}" data-tip="${esc(c.subject)}" style="--h:${wheelHue(i, back)}${i < back ? "" : ";--c:0"}">` +
+    `<i class="swatch"></i><span class="hash">${esc(c.short)}</span><span class="date">${esc(c.date)}</span><span class="subject">${esc(c.subject)}</span></div>`;
+  return `<div class="history chrome">${h.commits.map(row).join("")}</div>`;
+}
 
 // ## 3.9 The shape: the lane as laid
 //
@@ -2473,7 +2524,7 @@ function canvasNodeHtml(b: Brief): string {
   const set = home ? home.set : b.set;
   const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
   // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
-  return `<div class="cnode${zone ? " whole" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
+  return `<div class="cnode${zone ? " whole" : ""}" style="${tint(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -3473,7 +3524,7 @@ function showTip(el: Element, html: string): void {
   const w = t.offsetWidth;
   const h = t.offsetHeight;
   const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
-  const fig = el.closest("svg.fig, .tree, .keys, .settings");
+  const fig = el.closest("svg.fig, .tree, .keys, .settings, .history");
   const wing = el.closest<HTMLElement>(".wing");
   let left: number;
   let top: number;
@@ -4083,6 +4134,14 @@ function wire(): void {
       saveSettings();
       return void drawAll();
     }
+    // a commit's row reads back to it, that commit included; the row the reading stands at turns the history off
+    const back = t.closest<HTMLElement>("[data-back]");
+    if (back) {
+      const rank = Number(back.dataset.back);
+      state.settings.back = state.settings.back === rank + 1 ? 0 : rank + 1;
+      saveSettings();
+      return void drawAll();
+    }
     const set = t.closest<HTMLElement>("[data-set]");
     if (set) {
       const v = set.dataset.value!;
@@ -4487,8 +4546,10 @@ if (typeof document !== "undefined") start();
 
 /**
  * The palette: every colour's role once, with its light value and its dark value side by side. A role whose value takes
- * the branch hue reads it from --h, so it is set on every element and follows the branch the element stands under. A
- * sketch imports this and falls back to the light side where no page supplies the roles.
+ * the branch hue reads it from --h, so it is set on every element and follows the branch the element stands under; its
+ * chroma is scaled by --c, one unless an element sets it to nothing, which is how a brief goes grey at its own lightness
+ * when the reading is of history and no commit asked for changed it. A sketch imports this and falls back to the light
+ * side where no page supplies the roles.
  */
 export const PALETTE: Record<string, [light: string, dark: string]> = {
   ground: ["#ffffff", "oklch(18.5% 0.005 60)"],
@@ -4500,11 +4561,11 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   track: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .13)"],
   meter: ["oklch(62% 0.19 28)", "oklch(70% 0.14 28)"],
   rim: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .1)"],
-  rest: ["oklch(88% 0.045 var(--h))", "oklch(35% 0.04 var(--h))"],
-  door: ["oklch(74% 0.085 var(--h))", "oklch(54% 0.07 var(--h))"],
-  on: ["oklch(42% 0.072 var(--h))", "oklch(84% 0.055 var(--h))"],
-  lit: ["oklch(60% 0.12 var(--h))", "oklch(74% 0.1 var(--h))"],
-  glow: ["oklch(80% 0.08 var(--h))", "oklch(47% 0.06 var(--h))"],
+  rest: ["oklch(88% calc(0.045 * var(--c, 1)) var(--h))", "oklch(35% calc(0.04 * var(--c, 1)) var(--h))"],
+  door: ["oklch(74% calc(0.085 * var(--c, 1)) var(--h))", "oklch(54% calc(0.07 * var(--c, 1)) var(--h))"],
+  on: ["oklch(42% calc(0.072 * var(--c, 1)) var(--h))", "oklch(84% calc(0.055 * var(--c, 1)) var(--h))"],
+  lit: ["oklch(60% calc(0.12 * var(--c, 1)) var(--h))", "oklch(74% calc(0.1 * var(--c, 1)) var(--h))"],
+  glow: ["oklch(80% calc(0.08 * var(--c, 1)) var(--h))", "oklch(47% calc(0.06 * var(--c, 1)) var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
   glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
@@ -4727,6 +4788,17 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .badge.off { opacity: .35; pointer-events: none; }
 .badge .held { color: var(--faint); font-size: 11px; }
 /* the keys: the whole table in a wing, grouped by what each act works on, its caps always inked */
+/* the history: a row per commit, the swatch its hue or grey, the subject cut to what the row leaves */
+.history { width: 264px; display: flex; flex-direction: column; gap: 1px; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); }
+.history .none { display: block; padding: 0 8px; }
+.history .commit { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: background .15s; }
+.history .commit:hover { background: var(--wash); }
+.history .commit.on { background: var(--wash); color: var(--ink); }
+.history .swatch { flex: none; width: 9px; height: 9px; border-radius: 3px; background: var(--lit); }
+.history .hash { flex: none; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+.history .commit.in .hash { color: var(--on); }
+.history .date { flex: none; color: var(--faint); font-size: 11px; }
+.history .subject { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .keys { width: 216px; display: flex; flex-direction: column; gap: 14px; font-family: var(--sans); font-size: var(--small); }
 .keys .group { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
 .keys .of { margin-bottom: 1px; }

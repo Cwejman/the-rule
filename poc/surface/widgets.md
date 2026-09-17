@@ -211,3 +211,11 @@ The keys is a wing widget: every act with the key that fires it, grouped by what
 It answers for the focus, so what the space bar would do now is what it says, and an act out of reach stands quiet in its place. Every badge in it is pressable, and each tells what it does on pointing, so it is the help as well as the list.
 
 *The author's ask of 2026-09-16, that every act available as a shortcut be visible somewhere; a figure rather than an overlay, since [an overlay stays refused](refused.md#j-an-overlay-at-all) and a figure is one function and one name. Whether it earns its place once the badges stand where the acts are is open.*
+
+## 9. The history
+
+The history is a wing widget: the last commits on the root, newest first, a row apiece, with a swatch, the short hash, the date and the subject cut to the row. Pressing a row reads the body back to that commit, it included: every brief whose own prose a commit since then changed takes that commit's hue, the newest warmest and the oldest asked for coolest across one section of the wheel, and every other brief goes grey at its own lightness, wherever it is drawn. Pressing the row the reading stands at turns it off, and [the history switch](framework.md#5-settings-are-data-and-a-figure-edits-them) sets the same thing by count.
+
+A brief's age is what git says of its lines: the newest commit among those that last touched a line between its heading and the next. A body outside a repository has no history, and the widget and the switch say so rather than stand idle.
+
+*Built 2026-09-17 from the author's ask to read the substrate as a diff of the head against a commit; the wheel section is the session's choice. A first step: the author's direction is that commits become briefs themselves, so that the lane and the canvas serve them, and this widget stands until they do.*
