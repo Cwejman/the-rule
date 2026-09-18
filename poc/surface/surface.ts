@@ -2553,12 +2553,12 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
   const n = o.head ? "" : numberIn(b, root);
   const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
-  // a row is one size, so it is filled rather than padded: the name runs on into the opening words of the face, and
-  // the two are cut together at the line the row holds, so a short name gives its room to what the piece says
-  const said = trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), 190);
-  const say = `<span class="say">${num}<b class="title">${esc(b.title)}</b> <span class="face">${esc(said)}</span></span>`;
-  // the figure stands on a line of its own beneath the name, where it neither squeezes the name nor ends ragged
-  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}${marksHtml(b, o.hides)}</div>`;
+  // a node carries its name and what waits beneath it, and nothing else: the width is set so that a name fills it
+  // rather than trailing off in one long line, and the figure stands on the line beneath
+  const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
+  // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
+  // width and a name that wraps needs no hanging indent
+  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -2583,7 +2583,7 @@ function columnHtml(root: string, col: number): string {
 
 /** How the nesting within a file is drawn: a spine down the left with the rows hanging into it, or one line threading from row to row. */
 /** The map's measures, all on one grid of four: the width of a row, the room between rows, how far a level steps in, and how far a reading stands from the row that named it. */
-const NODE = { w: 240, gap: 12, indent: 24, across: 48 };
+const NODE = { w: 192, gap: 12, indent: 24, across: 48 };
 const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false } };
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
@@ -4844,12 +4844,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
-.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
-/* the row is filled, not padded: the name runs on into what the piece says, and the two are cut together at the third
-   line, so every row is one size and none of it stands empty */
-.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; height: 4.05em; }
-.crow .title { font-weight: calc(500 - var(--thin)); color: var(--ink); }
-.crow .face { color: var(--muted); }
+.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
+/* the name is given a width it fills rather than one it trails off in: two lines is what most names take here, and
+   that is the room the node keeps, so a level of nodes reads as a set and none of them stands half empty */
+.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; min-height: 2.7em; }
+/* the foot of a node: where it stands in its reading, and what waits beneath it */
+.crow .foot { display: flex; align-items: center; gap: 6px; height: 6px; }
+.crow .title { color: var(--ink); }
 /* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
 .crow.opens { box-shadow: inset 0 0 0 1px var(--door); }
 /* the head of a column is the brief the file opens with, and it says so by its weight */
@@ -4860,7 +4861,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--track); color: var(--ink); }
 #depth .dc:hover { background: var(--muted); color: var(--ground); }
-.crow .num { display: inline-block; width: 1.7em; margin-right: .2em; text-align: right; font-size: .85em; color: var(--faint); }
+.crow .num { flex: none; font-size: .8em; line-height: 1; color: var(--faint); }
 .crow.on .num { color: var(--on); }
 /* what the reading stands on takes the branch's hue at full weight; what the reader has selected is filled as well,
    since the two are different things and a reader may have selected one while reading another */
@@ -4870,7 +4871,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
 /* the figure: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy, on its own
    line and beginning at the row's own edge, so a level's figures read against each other */
-.crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; overflow: hidden; }
+.crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; min-width: 0; overflow: hidden; }
 .crow .marks i { display: block; flex: none; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
