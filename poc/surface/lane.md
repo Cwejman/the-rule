@@ -44,7 +44,7 @@ A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which i
 
 ## 2. Two grades
 
-Every brief in the lane stands at one of two grades: its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and the level beneath it laid at faces, unless the reader has already folded or unfolded there.
+Every brief in the lane stands at one of two grades: its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and its level standing beneath it.
 
 A brief never folds past its face, so nothing in the lane is ever a bare name, and folding is one act with one inverse.
 
@@ -52,11 +52,13 @@ Org-mode has cycled a heading between folded, children and whole for twenty year
 
 *Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third grade, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 
-## 3. One step ahead
+## 3. A reading is laid whole
 
-A brief at its face shows nothing of its level in the lane; what lies beneath it is drawn in [the wings](framework.md#2-the-areas) instead. So the lane always reveals one step ahead of what is being read and no more: nothing beneath is out of reach, and nothing is forced on the reader.
+The lane lays all of the reading it holds: every brief of the file unfolded, its prose whole, down to its last heading. The reader crossed a boundary to get here and asked for this reading; handing it a level at a time makes them ask again at every level.
 
-*Reasoned, the author's, 2026-09-13.*
+Folding is what they do afterwards, to a part they have read or do not want, and [the keys](#64-the-keys) fold the lot in one act. What stays at its face is a card, since what a card holds waits past a boundary rather than beneath a fold.
+
+*The author's decision, 2026-09-18. It supersedes the lane revealing one step ahead of the reading, reasoned 2026-09-13, which was written when the lane held the whole body and a fold was the only thing keeping four hundred briefs out of one run; [the boundary](#11-why-the-lane-stops-there) does that now.*
 
 ## 4. Where you are is the brief in focus
 
@@ -108,7 +110,7 @@ The fade at the top comes in with the reading line, since nothing stands above t
 
 ## 5. Arriving lays the lane
 
-Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: the ancestors of the address whole, their siblings at faces, the address and its siblings whole, and the level beneath the address at faces. Then the lane scrolls to the address. Above the focus, then, lies what was taken whole and what was passed at its face, so the way up is short.
+Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-a-reading-is-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
 
 Scrolling afterwards moves the focus and changes no grade, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the history, and the history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7-scoping-the-lane). The browser's back and forward walk them.
 

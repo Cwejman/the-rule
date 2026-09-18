@@ -28,7 +28,7 @@ The author's verdict on the coupling was that one small scroll moved three panes
 
 A preview pane showing faces and no prose.
 
-The level beneath is laid in the lane as faces, [one step ahead](lane.md#3-one-step-ahead), and what lies further is [the ahead](widgets.md#4-the-ahead). Faces inline in the reading are not this refusal, which was a pane of doors standing beside it.
+The level beneath stands in the lane already, since [a reading is laid whole](lane.md#3-a-reading-is-laid-whole), and what lies past its boundaries is entered. Prose inline in the reading is not this refusal, which was a pane of doors standing beside it.
 
 ## d. Two scroll axes in one region
 
@@ -70,7 +70,7 @@ Reaching it is the problem. On a crowded figure the pointer cannot get from a ce
 
 The second program kept an overlay that only told, raised beside whatever the pointer rested on and never entered.
 
-What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5-links), a brief's level [in the lane](lane.md#3-one-step-ahead) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
+What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5-links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
 
 ## k. A level to a pane, three abreast
 
@@ -88,7 +88,7 @@ Refused with the panes; there is no row to move.
 
 The second program drew the level beneath a brief as a small band beside its heading, told it on pointing, and unfolded it on a press.
 
-That is not how a document reads: its subsections present themselves as you scroll. The lane lays the level beneath a whole brief [at faces](lane.md#3-one-step-ahead), and a reader folds what they do not want rather than asking for what they do.
+That is not how a document reads: its subsections present themselves as you scroll. The lane lays [the reading whole](lane.md#3-a-reading-is-laid-whole), and a reader folds what they do not want rather than asking for what they do.
 
 ## n. Pressing a brief to unfold its level without entering it
 

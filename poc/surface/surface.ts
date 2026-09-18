@@ -1345,16 +1345,22 @@ const BLOCK: Record<string, (t: Tok) => string> = {
 // the grades afresh; folding changes one brief or one level; scrolling changes
 // nothing but the focus.
 
-/** Lays the lane for an address: ancestors whole, their siblings at faces, its level whole, the level beneath at faces. */
-function lay(address: string): void {
+/**
+ * Lays the lane for an address: the reading whole. A file is one reading bounded by its cards, so every brief of it
+ * stands unfolded from the start and folding is what a reader does afterwards, to a part they have read or do not
+ * want. A card stays at its face, since what it holds waits past a boundary.
+ */
+function lay(): void {
   const g = state.grades;
   g.clear();
   const S = state.scope;
-  if (!within(address, S)) address = S;
-  const path = prefixesOf(address).filter((p) => within(p, S) && opensInLane(p));
   g.set(S, "whole");
-  path.forEach((p) => level(p).forEach((c) => g.set(c.address, !isCard(c) && (path.includes(c.address) || p === parentOf(address)) ? "whole" : "face")));
-  closeLay();
+  const open = (a: string): void =>
+    level(a).forEach((c) => {
+      g.set(c.address, isCard(c) ? "face" : "whole");
+      if (!isCard(c)) open(c.address);
+    });
+  open(S);
 }
 
 /** Whether an address stands in the holon of another: the root itself, or beneath it. */
@@ -3628,7 +3634,7 @@ function follow(to: string): void {
   }
   arriving = true;
   state.scope = level(target).length ? target : parentOf(target);
-  lay(target);
+  lay();
   state.focus = target;
   drawAll();
   scrollToFocus(false);
@@ -3731,7 +3737,7 @@ function arrive(a: string): void {
   const target = brief(a) ? a : nearest(a);
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
-  lay(target);
+  lay();
   state.focus = target;
   drawAll();
   scrollToFocus(false);
@@ -4000,7 +4006,7 @@ function scopeTo(S: string): void {
   move(depthOf(S) > depthOf(state.scope) ? "in" : "out", S);
   state.scope = S;
   if (!within(state.focus, S)) state.focus = S;
-  lay(state.focus);
+  lay();
   drawAll();
   scrollToFocus(false);
   // a change of scope is a step of its own in the browser's history as well
