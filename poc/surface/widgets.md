@@ -92,19 +92,27 @@ Beside its face a folded brief carries a grey tick for every paragraph and a sma
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 3.2 The levels above the scope
+### 3.2 A card says the lane stops there
+
+[A card](lane.md#12-a-mount-raises-a-card) is not a brief of this reading, and the shape draws it apart: a row set off from the rows around it, holding the marks of the brief on the other side, with nothing beneath it however heavy that branch is. A tail would say the level waits one fold away, and it does not; it waits one opening away.
+
+So a reader scanning the shape sees where this reading ends before they reach it, and the two things a press can do, folding within and crossing out, never look alike.
+
+*The author's ask of 2026-09-18, that the minimap embody the boundary; the form as built.*
+
+### 3.3 The levels above the scope
 
 When the lane is scoped, the levels above the scope stand to the left of the opening's row, a grey tick per ancestor, outermost leftmost, and each is a press that scopes out to that level, as the ticks to the right are what a fold hides.
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 3.3 The viewport scrubs the lane
+### 3.4 The viewport scrubs the lane
 
 The viewport, the part of the lane on the screen, is drawn over the shape as a shaded band, and dragging it scrubs the lane, so the shape is also the way to move fast through a long body.
 
 *Reasoned, the author's, 2026-09-13.*
 
-### 3.4 Two presses, read from where they land
+### 3.5 Two presses, read from where they land
 
 A brief has two presses, and what a press does is read from where it lands, so no modifier key is needed. Its blocks go to it. The room to their right, where its ticks and tail stand when it is folded and nothing stands when it is unfolded, folds or unfolds it, and folding from there never scrolls the lane.
 

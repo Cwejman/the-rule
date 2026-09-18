@@ -6,13 +6,33 @@ status: in force
 
 # Reading and orientation come apart
 
-## 1. The body in the order a document reads
+## 1. The lane holds one reading
 
-The lane holds the body depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the root's title and its first paragraph, stands first.
+The lane holds one reading depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the scope's title and its first paragraph, stands first.
+
+One reading and not the body: the lane runs to the end of its file and stops there, since [a file is one linear reading](../practice.md#11-a-file-is-one-linear-reading). What lies past a mount is read by going there.
 
 The space between briefs steps down with depth, as [the design language's rhythm](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice) asks: what lies beneath a brief sits together, and the briefs of a level stand further apart the higher the level, so the gap before a brief says which level it begins.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13; bounded to one reading by his decision of 2026-09-18.*
+
+### 1.1 Why the lane stops there
+
+The lane used to hold the whole body, and every brief in it could be unfolded, so the root could be opened into all four hundred briefs at once. Nobody wrote that reading and nobody can take it in.
+
+Two wholes laid into one run are neither: each was composed to be read from its first line to its last, and a reader given both at once has a run that was never composed. So the boundary is the file, and crossing it is an act the reader takes rather than one a fold performs.
+
+What the reader loses is one scroll past a mount. What the reader gains is that everything now in front of them was written to be read together, and that holding the space bar opens this reading rather than the world.
+
+*The author's decision, 2026-09-18, after reading the arc on the surface and finding the root expandable into everything.*
+
+### 1.2 A mount raises a card
+
+A mount says only [where its part stands](../practice.md#32-a-mounting-brief-says-placement-not-content), so on its own it would leave the reader at a bare link. Beneath its paragraph the lane raises a card: a figure of its own, standing in the prose as an image does, carrying the part's title, its face, and the confidence line that says whether it is in force, ratified or open, since that is what decides whether to enter.
+
+The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
+
+*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is mounted.*
 
 ## 2. Two grades
 
@@ -106,7 +126,9 @@ Scrolling alone is not a change, and a new change clears what was undone.
 
 Folding takes a brief to its face and unfolding takes it whole, [the two grades](#2-two-grades), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
-*Reasoned, the author's, 2026-09-13; pressing the face is the author's lean, and the best gesture is not yet known.*
+[A card](#12-a-mount-raises-a-card) carries the same line and takes the same two grades, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
+
+*Reasoned, the author's, 2026-09-13; pressing the face is the author's lean, and the best gesture is not yet known; the card, 2026-09-18.*
 
 ### 6.1 The action line is the press
 
@@ -134,7 +156,7 @@ So the deeper structure yields first, and whether unfolding gives only three par
 
 The tree is the lane's own outline, so folding a row there is folding the brief in the lane, one state and never two, and there the folder's triangle does it, since that is what a tree reader expects.
 
-In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press with the modifier key held folds or unfolds it in place. In the shape, the room to the right of a brief's blocks folds or unfolds it, [as the shape says](widgets.md#34-two-presses-read-from-where-they-land), and no modifier is needed.
+In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press with the modifier key held folds or unfolds it in place. In the shape, the room to the right of a brief's blocks folds or unfolds it, [as the shape says](widgets.md#35-two-presses-read-from-where-they-land), and no modifier is needed.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -166,7 +188,9 @@ A small reversal of the scroll, down then up then down within a moment, folds or
 
 A reader can make any brief the root of the lane: its heading becomes the opening, its holon becomes the whole, and everything above it leaves the lane. Enter does it to the brief in focus, when that brief has a level beneath it, and the address carries the scope after the focus, so a scoped place can be handed to someone like any other.
 
-*Reasoned, the author's, 2026-09-13; the address form is the builder's call.*
+Opening [a card](#12-a-mount-raises-a-card) is the same act, and it is the one place the act is not optional: the reading on the other side is reached no other way. Scoped there, the brief the card showed becomes the opening, and it is read from its own prose rather than from the placement that mounted it.
+
+*Reasoned, the author's, 2026-09-13; the address form is the builder's call; opening a card, 2026-09-18.*
 
 ### 7.1 Scoping does what heading sizes can only do so far
 
@@ -182,7 +206,7 @@ Shift with enter widens the scope by one level, to the parent of the scope root.
 
 ### 7.3 The levels above stay in sight
 
-The levels above the scope stay visible in the figures, as the levels beneath a fold are: the shape draws them as [grey ticks](widgets.md#32-the-levels-above-the-scope) to the left of the opening's row, and the tree as dim rows above the root, each a press that scopes out to it. Over the lane itself they stand as the way down, beneath.
+The levels above the scope stay visible in the figures, as the levels beneath a fold are: the shape draws them as [grey ticks](widgets.md#33-the-levels-above-the-scope) to the left of the opening's row, and the tree as dim rows above the root, each a press that scopes out to it. Over the lane itself they stand as the way down, beneath.
 
 *Reasoned, the author's, 2026-09-13.*
 

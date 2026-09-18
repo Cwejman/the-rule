@@ -10,7 +10,7 @@ status: in force
 
 The first program gave a pane to a single brief and put the rest of its level in a list to choose from.
 
-That makes a level a choice between peers, where [a level is read through](lane.md#1-the-body-in-the-order-a-document-reads).
+That makes a level a choice between peers, where [a level is read through](lane.md#1-the-lane-holds-one-reading).
 
 ## b. Panes scrolling at graded speeds
 

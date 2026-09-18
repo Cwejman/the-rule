@@ -210,7 +210,7 @@ Without it a reader who had closed the shape on a desk could never ask for it ag
 
 ### 5.3 The rail takes no presses
 
-The shape gives a brief two presses, [read from where they land](widgets.md#34-two-presses-read-from-where-they-land): its blocks go to it, the room to their right folds it. Neither is there under a finger. A row of the rail is a few pixels tall, which no finger can aim at, and the room to the right went with the marks.
+The shape gives a brief two presses, [read from where they land](widgets.md#35-two-presses-read-from-where-they-land): its blocks go to it, the room to their right folds it. Neither is there under a finger. A row of the rail is a few pixels tall, which no finger can aim at, and the room to the right went with the marks.
 
 So the rail is scrubbed and nothing else, and what the two presses gave is had elsewhere: the outline goes, the action line folds.
 
