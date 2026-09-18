@@ -1151,7 +1151,7 @@ const ACTIONS: Record<string, Action> = {
       chain = chain.slice(0, chain.indexOf(x));
       picked = x;
       drawCanvas();
-      bringIntoView(x);
+      requestAnimationFrame(() => bringIntoView(x));
     },
   },
   read: {
@@ -2538,8 +2538,7 @@ function marksHtml(b: Brief, hides: boolean): string {
   const rest = blocksOf(b).slice(1);
   const weight = hides ? (state.index!.branch.get(b.address) ?? 0) : 0;
   const tail = hides && beneathOf(b) ? Math.round(Math.min(64, 8 + Math.log2(1 + weight / 400) * 10)) : 0;
-  if (!rest.length && !tail) return "";
-  const bars = rest.slice(0, 8).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
+  const bars = rest.slice(0, 10).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
   return `<span class="marks">${bars}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`;
 }
 
@@ -2554,8 +2553,8 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
   const n = o.head ? "" : numberIn(b, root);
   const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
-
-  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${num}<span class="title">${esc(b.title)}</span>${marksHtml(b, o.hides)}</div>`;
+  // the figure stands on a line of its own beneath the name, where it neither squeezes the name nor ends ragged
+  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}><span class="name">${num}<span class="title">${esc(b.title)}</span></span>${marksHtml(b, o.hides)}</div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -2579,7 +2578,9 @@ function columnHtml(root: string, col: number): string {
 }
 
 /** How the nesting within a file is drawn: a spine down the left with the rows hanging into it, or one line threading from row to row. */
-const TREE = { spine: { indent: 28, x: 12, tick: true }, thread: { indent: 16, x: 26, tick: false } };
+/** The map's measures, all on one grid of four: the width of a row, the room between rows, how far a level steps in, and how far a reading stands from the row that named it. */
+const NODE = { w: 240, gap: 12, indent: 24, across: 48 };
+const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false } };
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
@@ -2621,7 +2622,7 @@ function drawCanvas(): void {
   if (!chainHolds(state.focus)) chain = cardPathOf(state.focus);
   if (picked === null || !brief(picked) || !chainHolds(picked)) picked = state.focus;
   colOf.clear();
-  ui.canvas.innerHTML = `<div id="stage" style="--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--gap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
     fitCanvas();
     fitted = state.body.root;
@@ -2658,11 +2659,11 @@ function drawEdges(): void {
     const p = at(row);
     const x = p.left + form.x;
     const last = mid(at(rows[rows.length - 1]));
-    paths.push(`<path class="nest" d="M${x.toFixed(1)} ${(p.bottom + 2).toFixed(1)}L${x.toFixed(1)} ${last.toFixed(1)}"/>`);
+    paths.push(`<path class="nest" d="M${x.toFixed(1)} ${p.bottom.toFixed(1)}L${x.toFixed(1)} ${last.toFixed(1)}"/>`);
     if (form.tick)
       rows.forEach((r) => {
         const q = at(r);
-        paths.push(`<path class="nest" d="M${x.toFixed(1)} ${mid(q).toFixed(1)}L${(q.left - 2).toFixed(1)} ${mid(q).toFixed(1)}"/>`);
+        paths.push(`<path class="nest" d="M${x.toFixed(1)} ${mid(q).toFixed(1)}L${q.left.toFixed(1)} ${mid(q).toFixed(1)}"/>`);
       });
   });
   // an opening: the edge from the row the reader pressed to the head of the reading it named
@@ -2675,7 +2676,7 @@ function drawEdges(): void {
     // the two stand with their tops level, so the line is drawn on the first line of each rather than on their
     // middles: a row that wrapped to two lines would otherwise tilt the line it leaves by half a line
     const y = p.top + Math.min(p.bottom - p.top, q.bottom - q.top) / 2;
-    paths.push(`<path class="open" ${hued(head.dataset.a ?? "")} d="M${(p.right + 2).toFixed(1)} ${y.toFixed(1)}L${(q.left - 3).toFixed(1)} ${y.toFixed(1)}"/>`);
+    paths.push(`<path class="open" ${hued(head.dataset.a ?? "")} d="M${p.right.toFixed(1)} ${y.toFixed(1)}L${q.left.toFixed(1)} ${y.toFixed(1)}"/>`);
   });
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
@@ -2691,10 +2692,14 @@ function pickNode(a: string, col: number | null): void {
   if (col !== null) chain = [...chain.slice(0, col), a];
   drawCanvas();
   // an opening brings the reading it opened into the pane, since that is what the press was for
-  const st = stage();
-  const opened = col === null ? null : st?.querySelector<HTMLElement>(`.cnode.open > .crow[data-a="${cssEsc(a)}"]`)?.nextElementSibling?.querySelector<HTMLElement>(".ccol");
-  if (opened) bringInto(opened, 0.42);
-  else bringIntoView(a);
+  // the row that was pressed and the reading it opened are brought in together, so the reader keeps the place they
+  // pressed from and meets what it led to beside it. It waits a frame, since the browser has not finished laying the
+  // column out when the draw returns and a measure taken then is of where the map was, not where it is
+  requestAnimationFrame(() => {
+    const pair = col === null ? null : (stage()?.querySelector<HTMLElement>(`.cnode.open > .crow[data-a="${cssEsc(a)}"]`)?.parentElement ?? null);
+    if (pair) bringInto(pair, 0.06);
+    else bringIntoView(a);
+  });
 }
 
 // ### 3.11.1 The depth: every brief in the scope unfolded to a depth, and folded beyond it
@@ -2778,25 +2783,35 @@ function bringIntoView(a: string): void {
   if (rows.length) bringInto(rows[rows.length - 1], 0.5);
 }
 
-/** Eases the view until a part of the map stands in the pane, and leaves one already in view where it is. */
+/**
+ * Eases the view until a part of the map stands in the pane, and leaves one already in view where it is. Where the
+ * element stands is read from the transform as it is painted, since an ease may still be running, and where it should
+ * stand is reckoned against the view as it is meant to be, so two openings in quick succession do not fight.
+ */
 function bringInto(el: HTMLElement, leftAt: number): void {
+  const st = stage();
+  if (!st) return;
   const c = ui.canvas.getBoundingClientRect();
+  const m = new DOMMatrixReadOnly(getComputedStyle(st).transform);
   const r = el.getBoundingClientRect();
-  const top = canvasTop();
+  const kx = m.a || 1;
+  const ky = m.d || 1;
+  // where it stands on the stage itself, free of whatever the transform is doing at this moment
+  const lx = (r.left - c.left - m.e) / kx;
+  const ly = (r.top - c.top - m.f) / ky;
+  const w = (r.width / kx) * view.k;
+  const h = (r.height / ky) * view.k;
   // the face and the acts stand over the map, so what is brought in is brought into what is left clear of them
   const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#face")?.offsetWidth ?? 0);
   const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#field") ? 44 : 0);
-  const fitsX = r.left >= c.left + CANVAS_INSET && r.right <= c.right - right;
-  const fitsY = r.top >= c.top + top && r.bottom <= c.bottom - foot;
+  const top = canvasTop();
+  const x = view.x + lx * view.k;
+  const y = view.y + ly * view.k;
+  const fitsX = x >= CANVAS_INSET && x + w <= c.width - right;
+  const fitsY = y >= top && y + h <= c.height - foot;
   if (fitsX && fitsY) return;
-  if (!fitsX) {
-    const want = clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - r.width - right));
-    view.x = Math.round(view.x + (c.left + want - r.left));
-  }
-  if (!fitsY) {
-    const want = clamp(c.height / 3, top, Math.max(top, c.height - r.height - foot));
-    view.y = Math.round(view.y + (c.top + want - r.top));
-  }
+  if (!fitsX) view.x = Math.round(clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - w - right)) - lx * view.k);
+  if (!fitsY) view.y = Math.round(clamp(c.height / 3, top, Math.max(top, c.height - h - foot)) - ly * view.k);
   applyView(true);
 }
 
@@ -4212,7 +4227,8 @@ function wire(): void {
       e.preventDefault();
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
-    if (t.closest("a[href]") || window.getSelection()?.toString()) return;
+    // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
+    if (t.closest("a[href]") || (!t.closest("#canvas") && window.getSelection()?.toString())) return;
     // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
     const badge = t.closest<HTMLElement>("[data-act]");
     if (badge) {
@@ -4290,7 +4306,10 @@ function wire(): void {
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
     const held = (e.target as HTMLElement).closest<HTMLElement>("#card");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
-    const cv = (e.target as HTMLElement).closest("#depth") ? null : (e.target as HTMLElement).closest<HTMLElement>("#canvas");
+    const el = e.target as HTMLElement;
+    // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
+    // must neither cancel it nor drag the map out from under the reader
+    const cv = el.closest("#depth") || el.closest(".crow") || el.closest("#field") || el.closest("#face") ? null : el.closest<HTMLElement>("#canvas");
     if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
     else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
@@ -4304,7 +4323,12 @@ function wire(): void {
       railScrub(e.clientX, e.clientY);
     } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
     else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
-    if (drag) (e.target as Element).setPointerCapture?.(e.pointerId);
+    // the capture is taken on the area rather than on what the press landed on, since a redraw between the press and
+    // its release would detach that element and the release would never reach the page
+    if (drag)
+      try {
+        drag.el.setPointerCapture?.(e.pointerId);
+      } catch {}
   });
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
@@ -4806,21 +4830,22 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
 #edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 #edges path.open { stroke: var(--door); stroke-width: 1.5; }
-/* a column is one file read top to bottom; a level stands beneath the brief that holds it, stepped in so the line
-   that joins them has room to stand */
-.ccol { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+/* the map is laid on one grid: a row is one width, the room between rows is one gap, a level steps in by one, and a
+   reading stands one across from the row that named it. Nothing in it is a number of its own */
+.ccol { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap); }
 .cnode { display: flex; flex-direction: column; align-items: flex-start; }
 /* an opening holds its row and the reading it opened side by side, the reading beginning level with the row */
-.cnode.open { flex-direction: row; align-items: flex-start; gap: 54px; }
-.ckids { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; margin: 9px 0 0 var(--indent, 28px); }
+.cnode.open { flex-direction: row; align-items: flex-start; gap: var(--across); }
+.ckids { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap); margin: var(--gap) 0 0 var(--indent); }
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
-/* a row is a thing to look at and to press, so it keeps its own edge. The rows of a level share one width, and the
-   number keeps its room whether the row has one or not, so the titles begin at one edge and the marks end at one */
-.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .5em; width: 252px; padding: .42em .6em; border-radius: 7px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s, background .15s; }
+/* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
+   the next, so the name is never squeezed by the figure and both begin at the row's own edge */
+.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
+.crow .name { display: flex; align-items: baseline; gap: 8px; min-height: 2.7em; }
 /* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
 .crow.opens { box-shadow: inset 0 0 0 1px var(--door); }
 /* the head of a column is the brief the file opens with, and it says so by its weight */
-.crow.head { width: auto; max-width: 300px; font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--door); }
+.crow.head { font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--door); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
@@ -4835,11 +4860,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--door); }
 .crow.picked.here { box-shadow: inset 0 0 0 1.5px var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-/* the marks say what a row does not show, and they end at the row's own edge, so a level's marks line up */
-.crow .marks { display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex: 1 0 auto; margin-left: auto; min-width: 0; max-width: 40%; overflow: hidden; }
-.crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
+/* the figure: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy, on its own
+   line and beginning at the row's own edge, so a level's figures read against each other */
+.crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; overflow: hidden; }
+.crow .marks i { display: block; flex: none; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-.crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
+.crow .marks .tail { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
 /* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
 #field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
 #field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }

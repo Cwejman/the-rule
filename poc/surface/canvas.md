@@ -94,9 +94,9 @@ A row is a thing to look at and to press, so it keeps its own outline. What a ro
 
 A chevron at the row's right was built first and refused: with the press already opening what a row leads to, and the acts standing in the field, it said nothing a reader needed, and it never lined up against a name that wrapped.
 
-The rows of a level share one width, and the number keeps its room whether a row has one or not, so every title of a level begins at one edge and the marks end at one.
+Every row is one size, 240 by 64, and the map is laid on one grid of four: twelve between rows, twenty-four for a level's step in, forty-eight from a row to the reading it opened. The name stands on one line of the row and the figure on the next, since a row is thin and a figure beside a name squeezes it; both begin at the row's own edge, and the lines that join rows run edge to edge with them.
 
-*The author's, 2026-09-18, on reading a canvas whose rows had lost their edges and whose chevrons did not line up; as built the same day.*
+*The author's, 2026-09-18, on reading a canvas whose rows had lost their edges, whose chevrons did not line up and whose margins were each their own number; as built the same day.*
 
 ### 4.6 A folded node says how deep it is
 
@@ -201,6 +201,14 @@ The whole body drawn at once. [The chain](#3-the-path-the-reader-has-opened-and-
 The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#52-what-is-selected-shows-its-face).
 
 *Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above, and all four taken out of the code the same day.*
+
+### 4.7 A press is a press, and only the ground is dragged
+
+A press on a row was also the beginning of a pan, and any movement in it cancelled the press and dragged the map instead, so half of what a reader pressed did nothing. The ground alone is dragged now: a press on a row, on the acts or on the face is a press, whatever the hand does in it.
+
+Three things went with that fault. What counts as a movement is the distance travelled rather than the height alone, so a sideways pan moves at all. The pointer is held by the area rather than by what the press landed on, since a redraw between the press and its release would detach that element and the release would never arrive. And a selection left behind in the prose no longer swallows presses on the canvas, which selects nothing of its own.
+
+*The author's report, 2026-09-18, that pressing did not work; found and mended the same day.*
 
 ## 9. Two faults as built
 
