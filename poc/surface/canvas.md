@@ -146,7 +146,23 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 *The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
-### 5.2 What is selected shows its face
+### 5.2 The keys act where the hand is, and take the same shape in both panes
+
+A key acts in the pane the reader last acted in: pressing or panning the map puts their hand on it, scrolling or pressing the prose brings it back to the lane, and where the canvas stands alone it is always the map. Without that the keys were dead whenever the prose stood beside the map, which is how a reader reads.
+
+The four moves keep one shape across the panes, each acting on that pane's own object: the reading in the lane, what is selected on the map.
+
+- Down and up move where the reader is: the next brief of the lane, the next node of this level.
+
+- Right goes in: into the first brief beneath in the lane; on the map it opens what the node holds as a column of its own, and steps into that column once it stands open.
+
+- Left goes back out: to the brief above in the lane; on the map it closes the reading this node opened, or moves to the node it stands under.
+
+- Return commits and shift with it takes that back: the lane scopes in and widens out, the map goes to what is selected and closes what it opened.
+
+*The author's, 2026-09-18, that the keys be aligned with the canvas's acts and the prose's; as built the same day, after they had been left acting only where the canvas stood alone.*
+
+### 5.3 What is selected shows its face
 
 A node is a heading and a few marks, and a reader who has selected one still does not know what it holds. So what is selected shows its face, the title, its placement, its stamp and its first paragraph, with the figure it opens with where it has one.
 
@@ -218,7 +234,7 @@ The zone, a shaded panel held by dashed edges out of the parent row's sides, hol
 
 The whole body drawn at once. [The chain](#3-the-path-the-reader-has-opened-and-not-the-whole-body) replaces it, and the whole map waits.
 
-The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#52-what-is-selected-shows-its-face).
+The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#53-what-is-selected-shows-its-face).
 
 *Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above, and all four taken out of the code the same day.*
 

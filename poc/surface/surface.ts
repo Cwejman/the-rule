@@ -1089,7 +1089,7 @@ type Action = {
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
 /** The brief an act falls on when none is named: the one under the pointer while one is pointed at, else the focus, since [pointing overrides the focus](lane.md#43-pointing-overrides-the-focus) for the acts as for the highlight. */
 const acts = (a?: string): string =>
-  a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : canvasAlone() && picked !== null && brief(picked) ? picked : state.focus);
+  a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : handOnMap() && picked !== null && brief(picked) ? picked : state.focus);
 
 const ACTIONS: Record<string, Action> = {
   unfold: {
@@ -1131,12 +1131,12 @@ const ACTIONS: Record<string, Action> = {
   openNode: {
     label: () => "open",
     mark: () => ICON.openRight,
-    keys: [{ key: "ArrowRight" }],
+    keys: [],
     help: () => "Opens what this piece holds as a column of its own to the right, without taking the reading there.",
-    also: "A press on a placement, which opens the reading it names.",
+    also: "The right arrow, where the canvas stands alone.",
     can: (a) => {
       const x = acts(a);
-      return (a !== undefined ? canvasOn() : canvasAlone()) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
+      return (a !== undefined ? canvasOn() : handOnMap()) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
     },
     run: (a) => {
       const x = acts(a);
@@ -1146,9 +1146,10 @@ const ACTIONS: Record<string, Action> = {
   closeNode: {
     label: () => "close",
     mark: () => ICON.closeRight,
-    keys: [{ key: "ArrowLeft" }],
+    keys: [],
     help: () => "Closes the reading this piece opened, so the map ends here again.",
-    can: (a) => (a !== undefined ? canvasOn() : canvasAlone()) && chain.includes(acts(a)),
+    also: "The left arrow, where the canvas stands alone.",
+    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && chain.includes(acts(a)),
     run: (a) => {
       const x = acts(a);
       chain = chain.slice(0, chain.indexOf(x));
@@ -1163,7 +1164,7 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "Enter" }],
     help: () => "Takes the reading to what is selected on the canvas: the lane opens that reading and the address becomes it.",
     also: "A press again on what is already selected.",
-    can: (a) => (a !== undefined ? canvasOn() : canvasAlone()) && !!brief(acts(a)) && acts(a) !== state.focus,
+    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && !!brief(acts(a)) && acts(a) !== state.focus,
     run: (a) => readOn(acts(a)),
   },
   face: {
@@ -1188,12 +1189,15 @@ const ACTIONS: Record<string, Action> = {
     run: (a) => scopeTo(acts(a)),
   },
   widen: {
-    label: () => "widen",
+    label: () => (handOnMap() ? "close" : "widen"),
     keys: [{ key: "Enter", shift: true }],
-    help: () => "Widens the scope to the level above, so what stood around this brief comes back.",
+    help: () =>
+      handOnMap()
+        ? "Closes the reading this node opened, which is what going in with return undoes."
+        : "Widens the scope to the level above, so what stood around this brief comes back.",
     also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
-    can: () => state.scope !== "",
-    run: () => popUp(),
+    can: () => (handOnMap() ? picked !== null && ACTIONS.closeNode.can(picked) : state.scope !== ""),
+    run: () => (handOnMap() && picked !== null && ACTIONS.closeNode.can(picked) ? ACTIONS.closeNode.run(picked) : popUp()),
   },
   deeper: {
     label: () => "a level more",
@@ -1214,30 +1218,46 @@ const ACTIONS: Record<string, Action> = {
   next: {
     label: () => "next",
     keys: [{ key: "ArrowDown" }],
-    help: () => "Moves the reading on to the next brief in the lane, folding nothing.",
+    help: () => (handOnMap() ? "Moves to the next node of this level on the canvas." : "Moves the reading on to the next brief in the lane, folding nothing."),
     can: () => true,
-    run: () => step(1),
+    run: () => (handOnMap() ? stepPick(1) : step(1)),
   },
   previous: {
     label: () => "previous",
     keys: [{ key: "ArrowUp" }],
-    help: () => "Moves the reading back to the brief before this one in the lane, folding nothing.",
+    help: () => (handOnMap() ? "Moves back to the node before this one on this level of the canvas." : "Moves the reading back to the brief before this one in the lane, folding nothing."),
     can: () => true,
-    run: () => step(-1),
+    run: () => (handOnMap() ? stepPick(-1) : step(-1)),
   },
   above: {
-    label: () => "above",
+    label: () => "out",
     keys: [{ key: "ArrowLeft" }],
-    help: () => "Moves the reading up to the brief this one stands beneath, folding nothing.",
-    can: () => state.focus !== state.scope,
-    run: () => up(),
+    help: () =>
+      handOnMap()
+        ? "Goes back out: closes the reading this node opened, or moves to the node it stands under."
+        : "Moves the reading up to the brief this one stands beneath, folding nothing.",
+    can: () => (handOnMap() ? picked !== null && (ACTIONS.closeNode.can(picked) || !!brief(parentOf(picked))) : state.focus !== state.scope),
+    run: () => {
+      if (!handOnMap()) return up();
+      if (picked !== null && ACTIONS.closeNode.can(picked)) return ACTIONS.closeNode.run(picked);
+      if (picked) pickNode(parentOf(picked), null);
+    },
   },
   beneath: {
-    label: () => "beneath",
+    label: () => "in",
     keys: [{ key: "ArrowRight" }],
-    help: () => "Moves the reading into the first brief beneath this one, when it stands in the lane.",
-    can: () => level(state.focus).length > 0,
-    run: () => down(),
+    help: () =>
+      handOnMap()
+        ? "Goes in: opens what this node holds as a column of its own, and steps into it once it stands open."
+        : "Moves the reading into the first brief beneath this one, when it stands in the lane.",
+    can: () => (handOnMap() ? picked !== null && level(picked).length > 0 : level(state.focus).length > 0),
+    run: () => {
+      if (!handOnMap()) return down();
+      if (picked === null) return;
+      if (ACTIONS.openNode.can(picked)) return ACTIONS.openNode.run(picked);
+      const first = level(picked)[0];
+      if (first) pickNode(first.address, null);
+    },
   },
   undo: {
     label: () => "undo",
@@ -2502,8 +2522,16 @@ const colOf = new Map<string, number>();
 let picked: string | null = null;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
-/** Whether the canvas is the pane standing alone, where a key acts on what is selected there rather than on the reading. */
+/** Whether the canvas is the pane standing alone. */
 const canvasAlone = (): boolean => canvasOn() && ui.scroll.classList.contains("off");
+
+/** Which pane the reader last acted in, which is the one a key acts on: the map, or the reading. */
+let hand: "lane" | "canvas" = "lane";
+/**
+ * Whether a key acts on the map. It does where the canvas stands alone, and where the reader's hand is last on the
+ * map, so the keys go on acting where they were acting rather than on whichever pane happens to stand.
+ */
+const handOnMap = (): boolean => canvasOn() && (canvasAlone() || hand === "canvas");
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
 /** The readings on the way to an address: every card at or above it, the outermost first. */
@@ -2700,6 +2728,15 @@ function drawEdges(): void {
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
   svg.innerHTML = paths.join("");
+}
+
+/** Moves the selection along the level it stands in, as the reading moves brief by brief in the lane. */
+function stepPick(by: number): void {
+  if (picked === null) return void (level("")[0] && pickNode(level("")[0].address, null));
+  const sibs = level(parentOf(picked));
+  const i = sibs.findIndex((b) => b.address === picked);
+  const next = sibs[i + by];
+  if (next) pickNode(next.address, null);
 }
 
 /**
@@ -4117,6 +4154,8 @@ const pointer = { x: -1, y: -1, still: false };
 
 /** Scrolling moves the focus and nothing else; the address follows without entering the history. */
 function onScroll(): void {
+  // reading is acting in the lane, so a scroll brings the reader's hand back to it and the keys with it
+  if (!arriving) hand = "lane";
   // a scroll takes the tooltip away, except the callout, which is the finger's own answer to the scrubbing it caused
   if (!ui.tip.classList.contains("callout")) hideTip();
   markAway();
@@ -4273,6 +4312,9 @@ function wire(): void {
   document.addEventListener("click", (e) => {
     hideTip();
     const t = e.target as HTMLElement;
+    // the reader's hand moves to the pane they press in, and the keys follow it
+    if (t.closest("#canvas")) hand = "canvas";
+    else if (t.closest("#scroll")) hand = "lane";
     // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
     const inner = t.closest<HTMLAnchorElement>('a[href^="#/"]');
     if (inner && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
@@ -4411,6 +4453,7 @@ function wire(): void {
     drag.moved = true;
     state.scrubbing = true;
     if (drag.kind === "canvas") {
+      hand = "canvas";
       view.x = drag.vx! + (e.clientX - drag.x);
       view.y = drag.vy! + (e.clientY - drag.y);
       applyView(false);
