@@ -2452,8 +2452,11 @@ function canvasNodeHtml(b: Brief): string {
   const sections = kids.filter((k) => !isCard(k));
   const cards = kids.filter(isCard);
   const set = b.set;
+  // the holarchy is the map itself, so what a brief places always stands to its right, however the brief is folded: the
+  // canvas is one body a reader moves in rather than a crop of it. A file's own sections are the column beneath, and
+  // that is what folding governs, since reading a file's structure is the thing a reader asks for.
   const zone = whole && sections.length ? `<div class="czone${set ? " set" : ""}${placed ? " placed" : ""}" data-fold="${esc(b.address)}">${sections.map(canvasNodeHtml).join("")}</div>` : "";
-  const across = whole && cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
+  const across = cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
   return (
     `<div class="cnode${zone ? " whole" : ""}${placed ? " placed" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">` +
     `<div class="cwith">${line}${across}</div>${zone}</div>`
@@ -2477,24 +2480,26 @@ function portHtml(b: Brief, side: "in" | "out"): string {
 /** Draws the canvas whole from the state: the entry, the column beneath it, then the arrows; fits the view when the scope changed. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
-  const S = state.scope;
+  // the canvas draws the whole body and not the scope. It is one map a reader moves in, growing to the right as the
+  // holarchy does and down as each file reads, and scoping is a thing they choose when they want only one reading in
+  // front of them rather than the frame the map is drawn in.
+  const S = "";
   const root = brief(S)!;
-  // the entry is the scope's root, named at the top; at the root of the body there is nothing above the first brief, so
-  // the column simply begins with it
-  const entry = S ? `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title)}</span></div></div>` : "";
-  // the scope's own level splits as every level does: its sections run down as the reading does, and what its prose
-  // places runs to the right, each a reading of its own
+  const entry = "";
   const kids = level(S);
   const sections = kids.filter((k) => !isCard(k));
   const cards = kids.filter(isCard);
   const across = cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
   const column = `<div class="ccol${root.set ? " set" : ""}">${entry}${sections.map(canvasNodeHtml).join("")}</div>`;
   ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="cwith">${column}${across}</div></div>`;
-  if (fitted !== S) {
+  if (fitted !== state.scope) {
     fitCanvas();
-    fitted = S;
+    fitted = state.scope;
   }
   applyView(false);
+  // the map is wider than the pane, so the view is brought to where the reader stands rather than left at its left edge
+  followed = null;
+  followFocus();
   drawEdges();
 }
 
@@ -2624,10 +2629,13 @@ function fitCanvas(): void {
   if (!st) return;
   const W = ui.canvas.clientWidth;
   const w = st.scrollWidth || 1;
-  // the floor was set when a body was a column and only ever as wide as one node; laid across it is as wide as the
-  // holons it holds, so the fit may go further down before it gives up and leaves the rest to the reader's panning
-  view.k = clamp((W - 2 * CANVAS_INSET) / w, 0.35, 1);
-  view.x = Math.max(CANVAS_INSET, (W - w * view.k) / 2);
+  // a body laid across is wider than any pane, and shrinking it until it fits would make a picture nobody can read. So
+  // the canvas fits only while what that costs is still legible, and past that it stays at its own size and lets the
+  // reader move in it, which is what a map is for. Where it does not fit, the focus is what brings the view to place.
+  const fit = (W - 2 * CANVAS_INSET) / w;
+  const fits = fit >= 0.6;
+  view.k = fits ? Math.min(fit, 1) : 1;
+  view.x = fits ? Math.max(CANVAS_INSET, (W - w * view.k) / 2) : CANVAS_INSET;
   view.y = canvasTop();
 }
 
@@ -2999,13 +3007,14 @@ function drawCrumb(): void {
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
   const above = run.length - kept.length;
-  // the run says three things and draws them apart. A reading the reader is inside, the body's root and every card they
-  // opened to get here, stands as a chip in its branch's hue, the way the card they pressed stands in the prose. A
-  // section of the reading they are in stands as plain faint text, since it is a place within one thing rather than a
-  // thing entered. And the rightmost is where the highlight is, at full ink, whichever of the two it happens to be.
+  // the run says three things, and the type tells them apart rather than any shape drawn around them. The scope, the
+  // way down to the reading the reader has opened, stands bold. The address within it stands at normal weight, since it
+  // is a place inside what the bold already named. The head, what the reader is looking at, takes full ink, and where
+  // it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is.
   const step = (a: string): string => {
-    const cls = ["step", a === "" || isCard(brief(a)) ? "reading" : "section", ...(a === S ? ["root"] : []), ...(a === state.focus ? ["now"] : [])].join(" ");
-    const takes = a === state.focus ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
+    const head = a === state.focus;
+    const cls = ["step", depthOf(a) <= depthOf(S) ? "scope" : "in", ...(a === S ? ["root"] : []), ...(head ? ["now", ...(ACTIONS.open.can(a) ? ["opens"] : [])] : [])].join(" ");
+    const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${esc(brief(a)!.title)}</span>`;
   };
   // the acts of the rightmost stand after it: where it is a reading of its own, entering it and widening out of it are
@@ -4590,14 +4599,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #crumb { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
 #crumb .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
 #crumb .step:hover, #crumb .step.lit { color: var(--on); }
-/* a reading the reader is inside stands as a chip outlined in its branch's hue, the form the card they pressed had, so
-   the crossings they made read apart from the places within the one they are in */
-#crumb .step.reading { flex: none; padding: 1px 7px; border-radius: 999px; outline: 1px solid var(--rest); outline-offset: -1px; color: var(--muted); }
-#crumb .step.reading:hover, #crumb .step.reading.lit { outline-color: var(--lit); color: var(--on); }
+/* the run's three parts are told apart by the type and nothing else: the scope bold, the address within it at normal
+   weight, and the head at full ink, underlined in its hue where it opens onto a reading of its own */
+#crumb .step.scope { flex: none; font-weight: calc(600 - var(--thin)); color: var(--muted); }
+#crumb .step.in { font-weight: calc(400 - var(--thin)); color: var(--faint); }
 #crumb .step.root { flex: none; color: var(--muted); }
 /* the last step is where the reader stands, so it is the one that is not faint */
 #crumb .step.now { flex: none; color: var(--ink); cursor: default; }
-#crumb .step.now.reading { color: var(--ink); outline-color: var(--door); }
+#crumb .step.now.opens { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+#crumb .step.now.opens:hover, #crumb .step.now.opens.lit { text-decoration-color: var(--lit); cursor: pointer; }
 #crumb .step.now.lit { color: var(--on); }
 #crumb .step.root.lit { color: var(--on); }
 #crumb .place, #crumb .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }

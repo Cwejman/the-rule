@@ -56,6 +56,10 @@ The two dimensions say two different things, and that is the whole of the layout
 
 So a file is a column and a body of files is a row of columns, and which of the two a reader is looking at is in the shape itself rather than in a mark upon it. A brief that holds both is drawn with its own row and, to its right, the readings it placed; its sections run down beneath it as before.
 
+The canvas draws the whole body and not the scope. It is one map a reader moves in, growing to the right as the holarchy does and down as each file reads, so what a placement leads to always stands beside it and nothing is entered and left to see the next thing. What folding governs is the column: a file's sections stand beneath it when it is whole, since a file's structure is what a reader asks to see. Scoping is theirs to choose when they want one reading in front of them and nothing else, and it is not the frame the map is drawn in.
+
+Where the map is wider than the pane, which it soon is, the canvas does not shrink until it fits: a picture nobody can read says nothing. It fits while what that costs is legible and stays at its own size past that, and the brief in focus is what brings the view to place.
+
 An unfolded step holds a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level of sections is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them.
 
 ```
@@ -146,7 +150,9 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 ## 8. What this leaves open
 
-The width. Laid across, a canvas is as wide as the holons it holds, and beside the lane it has a third of the page and reads too small to be of use. Whether the canvas should stand alone in the middle whenever it is chosen, or keep the pair and let the reader pan, is the author's to say once he has looked.
+A level of a file made a column of its own. Where a file's level is long, or is the thing a reader is comparing across, breaking it out beside the file rather than beneath it would give the layout a third use of the across. It is the author's idea of 2026-09-18, wanted where a reader asks for it rather than always, and no act has been given to it.
+
+Whether a canvas beside the lane has the room to be read at all, since the map is wide by nature and the middle holds the two panes at half the page each.
 
 How a jump edge is told apart from an offer, since both are links in prose. Which of several borrowers the reader came through, once the substrate holds a borrowed flow.
 
