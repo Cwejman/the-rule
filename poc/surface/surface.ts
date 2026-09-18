@@ -1480,12 +1480,40 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
  * since that is what decides whether to enter. Unfolded it gives the whole of that brief, and past that the only act is
  * to open it, which changes the reading.
  */
+/**
+ * The overview a card carries at its right: the reading beyond the boundary drawn small, a row per brief, indented by
+ * its depth and as long as that brief's own prose. It is the shape's reading of a branch the lane will never lay, so a
+ * reader sees how much waits and in what shape before spending the opening on it.
+ */
+const CARDMAP = { w: 62, pitch: 4, bar: 2, indent: 5, tall: 132 };
+function cardMap(a: string): string {
+  const kin = state.body!.briefs.filter((b) => b.address.startsWith(a + "/"));
+  if (kin.length === 0) return "";
+  // the rows keep their pitch while they fit, and scale together once the branch is taller than the room
+  const pitch = Math.min(CARDMAP.pitch, CARDMAP.tall / kin.length);
+  const bar = Math.max(1, Math.min(CARDMAP.bar, pitch - 1));
+  const base = depthOf(a);
+  const own = (x: string) => state.index!.own.get(x) ?? 0;
+  const most = Math.max(1, ...kin.map((b) => own(b.address)));
+  const rows = kin
+    .map((b, i) => {
+      const x = Math.min(CARDMAP.w - 8, (depthOf(b.address) - base - 1) * CARDMAP.indent);
+      const w = clamp((own(b.address) / most) * (CARDMAP.w - x), 3, CARDMAP.w - x);
+      const kind = isCard(b) ? "card" : level(b.address).length > 0 ? "head" : "para";
+      return `<rect class="${kind}" x="${x}" y="${(i * pitch).toFixed(1)}" width="${w.toFixed(1)}" height="${bar.toFixed(1)}" rx="${(bar / 2).toFixed(1)}"/>`;
+    })
+    .join("");
+  const h = Math.ceil(kin.length * pitch);
+  return `<svg class="fig cardmap" width="${CARDMAP.w}" height="${h}" viewBox="0 0 ${CARDMAP.w} ${h}">${rows}</svg>`;
+}
+
 function cardHtml(a: string): string {
   const b = brief(a);
   if (!b) return `<p class="chrome dim">a part that is not in the body</p>`;
   const g = gradeOf(a) ?? "face";
-  const all = blocksOf(b);
-  const [first, ...more] = all;
+  // what the card shows is the brief's own prose: the parts it places in turn lie past this boundary and are not drawn
+  const all = blocksOf(b).filter((t) => t.type !== "card");
+  const [first] = all;
   const conf = confidenceOf(all);
   const face = ([first] as (Tok | undefined)[]).filter((t): t is Tok => t !== undefined && t !== conf);
   const foldable = all.length > face.length;
@@ -1497,12 +1525,13 @@ function cardHtml(a: string): string {
     `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(a)}"` : ""}>` +
     (hidden.length ? actFigure(b, hidden, []) : "") +
     (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("open", a)}</span>` +
+    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${acts() === a ? badgeHtml("open", a) : ""}</span>` +
     `</div>`;
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
-    blocks(shown) +
+    `<div class="card-body">${blocks(shown)}</div>` +
+    `<div class="card-map">${cardMap(a)}</div>` +
     line +
     `</div>`
   );
@@ -3080,11 +3109,12 @@ const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt
 /** The brief under the reading line, or the nearest above it. */
 function focusUnderLine(): string {
   const y = readingLine();
-  const arts = all<HTMLElement>(".brief", ui.lane);
-  const under = arts.find((el) => {
+  // a card is a thing of the reading like a brief, so the line falls on it and it is the innermost that wins
+  const arts = all<HTMLElement>(".brief, .card", ui.lane);
+  const under = arts.filter((el) => {
     const r = el.getBoundingClientRect();
     return r.top <= y && r.bottom > y;
-  });
+  }).at(-1);
   const above = arts.filter((el) => el.getBoundingClientRect().top <= y).at(-1);
   return (under ?? above)?.dataset.a ?? "";
 }
@@ -3092,7 +3122,7 @@ function focusUnderLine(): string {
 /** Marks the path and the focus wherever rows and articles stand, and moves the tree's line, without drawing again. */
 function drawFocusMarks(): void {
   const onPath = new Set(prefixesOf(state.focus));
-  all<HTMLElement>(".brief, .row, .crow", ui.areas).forEach((el) => {
+  all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
   });
@@ -4014,6 +4044,9 @@ function wire(): void {
     if (t.closest("#canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
+    // a card is the part itself, standing here: pressing it goes there, as pressing a figure's cell does
+    const opened = t.closest<HTMLElement>("#lane .card[data-card]");
+    if (opened) return void goTo(opened.dataset.card!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
       const k = pick.dataset.widget!;
@@ -4506,7 +4539,9 @@ a.outside { text-decoration-style: dotted; color: var(--muted); cursor: help; }
 .dim { color: var(--faint); }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 
-#header { position: absolute; top: 8px; left: 0; right: 0; z-index: 4; display: flex; justify-content: center; gap: 16px; pointer-events: none; }
+/* the warnings stand at the foot's left end, clear of the way down, which holds the whole of the top line: the run of
+   names at its left and the depth strip and the trail at its right, and a count centred over it read as part of them */
+#header { position: absolute; bottom: 10px; left: 12px; z-index: 4; display: flex; gap: 16px; pointer-events: none; }
 #header > * { pointer-events: auto; }
 #header .warnings { cursor: help; }
 #crumb { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
@@ -4652,8 +4687,23 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a card stands in the prose as an image does, and is drawn as one: the same ground, the same hairline and the same
    corner, so a part presented in the reading reads as a figure rather than as more of the text. The hue arrives only
    under the pointer, as it does on a link */
-.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; transition: outline-color .15s; }
-.brief .card:hover { outline-color: var(--door); }
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; opacity: calc(1 - var(--dim)); transition: outline-color .15s, opacity .3s; }
+/* a card is a thing of the reading, so it takes the ink a brief takes: full where the reading stands or the pointer
+   rests, a step dimmer everywhere else, and its hue arrives with the highlight rather than with the pointer alone */
+.brief .card.here, .brief .card.lit { opacity: 1; outline-color: var(--door); }
+/* the prose around a card gives way while the card is the thing being read */
+.brief.here:has(.card.here) > .surface, .brief.here:has(.card.here) > p { opacity: calc(1 - var(--dim)); transition: opacity .3s; }
+.brief .card { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
+.brief .card-top, .brief .card-act { grid-column: 1 / -1; }
+.brief .card-body { grid-column: 1; min-width: 0; }
+/* the overview stands at the card's right, top-aligned with the prose it belongs to, and gives way where the lane is narrow */
+.brief .card-map { grid-column: 2; }
+.brief .card-map svg { display: block; }
+svg.cardmap .para { fill: var(--rest); }
+svg.cardmap .head { fill: var(--door); }
+svg.cardmap .card { fill: none; stroke: var(--door); stroke-width: .8; }
+.brief .card.lit svg.cardmap .para, .brief .card.here svg.cardmap .para { fill: var(--door); }
+.brief .card.lit svg.cardmap .head, .brief .card.here svg.cardmap .head { fill: var(--lit); }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h3); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
 .brief .card .stamp { flex: none; white-space: nowrap; }
