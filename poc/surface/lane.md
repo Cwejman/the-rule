@@ -14,7 +14,7 @@ A reader reads one thing at a time, and the eye that moves to a second column of
 
 The lane holds one reading depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the scope's title and its first paragraph, stands first.
 
-One reading and not the body: the lane runs to the end of its file and stops there, since [a file is one linear reading](../practice.md#11-a-file-is-one-linear-reading). What lies past a mount is read by going there.
+One reading and not the body: the lane runs to the end of its file and stops there, since [a file is one linear reading](../practice.md#11-a-file-is-one-linear-reading). What a link places is read by going there.
 
 The space between briefs steps down with depth, as [the design language's rhythm](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice) asks: what lies beneath a brief sits together, and the briefs of a level stand further apart the higher the level, so the gap before a brief says which level it begins.
 
@@ -26,17 +26,19 @@ The lane used to hold the whole body, and every brief in it could be unfolded, s
 
 Two wholes laid into one run are neither: each was composed to be read from its first line to its last, and a reader given both at once has a run that was never composed. So the boundary is the file, and crossing it is an act the reader takes rather than one a fold performs.
 
-What the reader loses is one scroll past a mount. What the reader gains is that everything now in front of them was written to be read together, and that holding the space bar opens this reading rather than the world.
+What the reader loses is one scroll past a card. What the reader gains is that everything now in front of them was written to be read together, and that holding the space bar opens this reading rather than the world.
 
 *The author's decision, 2026-09-18, after reading the arc on the surface and finding the root expandable into everything.*
 
-### 1.2 A mount raises a card
+### 1.2 A placed part raises a card
 
-A mount says only [where its part stands](../practice.md#32-a-mounting-brief-says-placement-not-content), so on its own it would leave the reader at a bare link. Beneath its paragraph the lane raises a card: a figure of its own, standing in the prose as an image does, carrying the part's title, its face, and the confidence line that says whether it is in force, ratified or open, since that is what decides whether to enter.
+[A lone link places a part](../practice.md#3-a-lone-link-places-a-part), and on its own it would leave the reader at a bare link. Where it stands the lane raises a card instead: a figure of its own, standing in the prose as an image does, carrying the part's title, its face, and [the stamp its file carries](../practice.md#2-a-file-says-it-is-under-the-rule), in force or open or ratified, since that is what decides whether to enter.
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is mounted.*
+A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
+
+*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed.*
 
 ## 2. Two grades
 
@@ -130,7 +132,7 @@ Scrolling alone is not a change, and a new change clears what was undone.
 
 Folding takes a brief to its face and unfolding takes it whole, [the two grades](#2-two-grades), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
-[A card](#12-a-mount-raises-a-card) carries the same line and takes the same two grades, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
+[A card](#12-a-placed-part-raises-a-card) carries the same line and takes the same two grades, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
 
 *Reasoned, the author's, 2026-09-13; pressing the face is the author's lean, and the best gesture is not yet known; the card, 2026-09-18.*
 
@@ -192,7 +194,7 @@ A small reversal of the scroll, down then up then down within a moment, folds or
 
 A reader can make any brief the root of the lane: its heading becomes the opening, its holon becomes the whole, and everything above it leaves the lane. Enter does it to the brief in focus, when that brief has a level beneath it, and the address carries the scope after the focus, so a scoped place can be handed to someone like any other.
 
-Opening [a card](#12-a-mount-raises-a-card) is the same act, and it is the one place the act is not optional: the reading on the other side is reached no other way. Scoped there, the brief the card showed becomes the opening, and it is read from its own prose rather than from the placement that mounted it.
+Opening [a card](#12-a-placed-part-raises-a-card) is the same act, and it is the one place the act is not optional: the reading on the other side is reached no other way. Scoped there, the brief the card showed becomes the opening, read from its own prose.
 
 *Reasoned, the author's, 2026-09-13; the address form is the builder's call; opening a card, 2026-09-18.*
 

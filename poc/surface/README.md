@@ -12,7 +12,7 @@ Knowledge under the rule stands in a shape, and neither of those lets a reader m
 
 So the surface reads a body in one lane of prose, each brief folded or unfolded as the reader chooses, and it orients from the sides: where the reader came from, what lies beneath, what a brief points at, as headings and shape rather than as more text. It stands on the markdown and the directories rather than replacing them, and a session's own work is read the same way once it is written down there.
 
-*In force, the author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use.*
+*The author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use.*
 
 ## 1. One interface, and what refusing more buys
 
@@ -34,55 +34,31 @@ What it finds there it does not interpret. What counts as a brief, and what nest
 
 *Reasoned, 2026-09-12.*
 
-## 3. Reading and orientation come apart
+## 3. What the reading is, and what draws it
 
-What the surface is handed settled, the first thing it decides is how that body is read, and everything beneath follows from it.
+Everything above says what the surface is handed. What follows is what it does with it, and it is laid in the order it was built: the reading first, then what the orientation stands in, then the widgets that fill it, then the one file that makes the whole.
+
+[Reading and orientation come apart](lane.md)
+
+[Five areas, and what stands in them](framework.md)
+
+[The widgets](widgets.md)
+
+[How it is built](implementation.md)
 
 *Reasoned, the author's, 2026-09-13.*
 
-[the level beneath](lane.md)
+## 4. What is not built, and what is not a screen
 
-## 4. Five areas, and what stands in them
+Past what stands are two readings of their own. The canvas is the second mode, where the work with two dimensions is going. The phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size.
 
-With the reading apart from the orientation, what the orientation stands in comes next: the page's own small framework.
+[The canvas](canvas.md)
 
-*Reasoned, the author's, 2026-09-13.*
+[A touch reading](touch.md)
 
-[the level beneath](framework.md)
+*The author's, 2026-09-15 and 2026-09-16; the canvas open, the touch reading built.*
 
-## 5. The widgets
-
-The framework gives the areas; what stands in them is the widgets, which is where most of the drawing is.
-
-*Reasoned, 2026-09-13.*
-
-[the level beneath](widgets.md)
-
-## 6. How it is built
-
-Everything above says what the surface gives a reader; this is the one file that makes it, and it stands after what it serves.
-
-*In force, the author's decision, 2026-09-12.*
-
-[the level beneath](implementation.md)
-
-## 7. The canvas
-
-Past what is built stands the second mode, the canvas, which is where the work with two dimensions is going.
-
-*The author's, 2026-09-15; open.*
-
-[the level beneath](canvas.md)
-
-## 8. A touch reading
-
-Everything above assumed a pointer and room; the phone takes both away, and what every rule above becomes there is held apart rather than scattered through them.
-
-*The author's, 2026-09-16.*
-
-[the level beneath](touch.md)
-
-## 9. What this does not answer
+## 5. What this does not answer
 
 Four things the surface does not answer cross the levels beneath, so they stand here rather than at one level's foot.
 
@@ -96,10 +72,10 @@ What stands beside a brief in the left gutter. Commits and people belong there, 
 
 *Open, 2026-09-13.*
 
-## 10. What was tried and refused
+## 6. The programs before this one
 
-Last, and read only when someone proposes one of them again: what was reached for before this model and is not wanted.
+Last, and read only when someone proposes one of them again: what the programs before this model reached for, and the reason each is not wanted. That level is a flat run rather than a gradient, since a refusal is looked up and never read through, so no refusal stands on another and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
+
+[What was tried and refused](refused.md)
 
 *Seen, in both programs and in the author's reading of them.*
-
-[the level beneath](refused.md)

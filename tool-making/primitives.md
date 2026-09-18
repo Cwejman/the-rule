@@ -14,7 +14,7 @@ Work is one word. Studying an existing product finds a great deal of it, under t
 
 Roles already exist in an existing product. In building one they are not set early on; they come up as the work progresses, step by step.
 
-*Ratified by the author on 2026-09-14 for what stands beneath; this opening is his words of 2026-09-15, brought here from the brief that used to mount it and ratified in its new place on 2026-09-18.*
+*The author's words of 2026-09-15, moved here from the entry above and ratified in their new place 2026-09-18.*
 
 ## 1. Goals give the tool its purpose
 

@@ -98,7 +98,7 @@ Beside its face a folded brief carries a grey tick for every paragraph and a sma
 
 ### 3.2 A card says the lane stops there
 
-[A card](lane.md#12-a-mount-raises-a-card) is not a brief of this reading, and the shape draws it apart: a row set off from the rows around it, holding the marks of the brief on the other side, with nothing beneath it however heavy that branch is. A tail would say the level waits one fold away, and it does not; it waits one opening away.
+[A card](lane.md#12-a-placed-part-raises-a-card) is not a brief of this reading, and the shape draws it apart: a row set off from the rows around it, holding the marks of the brief on the other side, with nothing beneath it however heavy that branch is. A tail would say the level waits one fold away, and it does not; it waits one opening away.
 
 So a reader scanning the shape sees where this reading ends before they reach it, and the two things a press can do, folding within and crossing out, never look alike.
 
@@ -196,7 +196,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one square, drawn as droplets on a round plate. The root sits at the centre, its briefs are droplets around it, and each carries its own smaller droplets further out, level by level to the rim. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is grey at every depth.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#10-what-was-tried-and-refused). It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one). It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
 ### 7.1 Droplets meet without merging
 

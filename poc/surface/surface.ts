@@ -49,8 +49,8 @@ async function run(): Promise<void> {
     const body = await trace(root);
     console.log(`${body.briefs.length} briefs traced from ${body.root}`);
     body.warnings.forEach((w) => console.log("  " + w));
-    const borrows = body.briefs.filter((b) => b.borrow !== undefined);
-    if (borrows.length) console.log(`${borrows.length} borrow${borrows.length === 1 ? "" : "s"}:\n${borrows.map((b) => `  ${b.file} ${b.number} "${b.title}" borrows ${b.borrow || "the root"}`).join("\n")}`);
+    const many = body.briefs.filter((b) => b.card).filter((b) => tokensIn("card", body.briefs.flatMap((x) => x.body)).filter((t) => t.to === b.address).length > 1);
+    if (many.length) console.log(`${many.length} part${many.length === 1 ? "" : "s"} placed in more than one place:\n${many.map((b) => `  ${b.file} "${b.title}"`).join("\n")}`);
     const sets = body.briefs.filter((b) => b.set);
     if (sets.length) console.log(`${sets.length} level${sets.length === 1 ? "" : "s"} of letters: ${sets.map((b) => `${b.file} ${b.number || "·"}`).join(", ")}`);
     // faces past the practice's flag are listed apart from the warnings, since each is read and may be left with a reason
@@ -277,10 +277,10 @@ type Brief = {
   door: boolean;
   /** set by the trace when the brief's level is a set of letters: no brief of it stands on another */
   set?: boolean;
-  /** set by the trace when the brief's lone link names a level already placed elsewhere: the address of its home */
-  borrow?: string;
-  /** set by the trace on a mount: the prose of the brief on the other side, which is the mounted file's own. Its presence is the boundary */
-  across?: Tok[];
+  /** set by the trace on the root brief of a placed file: it is the whole a card raises, and the boundary of a reading */
+  card?: boolean;
+  /** set by the trace on the root brief of a file: what its stamp says of it beyond being under the rule, its status or who ratified it */
+  stamp?: Record<string, string>;
 };
 
 /** The body: every brief in reading order, and what the trace had to say. */
@@ -345,11 +345,8 @@ const prefixesOf = (address: string): string[] =>
 /** The blocks of a brief's prose: every token that is not spacing. */
 const blocksOf = (b: Brief): Tok[] => b.body.filter((t) => t.type !== "space");
 
-/** Whether a brief mounts a reading of its own: its level lies in another file, so the lane stops at it and a card stands there. */
-const crosses = (b: Brief | undefined): boolean => b?.across !== undefined;
-
-/** The blocks of the brief on the other side of a mount. */
-const acrossOf = (b: Brief): Tok[] => (b.across ?? []).filter((t) => t.type !== "space");
+/** Whether a brief is a reading of its own: the root of a placed file, which a card raises and the lane stops at. */
+const isCard = (b: Brief | undefined): boolean => b?.card === true;
 
 /** A brief's confidence line: the last block, where it is a paragraph that is nothing but italics. */
 const confidenceOf = (blocks: Tok[]): Tok | null => {
@@ -357,8 +354,8 @@ const confidenceOf = (blocks: Tok[]): Tok | null => {
   return last?.type === "paragraph" && bare(last).length === 1 && bare(last)[0].type === "em" ? last : null;
 };
 
-/** The prose a brief gives its own reading: what stands across a mount, or its own. */
-const readingOf = (b: Brief): Tok[] => (crosses(b) ? acrossOf(b) : blocksOf(b));
+/** What a file's stamp says of it, as the card shows it: who ratified it, or what its status is. */
+const stampOf = (b: Brief): string => (b.stamp?.["ratified"] ? `ratified · ${b.stamp["ratified"]}` : (b.stamp?.["status"] ?? ""));
 
 /** Every token of a kind in a run, however deep. */
 const tokensIn = (type: string, toks: Tok[] = []): Tok[] =>
@@ -454,15 +451,15 @@ const imageBlocks = (toks: Tok[]): Tok[] =>
   });
 
 /** A mount: a paragraph that is nothing but one link, standing last in a brief. */
-function mountOf(body: Tok[]): Tok | null {
-  const last = body.findLast((t) => t.type !== "space");
-  const inline = bare(last);
-  const link = last?.type === "paragraph" && inline.length === 1 && inline[0].type === "link" ? inline[0] : null;
+/** The lone link a paragraph is, where it is nothing but a relative link: that paragraph places a part. */
+function placementIn(tok: Tok): Tok | null {
+  const inline = bare(tok);
+  const link = tok.type === "paragraph" && inline.length === 1 && inline[0].type === "link" ? inline[0] : null;
   return link && link.href && !/^[a-z]+:/i.test(link.href) ? link : null;
 }
 
-/** A body with its mount paragraph taken off. */
-const withoutMount = (body: Tok[]): Tok[] => body.slice(0, body.findLastIndex((t) => t.type !== "space"));
+/** Every paragraph of a body that is nothing but a relative link, in the order they stand. */
+const placementsIn = (body: Tok[]): Tok[] => body.filter((t) => placementIn(t) !== null);
 
 // ## 2.4 It is traced from a root, by its mounts
 //
@@ -488,12 +485,13 @@ async function trace(rootArg: string): Promise<Body> {
   const warn = (s: string) => void warnings.push(s);
 
   /** Reads and cuts a stamped file, or says why it cannot. */
-  const read = (abs: string): { kind: string; cut: Cut } | { fault: string } => {
-    if (seen.has(abs)) return { fault: "mounted twice; the second mount is skipped" };
+  const read = (abs: string): { kind: string; stamp: Record<string, string>; cut: Cut } | { fault: string } => {
+    if (seen.has(abs)) return { fault: "read twice; the second reading is skipped" };
     seen.add(abs);
-    if (!existsSync(abs) || statSync(abs).isDirectory()) return { fault: "missing; the mount is skipped" };
+    if (!existsSync(abs) || statSync(abs).isDirectory()) return { fault: "missing; the placement is skipped" };
     const st = stamped(readFileSync(abs, "utf8"));
-    return st ? { kind: st.front["kind"] ?? "brief", cut: cut(imageBlocks(lean(marked.lexer(st.rest) as unknown as Tok[]))) } : { fault: "not under the rule; the mount is skipped" };
+    const keep = (f: Record<string, string>) => Object.fromEntries(Object.entries(f).filter(([k]) => k === "status" || k === "ratified"));
+    return st ? { kind: st.front["kind"] ?? "brief", stamp: keep(st.front), cut: cut(imageBlocks(lean(marked.lexer(st.rest) as unknown as Tok[]))) } : { fault: "not under the rule; the placement is skipped" };
   };
 
   /** A free address for a title under a parent: the slug, suffixed when a sibling already took it. */
@@ -536,54 +534,59 @@ async function trace(rootArg: string): Promise<Body> {
       briefs.push(brief);
       table.set(`${abs}#${slug(s.heading)}`, address);
       gather(s.body, abs, file, title);
+      // the parts stand in the order a reader meets them: what the prose places, then the sections beneath it
+      tracePlacements(brief, abs, file);
       traceLevel(s.children, brief, abs, file, kind);
-      traceMount(brief, s.children.length > 0, abs, file);
+      brief.door = level0(brief.address);
     });
   };
 
+  /** Whether anything stands beneath an address: a card its prose raised, or a section of its own. */
+  const level0 = (a: string): boolean => briefs.some((b) => parentOf(b.address) === a && b.address !== a);
+
   /**
-   * Follows a brief's mount, if it has one and may: the paragraph leaves the body and the file becomes the level. A lone
-   * link to a file already placed, or to a heading in one, borrows that level instead: the first place the reading met
-   * it is its home, and the borrowing brief only points there.
+   * Follows every lone link in a brief's prose, in the order they stand. Each places a part: the file it names is read,
+   * its own brief becomes a brief beneath this one, and the paragraph that was the link becomes a card in its place. A
+   * link to a file already placed raises a card on that same part, since a part stands in every place that links it.
    */
-  const traceMount = (brief: Brief, hasSubsections: boolean, abs: string, file: string): void => {
-    const m = mountOf(brief.body);
-    if (!m) return;
-    if (hasSubsections) return warn(`${file}: "${brief.title}" mounts ${m.href} and has subsections of its own; the mount is skipped`);
-    const hash = m.href!.indexOf("#");
-    const path = hash < 0 ? m.href! : m.href!.slice(0, hash);
-    const anchor = hash < 0 ? "" : m.href!.slice(hash + 1);
-    const target = entryOf(path ? resolve(dirname(abs), path) : abs);
-    if (!within(target)) return warn(`${file}: "${brief.title}" mounts ${m.href}, which lies above the root; the mount is skipped`);
-    const home = table.get(anchor ? `${target}#${anchor}` : target);
-    if (home !== undefined) {
-      if (home === brief.address) return warn(`${file}: "${brief.title}" borrows itself; the link is skipped`);
-      brief.body = withoutMount(brief.body);
-      brief.borrow = home;
-      brief.door = true;
-      return;
-    }
-    if (anchor) return warn(`${file}: "${brief.title}" borrows ${m.href}, which the reading has not met; the link is skipped`);
-    brief.body = withoutMount(brief.body);
-    const r = read(target);
-    if ("fault" in r) return warn(`${rel(target)}: ${r.fault}`);
-    const tfile = rel(target);
-    if (r.cut.title === null) warn(`${tfile}: no title`);
-    else if (r.cut.title !== brief.title) warn(`${tfile}: titled "${r.cut.title}", mounted by "${brief.title}"`);
-    r.cut.strays.forEach((s) => warn(`${tfile}: a second title "${s}"; read as prose`));
-    if (r.cut.sections.length === 0) return warn(`${tfile}: mounted by "${brief.title}" and has no section; a level with nothing in it`);
-    // the file carries its own brief, and that prose is what stands across the boundary: the card shows it, and it is
-    // the opening once the reader has gone there. The mount on this side says only where the part stands.
-    const lead = r.cut.lead.filter((t) => t.type !== "space");
-    if (lead.length === 0) warn(`${tfile}: no brief of its own; a mounted file opens with the prose that gives its understanding`);
-    else gather(r.cut.lead, target, tfile, r.cut.title ?? brief.title);
-    brief.across = r.cut.lead;
-    const said = blocksOf(brief).filter((t) => t !== confidenceOf(blocksOf(brief)));
-    if (said.length > 1) warn(`${file}: "${brief.title}" mounts ${m.href} in ${said.length} paragraphs; a mount says where its part stands, in one`);
-    table.set(target, brief.address);
-    if (r.cut.title !== null) table.set(`${target}#${slug(r.cut.title)}`, brief.address);
-    brief.door = true;
-    traceLevel(r.cut.sections, brief, target, tfile, r.kind);
+  const tracePlacements = (holder: Brief, abs: string, file: string): void => {
+    placementsIn(holder.body).forEach((para) => {
+      const m = placementIn(para)!;
+      const hash = m.href!.indexOf("#");
+      const path = hash < 0 ? m.href! : m.href!.slice(0, hash);
+      const anchor = hash < 0 ? "" : m.href!.slice(hash + 1);
+      const target = entryOf(path ? resolve(dirname(abs), path) : abs);
+      const said = `${file}: "${holder.title || "the title"}" places ${m.href}`;
+      if (!within(target)) return void warn(`${said}, which lies above the root; the placement is skipped`);
+      // a part already placed is raised again, whole: one file, and as many places as link it
+      const standing = table.get(anchor ? `${target}#${anchor}` : target);
+      if (standing !== undefined) {
+        if (standing === holder.address) return void warn(`${said}, which is itself; the link is skipped`);
+        return void Object.assign(para, { type: "card", to: standing, tokens: undefined });
+      }
+      if (anchor) return void warn(`${said}, a heading the reading has not met; the link is skipped`);
+      const r = read(target);
+      if ("fault" in r) return void warn(`${rel(target)}: ${r.fault}`);
+      const tfile = rel(target);
+      if (r.cut.title === null) return void warn(`${tfile}: no title; the placement is skipped`);
+      r.cut.strays.forEach((x) => warn(`${tfile}: a second title "${x}"; read as prose`));
+      // a file holds its level as sections, as cards its prose places, or as both; with neither it is a brief, not a part
+      if (r.cut.sections.length === 0 && placementsIn(r.cut.lead).length === 0) return void warn(`${tfile}: placed by "${holder.title || "the title"}" and has no section and places nothing; a level with nothing in it`);
+      const lead = r.cut.lead.filter((t) => t.type !== "space");
+      if (lead.length === 0) warn(`${tfile}: no brief of its own; a placed file opens with the prose that gives its understanding, which is what its card shows`);
+      const address = addressFor(holder.address, r.cut.title);
+      if (!address.endsWith(slug(r.cut.title))) warn(`${tfile}: another part titled "${r.cut.title}" stands in the same place; this one is addressed ${address}`);
+      // a heading whose words the card repeats earns the reader nothing, and doubles the address as well
+      if (holder.address.endsWith("/" + slug(r.cut.title)) || holder.address === slug(r.cut.title)) warn(`${tfile}: placed by a brief of the same title, so its card repeats that heading and its address reads ${address}; the heading earns nothing here`);
+      const brief: Brief = { address, title: r.cut.title, number: "", written: "", file: tfile, kind: r.kind, body: r.cut.lead, door: true, card: true, stamp: r.stamp };
+      briefs.push(brief);
+      table.set(target, address);
+      table.set(`${target}#${slug(r.cut.title)}`, address);
+      gather(r.cut.lead, target, tfile, r.cut.title);
+      Object.assign(para, { type: "card", to: address, tokens: undefined });
+      tracePlacements(brief, target, tfile);
+      traceLevel(r.cut.sections, brief, target, tfile, r.kind);
+    });
   };
 
   // The root: its title and opening are its own brief, and its sections are the first level.
@@ -592,15 +595,16 @@ async function trace(rootArg: string): Promise<Body> {
     const why = "fault" in r ? r.fault : "no title";
     return { title: "", root: rel(rootFile), briefs: [], warnings: [`${rel(rootFile)}: ${why}; nothing traced`], traced: new Date().toISOString() };
   }
-  const root: Brief = { address: "", title: r.cut.title, number: "", written: "", file: rel(rootFile), kind: r.kind, body: r.cut.lead, door: r.cut.sections.length > 0 };
+  const root: Brief = { address: "", title: r.cut.title, number: "", written: "", file: rel(rootFile), kind: r.kind, body: r.cut.lead, door: r.cut.sections.length > 0, stamp: r.stamp };
   briefs.push(root);
   addresses.add("");
   table.set(rootFile, "");
   table.set(`${rootFile}#${slug(root.title)}`, "");
   r.cut.strays.forEach((s) => warn(`${root.file}: a second title "${s}"; read as prose`));
   gather(root.body, rootFile, root.file, root.title);
+  tracePlacements(root, rootFile, root.file);
   traceLevel(r.cut.sections, root, rootFile, root.file, r.kind);
-  traceMount(root, r.cut.sections.length > 0, rootFile, root.file);
+  root.door = level0("");
 
   // ## 2.5 Links are rewritten to addresses
   //
@@ -977,7 +981,6 @@ function indexBody(body: Body): Index {
   body.briefs.forEach((b) => branchOf(b.address));
   const pointers = body.briefs.flatMap((b) => [
     ...linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [{ to: l.to, from: b.address }] : [])),
-    ...(b.borrow !== undefined ? [{ to: b.borrow, from: b.address }] : []),
   ]);
   const backlinks = new Map(Array.from(Map.groupBy(pointers, (p) => p.to), ([to, ps]) => [to, new Set(ps.map((p) => p.from))]));
   const depth = Math.max(0, ...body.briefs.map((b) => depthOf(b.address)));
@@ -989,8 +992,9 @@ const brief = (a: string): Brief | undefined => state.index?.by.get(a);
 const gradeOf = (a: string): Grade | null => state.grades.get(a) ?? null;
 const inLane = (a: string): boolean => state.grades.has(a);
 
-/** The briefs in the lane, in reading order: a brief, then its level, then the next. */
-const laneOrder = (parent = ""): Brief[] => level(parent).flatMap((b) => (inLane(b.address) ? [b, ...(gradeOf(b.address) === "whole" ? laneOrder(b.address) : [])] : []));
+/** The briefs the lane lays, in reading order: a brief, then its level, then the next. A card is drawn in its holder's prose rather than laid, so it is never one of them. */
+const laneOrder = (parent = ""): Brief[] =>
+  level(parent).flatMap((b) => (inLane(b.address) && !isCard(b) ? [b, ...(gradeOf(b.address) === "whole" ? laneOrder(b.address) : [])] : []));
 
 /** The nearest address that resolves, for a link or a hash that no longer does. */
 const nearest = (a: string): string => prefixesOf(a).findLast((p) => brief(p)) ?? "";
@@ -1001,11 +1005,11 @@ const nearestInLane = (a: string): string => prefixesOf(a).findLast((p) => inLan
 /** How many briefs stand beneath an address, at any depth. */
 const beneathCount = (a: string): number => level(a).reduce((s, k) => s + 1 + beneathCount(k.address), 0);
 
-/** The level a brief unfolds onto: its own, or the one it borrows. */
-const levelOf = (b: Brief): Brief[] => level(b.borrow ?? b.address);
-/** How many briefs a brief unfolds onto, its own or borrowed. */
-const beneathOf = (b: Brief): number => beneathCount(b.borrow ?? b.address);
-/** Whether a brief unfolds at all: paragraphs past its face, or a level, its own or borrowed. */
+/** The level a brief unfolds onto. */
+const levelOf = (b: Brief): Brief[] => level(b.address);
+/** How many briefs a brief unfolds onto. */
+const beneathOf = (b: Brief): number => beneathCount(b.address);
+/** Whether a brief unfolds at all: paragraphs past its face, or a level of its own. */
 const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
 
 const fmt = (n: number) => n.toLocaleString("en-US");
@@ -1297,6 +1301,8 @@ const INLINE: Record<string, (t: Tok) => string> = {
 const BLOCK: Record<string, (t: Tok) => string> = {
   space: () => "",
   paragraph: (t) => `<p>${inline(t.tokens)}</p>`,
+  // a paragraph that was nothing but a lone link is a placement, and the card stands in its room
+  card: (t) => cardHtml(t.to ?? ""),
   text: (t) => inline(t.tokens ?? [t]),
   heading: (t) => `<p class="stray">${inline(t.tokens)}</p>`,
   list: (t) => {
@@ -1343,7 +1349,7 @@ function lay(address: string): void {
   if (!within(address, S)) address = S;
   const path = prefixesOf(address).filter((p) => within(p, S) && opensInLane(p));
   g.set(S, "whole");
-  path.forEach((p) => level(p).forEach((c) => g.set(c.address, path.includes(c.address) || p === parentOf(address) ? "whole" : "face")));
+  path.forEach((p) => level(p).forEach((c) => g.set(c.address, !isCard(c) && (path.includes(c.address) || p === parentOf(address)) ? "whole" : "face")));
   closeLay();
 }
 
@@ -1354,7 +1360,7 @@ const within = (a: string, root: string): boolean => root === "" || a === root |
  * The reading an address stands in: the nearest mount at or above it, which is the root of its file, or the body's own
  * root where none. The lane never holds more than one of these, so every arrival scopes to it.
  */
-const fileRootOf = (a: string): string => prefixesOf(a).findLast((p) => crosses(brief(p))) ?? "";
+const fileRootOf = (a: string): string => prefixesOf(a).findLast((p) => isCard(brief(p))) ?? "";
 
 /** The scope an address is read in: the reader's, where it stands in the same reading, and that reading otherwise. */
 const scopeFor = (a: string): string => (within(a, state.scope) && fileRootOf(state.scope) === fileRootOf(a) ? state.scope : fileRootOf(a));
@@ -1363,7 +1369,7 @@ const scopeFor = (a: string): string => (within(a, state.scope) && fileRootOf(st
 const depthIn = (a: string): number => depthOf(a) - depthOf(state.scope);
 
 /** Whether a brief's level stands in this reading: a mount's does not, unless the reader has opened it and it is the scope. */
-const opensInLane = (a: string): boolean => !crosses(brief(a)) || a === state.scope;
+const opensInLane = (a: string): boolean => !isCard(brief(a)) || a === state.scope;
 
 /** Every whole brief shows its level: children with no grade yet take a face, and a mount's level is not in this reading. */
 function closeLay(): void {
@@ -1433,7 +1439,7 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
   const bars = kids.map((k) => ({ w: branchLength(k.address), deep: level(k.address).length > 0 }));
   const merged = kids.length > FIG.level || wide(bars) > room;
   // merged, the one bar is as long as the whole level is heavy, never as long as the room happens to be
-  const home = b.borrow ?? b.address;
+  const home = b.address;
   const heavy = (state.index!.branch.get(home) ?? 0) - (state.index!.own.get(home) ?? 0);
   const whole = clamp(Math.sqrt(Math.max(1, heavy / LINE_CHARS)) * 4.4, 8, Math.max(8, Math.min(48, room)));
   const cells = !kids.length ? [] : merged ? [{ w: whole, deep: false, all: true }] : bars.map((x) => ({ ...x, all: false }));
@@ -1470,29 +1476,32 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
 }
 
 /**
- * The card a mount raises: the brief on the other side, presented where it is mounted, as a figure of its own. It
- * carries the part's title, its face and its confidence line, since that is what decides whether to enter; unfolded it
- * gives the whole of that brief, and past that the only act is to open it, which changes the reading.
+ * The card a placed part raises, where its link stood: the part's own title and face, and the stamp its file carries,
+ * since that is what decides whether to enter. Unfolded it gives the whole of that brief, and past that the only act is
+ * to open it, which changes the reading.
  */
-function cardHtml(b: Brief, g: Grade): string {
-  const blocks_ = acrossOf(b);
-  const [first, ...rest] = blocks_;
-  const conf = confidenceOf(blocks_);
-  // the face of the brief across, and its confidence line with it, since what it says is what decides whether to enter
-  const face = ([first, ...(conf && conf !== first ? [conf] : [])] as (Tok | undefined)[]).filter((t): t is Tok => t !== undefined);
-  const foldable = blocks_.length > face.length;
-  const shown = g === "whole" ? blocks_ : face;
-  const hidden = blocks_.filter((t) => !shown.includes(t));
-  const beneath = beneathCount(b.address);
+function cardHtml(a: string): string {
+  const b = brief(a);
+  if (!b) return `<p class="chrome dim">a part that is not in the body</p>`;
+  const g = gradeOf(a) ?? "face";
+  const all = blocksOf(b);
+  const [first, ...more] = all;
+  const conf = confidenceOf(all);
+  const face = ([first] as (Tok | undefined)[]).filter((t): t is Tok => t !== undefined && t !== conf);
+  const foldable = all.length > face.length;
+  const shown = g === "whole" ? all : face;
+  const hidden = all.filter((t) => !shown.includes(t));
+  const beneath = beneathCount(a);
+  const stamp = stampOf(b);
   const line =
-    `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(b.address)}"` : ""}>` +
+    `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(a)}"` : ""}>` +
     (hidden.length ? actFigure(b, hidden, []) : "") +
     (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-    `<span class="acts">${foldable ? badgeHtml("unfold", b.address) : ""}${badgeHtml("open", b.address)}</span>` +
+    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("open", a)}</span>` +
     `</div>`;
   return (
-    `<div class="card ${g}" data-card="${esc(b.address)}" ${hued(b.address)}>` +
-    `<h3 class="card-head">${esc(b.title)}</h3>` +
+    `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
+    `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
     blocks(shown) +
     line +
     `</div>`
@@ -1502,17 +1511,6 @@ function cardHtml(b: Brief, g: Grade): string {
 /** One brief in the lane at its grade: its face, the heading and the first block, then the rest when whole; `after` is the gap beneath it. */
 function articleHtml(b: Brief, g: Grade, after: number): string {
   const d = Math.min(4, depthIn(b.address));
-  // a mount is one paragraph of placement and is always given whole: what its grade governs is the card beneath it
-  if (crosses(b))
-    return (
-      `<article class="brief mount ${g}${prefixesOf(state.focus).includes(b.address) ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
-      `<div class="surface">` +
-      `<h2 class="head d${d}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
-      blocks(blocksOf(b)) +
-      `</div>` +
-      cardHtml(b, g) +
-      `</article>`
-    );
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
   const beneath = beneathOf(b);
@@ -1528,9 +1526,6 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       : "";
   // a whole brief folds from a line at its foot
   const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span></div>` : "";
-  // a borrowing brief says what it borrows and where its home is; pressing the line follows it there
-  const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
-  const borrow = home ? `<div class="act borrow chrome" data-a="${esc(home.address)}" data-borrow="${esc(home.address)}" ${hued(home.address)}>${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
@@ -1538,7 +1533,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
     (first ? blocks([first]) : "") +
     more +
     `</div>` +
-    (g === "whole" ? blocks(rest) + borrow + less : "") +
+    (g === "whole" ? blocks(rest) + less : "") +
     `</article>`
   );
 }
@@ -1547,7 +1542,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}><h1>${esc(root.title)}</h1>${blocks(readingOf(root))}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}><h1>${esc(root.title)}</h1>${blocks(root.body)}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -2178,7 +2173,7 @@ function shapeSvg(W: number, H: number): string {
     const ghost = folded ? "" : " ghost";
     const beyond = b ? blocksOf(b).slice(1) : [];
     const paras = beyond.length;
-    const hidden = b && !crosses(b) && level(l.a).length > 0 ? ix.branch.get(l.a)! - ix.own.get(l.a)! : 0;
+    const hidden = b && !isCard(b) && level(l.a).length > 0 ? ix.branch.get(l.a)! - ix.own.get(l.a)! : 0;
     const face = l.blocks[1] ?? l.blocks[0];
     const y = face ? (4 + face.top * k).toFixed(1) : "0";
     const h = face ? Math.max(1.2, face.height * k - 1).toFixed(1) : "1";
@@ -2413,15 +2408,14 @@ function canvasNodeHtml(b: Brief): string {
     !whole && (rest.length || beneath)
       ? `<span class="marks">${rest.slice(0, 8).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`
       : "";
-  const home = b.borrow !== undefined ? brief(b.borrow) : undefined;
-  const borrowed = home ? `<span class="borrowed" data-a="${esc(home.address)}" data-tip="borrows ${esc(home.title || state.body!.title)}">${icon("links")}</span>` : "";
-  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${borrowed}</div>`;
+  const placed = isCard(b);
+  const mark = placed ? `<span class="placed" data-tip="a reading of its own" ${hued(b.address)}>${icon("links")}</span>` : "";
+  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${mark}</div>`;
   const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
-  // a borrowing node's zone is its home's level, named as such; a folded borrowed brief is drawn at its face
-  const zoneOf = home ? level(home.address) : kids;
-  const label = home && whole && zoneOf.length ? `<div class="zlabel">${icon("links")}<span>borrows</span>${pathHtml(home.address)}<span class="name">${esc(home.title || state.body!.title)}</span></div>` : "";
-  const set = home ? home.set : b.set;
-  const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${home ? " borrowed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
+  const zoneOf = kids;
+  const label = placed && whole && zoneOf.length ? `<div class="zlabel">${icon("links")}<span>a reading of its own</span></div>` : "";
+  const set = b.set;
+  const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${placed ? " placed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
   // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
   return `<div class="cnode${zone ? " whole" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
 }
@@ -2433,8 +2427,7 @@ const PORT_SHOWN = 5;
 function portHtml(b: Brief, side: "in" | "out"): string {
   const ix = state.index!;
   const backs = Array.from(ix.backlinks.get(b.address) ?? []);
-  // borrowers stand first among what leads to a brief, since a borrow is a place its level stands and a link an offer
-  const list = side === "in" ? [...backs.filter((a) => brief(a)?.borrow === b.address), ...backs.filter((a) => brief(a)?.borrow !== b.address)] : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
+  const list = side === "in" ? backs : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
   const shown = list.filter((a) => brief(a)).slice(0, list.length > PORT_SHOWN + 1 ? PORT_SHOWN : PORT_SHOWN + 1);
   const more = list.length - shown.length;
   const cells = shown.map((a) => `<i class="pc" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
@@ -4021,9 +4014,6 @@ function wire(): void {
     if (t.closest("#canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
-    // the line of a borrowing brief follows to the home of what it borrows, as a link would
-    const borrowed = t.closest<HTMLElement>("[data-borrow]");
-    if (borrowed) return void follow(borrowed.dataset.borrow!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) {
       const k = pick.dataset.widget!;
@@ -4578,7 +4568,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .czone { margin-top: -8px; padding: 22px 24px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
 .czone:hover { border-color: var(--door); }
 
-.czone.borrowed { padding-top: 8px; }
+.czone.placed { padding-top: 8px; }
 .zlabel { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: var(--sans); font-size: 11px; color: var(--faint); margin-bottom: 2px; }
 .zlabel .icon { width: 11px; height: 11px; }
 .zlabel .name { color: var(--muted); }
@@ -4609,8 +4599,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
-.crow .borrowed { flex: none; color: var(--door); }
-.crow .borrowed .icon { width: 11px; height: 11px; }
+.crow .placed { flex: none; color: var(--door); }
+.crow .placed .icon { width: 11px; height: 11px; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
@@ -4659,12 +4649,17 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the card a mount raises: the brief on the other side, standing in the prose as a figure of its own rather than as
    more of this reading. It is inset and ruled in its branch's own hue, so meeting a boundary never looks like a fold
    within one, and it ends at its own act line, where the only way further is to open it */
-.brief.mount .card { margin: 6px 0 0; padding: 14px 16px 10px; border-radius: 8px; background: var(--wash); border-left: 2px solid var(--door); }
-.brief.mount .card:hover { border-left-color: var(--lit); }
-.brief.mount .card-head { font-family: var(--head-face); font-size: calc(var(--t) * .5); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0 0 .5em; letter-spacing: calc(-.008em * var(--head-tight)); }
-.brief.mount .card p { margin-bottom: 10px; }
-.brief.mount .card p:last-of-type { margin-bottom: 0; }
-.brief.mount .card-act { margin: 10px -8px 0; }
+/* a card stands in the prose as an image does, and is drawn as one: the same ground, the same hairline and the same
+   corner, so a part presented in the reading reads as a figure rather than as more of the text. The hue arrives only
+   under the pointer, as it does on a link */
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; transition: outline-color .15s; }
+.brief .card:hover { outline-color: var(--door); }
+.brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
+.brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h3); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
+.brief .card .stamp { flex: none; white-space: nowrap; }
+.brief .card p { margin-bottom: 10px; }
+.brief .card p:last-of-type { margin-bottom: 0; }
+.brief .card-act { margin: 12px -8px 0; }
 
 .act:hover { color: var(--on); }
 /* the badge: the key drawn as a cap, and what it does beside it. Its room is kept on every line, and it inks only on
@@ -4723,10 +4718,6 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .act:hover svg.fig.marks .para, .act:hover svg.fig.marks .head { fill: var(--lit); }
 .act:hover svg.fig.marks .image { stroke: var(--lit); }
 .act.less { margin-top: -6px; }
-.act.borrow { flex-wrap: wrap; gap: 6px; color: var(--muted); }
-.act.borrow .icon { width: 12px; height: 12px; flex: none; }
-.act.borrow .name { color: var(--ink); }
-.act.borrow:hover .name { color: var(--on); }
 .pointing .brief.here:not(.lit):not(.keep) { opacity: calc(1 - var(--dim)); }
 .brief.lit, .brief.keep { opacity: 1; }
 .head { position: relative; font-family: var(--head-face); display: flex; align-items: baseline; font-weight: calc(600 - var(--thin)); line-height: 1.2; letter-spacing: calc(-.012em * var(--head-tight)); margin: 0 0 .56em; transition: color .12s; }

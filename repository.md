@@ -8,7 +8,7 @@ status: in force
 
 The rule has a repository of its own as a pragmatic first step. Projects needed it as a submodule before the rule could be written again as its entry, so it moved whole, as it stands, with the rule left as ratified. What comes next is that writing.
 
-*In force, the author's decision, 2026-09-14.*
+*The author's decision, 2026-09-14.*
 
 ## 1. The name is the rule
 
@@ -34,7 +34,7 @@ A rule, in the sense a monastery keeps one, governs a whole life: the work, the 
 
 ### 1.3 The file took the name
 
-`rule.md` is ratified, so it is edited only [in review with the author](poc/practice.md#24-a-ratified-file-is-edited-only-in-review). It was `code.md` until 2026-09-17, when the name moved into the text and onto the file in one commit, and every stamp went from `under: the code` to `under: the rule` with it, [the frozen labs'](poc/practice.md#12-the-labs-files-are-frozen) included; [the proof of concept](poc/README.md#6-the-rename-breaks-dependents) says what that breaks.
+`rule.md` is ratified, so it is edited only [in review with the author](poc/practice.md#24-a-ratified-file-is-edited-only-in-review). It was `code.md` until 2026-09-17, when the name moved into the text and onto the file in one commit, and every stamp went from `under: the code` to `under: the rule` with it, [the frozen labs'](poc/practice.md#12-the-labs-files-are-frozen) included; [the proof of concept](poc/README.md#1-the-rename-breaks-dependents) says what that breaks.
 
 *In force, the author's decision, 2026-09-17; the study's own prose still says the code, as the record of what the labs ran under.*
 

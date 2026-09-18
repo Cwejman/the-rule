@@ -36,9 +36,9 @@ The body is traced from a root and handed over as a flat list of briefs in readi
 
 ### 3.1 It is traced from a root, by its mounts
 
-The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-rule), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the mounts](../practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry): every brief that ends with a lone link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
+The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-rule), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the placements](../practice.md#3-a-lone-link-places-a-part): every paragraph in a brief that is nothing but a link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
 
-So the body is whatever the root connects, and nothing is scanned. A file no mount reaches is simply not in it. A mount that names a missing or unstamped file is skipped, and the process says so rather than failing silently. So is a brief that mounts a part and holds subsections of its own, which [the practice forbids](../practice.md#33-a-mounting-brief-has-no-subsections), so no brief the page receives has more than one level.
+So the body is whatever the root connects, and nothing is scanned. A file no link places is simply not in it. A placement that names a missing or unstamped file is skipped, and the process says so rather than failing silently. A brief may place any number of parts and still hold subsections of its own, so what the page receives is a brief with a level and with cards, and it draws each card where its link stood.
 
 *In force, the author's decision, 2026-09-12.*
 
@@ -46,7 +46,7 @@ So the body is whatever the root connects, and nothing is scanned. A file no mou
 
 A mounted file's own prose, what stands before its first section, is given to the brief that mounts it as what lies across the boundary. One address holds both sides, so nothing a link or a stored fold names has changed: the mount is that address in the entry's reading, and the brief across it is that address opened.
 
-That one field is the whole of the boundary in the data. A brief that carries it is a mount, the lane stops there and draws [a card](lane.md#12-a-mount-raises-a-card), the scope of any address is the nearest mount at or above it, and the shape draws the row apart. Nothing else had to be told where a file ends.
+That one field is the whole of the boundary in the data. A brief that carries it is a mount, the lane stops there and draws [a card](lane.md#12-a-placed-part-raises-a-card), the scope of any address is the nearest mount at or above it, and the shape draws the row apart. Nothing else had to be told where a file ends.
 
 *As built, 2026-09-18, on [the author's decision](../../author/ideas-2026-09-18.md#5-unfolding-everything-may-break-the-linear-whole) that a file is one reading.*
 

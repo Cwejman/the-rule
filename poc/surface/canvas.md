@@ -88,7 +88,7 @@ A folded node shows nothing of its level, so it wants marks for what it hides, a
 
 Three things in the markdown carry a flow, and nothing new is written for the canvas.
 
-A lone link last in a brief places a structure there, and [the first place is its home](../practice.md#37-a-second-lone-link-borrows-and-the-first-place-is-the-home); every later one borrows it, drawn as a zone that names its home. A branch is a step whose level holds one brief per condition, each placing or borrowing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose stays an offer, never a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
+A lone link in a brief places a structure there, and [a structure may stand in several places](../practice.md#36-a-part-may-stand-in-several-places), each drawn as a zone of its own. A branch is a step whose level holds one brief per condition, each placing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose stays an offer, never a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
 
 *The author's decisions, 2026-09-15.*
 
@@ -104,7 +104,7 @@ The markdown does not say whether a level is a sequence or a set, and only a set
 
 A number claims that a brief stands on the ones before it. A letter claims that no brief of the level stands on another: each is readable alone, in any order, and the parent stands on the set rather than on a chain. That is all the substrate says. What a reader makes of independence is the domain's reading: a flow reads a lettered level under a step as alternatives, take one, which [toolmaking](../../tool-making/README.md) can say for itself; a body of knowledge reads it as a set, take any or all, looked up rather than read through.
 
-The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#10-what-was-tried-and-refused) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
+The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#6-the-programs-before-this-one) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
 
 A choice as a list, one item per condition, each with a link to its path, was the session's own proposal and was set aside: it takes every path out of the reading and gives a condition no address.
 

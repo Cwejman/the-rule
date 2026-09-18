@@ -15,7 +15,7 @@ Nothing in it need be kept as code: the substrate is prose, and a script is a se
 
 A file is read the way [the gradient](../rule.md#31-the-gradient) is laid: its title and first paragraph, then each heading with the first paragraph under it, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
 
-[A mount](practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry) is where the file ends. It says only where its part stands and never what it gives, so a session that reads an entry to its depth has read placements, not understandings, and reading on means opening the file and reading it the same way. That is the same act the reader makes at [a boundary](practice.md#11-a-file-is-one-linear-reading), and a session pays it for the same reason: depth here is cheap, and depth across every boundary at once is the whole body.
+[A lone link](practice.md#3-a-lone-link-places-a-part) is where the file ends. What it places is not in this file, so a session that reads an entry to its depth has read what the entry says and not what its parts give, and reading on means opening each file and reading it the same way. That is the same act the reader makes at [a boundary](practice.md#11-a-file-is-one-linear-reading), and a session pays it for the same reason: depth here is cheap, and depth across every boundary at once is the whole body.
 
 The whole is held that way, by depth, and a brief is read in full only where the work will touch it. The session that just wrote a brief does not read it again; the fresh read belongs to [a fresh head](../rule.md#54-the-fresh-head).
 
@@ -31,7 +31,7 @@ A brief is named by [its number](practice.md#4-headings-carry-numbers) and its f
 
 Inserting or moving a brief renumbers every heading after it, and every pointer written by number goes stale without any link breaking. So after every [round](../rule.md#53-the-rounds) the tree is checked for what a move breaks, and a round is not done until every list beneath is empty, the orphans and the faces kept with a reason aside.
 
-[The surface's](surface/README.md) own check prints the links, the images, the mounts and the faces for a tree it traces, run from [the arc's](../README.md) folder:
+[The surface's](surface/README.md) own check prints the links, the images, the placements and the faces for a tree it traces, run from [the arc's](../README.md) folder:
 
 ```
 bun poc/surface/surface.ts . --check
@@ -53,13 +53,13 @@ Links are checked so that each resolves to a file and an anchor that exist, and 
 
 *As built, 2026-09-14.*
 
-### 3.3 Mounts
+### 3.3 Placements
 
-Every mount is checked against [the practice's rules for mounts](practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry), and every mounted file against what a brief and its level hold. The files nothing mounts are listed too, not as faults, since [orphans are allowed](practice.md#36-what-stands-beside-an-entry-without-a-mount), but so that a part left unconnected is seen.
+Every placement is checked against [the practice's rules](practice.md#3-a-lone-link-places-a-part), and every placed file against what a brief and its level hold. The files nothing places are listed too, not as faults, since [orphans are allowed](practice.md#35-what-stands-beside-an-entry-without-a-placement), but so that a part left unconnected is seen.
 
-Two of those checks came with [the boundary](practice.md#11-a-file-is-one-linear-reading): a mounting brief past [one paragraph](practice.md#32-a-mounting-brief-says-placement-not-content), which is a mount that has begun saying what its part is, and a mounted file whose title disagrees with the heading that mounts it or that opens with no brief of its own.
+One of those checks came with [the boundary](practice.md#11-a-file-is-one-linear-reading): a placed file that opens with no brief of its own, and so has nothing for its card to show.
 
-*As built, 2026-09-14; the two boundary checks, 2026-09-18.*
+*As built, 2026-09-14; the boundary's check, 2026-09-18.*
 
 ### 3.4 Faces past the flag
 

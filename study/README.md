@@ -21,59 +21,49 @@ The search ends when the proof is lived, not argued. Three marks:
 
 3. **The proof is the experience**: a senior reader finishes with no unanswerable questions, a fresh session bootstraps and can be trusted, and the author reads without fatigue.
 
-## 2. Where the search stands
+## 2. Where the search stands, and what it still owes
 
-With the finish line held, what comes next is how far the search has got towards it, lab by lab.
+With the finish line held, what comes next is how far the search has got towards it, lab by lab, and what it cannot leave behind it.
 
-*Seen, in ten labs.*
+[Where the search stands](labs.md)
 
-[the level beneath](labs.md)
+What the labs settled is already in the law; what they cannot leave behind is their provenance, one entry per rule saying what it rests on and how strongly it holds. It is the largest debt the study carries, and the one that cannot wait, since provenance exists only while the work is happening.
 
-## 3. The grounds
+[The grounds](grounds.md)
 
-What the labs settled is in the law already; what they cannot leave behind them is their provenance, and that is the artifact this level holds.
+*Seen, in ten labs; the grounds in force and in arrears.*
 
-*In force; the largest debt the study carries.*
-
-[the level beneath](grounds.md)
-
-## 4. What is owed
+## 3. What is owed
 
 The grounds are the largest debt, and the only one that cannot wait. Every rule the night's editions gained has no entry, and labs 01 to 06 are in arrears entirely.
 
 - **The author's cold read of lab 10's piece**, which was the whole point of running the lab. It stands finished and unjudged. The verdict lands in [where the search stands](labs.md#2-lab-10--the-code-rewritten-and-read), and its evidence beside it, as [07's first](07-breakdown/evidence-unit-of-change.md) was.
 
-- **Owed to the edition**: the step, named as the holon viewed by its change, which the drawings want and the code does not yet carry.
+- **Owed to the edition**: the step, named as the holon viewed by its change, which the drawings want and the rule does not yet carry.
 
 - **Labs to cut**: the research-allowed A/B — does lifting the raw-alone wall restore the depth the 04 verdict found missing ([issue #1](https://github.com/Cwejman/OpenLight/issues/1)); the relaxation of the order law's recursion, a later study; and, should structure alone fall flat in the reads, the combined arm — structure plus narrative.
 
 - **Team opens** ([issue #1](https://github.com/Cwejman/OpenLight/issues/1) — Eric, Emelie, Sanna): what the second level of a document is; whether an intro carries a short guide to how the text is read; how running-text source references are handled; expand/collapse folding — blocked for now, since GitHub does not guarantee an anchor reaches into a collapsed section.
 
-## 5. What the method has found
+## 4. What the running of it taught
 
-Past what the study owes stands what it has already taught about the running of it rather than about the writing.
+Past what the study owes stands what it has already taught about the running of the work rather than about the writing, each finding settled by repetition rather than by one run. Beside it stands what is found by counting instead of by reading, which needs nobody's judgment and is kept apart for that reason.
 
-*Seen, across the ten runs.*
+[What the method has found](findings.md)
 
-[the level beneath](findings.md)
+[What the study measures of itself](measured.md)
 
-## 6. What the study measures of itself
+*Seen, across the ten runs; the measures machine work.*
 
-Beside what was found by reading stands what is found by counting, which needs nobody's judgment and is kept apart for that reason.
+## 5. Arriving without OpenLight
 
-*Measured, each run.*
+Last, for a reader who has met the study without the project it began inside and needs it to read the rest.
 
-[the level beneath](measured.md)
-
-## 7. The project it began in
-
-Last of the levels, for a reader who has met the study without the project it began inside and needs it to read the rest.
+[The project it began in](openlight.md)
 
 *Written 2026-09-14, when the study moved with the rule to a repository of its own.*
 
-[the level beneath](openlight.md)
-
-## 8. Notes
+## 6. Notes
 
 - **The law is not here.** [The code](../rule.md) stands at the arc's root, with [the practice](../poc/practice.md) and [the skill](../poc/skill.md) in the proof of concept beneath it. Each lab ships the edition it ran under, and the ancestor those editions grew from is [the edition of 2026-08-30](code-2026-08-30.md). A claim matures in the labs, enters an edition, and its row retires from the notebook. Git keeps everything that leaves.
 

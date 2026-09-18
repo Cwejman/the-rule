@@ -8,7 +8,7 @@ status: in force
 
 Much of the arc grew a decision at a time, and [its faces](practice.md#52-a-face-is-short) grew with it. The polish reads every file outside the rule and the study against the rule, in the order they stand on each other, and writes each again where it fails, before the arc moves. It is a plan written for a session that starts fresh, with the record of what that session did at its foot.
 
-*In force, 2026-09-14.*
+*Written 2026-09-14.*
 
 ## 1. Why the arc is polished now
 

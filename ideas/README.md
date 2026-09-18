@@ -11,31 +11,19 @@ They are held open. None of them is law, and nothing in the rule depends on them
 
 *The author's, open.*
 
-## 1. Giving as a business
+## 1. How any of this is offered, and how far it reaches
 
-The stance on how any of this is offered comes first, since it bears on everything else here.
+The stance on how a model and a harness should be offered comes first, since it bears on everything else here. Then how far the shape reaches past prose, which is the question the stance is held for. Then the one join the rule does not give, which is the deepest question that reach raises.
 
-*The author's, marked so, and open.*
+[Giving as a business](gaab.md)
 
-[the level beneath](gaab.md)
+[Tenants beyond prose](tenants.md)
 
-## 2. Tenants beyond prose
+[How two holons drive each other](resonance.md)
 
-Then how far the shape reaches past prose, which is the question the stance above is held for.
+*The author's, marked so, and open; begun 2026-09-11.*
 
-*The author's, held open and marked so; begun 2026-09-11.*
-
-[the level beneath](tenants.md)
-
-## 3. How two holons drive each other
-
-One join the rule does not give is asked here, and it is the deepest of the questions the reach above raises.
-
-*Derived 2026-09-11, from the author's question about resonance between the operators of a synthesizer.*
-
-[the level beneath](resonance.md)
-
-## 4. Letting go by contract
+## 2. Letting go by contract
 
 [To debrief](../rule.md#55-the-debrief) is to let go: the detail stays beneath, the conclusion goes to the surface, and what the surface keeps is a contraction of what was there. What is kept is typed, or at least categorised, and then it is what a program can take: substrate as argument data. The author's point is that the contraction can be made contractual.
 
@@ -50,7 +38,7 @@ Rembrandt, [two women teaching a child to walk](https://commons.wikimedia.org/wi
 
 *Reasoned, the author's thought of 2026-09-11 on how a substrate is let go of gracefully, for a context or for anything else, held open with the names kept as coined; the contract is [the rule's sixth section](../rule.md#6-how-far-this-goes) and the project's substrate, and the rest is what a surface built on them would feel like.*
 
-## 5. What is told, and what is shown
+## 3. What is told, and what is shown
 
 Knowledge divides into what has to be told and what can be shown. The rule is told, and by [lab 10](../study/10-comprehension/debrief.md) it is nearly told. From there the gains move to what is shown: the surface the substrate is read through, and the interface it is worked in. This is the author's split for grading where effort goes next, held 2026-09-11.
 
@@ -58,10 +46,10 @@ In that pair the human's role is the art direction. That is what a person does f
 
 *Reasoned, the author's, and open; the reason [the surface](../poc/surface/README.md) was taken up before lab ten's piece was read.*
 
-## 6. Reading the substrate as a diff
+## 4. What was built and taken out again
 
-Last, and the only one of these that was built and taken out again, kept so the learning outlives the code.
+Last, and the only one of these that reached the code: the surface was given git's history for a day and it came out the same evening, kept here so the learning outlives what was removed.
+
+[Reading the substrate as a diff](history.md)
 
 *Seen, 2026-09-17; postponed by the author.*
-
-[the level beneath](history.md)

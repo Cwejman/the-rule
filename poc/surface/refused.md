@@ -76,7 +76,7 @@ What it told now has a home a reader can see without pointing: a link's target [
 
 The second program gave each level of the path a pane and stood the panes side by side, the reading stepping right as it went deeper.
 
-The author's verdict after a day of use: only one pane is ever read, since an eye that moves to the next has stopped reading the last, and the other panes earned their room for orientation alone, which they gave in prose. [Reading and orientation come apart](README.md#3-reading-and-orientation-come-apart), and orientation is headings and shape.
+The author's verdict after a day of use: only one pane is ever read, since an eye that moves to the next has stopped reading the last, and the other panes earned their room for orientation alone, which they gave in prose. [Reading and orientation come apart](lane.md), and orientation is headings and shape.
 
 ## l. A horizontal scrub of a row of panes
 

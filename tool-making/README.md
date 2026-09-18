@@ -42,13 +42,13 @@ This belongs in the substrate. The substrate is lossless, it stands at various l
 
 *The author's, 2026-09-15.*
 
-## 2. The primitives
+## 2. What comprehension is made of here
 
 Once value is held to be made by comprehension, what comes next is the few things that comprehension is made of here, brought whole from the dependent project on 2026-09-15 and absorbed step by step.
 
-*Ratified by the author on 2026-09-14.*
+[The primitives](primitives.md)
 
-[the level beneath](primitives.md)
+*Ratified by the author on 2026-09-14.*
 
 ## 3. Where the substrate of work strains
 
@@ -100,9 +100,9 @@ So it is not known whether this is a new dynamic in the substrate, or the existi
 
 ## 4. What was settled, and what is left open
 
-A child with several parents is [a borrow](../poc/practice.md#37-a-second-lone-link-borrows-and-the-first-place-is-the-home): a lone link last in a brief places a structure there, the first such place is its home, and every later one borrows it. Links in prose stay offers.
+A child with several parents is [a part in several places](../poc/practice.md#36-a-part-may-stand-in-several-places): a lone link in a brief places a structure there, and the same structure may be placed wherever it belongs, whole each time. Links in prose stay offers.
 
-A branch is a step whose level holds one brief per condition, each placing or borrowing its path, and the flow continues at the next step of the level above; the level is [one of letters](../poc/practice.md#41-a-level-of-letters-is-a-set), which says only that no condition stands on another, and a flow reads that as a choice. All three are drawn by [the canvas](../poc/surface/canvas.md).
+A branch is a step whose level holds one brief per condition, each placing its path, and the flow continues at the next step of the level above; the level is [one of letters](../poc/practice.md#41-a-level-of-letters-is-a-set), which says only that no condition stands on another, and a flow reads that as a choice. All three are drawn by [the canvas](../poc/surface/canvas.md).
 
 Left open: how the ratified level beneath and the words above become one, brief by brief, in discussion.
 

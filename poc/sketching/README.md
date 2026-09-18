@@ -20,7 +20,7 @@ A sketch is [an image like any other](../practice.md#8-visuals) in where it stan
 
 ## 2. Prose decides what is drawn, and a little code keeps it exact
 
-What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#6-what-this-does-not-answer).
+What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5-what-this-does-not-answer).
 
 What prose cannot give is geometry a model cannot measure, and a sight of what it drew. A label that overflows its room, two labels on one spot, a colour written as a value that no theme can reach: these are what make a generated drawing look cheap, and none of them is a matter of taste. So the rule is thin, and it does only what prose cannot: it keeps the geometry exact and lets the session look.
 
@@ -42,23 +42,17 @@ A sketch names no face. Set into the page it takes the surface's sans, and shown
 
 *Reasoned, the author's direction, 2026-09-14.*
 
-## 4. The skill
+## 4. What makes one
 
-What a session does to make a sketch: when one earns its place, the forms a sketch takes, the design language it is drawn in, and the loop from an outline to a sketch in `.img` with its text beneath.
+A session makes a sketch by prose and a little code, and both stand apart: what it does, when a sketch earns its place and the language it is drawn in; and the one file that keeps the geometry exact and lets the session look at what it drew.
 
-*In force, 2026-09-14.*
+[The skill](skill.md)
 
-[the level beneath](skill.md)
-
-## 5. The tool
-
-One TypeScript file run with Bun, beside this brief, that writes a sketch's skeleton and stamps its style from the palette, measures a label's room, checks a sketch against the language, and renders it for the session to look at.
+[The tool](implementation.md)
 
 *In force, 2026-09-14.*
 
-[the level beneath](implementation.md)
-
-## 6. What this does not answer
+## 5. What this does not answer
 
 Whether components are needed. The practice's hypothesis of a few reusable pieces in one file [gave way to this level](../practice.md#81-the-sketch), and is taken up only when the same composition is drawn by hand for the third time.
 
@@ -68,11 +62,11 @@ What keeps a sketch true when the text it draws changes. A sketch is a second st
 
 Whether a session can art direct a sketch: find which understanding most needs a picture, and paint it so the win reads first. This is under review. The first sketches for [the rule](../../rule.md) were reasoned through outlines and fresh heads, and still drew one act of breaking where the gradient itself wanted painting, and the author was not sold on them.
 
-So far the drawings that teach best, and carry the win first, come from the human mind, and inference has not yet shown the same level of design. It is [the split between what is told and what is shown](../../ideas/README.md#5-what-is-told-and-what-is-shown) met in practice, and it is to be explored further.
+So far the drawings that teach best, and carry the win first, come from the human mind, and inference has not yet shown the same level of design. It is [the split between what is told and what is shown](../../ideas/README.md#3-what-is-told-and-what-is-shown) met in practice, and it is to be explored further.
 
 *Open, 2026-09-14; the art direction seen in the author's reading of the first sketches for the rule, 2026-09-15.*
 
-## 7. What was tried and refused
+## 6. What was tried and refused
 
 A flat run, looked up when one of these is proposed again.
 

@@ -21,7 +21,7 @@ A folder without an entry file is a pile, and holds nothing the rule can read.
 
 ### 1.1 A file is one linear reading
 
-A file is read in one stretch, from its title down through its last heading, and everything in it belongs to that one run. What a mount names is a reading of its own, and it is entered rather than unfolded into this one.
+A file is read in one stretch, from its title down through its last heading, and everything in it belongs to that one run. What a lone link places is a reading of its own, and it is entered rather than unfolded into this one.
 
 What decides it is what a holon is. A holon written to be read linearly, laid inside another holon written to be read linearly, gives one run that nobody composed, and neither is a sovereign whole in it any more. So the two stay apart, and the file is where they part.
 
@@ -77,65 +77,61 @@ Files that stand on a ratified one are not bound by it, and may change as freely
 
 *Preferred, the author's, 2026-09-14, when the rule became the first file ratified whole.*
 
-## 3. Every part is mounted by one brief of its entry
+## 3. A lone link places a part
 
-Everything under the rule beside an entry is mounted by it, with [two exceptions](#36-what-stands-beside-an-entry-without-a-mount), and a mount is a brief of its own rather than a mention among others. Every file and folder beside the entry is mounted by one of its briefs and by no more than one, so the order a reader meets the parts in is the order those briefs stand in, and the entry has had to ask which part is biggest.
+A paragraph that is nothing but a link places a part there: the file it names is read, and it stands at that point as a whole of its own. It is the one way a part is connected, and [the surface draws it as a card](surface/lane.md#12-a-placed-part-raises-a-card), the part's own title and face standing in the prose as a figure does.
 
-The mount and the part are two briefs, one on each side of [the boundary](#11-a-file-is-one-linear-reading). The mount belongs to the entry's reading and places the part in it; the part's own brief belongs to the reading the reader opens. Two facts, two homes, and a layer between them where there used to be one.
+A brief may place any number of parts, anywhere in its prose, and a link inside a sentence places nothing: it stays [an offer](../rule.md#322-the-link) like any other.
 
-*Reasoned, the author's, 2026-09-12, from an entry whose one section listed its five parts in five paragraphs, so it never had to ask; the two briefs the author's decision of 2026-09-18.*
+*The author's decision, 2026-09-18. It replaces the practice of 2026-09-12, which gave every part a brief of its own in the entry: that forced a layer of headings nobody wanted, and the card gives the part its presentation without one.*
 
-### 3.1 The mount stands last in its brief
+### 3.1 A part is placed where the prose has got to
 
-The mount is a paragraph that is nothing but the link, after the prose and after [the confidence line](#55-the-confidence-line-stands-last), because a reader decides to go down once they have read what is above. A mount on the heading asks a reader to descend before reading. A link in running prose is a different thing and may be written anywhere.
+The link stands where the reader is ready for it, which is after whatever they need to hold first, and the card stands there. A part placed before its ground asks the reader to go down before they can read.
 
-*Reasoned, the author's, 2026-09-12.*
+Nothing else marks it. A part whose placement wants a paragraph of its own gets one; a part placed after the prose that covers it needs none.
 
-### 3.2 A mounting brief says placement, not content
+*The author's decision, 2026-09-18; it loosens the rule of 2026-09-12 that a placement stood last in its brief, which several parts in one brief cannot all do.*
 
-A mounting brief says where the part stands and why it stands there: what the reader holds by now, and why this is the next thing to go into. What the part gives is the part's own brief to say, in its own file, so no fact is written in two homes.
+### 3.2 A heading per part is a choice, not a rule
 
-That takes one paragraph, and the check flags a second. A mount that grows is a mount that has begun saying what the part is, which is the one thing it must not say.
+An entry may give each part a brief of its own, and then that brief says where the part stands and why, in the reader's terms. Or it may hold its parts in one brief, and place them in the prose it already has.
 
-*The author's decision, 2026-09-18, on moving the brief into the file; the flag at a second paragraph is structural so that nobody writes to a character count.*
+The choice is whether the placement is worth a level of its own. Where a reader needs to be told what they hold and why this comes next, the heading earns its place. Where the entry's own brief has already said it, a heading adds a name and nothing else, and the card beneath it repeats the name a second time.
 
-### 3.3 A mounting brief has no subsections
+What is lost when the headings go is that nothing then forces the entry to ask which part is biggest. That question was what the old rule bought, and the gradient still asks it; the practice no longer does.
 
-A brief that mounts a part has no subsections of its own. The mount already says its level is elsewhere, and a brief with both would have two levels where every brief has one.
+*The author's decision, 2026-09-18, on the layer of briefs being unnecessary; the cost is named from the finding of 2026-09-12, an entry whose one section listed its five parts in five paragraphs, so it never had to ask.*
 
-*Reasoned, the author's, 2026-09-12, so that what [the surface](surface/README.md) is handed stays one kind of level.*
+### 3.3 A placed file carries its own brief
 
-### 3.4 A mounted file carries its own brief
+A placed file opens with its own brief: the title, the prose that gives the understanding, and [the confidence line](#55-the-confidence-line-stands-last), and its level stands beneath that. It is the whole a reader opened the boundary for, and it may run larger than a brief inside a document, since it is the first thing they meet on the other side.
 
-A mounted file opens with its own brief: the title, the prose that gives the understanding, and [the confidence line](#55-the-confidence-line-stands-last), and its level stands beneath that. The title is the part's name and the mounting heading repeats it, without [a number](#4-headings-carry-numbers), so a reader crossing the boundary knows which brief this level belongs to and a script can check that the two agree.
+Its title is its own. Where a brief above gives it a heading as well, the two say the same name, and that is the heading's cost.
 
-That brief may run larger than one inside a document. It is the whole a reader opened the boundary for, and it is the first thing they meet on the other side. It is still a brief, still paragraphs, and whatever the understanding did not need still goes beneath it.
+*The author's decision, 2026-09-18. It inverts the practice of 2026-09-12, which kept the prose in the entry and left the file with its parts alone, after four placed files' first paragraphs had become copies of the briefs that placed them. Emptying the file was what stopped the copying then; the card is what stops it now, since the copy has nowhere to stand.*
 
-*The author's decision, 2026-09-18. It inverts the practice of 2026-09-12, which kept the prose in the entry and left the file with its parts alone, after four mounted files' first paragraphs had become copies of the briefs that mounted them. Emptying the file was what stopped the copying then; [the mount saying placement](#32-a-mounting-brief-says-placement-not-content) is what stops it now, since a placement has nothing to copy.*
+### 3.4 An empty level is not a level
 
-### 3.5 An empty level is not a level
-
-A mounted part has a level to hold. A file with no sections has nothing beneath its mount, so it is no boundary and no reading of its own: its prose is a brief of the entry and stands there as a section rather than as a file. The same holds one grain up: a folder whose entry mounts nothing is a file beside the entry above, and the folder goes.
+A placed part has a level to hold, as sections of its own, as parts its prose places, or as both. A file with neither has nothing beneath it, so it is no boundary and no reading of its own: its prose is a brief of the entry and stands there as a section rather than as a file. The same holds one grain up: a folder whose entry places nothing is a file beside the entry above, and the folder goes.
 
 *Reasoned, 2026-09-12, from the rule above applied to the arc, where a note of four paragraphs and the entries of the labs had nothing beneath them to hold; read again under [the boundary](#11-a-file-is-one-linear-reading), 2026-09-18.*
 
-### 3.6 What stands beside an entry without a mount
+### 3.5 What stands beside an entry without a placement
 
-Two kinds of file stand beside an entry without a mount, and a reader meets both. A file under the rule that nothing mounts is an orphan: the root of a body of its own, so it keeps its own opening. Orphans are allowed for now, since a part can be worked on alone and connected when it is ready.
+Two kinds of file stand beside an entry that nothing places, and a reader meets both. A file under the rule that no link places is an orphan: the root of a body of its own, so it keeps its own opening. Orphans are allowed for now, since a part can be worked on alone and connected when it is ready.
 
-A file not under the rule, one without [the stamp](#2-a-file-says-it-is-under-the-rule), is not governed by it at all. A brief reaches it by a link and never by a mount, and it stays as it was written.
+A file not under the rule, one without [the stamp](#2-a-file-says-it-is-under-the-rule), is not governed by it at all. A brief reaches it by a link in prose and never by a placement, and it stays as it was written.
 
 *Preferred, the author's, 2026-09-12; whether orphans stay allowed is open.*
 
-### 3.7 A second lone link borrows, and the first place is the home
+### 3.6 A part may stand in several places
 
-A lone link last in a brief always says the same thing, that the structure stands here, and a file may be named that way from more than one brief.
+A part is placed wherever it belongs, and that may be more than one place. Each placement raises the same card, and the reader who meets it in either place meets the whole of it.
 
-The first place the reading meets it is its home: that mount gives the level its one address and its one place in a linear reading, and every later lone link to it is a borrow, which stands at the borrowing brief as the home does and leads to the same one reading, so the prose is never read twice. Nothing is written to tell the two apart; the trace tells them apart by order, and the check says which is which.
+There is no borrowing and no lesser copy: the file is one, and the places that link it are many. What the reading owes is only that a reader who arrives by one route can see which route they took, and that is [a question of the way down](surface/lane.md#75-the-way-down-stands-over-the-lane) rather than of the substrate.
 
-The ground offered is [the primitives' rule](../tool-making/primitives.md#21-shared-ground-rises-to-a-shared-level) that shared work rises to the level covering all who use it and is placed before what depends on it, so the home is where it is read first. The author is not sure that follows from the rule itself, and it is used for now to see.
-
-*A trial, the author's decision, 2026-09-15; not yet built in the trace, which still skips a second mount, and the doubt is the author's own.*
+*The author's decision, 2026-09-18. It replaces the trial of 2026-09-15, under which the first place met was the home and every later link a borrow laid folded; the author's reading is that a part simply has several homes, and the route a reader took is the surface's to say.*
 
 ## 4. Headings carry numbers
 
@@ -235,7 +231,7 @@ They fail together in one place: each needs something that resolves a link again
 
 ## 7. A file is cut around one brief, and moves only where it is stood on
 
-A file has one root brief, [its own](#34-a-mounted-file-carries-its-own-brief) whether it is mounted or not, and it is cut so that its root is the brief that the most of the region it serves stands on. What follows is where a ground moves, and when a file may go. When a brief is central to two regions it lives in one file and the other links to it, never split, by the rule's one home.
+A file has one root brief, [its own](#33-a-placed-file-carries-its-own-brief) whether anything places it or not, and it is cut so that its root is the brief that the most of the region it serves stands on. What follows is where a ground moves, and when a file may go. When a brief is central to two regions it lives in one file and the other links to it, never split, by the rule's one home.
 
 A ground moves down, never up. A brief one other brief stands on moves into that brief's holon. A brief many stand on moves to the level that covers them all, and never above it, since a ground held above its own readers is a ground they cannot keep.
 
@@ -320,6 +316,6 @@ A term the reader will need again is introduced: the term leads, and its plain e
 
 The practice was found in the labs, and their files stay as the finding left them.
 
-Their outputs, prompts and editions carry the stamp from when they were written, under editions of the rule that are not the law now, and they are frozen. So they are reached by links rather than mounts, and nothing here is applied to them. Whether they keep the stamp, and so whether the substrate holds them at all, is open, and a first reader need not open them.
+Their outputs, prompts and editions carry the stamp from when they were written, under editions of the rule that are not the law now, and they are frozen. So they are reached by links in prose rather than placed, and nothing here is applied to them. Whether they keep the stamp, and so whether the substrate holds them at all, is open, and a first reader need not open them.
 
 *Open.*
