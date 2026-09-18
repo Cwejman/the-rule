@@ -159,7 +159,10 @@ async function serve(rootArg: string, port: number): Promise<void> {
     held = new Set(assetsOf(b));
     return b;
   };
-  const body = async () => Response.json(await retrace());
+  // nothing the live process serves may be kept by the browser: the page carries the whole of the drawing, so a reader
+  // who reloads after a change must be handed the page as it is now and never the one they had
+  const fresh = { "cache-control": "no-store, must-revalidate" };
+  const body = async () => Response.json(await retrace(), { headers: fresh });
   const asset = (path: string) => {
     const file = decodeURIComponent(path.slice("/asset/".length));
     return held.has(file) ? new Response(Bun.file(join(rootDir, file)), { headers: { "cache-control": "no-cache" } }) : new Response("not an image the body holds", { status: 404 });
@@ -173,7 +176,7 @@ async function serve(rootArg: string, port: number): Promise<void> {
     fetch: (req) => {
       const path = new URL(req.url).pathname;
       if (path.startsWith("/asset/")) return asset(path);
-      return (routes[path] ?? (() => new Response(page(null, script), { headers: { "content-type": "text/html; charset=utf-8" } })))();
+      return (routes[path] ?? (() => new Response(page(null, script), { headers: { "content-type": "text/html; charset=utf-8", ...fresh } })))();
     },
   });
   console.log(`the surface reads ${rootDir}\n  http://localhost:${port}/`);
@@ -2584,6 +2587,8 @@ function columnHtml(root: string, col: number): string {
 /** How the nesting within a file is drawn: a spine down the left with the rows hanging into it, or one line threading from row to row. */
 /** The map's measures, all on one grid of four: the width of a row, the room between rows, how far a level steps in, and how far a reading stands from the row that named it. */
 const NODE = { w: 192, gap: 12, indent: 24, across: 48 };
+/** The least the type on the map is drawn at, whatever the zoom: past it the nodes go on shrinking and the names are cut instead. */
+const TYPE_FLOOR = 10.5;
 const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false } };
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
@@ -2750,9 +2755,21 @@ function applyView(ease: boolean): void {
   const st = stage();
   if (!st) return;
   st.classList.toggle("easing", ease);
-  // one transform and nothing else: the type scales with the boxes, since counter-scaling it relaid every row at
-  // each step of the zoom and the whole map shifted in small jagged steps as it went
   st.style.transform = `translate(${view.x.toFixed(1)}px, ${view.y.toFixed(1)}px) scale(${view.k.toFixed(3)})`;
+  // the type has a floor. Zooming out shrinks the nodes and not the names, so an overview reads rather than merely
+  // being small, and a name that no longer fits its node is cut. It steps rather than sliding, since every change of
+  // the type lays the rows again, and sliding it laid them at every notch of the wheel
+  const row = st.querySelector<HTMLElement>(".crow");
+  if (row) {
+    const kzNow = Number(st.style.getPropertyValue("--kz") || 1);
+    const base = parseFloat(getComputedStyle(row).fontSize) / (kzNow || 1);
+    const want = Math.max(1, TYPE_FLOOR / (base * view.k));
+    const kz = (Math.round(want * 20) / 20).toFixed(2);
+    if (st.style.getPropertyValue("--kz") !== kz) {
+      st.style.setProperty("--kz", kz);
+      requestAnimationFrame(drawEdges);
+    }
+  }
   rememberView();
 }
 
@@ -4844,7 +4861,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
-.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
+.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
 /* the name is given a width it fills rather than one it trails off in: two lines is what most names take here, and
    that is the room the node keeps, so a level of nodes reads as a set and none of them stands half empty */
 /* a node takes the room its name needs and no more, since room on the map is what there is least of: one line where

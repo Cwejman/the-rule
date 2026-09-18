@@ -154,7 +154,9 @@ The process answers four requests: the page itself, the body as JSON, a stream t
 
 An image is served only when the last trace reached it, so the process hands out nothing else under the path, and its address carries the file's modification time, so a changed image is fetched again rather than kept from before.
 
-*In force, as built 2026-09-13 and 2026-09-14.*
+Nothing it serves may be kept by the browser. The page carries the whole of the drawing, so a reader who reloads after a change must be handed the page as it stands and never the one they had; without that a browser's own guess at how long a page keeps is enough to leave a reader reading a build that is gone.
+
+*In force, as built 2026-09-13 and 2026-09-14; the page served fresh, 2026-09-18, after the author reloaded onto a build that no longer existed.*
 
 #### 5.1.1 A restart reaches the page
 
