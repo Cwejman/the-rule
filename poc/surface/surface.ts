@@ -1525,7 +1525,7 @@ function cardHtml(a: string): string {
     `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(a)}"` : ""}>` +
     (hidden.length ? actFigure(b, hidden, []) : "") +
     (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${acts() === a ? badgeHtml("open", a) : ""}</span>` +
+    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("open", a)}</span>` +
     `</div>`;
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
@@ -4692,8 +4692,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a card is for looking at directly, not for reading through, so it never dims: the prose around it carries the
    reading's ink and the card carries its own. What says which card the reading stands on is its outline taking the
    branch's hue, which is as much as a thing meant to be scanned should ever change */
-.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; transition: outline-color .15s; }
-.brief .card.here, .brief .card.lit { outline-color: var(--lit); }
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; color: var(--muted); transition: outline-color .15s, color .2s; }
+/* the card the reading stands on takes full ink and its outline takes the branch's hue; the others stay legible and
+   quiet, which is what a thing meant to be scanned should do rather than fade */
+.brief .card.here, .brief .card.lit { color: var(--ink); outline-color: var(--lit); }
+/* opening is the act a press on the card already does, so its badge stands only where a key reaches it: on the card the
+   reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
+.brief .card .acts [data-act="open"] { display: none; }
+.brief .card.here .acts [data-act="open"], .brief .card.lit .acts [data-act="open"] { display: inline-flex; }
 .brief .card { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
 .brief .card-top, .brief .card-act { grid-column: 1 / -1; }
 .brief .card-body { grid-column: 1; min-width: 0; }
