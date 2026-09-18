@@ -252,17 +252,15 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws the scope as nodes from the same state the lane draws, so folding on one is folding on the other.
+The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What it holds of its own is the chain, which card of each column stands open, and what is selected; both are kept in the browser with the view.
 
-Each node is HTML, its row set in the chrome's type and laid out by the browser: a level is a flex column, a set a flex row of columns, and a whole node's level a zone beneath its row, held by dashed edges that come out of the row's own sides, so no layout is computed by hand and nothing shifts. A borrowing node's zone is its home's level, named as such above it. One SVG over the nodes draws the arrows from each step to the next, and the links of the highlighted node as dashed curves from its ports to whatever of their targets stand on the canvas, measured after the nodes are laid and divided by the zoom, and drawn again on a fold, a resize, a change of focus or pointer, or the fonts landing.
+Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
-The ports stand outside the row, what points at the node to its left and what it points at to its right, a cell per brief in its hue, the rest collapsed into a count past five. The depth strip stands in the way down, a cell per level beneath the scope; a press or a scrub across it unfolds every brief of the scope to that depth and folds beyond, as one change the reader can undo.
+Pan and zoom are one transform on the stage, which the browser composites without laying anything out again, and the type scales with it. The wheel pans, and a pinch, which arrives as a wheel with the control key, zooms about the pointer. A drag on the ground pans, a press on a row selects it and opens what it names, and a press again on what is selected goes there. A view fits the map once, when it is first drawn; after that an opening eases the reading it opened into the pane and nothing else moves.
 
 With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from the canvas alone.
 
-Pan and zoom are one transform on the stage, which the browser composites without laying anything out again. The wheel pans, and a pinch, which arrives as a wheel with the control key or as Safari's own gesture, zooms about the pointer. A drag on the ground pans, a press on a row goes, and a press on a zone's ground folds its brief. A change of scope fits the stage to the canvas's width, never larger than life, and a focus that leaves the view is eased back into it. The view is kept in the browser with the lane, per scope.
-
-*In force, 2026-09-15, as built.*
+*In force, 2026-09-18, as built; the pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
 
 ### 6.6 What the browser keeps
 

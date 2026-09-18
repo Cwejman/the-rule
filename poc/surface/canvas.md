@@ -42,7 +42,7 @@ The first build drew the whole body as one map, every placement standing beside 
 
 On arriving the chain is the path of the address the reader stands at, so a link handed to someone opens the map they would have built themselves.
 
-*The author's decision, 2026-09-18; the whole map is his own of 2026-09-15, held for later.*
+*The author's decision, 2026-09-18, as built the same day; the whole map is his own of 2026-09-15, held for later.*
 
 ## 4. Down is the reading, across is each opening
 
@@ -52,7 +52,7 @@ Pressing a node that leads to another reading draws an edge from its row to the 
 
 Opening is not scoping. The canvas is not reframed around what was opened, nothing leaves the map, and the way back is the column the edge came from.
 
-*The author's decision, 2026-09-18; across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), taken further the same day into the opening.*
+*The author's decision, 2026-09-18, as built the same day; across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), taken further the same day into the opening.*
 
 ### 4.1 An opening replaces what stood to the right
 
@@ -60,7 +60,7 @@ A column holds several nodes that can be opened, and only one of them is open at
 
 That is what lets the chain be the reader's place in the map: where they are is which node of each column is open, which is a run of names and nothing more.
 
-*The author's decision, 2026-09-18.*
+*The author's decision, 2026-09-18, as built the same day.*
 
 ### 4.2 Within a file the hierarchy goes down, drawn as a file tree
 
@@ -70,7 +70,7 @@ Every file now opens with a brief of its own, so the edge from the opening lands
 
 Two forms of that line stand against each other and are not decided. The line may pass through each nearest child in turn, which threads more and more lines through the rows as the nesting deepens; or one line may drop from the far left of the file's own brief and run the whole way, every row hanging into its side, which is what a file tree does. They are to be built and looked at side by side rather than argued.
 
-*The author's direction, 2026-09-18; the choice of line open, and his to make by looking.*
+*The author's direction, 2026-09-18; both lines are built and a switch in the settings, `nesting`, stands them side by side, so the choice is open and his to make by looking.*
 
 ### 4.3 A file opens whole, and folding comes after
 
@@ -78,7 +78,7 @@ A file opened on the canvas shows its heading tree whole. The reader asked to se
 
 Folding is what they do afterwards, to a part they have read or do not want: fold it from the acts, or shift with the arrows to fold the lot. Since the fold state is one, a file opened whole on the canvas stands unfolded in the lane as well.
 
-*The author's decision, 2026-09-18; that the lane unfolds with it is the session's reading of one state, and is his to refuse.*
+*The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3-a-reading-is-laid-whole) as well, which is the session's reading of one state and is his to refuse.*
 
 ### 4.4 A folded node says how deep it is
 
@@ -96,7 +96,7 @@ A node with nothing on the other side is only selected, and the field then offer
 
 Pointing projects nothing. A projection of the next level was proposed and dropped the same day: a press already looks in, and a ghost that has to dodge what is drawn costs more than it gives.
 
-*The author's decision, 2026-09-18, from the three cases put to him; the projection his own proposal, dropped by him the same day.*
+*The author's decision, 2026-09-18, as built the same day; the projection his own proposal, dropped by him the same day.*
 
 ### 5.1 The field the acts stand in
 
@@ -106,7 +106,7 @@ Under a finger an act is its glyph alone. On a desktop it is the glyph with what
 
 So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
-*The author's decision, 2026-09-18; what becomes of the page's own strip while the canvas stands is open.*
+*The author's decision, 2026-09-18; as built the same day on a desk, where the field stands within the canvas with its glyphs, words and keys. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
 ### 5.2 What is selected shows its face
 
@@ -116,7 +116,7 @@ It stands in one fixed place and never over the nodes, since a card that follows
 
 It hides into an eye in the field, in both grains, and comes back by the same eye.
 
-*The author's decision, 2026-09-18; it retires [the card at the foot of the phone](touch.md#46-what-is-chosen-on-the-canvas-raises-a-card), since what is selected is now named above and the foot is acts alone.*
+*The author's decision, 2026-09-18; as built the same day on a desk. It retires [the card at the foot of the phone](touch.md#46-what-is-chosen-on-the-canvas-raises-a-card), since what is selected is named above and the foot is acts alone, and that move is not built.*
 
 ## 6. One state, and the lane in step with it
 
@@ -178,15 +178,15 @@ The whole body drawn at once. [The chain](#3-the-path-the-reader-has-opened-and-
 
 The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#52-what-is-selected-shows-its-face).
 
-*Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above.*
+*Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above, and all four taken out of the code the same day.*
 
 ## 9. Two faults as built
 
-Zooming shifts the nodes in small jagged steps rather than scaling them evenly, which is the type being counter-scaled against the transform and the browser laying the rows again at each step.
+Zooming shifted the nodes in small jagged steps rather than scaling them evenly. The type was counter-scaled against the transform, by the square root of the zoom, so every row was laid again at each step; it now scales with the transform like everything else, and the whole map moves as one picture.
 
-Pinching on a phone behaves strangely. The gesture arrives as its own kind of event there, and the canvas reads the desktop's pinch, a wheel with the control key.
+Pinching on a phone behaves strangely, and that is not mended. The gesture arrives there as its own kind of event, and the canvas reads the desktop's pinch, a wheel with the control key held.
 
-*The author's report, 2026-09-18; both owed.*
+*The author's report, 2026-09-18; the zoom mended the same day, the pinch owed.*
 
 ## 10. What this leaves open
 
@@ -199,6 +199,8 @@ Whether a level of a file may be broken out into a column of its own where a rea
 The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
 The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
+
+How a reading that stands open is closed again, since opening a sibling replaces it and nothing else does; folding reaches a level within a file and not the column itself.
 
 A touch reading of the canvas beyond a drag that pans it, and [the pull past the top](lane.md#74-pull-past-the-top), which is built in the lane and not here.
 
