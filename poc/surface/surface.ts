@@ -1499,7 +1499,7 @@ function cardMap(a: string): string {
     .map((b, i) => {
       const x = Math.min(CARDMAP.w - 8, (depthOf(b.address) - base - 1) * CARDMAP.indent);
       const w = clamp((own(b.address) / most) * (CARDMAP.w - x), 3, CARDMAP.w - x);
-      const kind = isCard(b) ? "card" : level(b.address).length > 0 ? "head" : "para";
+      const kind = isCard(b) ? "away" : level(b.address).length > 0 ? "head" : "para";
       return `<rect class="${kind}" x="${x}" y="${(i * pitch).toFixed(1)}" width="${w.toFixed(1)}" height="${bar.toFixed(1)}" rx="${(bar / 2).toFixed(1)}"/>`;
     })
     .join("");
@@ -3122,9 +3122,11 @@ function focusUnderLine(): string {
 /** Marks the path and the focus wherever rows and articles stand, and moves the tree's line, without drawing again. */
 function drawFocusMarks(): void {
   const onPath = new Set(prefixesOf(state.focus));
+  // a card never dims, and opacity on a brief would take its cards with it, so a brief holding the focus keeps its ink
+  const holder = isCard(brief(state.focus)) ? parentOf(state.focus) : null;
   all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
-    el.classList.toggle("here", el.dataset.a === state.focus);
+    el.classList.toggle("here", el.dataset.a === state.focus || (el.classList.contains("brief") && el.dataset.a === holder));
   });
   if (canvasOn()) (followFocus(), drawEdges());
   all<HTMLElement>("svg.fig [data-a]", ui.areas).forEach((el) => {
@@ -4687,12 +4689,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a card stands in the prose as an image does, and is drawn as one: the same ground, the same hairline and the same
    corner, so a part presented in the reading reads as a figure rather than as more of the text. The hue arrives only
    under the pointer, as it does on a link */
-.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; opacity: calc(1 - var(--dim)); transition: outline-color .15s, opacity .3s; }
-/* a card is a thing of the reading, so it takes the ink a brief takes: full where the reading stands or the pointer
-   rests, a step dimmer everywhere else, and its hue arrives with the highlight rather than with the pointer alone */
-.brief .card.here, .brief .card.lit { opacity: 1; outline-color: var(--door); }
-/* the prose around a card gives way while the card is the thing being read */
-.brief.here:has(.card.here) > .surface, .brief.here:has(.card.here) > p { opacity: calc(1 - var(--dim)); transition: opacity .3s; }
+/* a card is for looking at directly, not for reading through, so it never dims: the prose around it carries the
+   reading's ink and the card carries its own. What says which card the reading stands on is its outline taking the
+   branch's hue, which is as much as a thing meant to be scanned should ever change */
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; transition: outline-color .15s; }
+.brief .card.here, .brief .card.lit { outline-color: var(--lit); }
 .brief .card { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
 .brief .card-top, .brief .card-act { grid-column: 1 / -1; }
 .brief .card-body { grid-column: 1; min-width: 0; }
@@ -4701,7 +4702,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .brief .card-map svg { display: block; }
 svg.cardmap .para { fill: var(--rest); }
 svg.cardmap .head { fill: var(--door); }
-svg.cardmap .card { fill: none; stroke: var(--door); stroke-width: .8; }
+svg.cardmap .away { fill: none; stroke: var(--door); stroke-width: .8; }
 .brief .card.lit svg.cardmap .para, .brief .card.here svg.cardmap .para { fill: var(--door); }
 .brief .card.lit svg.cardmap .head, .brief .card.here svg.cardmap .head { fill: var(--lit); }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
