@@ -2551,10 +2551,11 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
+  // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
   const n = o.head ? "" : numberIn(b, root);
-  const num = n ? `<span class="num">${esc(n)}</span>` : "";
-  const lead = o.opens ? `<span class="lead">${CHEVRON}</span>` : "";
-  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${num}<span class="title">${esc(b.title)}</span>${marksHtml(b, o.hides)}${lead}</div>`;
+  const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
+
+  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${num}<span class="title">${esc(b.title)}</span>${marksHtml(b, o.hides)}</div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -4220,6 +4221,8 @@ function wire(): void {
       // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
       return void (badge.closest(".strip") && drawChooser());
     }
+    // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
+    if (t.closest("#face") && picked && brief(picked)) return void goTo(picked);
     // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) {
@@ -4327,7 +4330,10 @@ function wire(): void {
     }
     // up or right turns a meter up; the shape scrubs by height alone
     const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
-    if (!drag.moved && Math.abs(dy) < 3) return;
+    // what counts as a movement is distance travelled, not height: the canvas pans in both directions, and a press
+    // with a shake in it was being taken for a drag and swallowed
+    const gone = drag.kind === "canvas" ? Math.hypot(e.clientX - drag.x, e.clientY - drag.y) : Math.abs(dy);
+    if (!drag.moved && gone < 4) return;
     drag.moved = true;
     state.scrubbing = true;
     if (drag.kind === "canvas") {
@@ -4808,35 +4814,32 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cnode.open { flex-direction: row; align-items: flex-start; gap: 54px; }
 .ckids { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; margin: 9px 0 0 var(--indent, 28px); }
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
-/* a row is its name and nothing drawn around it: the lines carry the structure, and ink is spent only where the
-   reader has asked. The rows of a level share one width, so their chevrons line up and every edge leaves at one x */
-.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .5em; width: 252px; padding: .38em .5em; border-radius: 7px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: background .15s, box-shadow .15s; }
-/* the head of a column is the brief the file opens with, and it says so by its weight and its hue */
-.crow.head { width: auto; max-width: 300px; font-weight: calc(600 - var(--thin)); color: var(--ink); }
+/* a row is a thing to look at and to press, so it keeps its own edge. The rows of a level share one width, and the
+   number keeps its room whether the row has one or not, so the titles begin at one edge and the marks end at one */
+.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .5em; width: 252px; padding: .42em .6em; border-radius: 7px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s, background .15s; }
+/* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
+.crow.opens { box-shadow: inset 0 0 0 1px var(--door); }
+/* the head of a column is the brief the file opens with, and it says so by its weight */
+.crow.head { width: auto; max-width: 300px; font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--door); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--track); color: var(--ink); }
 #depth .dc:hover { background: var(--muted); color: var(--ground); }
-.crow .num { flex: none; font-size: .85em; color: var(--faint); }
+.crow .num { flex: none; width: 1.7em; text-align: right; font-size: .85em; color: var(--faint); }
 .crow .title { flex: 0 1 auto; min-width: 0; }
 .crow.on .num { color: var(--on); }
-/* what the reading stands on takes the branch's hue; what the reader has selected is filled, since the two are
-   different things and a reader may have selected one while reading another */
-.crow.here { color: var(--on); }
-.crow.here .num { color: var(--on); }
-.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1px var(--door); }
-.crow.lit, .crow:hover { background: var(--wash); }
-/* the marks say what a row does not show, and a row that hides a great deal would otherwise squeeze its own name
-   away, so they yield first */
-.crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: 0 1 auto; min-width: 0; max-width: 33%; overflow: hidden; }
+/* what the reading stands on takes the branch's hue at full weight; what the reader has selected is filled as well,
+   since the two are different things and a reader may have selected one while reading another */
+.crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
+.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--door); }
+.crow.picked.here { box-shadow: inset 0 0 0 1.5px var(--on); }
+.crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
+/* the marks say what a row does not show, and they end at the row's own edge, so a level's marks line up */
+.crow .marks { display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex: 1 0 auto; margin-left: auto; min-width: 0; max-width: 40%; overflow: hidden; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
-/* an opening says so with the chevron at the row's right edge, which is where its edge leaves */
-.crow .lead { flex: none; margin-left: auto; display: grid; place-items: center; width: 11px; height: 11px; color: var(--door); }
-.crow .lead svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-.crow.open .lead { color: var(--lit); }
 /* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
 #field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
 #field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
@@ -4844,15 +4847,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
 #field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
 #field .badge .chord { display: flex; align-items: center; }
-/* the face of what is selected: one fixed place at the top right of the canvas, on the page's own ground */
-#face { position: absolute; top: 10px; right: 12px; z-index: 4; width: 262px; max-height: 42%; overflow: hidden; padding: 2px 0 0 14px; background: var(--ground); font-family: var(--sans); }
+/* the face of what is selected: one fixed place at the top right of the canvas, a thing standing over the map, so it
+   keeps its own edge; pressing it reads what it shows */
+#face { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
 #face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
 #face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 #face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
 #face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
 #face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
-/* it fades at its foot rather than cutting a line in half */
-#face::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
+#face::after { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 26px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }

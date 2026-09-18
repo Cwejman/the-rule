@@ -84,11 +84,21 @@ Folding is what they do afterwards, to a part they have read or do not want: fol
 
 A file's level goes down, and that is the ordinary reading. Where a reader wants one level in front of them, the act opens it as a column of its own to the right, and it leaves the column it came from.
 
-So the step right is always the reader's choice: a placement leads to another reading and says so with its chevron, which a press opens; a level of this file opens only when they ask for it by the act, and closes back into its column the same way. The map never widens on its own.
+So the step right is always the reader's choice: a placement leads to another reading and opens on a press; a level of this file opens only when they ask for it by the act, and closes back into its column the same way. The map never widens on its own.
 
 *The author's, 2026-09-18, wanted as a choice and not as a rule; as built the same day, on his reading that a piece could be gone to but not opened.*
 
-### 4.5 A folded node says how deep it is
+### 4.5 A row keeps its edge, and says what it leads to by it
+
+A row is a thing to look at and to press, so it keeps its own outline. What a row leads to is said by that outline rather than by a mark beside the name: a placement takes the branch's hue, as [the card in the lane does](lane.md#12-a-placed-part-raises-a-card), and a brief of this file keeps the quiet rim.
+
+A chevron at the row's right was built first and refused: with the press already opening what a row leads to, and the acts standing in the field, it said nothing a reader needed, and it never lined up against a name that wrapped.
+
+The rows of a level share one width, and the number keeps its room whether a row has one or not, so every title of a level begins at one edge and the marks end at one.
+
+*The author's, 2026-09-18, on reading a canvas whose rows had lost their edges and whose chevrons did not line up; as built the same day.*
+
+### 4.6 A folded node says how deep it is
 
 A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. As built, a folded row carries a bar per paragraph, a frame per image, and a tail as long as its level is heavy.
 
@@ -112,7 +122,7 @@ The acts stand naked, and there is one field for them, the same in both grains, 
 
 Under a finger an act is its glyph alone. On a desktop it is the glyph with what it does and the key that fires it, which is [the badge as it is drawn elsewhere](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the field stands within the canvas frame, centred at its foot, rather than at the foot of the page. Every act that can be taken appears; none stands behind an opener.
 
-The field is naked. No surface is drawn under it and no rim around it, since the page is flat and a bar of glass over a map is a second thing to look at; what keeps it readable is the page's own ground rising behind it, as the prose fades at its edges.
+The field is naked. No surface is drawn under it and no rim around it, since the page is flat and a bar of glass over a map is a second thing to look at; what keeps it readable is the page's own ground rising behind it, as the prose fades at its edges. The face is not naked: it is a thing standing over the map rather than a row of acts at its edge, so it keeps its own rim.
 
 So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
