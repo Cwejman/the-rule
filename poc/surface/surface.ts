@@ -4003,7 +4003,9 @@ function wire(): void {
     // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
     const el = named(e);
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
-    if (el?.tagName === "A" && el.closest("#lane")) el.closest(".brief")?.classList.add("keep");
+    // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
+    // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
+    if (el && el.closest("#lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
     point(el ? el.dataset.a! : null);
     tip(e);
   });
