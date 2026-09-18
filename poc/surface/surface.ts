@@ -901,6 +901,8 @@ type Settings = {
   prose: Face;
   /** which line draws the nesting within a file: a spine down the left, or one threading from row to row */
   tree: "spine" | "thread";
+  /** whether the face of what is selected on the canvas stands beside it */
+  face: "shown" | "hidden";
   /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
   areas: Record<AreaName, string[]>;
 };
@@ -922,6 +924,7 @@ const DEFAULTS: Settings = {
   headings: "serif",
   prose: "serif",
   tree: "spine",
+  face: "shown",
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
 };
 
@@ -1082,7 +1085,8 @@ type Action = {
 
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
 /** The brief an act falls on when none is named: the one under the pointer while one is pointed at, else the focus, since [pointing overrides the focus](lane.md#43-pointing-overrides-the-focus) for the acts as for the highlight. */
-const acts = (a?: string): string => a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : state.focus);
+const acts = (a?: string): string =>
+  a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : canvasAlone() && picked !== null && brief(picked) ? picked : state.focus);
 
 const ACTIONS: Record<string, Action> = {
   unfold: {
@@ -1120,6 +1124,27 @@ const ACTIONS: Record<string, Action> = {
     also: "The depth strip, scrubbed back to its start.",
     can: () => scopeDepth() > 0,
     run: () => foldAll(),
+  },
+  read: {
+    label: () => "read",
+    mark: () => ICON.lane,
+    keys: [{ key: "Enter" }],
+    help: () => "Takes the reading to what is selected on the canvas: the lane opens that reading and the address becomes it.",
+    also: "A press again on what is already selected.",
+    can: (a) => canvasOn() && !!brief(acts(a)) && acts(a) !== state.focus,
+    run: (a) => goTo(acts(a)),
+  },
+  face: {
+    label: () => (state.settings.face === "shown" ? "hide the face" : "the face"),
+    mark: () => ICON.ahead,
+    keys: [],
+    help: () => "Shows or hides the face of what is selected, which says what it holds without going there.",
+    can: () => canvasOn(),
+    run: () => {
+      state.settings.face = state.settings.face === "shown" ? "hidden" : "shown";
+      saveSettings();
+      drawCanvas();
+    },
   },
   open: {
     label: () => "open",
@@ -1242,26 +1267,34 @@ const chordName = (c: Chord): string => (c.shift ? `shift and ${KEY[c.key]?.name
  * One badge: the chord as caps and the action beside it, worded, or as a glyph where the room is tight. It carries the
  * address it acts on, so a press acts on the brief it stands beside rather than on the brief in focus.
  */
-function badgeHtml(id: string, a?: string, tight = false): string {
+function badgeHtml(id: string, a?: string, tight = false, marked = false): string {
   const act = ACTIONS[id];
   if (!act) return "";
+  // where a badge stands in a field of acts rather than beside its object, it leads with its glyph, so the row reads
+  // as acts rather than as words
+  const glyph = marked && act.mark ? `<span class="sign"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></span>` : "";
   // a badge keeps its room when it cannot be taken so that no row shifts under the pointer; with no pointer there is
   // nothing to shift under, and the room is wanted for the words, so a phone draws only what can be taken
   if (touch && !act.can(a)) return "";
   // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
   if (touch)
-    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}><span class="label">${esc(act.label(a))}</span></span>`;
+    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${glyph}<span class="label">${esc(act.label(a))}</span></span>`;
+  // an act with no key of its own has no cap to draw, so it carries its word alone, as it does under a finger
+  if (!act.keys.length)
+    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${act.mark ? `<span class="sign"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></span>` : ""}<span class="label">${esc(act.label(a))}</span></span>`;
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
   const held = act.keys[0].hold ? `<span class="held">held</span>` : "";
   // a badge beside a brief carries both caps: the key, inked on the brief a key acts on, and the pointer on every other
   // brief, where a press is the only way to it. The two take the same room, so no line shifts as the reading moves
-  const aimed = a !== undefined;
+  // a badge in a field of acts is not aimed at one brief on a line of its own, so it draws the key alone: the pointer
+  // cap is for a badge standing beside a brief, where it says how that brief is reached
+  const aimed = a !== undefined && !marked;
   const chord = `<span class="chord">${capsOf(act.keys[0], aimed)}${aimed ? cap(MOUSE, "pointer") : ""}</span>`;
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${chord}${said}${held}</span>`;
+  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${glyph}${chord}${said}${held}</span>`;
 }
 
 /** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
@@ -2057,7 +2090,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -2066,6 +2099,7 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
+  { key: "face", name: "the face", values: ["shown", "hidden"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
 ];
 
@@ -2431,6 +2465,8 @@ let chain: string[] = [];
 let picked: string | null = null;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
+/** Whether the canvas is the pane standing alone, where a key acts on what is selected there rather than on the reading. */
+const canvasAlone = (): boolean => canvasOn() && ui.scroll.classList.contains("off");
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
 /** The readings on the way to an address: every card at or above it, the outermost first. */
@@ -2507,13 +2543,45 @@ function columnHtml(root: string, col: number): string {
 const TREE = { spine: { indent: 28, x: 12, tick: true }, thread: { indent: 16, x: 26, tick: false } };
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
+/** The acts that stand in the canvas's own field, on whatever is selected there. */
+const FIELD_ACTS = ["read", "unfold", "open", "face"];
+
+/**
+ * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
+ * each with its glyph, its word and the key that fires it. Every act it has appears; none stands behind an opener.
+ */
+function fieldHtml(): string {
+  const a = picked;
+  const b = a ? brief(a) : undefined;
+  if (narrow() || !a || !b) return "";
+  // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
+  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)));
+  return `<div id="field" class="glass">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>`;
+}
+
+/**
+ * The face of what is selected: its placement, its title, its stamp and its first paragraph, which is the least that
+ * says whether to read it. It stands in one fixed place and never over the nodes, since a card that follows the
+ * pointer covers the very thing being looked at.
+ */
+function faceHtml(): string {
+  const b = picked ? brief(picked) : undefined;
+  if (narrow() || !b || state.settings.face === "hidden") return "";
+  const stamp = stampOf(b);
+  return (
+    `<div id="face" class="glass" ${hued(b.address)}>` +
+    `<div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${blocks(blocksOf(b).slice(0, 1))}</div>` +
+    `</div>`
+  );
+}
+
 /** Draws the canvas whole from the state: the root's column with the chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   // the canvas draws the path the reader has opened; arriving from outside it lays the path of where they arrived
   if (!chainHolds(state.focus)) chain = cardPathOf(state.focus);
   if (picked === null || !brief(picked) || !chainHolds(picked)) picked = state.focus;
-  ui.canvas.innerHTML = `<div id="stage" style="--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>`;
+  ui.canvas.innerHTML = `<div id="stage" style="--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
     fitCanvas();
     fitted = state.body.root;
@@ -4002,8 +4070,11 @@ function cycle(a: string): void {
   const jump = gradeOf(a) === "whole" && within(state.focus, a);
   refold(
     () => {
-      if (!inLane(a)) prefixesOf(a).forEach((p) => p !== a && gradeOf(p) !== "whole" && setGrade(p, "whole"));
-      setGrade(a, inLane(a) ? nextGrade(gradeOf(a)) : "whole");
+      // in the lane a fold is the brief's grade. Where the lane does not hold it, the canvas drew it from another
+      // reading, and there an absent grade means its level stands, so folding sets a face and unfolding takes it away
+      if (inLane(a)) return setGrade(a, nextGrade(gradeOf(a)));
+      if (gradeOf(a) === "face") state.grades.delete(a);
+      else state.grades.set(a, "face");
     },
     a,
     jump,
@@ -4341,8 +4412,10 @@ function wire(): void {
   // action says it can be. The space bar keeps its own discipline, since it acts when it is let go, so a reader who only
   // scrolls never reaches for the pointer, and held a moment it acts on the whole scope instead.
   const take = (c: Chord): boolean => {
-    const act = actionFor(c);
-    if (!act || !act.can()) return false;
+    // a chord may be claimed by more than one act, as return reads on the canvas and opens in the lane: the one that
+    // can be taken where the reader stands takes it
+    const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
+    if (!act) return false;
     act.run();
     return true;
   };
@@ -4719,6 +4792,25 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .lead { flex: none; display: grid; place-items: center; width: 11px; height: 11px; color: var(--door); }
 .crow .lead svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .crow.open .lead { color: var(--lit); }
+/* the acts of what is selected stand within the canvas at its foot, centred, rather than at the foot of the page:
+   every act it has, each with its glyph, its word and the key that fires it */
+#field { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 4px; padding: 5px 7px; border-radius: 12px; font-family: var(--sans); font-size: 12px; }
+#field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 8px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+#field .badge:hover { background: var(--wash); color: var(--ink); }
+#field .badge.off { opacity: .35; cursor: default; }
+#field .badge.off:hover { background: none; color: var(--muted); }
+#field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
+#field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
+#field .badge .chord { display: flex; align-items: center; }
+/* the face of what is selected: one fixed place at the top right of the canvas, never over the nodes */
+#face { position: absolute; top: 14px; right: 14px; z-index: 4; width: 268px; max-height: 44%; overflow: hidden; padding: 12px 14px; border-radius: 12px; font-family: var(--sans); }
+#face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
+#face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+#face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--ink); }
+#face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--on); }
+#face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
+/* the face fades at its foot rather than cutting a line in half */
+#face::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; background: linear-gradient(to bottom, transparent, var(--glass)); pointer-events: none; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
