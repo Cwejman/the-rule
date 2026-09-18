@@ -6,6 +6,10 @@ ratified: the author
 
 # The rule
 
+The rule is the law, and the place to start. It turns written knowledge into a medium, one that joins us to what we know and to each other, so that keeping it in order stops being a job of its own: you take part in it, and you add to it. It gives what knowledge is made of, the gradient it is laid by, and the few principles that follow, and one reading of it leaves you able to write under it.
+
+*Ratified by the author, 2026-09-14; that one reading suffices was seen in the labs. This opening came from the brief that used to mount the rule, and was ratified in its new place on 2026-09-18.*
+
 ## 1. Why there is a rule
 
 This is the essence the rest of the rule rests on: what knowledge is (its ontology), and what shape it takes (its topology). It leaves a good deal to your imagination, this is broken down further as the document progresses.

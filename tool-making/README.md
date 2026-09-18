@@ -44,17 +44,9 @@ This belongs in the substrate. The substrate is lossless, it stands at various l
 
 ## 2. The primitives
 
-In making tools a few simple ontological primitives are uncovered, and only what is needed at this stage is extracted. No complete body of existing practice is taken on: not the full approach of user experience with its flows, scenarios and personas. The primitives are laid win by win under the rule.
+Once value is held to be made by comprehension, what comes next is the few things that comprehension is made of here, brought whole from the dependent project on 2026-09-15 and absorbed step by step.
 
-The author's ratified statement of them so far stands beneath, brought whole from the dependent project on 2026-09-15 and absorbed step by step, never all at once.
-
-Goals come first, and the higher goals are unconditional. They may change, but they are much more stable. A goal breaks down into situation and condition, and there it stops being "we want to do this" and becomes "we do this here, because of that".
-
-Work is one word. Studying an existing product finds a great deal of it, under the names user flow, user scenario and user story, and all of it is work. Work is recursive: a piece of work may be reused across other work.
-
-Roles already exist in an existing product. In building one they are not set early on; they come up as the work progresses, step by step.
-
-*Ratified by the author on 2026-09-14 in the level beneath; the words above are the author's of 2026-09-15.*
+*Ratified by the author on 2026-09-14.*
 
 [the level beneath](primitives.md)
 

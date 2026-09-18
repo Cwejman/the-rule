@@ -6,6 +6,16 @@ ratified: the author
 
 # The primitives
 
+In making tools a few simple ontological primitives are uncovered, and only what is needed at this stage is extracted. No complete body of existing practice is taken on: not the full approach of user experience with its flows, scenarios and personas. The primitives are laid win by win under the rule.
+
+Goals come first, and the higher goals are unconditional. They may change, but they are much more stable. A goal breaks down into situation and condition, and there it stops being "we want to do this" and becomes "we do this here, because of that".
+
+Work is one word. Studying an existing product finds a great deal of it, under the names user flow, user scenario and user story, and all of it is work. Work is recursive: a piece of work may be reused across other work.
+
+Roles already exist in an existing product. In building one they are not set early on; they come up as the work progresses, step by step.
+
+*Ratified by the author on 2026-09-14 for what stands beneath; this opening is his words of 2026-09-15, brought here from the brief that used to mount it and ratified in its new place on 2026-09-18.*
+
 ## 1. Goals give the tool its purpose
 
 A goal says what should become or remain true. The highest goals are unconditional: they express the enduring good without carrying today's process, roles or tool inside them.

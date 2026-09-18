@@ -21,15 +21,15 @@ The doubts come first, since they are about what stands beneath the root and a r
 
 ## 2. Ideas of 2026-09-16
 
-The author's thinking of one day, dictated and typed prompt by prompt and ratified as said, each prompt whole in its own place: on styling the substrate expressively, on every prompt entering it, and on the business and governance of it.
+Then the days of dictated thinking, oldest first, since each day is read in the light of the one before it.
 
-*The author's, ratified 2026-09-16; the wording is a session's purification of speech, cut nowhere.*
+*The author's, ratified 2026-09-16.*
 
 [the level beneath](ideas-2026-09-16.md)
 
 ## 3. Ideas of 2026-09-17
 
-The next day's, begun with one: a sketch or an image as a substrate-native presentation, for heroing what matters.
+The next day's.
 
 *The author's, ratified 2026-09-17.*
 
