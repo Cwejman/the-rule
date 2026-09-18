@@ -242,7 +242,7 @@ The trail goes. Its cells are small targets, and every move a reader makes alrea
 
 ### 6.1 The depth leaves the phone
 
-[The depth](canvas.md#32-scope-and-how-far-things-explode) stood at the right of the way down, and on the author's reading it crowded the placement and offered something a phone should not offer: unfolding a scope six levels deep, which reads very wide and very long on a screen this narrow.
+[The depth](canvas.md#61-the-depth-strip) stood at the right of the way down, and on the author's reading it crowded the placement and offered something a phone should not offer: unfolding a scope six levels deep, which reads very wide and very long on a screen this narrow.
 
 So it is not drawn where the lane stands alone. A reader still unfolds brief by brief from the action line, which is the grain a phone reads in anyway.
 

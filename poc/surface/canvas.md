@@ -6,9 +6,11 @@ status: open
 
 # The canvas
 
-The surface is going to have a few modes, and the second is a canvas: the body as nodes a reader moves among, with its scope and how far it explodes under their hand, and the prose read in place or in a drawer beside. It is asked for by work, whose pieces are reused and reached from several places, and it is not built.
+The canvas is the surface's second pane: the body as nodes, which a reader opens one place at a time so that the map grows to the right as they go, with the prose kept in the lane beside it. It is how a body of work is moved in, where the lane is how one reading of it is read.
 
-*The author's, 2026-09-15; open.*
+It is built, and its design was laid again on 2026-09-18. What stands beneath is the design it is being built to, with what the first build did named where it is replaced.
+
+*The author's, 2026-09-15; laid again from his direction of 2026-09-18, and open.*
 
 ## 1. Comprehension is not only head-on
 
@@ -18,21 +20,7 @@ The lane with its shape is still too hard to comprehend a body of work by. The s
 
 *The author's, 2026-09-15.*
 
-## 2. A few modes, from a menu at the foot
-
-The surface is going to have a few modes, chosen perhaps from a centred menu at its foot. The first is the current lane of prose with its wings. The second is the canvas, and there the exploring begins: a few variants are made and held here, and as they are learned from they are removed or refined.
-
-*The author's, 2026-09-15.*
-
-## 3. Nodes and edges, drawn from the same state
-
-The canvas is nodes and edges, and it draws the same state the lane draws: the scope, every brief's grade, the focus and the pointer. A brief is a node, at its face when folded and unfolded as a zone when whole, so folding on the canvas is folding in the lane, one state and never two, as [the tree](widgets.md#2-the-tree) already holds.
-
-Pointing at a node lights it wherever it is drawn, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn). The brief in focus, where the reading stands, is highlighted apart from that, and where the reader came from is marked apart from both.
-
-*The author's, 2026-09-15.*
-
-### 3.1 Why work wants nodes
+### 1.1 Why work wants nodes
 
 The need for a node-based layout when working with work is what user experience calls user flows: to see as nodes what would otherwise be the headings of one long flat prose, with its branches, and with the flows that are reused.
 
@@ -40,73 +28,133 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 *The author's, 2026-09-15.*
 
-### 3.2 Scope, and how far things explode
+## 2. A few modes, from a menu at the foot
 
-As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of something and looks within it. In the canvas they may also adjust how far things explode, how many levels unfold, and that wants to be easy to scrub; the rest propagates. A reasonable default is needed, since the shape is hierarchical: from the entry there is little, and it grows and grows.
+The surface is going to have a few modes, chosen perhaps from a centred menu at its foot. The first is the current lane of prose with its wings. The second is the canvas, and there the exploring begins: a few variants are made and held here, and as they are learned from they are removed or refined.
 
-As built, a strip in the way down holds a cell per level beneath the scope, the unfolded ones marked, and a press or a scrub across it unfolds the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown. The two keys that move it stand together past its cells, [as one pair with their shift drawn once](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), since the strip is the act's own picture and needs no word beside it.
+*The author's, 2026-09-15.*
 
-The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole.
+## 3. The path the reader has opened, and not the whole body
 
-*The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
+The canvas draws where the reader is: the root's column, and beside it the chain of places they have opened to arrive here. Nothing else is laid out, so the map is as large as the way taken and no larger.
 
-## 4. Down for the reading, across for the depth
+The first build drew the whole body as one map, every placement standing beside the row that named it whether or not anyone had asked for it. Laid out at once a body reads as a wall, and the foundation wanted is not the wall but the path. Drawing everything is a later question, and one the chain does not foreclose.
 
-The two dimensions say two different things, and that is the whole of the layout. Down is the reading: everything one file holds stands in one column, its own brief at the top, then its sections and the parts it places, in the order they are read. Across is depth in the holarchy, and nothing else moves right: a part placed here is [a reading of its own](../practice.md#11-a-file-is-one-linear-reading), so its row keeps its place in this column and the file it names opens as a column beside that row, level with it.
+On arriving the chain is the path of the address the reader stands at, so a link handed to someone opens the map they would have built themselves.
 
-So one column is one file read top to bottom, and each step right is one boundary crossed. A reader looking at a column is inside a reading; a reader looking across is looking at the holarchy. Which of the two they are doing is in the shape itself rather than in a mark upon it.
+*The author's decision, 2026-09-18; the whole map is his own of 2026-09-15, held for later.*
 
-The canvas draws the whole body and not the scope. It is one map a reader moves in, growing to the right as the holarchy does and down as each file reads, so what a placement leads to always stands beside it and nothing is entered and left to see the next thing. What folding governs is the column: a file's sections stand beneath it when it is whole, since a file's structure is what a reader asks to see. Scoping is theirs to choose when they want one reading in front of them and nothing else, and it is not the frame the map is drawn in.
+## 4. Down is the reading, across is each opening
 
-Where the map is wider than the pane, which it soon is, the canvas does not shrink until it fits: a picture nobody can read says nothing. It fits while what that costs is legible and stays at its own size past that, and the brief in focus is what brings the view to place.
+The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross.
 
-An unfolded step holds a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level of sections is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them.
+Pressing a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Press on inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened.
 
-```
- Onboarding                        the scope root, the entry at the top
- │
- ├ 1  Sign up
- ├ 2  Verify the email
- ├ 3  Collect the payment          ends with a lone link: borrowed
- │    ┌ the payment flow ┄┄┄┄┄┄┄┄┄┐   home: Payments › The payment flow
- │    │ 1  Choose a method        │
- │    │ 2  Charge the card        │
- │    │ 3  Confirm                │
- │    └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
- ├ 4  Choose a plan               branches: its level is conditions
- │    ┌ If a team ──────┐ ┌ If alone ─────┐
- │    │ 1  Name it      │ │ 1  Pick a tier│
- │    │ 2  Invite people│ │               │
- │    └─────────────────┘ └───────────────┘
- ├ 5  Send the welcome            both paths continue here
- │
-```
+Opening is not scoping. The canvas is not reframed around what was opened, nothing leaves the map, and the way back is the column the edge came from.
 
-A zone is held by dashed edges that come out of the parent row's own sides, the row keeping its corners and standing centred over the zone, a nested row a step narrower per level so the nesting shows in the rows themselves, and a set wraps past three columns so no row grows past reading, at the author's suggestion once a first cut with a shifted, shaded zone had been seen, so the parent is seen to hold what stands under it and nothing shifts; pointing at its ground lights its edges, and pressing it folds the brief. The canvas itself keeps an edge, the rim an image keeps, so it is not cut off unseen. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it. In use the canvas proved narrower than expected, since a flow that does not branch is a column.
+*The author's decision, 2026-09-18; across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), taken further the same day into the opening.*
 
-*The author's direction, 2026-09-15, from the session's drawing; the dashed edges the author's, the same day, on seeing the first cut. Across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), once the boundary made the two kinds of part tell apart; what it cost is that a canvas laid across wants the middle to itself, which [what this leaves open](#8-what-this-leaves-open) carries.*
+### 4.1 An opening replaces what stood to the right
 
-### 4.1 A folded node says how deep it is
+A column holds several nodes that can be opened, and only one of them is open at a time. Opening a second replaces the chain that stood to the right of that column, so there is one path across the map and never a spreading tree.
+
+That is what lets the chain be the reader's place in the map: where they are is which node of each column is open, which is a run of names and nothing more.
+
+*The author's decision, 2026-09-18.*
+
+### 4.2 Within a file the hierarchy goes down, drawn as a file tree
+
+A file's own levels do not step right; they go down in the one column, since the column is the reading. What was needed was a way to draw that nesting, and the zone the first build drew, a shaded panel held by dashed edges out of the parent's sides, is cumbersome once it nests.
+
+Every file now opens with a brief of its own, so the edge from the opening lands on that brief, and the nesting hangs beneath it as a file tree draws one: a line dropping from the brief, each level's rows hanging into it, the line standing in from the left rather than centred so the indent draws itself.
+
+Two forms of that line stand against each other and are not decided. The line may pass through each nearest child in turn, which threads more and more lines through the rows as the nesting deepens; or one line may drop from the far left of the file's own brief and run the whole way, every row hanging into its side, which is what a file tree does. They are to be built and looked at side by side rather than argued.
+
+*The author's direction, 2026-09-18; the choice of line open, and his to make by looking.*
+
+### 4.3 A file opens whole, and folding comes after
+
+A file opened on the canvas shows its heading tree whole. The reader asked to see what is in there, and a level at a time would make them ask again for every level.
+
+Folding is what they do afterwards, to a part they have read or do not want: fold it from the acts, or shift with the arrows to fold the lot. Since the fold state is one, a file opened whole on the canvas stands unfolded in the lane as well.
+
+*The author's decision, 2026-09-18; that the lane unfolds with it is the session's reading of one state, and is his to refuse.*
+
+### 4.4 A folded node says how deep it is
 
 A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. As built, a folded row carries a bar per paragraph, a frame per image, and a tail as long as its level is heavy.
 
 *The author's, 2026-09-15; the marks as built the same day.*
 
-## 5. What the substrate gives the canvas
+## 5. One press opens, two presses read
+
+Three things a reader wants of a node, and they are not one act. To see what is in there, which is what exploring is and what happens most. To go there and read it. And to know what it is before spending either.
+
+So a press selects the node and opens it to the right, and the prose does not move. A press again on the node already selected goes there, and the lane takes that reading; enter does the same, and so does the act in the field. Going implies opening, so the two never fight: what is committed to is already open.
+
+A node with nothing on the other side is only selected, and the field then offers reading it and nothing more.
+
+Pointing projects nothing. A projection of the next level was proposed and dropped the same day: a press already looks in, and a ghost that has to dodge what is drawn costs more than it gives.
+
+*The author's decision, 2026-09-18, from the three cases put to him; the projection his own proposal, dropped by him the same day.*
+
+### 5.1 The field the acts stand in
+
+The acts stand naked, and there is one field for them, the same in both grains, so that a desktop and a phone are not two designs and moving between the panes does not move the acts. The standing acts, the other pane and the settings, stand in that field beside the acts of whatever is selected.
+
+Under a finger an act is its glyph alone. On a desktop it is the glyph with what it does and the key that fires it, which is [the badge as it is drawn elsewhere](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the field stands within the canvas frame, centred at its foot, rather than at the foot of the page. Every act there is appears; none stands behind an opener.
+
+So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
+
+*The author's decision, 2026-09-18; what becomes of the page's own strip while the canvas stands is open.*
+
+### 5.2 What is selected shows its face
+
+A node is a heading and a few marks, and a reader who has selected one still does not know what it holds. So what is selected shows its face, the title, its placement, its stamp and its first paragraph, with the figure it opens with where it has one.
+
+It stands in one fixed place and never over the nodes, since a card that follows the pointer covers the very thing being looked at. On a desktop that place is the top right within the canvas frame, small. On a phone it is a low card directly beneath the way down, which a press grows and a press puts back.
+
+It hides into an eye in the field, in both grains, and comes back by the same eye.
+
+*The author's decision, 2026-09-18; it retires [the card at the foot of the phone](touch.md#46-what-is-chosen-on-the-canvas-raises-a-card), since what is selected is now named above and the foot is acts alone.*
+
+## 6. One state, and the lane in step with it
+
+The canvas draws the same state the lane draws: the fold of every brief, the focus, the pointer and the scope. Folding on one is folding on the other, and a brief lit in one is lit in the other, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn).
+
+The two panes are in step as the reader moves: one focus between them, and a scroll in either brings the other to where it went.
+
+What the canvas holds of its own is the chain, which node of each column is open. It is not the focus, since opening is not going, and it is kept in the browser with the view.
+
+*The author's, 2026-09-15; the panes in step with the scroll his of 2026-09-18.*
+
+### 6.1 The depth strip
+
+A strip in the way down says how far the scope stands unfolded: a cell per level beneath it, the unfolded ones marked, and a press or a scrub across it unfolds to that depth and folds beyond, in the lane as on the canvas.
+
+The two keys that move it stand together past its cells, [as one pair with their shift drawn once](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), since the strip is the act's own picture and needs no word beside it.
+
+The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole.
+
+*The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
+
+## 7. What the substrate gives the canvas
 
 Three things in the markdown carry a flow, and nothing new is written for the canvas.
 
-A lone link in a brief places a structure there, and [a structure may stand in several places](../practice.md#36-a-part-may-stand-in-several-places), each drawn as a zone of its own. A branch is a step whose level holds one brief per condition, each placing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose stays an offer, never a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
+A lone link in a brief places a structure there, and [a structure may stand in several places](../practice.md#36-a-part-may-stand-in-several-places). A branch is a step whose level holds one brief per condition, each placing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose is not a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
 
 *The author's decisions, 2026-09-15.*
 
-### 5.1 What a link means on the canvas comes from where it points
+### 7.1 A placement and a link both open, and the two are not alike
 
-A lone link is a zone. A link in prose to a step in the same flow is a jump, "then continue at step five", drawn as an edge inside the zone, and it is only for a path that skips ahead. A link anywhere else is an offer, drawn only while the node is pointed at, as [the links](widgets.md#5-links) tell of one beside the lane.
+Both kinds of link lead somewhere, so both open a column to the right, and what a reader presses is what they meant to follow. What differs is the claim each makes, and the drawing says which: a lone link places a part where the prose stands, which is deliberate, and a link in prose is an aboutness, an offer the reading did not need.
 
-*Reasoned, 2026-09-15.*
+Opening links as well as placements makes the map a graph, so a way may lead back to a column already open. The chain makes that harmless for now, since only one path is ever drawn; it is what has to be answered before the whole body is laid out at once.
 
-### 5.2 A level of letters is independence, and a flow reads it as a choice
+*The author's, 2026-09-18; how the two are told apart in the drawing is open, and the first build's answer, cells in a port, is [replaced](#8-what-the-first-build-did-that-goes).*
+
+### 7.2 A level of letters is independence, and a flow reads it as a choice
 
 The markdown does not say whether a level is a sequence or a set, and only a set is laid across. The author's proposal, taken up by the session on 2026-09-15: a level whose headings carry letters where a step carries a number, 4.a and 4.b under 4, so the mark stands where the claim of order already stands.
 
@@ -114,50 +162,44 @@ A number claims that a brief stands on the ones before it. A letter claims that 
 
 The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#6-the-programs-before-this-one) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
 
-A choice as a list, one item per condition, each with a link to its path, was the session's own proposal and was set aside: it takes every path out of the reading and gives a condition no address.
-
 It costs one addition the practice must name: the trace reads the written heading to tell the two apart, the check warns where a level mixes them, and addresses gain the form 4.a, nesting as 4.a.1. Letters run out at z and continue as aa, as columns do. The refusals, lettered, are the first body to try it on.
 
 *The author's proposal, 2026-09-15, its meaning as independence found in discussion that day; the decision the author's, and open.*
 
-## 6. What leads to a node
+## 8. What the first build did that goes
 
-Everything above the scope stands in the way down, in the hue of its branch, and needs no grouping beyond the hue. Where the reader explicitly came from is marked apart from the rest, at the entry's port.
+The canvas was built on 2026-09-15 and read against real material since, and four of its answers do not survive the design above. They are kept here so none of them is built a second time.
 
-What links to a node is the harder case, since there can be many, and a column gives a node little edge to arrive at. So a node has two ports: what comes in stands as a row of small cells to its left, in their hues, and what goes out as a row to its right, each cell a press and each told by the tooltip. A row too long collapses into a count. Edges are drawn only for the node pointed at or in focus: a link leaves its right side and arrives at the target's right side, as a bracket in the margin, and the target's cell for it lights, so no line crosses a node; an in-cell pointed at draws its line on the left side instead. The entry carries no ports: link cells beside the scope's root made no sense to the author, and the trail itself stays in the way down, since it is history and not place. What is still owed is the case of several borrowers leading to one level, where the one the reader came through wants marking; it waits for the first borrowed flow in real material. At the root of the body there is nothing above the first brief, so no entry is drawn and the column begins with it.
+The ports, a row of cells at either side of a node for what points at it and what it points at, with their edges drawn as brackets in the margin. They are a device of a map laid top to bottom, where a column leaves a node no side to arrive at; across the map a connection is an opening and has a direction of its own.
 
-*The author's question and the session's answer, 2026-09-15; the ports and their edges as built the same day, the trail owed.*
+The zone, a shaded panel held by dashed edges out of the parent row's sides, holding a level beneath its parent. [The file tree](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) replaces it.
 
-## 7. The prose beside the nodes
+The whole body drawn at once. [The chain](#3-the-path-the-reader-has-opened-and-not-the-whole-body) replaces it, and the whole map waits.
 
-The first thought was a page of its own, with each node holding all of its prose. Now a brief is always its own node, and how the nodes compose depends on what is folded and unfolded, so two ways stand: the prose read in place in the nodes, or the nodes condensed and the prose in a drawer to one side.
+The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#52-what-is-selected-shows-its-face).
 
-*The author's, 2026-09-15.*
+*Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above.*
 
-### 7.1 The prose drawer
+## 9. Two faults as built
 
-In the condensed mode a drawer of prose stands to one side, and a node is only its heading; pointing at it gives its face, pressing it gives the reading.
+Zooming shifts the nodes in small jagged steps rather than scaling them evenly, which is the type being counter-scaled against the transform and the browser laying the rows again at each step.
 
-On a linear run the drawer is simply scrolled, and scrolling to the next piece moves the focus to the next node and pans the canvas, when needed or always. Where the flow branches, the reader has to choose; scrolling up to where several things lead to this one, they choose again, though by default they go back the way they came. This may be the best of both worlds: the normal scrolled reading, and the movement through the nodes for free.
+Pinching on a phone behaves strangely. The gesture arrives as its own kind of event there, and the canvas reads the desktop's pinch, a wheel with the control key.
 
-*The author's, 2026-09-15.*
+*The author's report, 2026-09-18; both owed.*
 
-### 7.2 Pull past the top
+## 10. What this leaves open
 
-At the top of a scope, pulling up beyond where the lane can go should fill a gauge, and when it is full the reader is taken up, as some applications refresh when pulled past their top. The same could hold in the canvas mode with the prose to one side. A small detail, [built in the lane](lane.md#74-pull-past-the-top), where it serves with or without the canvas.
+Which of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) draws a file's nesting, which the author settles by looking.
 
-*The author's, 2026-09-15.*
+What becomes of the page's own strip on a desktop while the canvas stands, since the acts have a field of their own inside the frame.
 
-## 8. What this leaves open
+Whether a level of a file may be broken out into a column of its own where a reader asks for it, which the author wants as a choice rather than as a rule, and whether a placed part may be exploded in place rather than entered, which is the same act as exploding a card in the lane and waits with it.
 
-A level of a file made a column of its own. Where a file's level is long, or is the thing a reader is comparing, breaking it out beside the file rather than beneath it would let a reader make a level explicit as the boundaries already are. It is the author's idea of 2026-09-18, wanted where a reader asks for it rather than always, and no act has been given to it.
+The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
-Whether a canvas beside the lane has the room to be read at all, since the map is wide by nature and the middle holds the two panes at half the page each.
+The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
 
-How a jump edge is told apart from an offer, since both are links in prose. Which of several borrowers the reader came through, once the substrate holds a borrowed flow.
+A touch reading of the canvas beyond a drag that pans it, and [the pull past the top](lane.md#74-pull-past-the-top), which is built in the lane and not here.
 
-Prose read in place in the nodes, the second way of holding it, since the drawer is what stands. The rim the rows carry, which the surface otherwise refuses, and the look of the canvas as a whole, which wait on the author's art direction with real material. And a touch reading, for the canvas as for the lane.
-
-The canvas as built is [HTML under one transform](implementation.md#65-the-canvas-is-html-under-one-transform), and [the level of letters](#52-a-level-of-letters-is-independence-and-a-flow-reads-it-as-a-choice) stands as a trial in the practice.
-
-*Open, 2026-09-15.*
+*Open, 2026-09-18.*

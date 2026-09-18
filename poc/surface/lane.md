@@ -172,7 +172,7 @@ In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press wi
 
 The space bar folds or unfolds the brief in focus, and with shift held it folds the brief above, the parent of the focus, which takes the reader up to it. It acts when it is let go, so it can also be held: held a moment, it unfolds every brief in the scope, and with shift folds every brief in the scope to its face, and letting it go then does nothing more.
 
-The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#32-scope-and-how-far-things-explode) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
+The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#61-the-depth-strip) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
 
 Every key here is named where its act stands, [as a badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the few that have no object on the page, the arrows that move the reading, are met in [the keys](widgets.md#8-the-keys).
 
@@ -228,7 +228,7 @@ A pull that stops drains, so nothing happens by accident: it springs back after 
 
 ### 7.5 The way down stands over the lane
 
-The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is unfolded, [the depth](canvas.md#32-scope-and-how-far-things-explode), which moves the lane and the canvas alike; and how the reader came here, at the right.
+The way down stands over the middle, as wide as whatever it holds, the lane alone or the canvas beside it, and carries three things on one line: how here is placed, at the left edge; how far the scope is unfolded, [the depth](canvas.md#61-the-depth-strip), which moves the lane and the canvas alike; and how the reader came here, at the right.
 
 The line is as wide as what it spans, the lane alone or the canvas beside it, and no wider until it has to be. Where the run of names, the depth and the trail do not fit that, it grows to the right rather than cutting names, out to the margin the page keeps at its edge. So it stands over the prose in the ordinary case and reaches past it only when it is carrying more than the prose is wide.
 
