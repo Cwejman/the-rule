@@ -50,11 +50,13 @@ The strip counts the reading and not the body. A card's level lies past [a bound
 
 *The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
 
-## 4. Down for sequence, across for choice
+## 4. Down for the reading, across for the holarchy
 
-A level is laid as a column, since the lane reads down and a drawer's scroll maps straight onto a column, and steps are wide because they carry their headings.
+The two dimensions say two different things, and that is the whole of the layout. Down is the linear reading: the sections of one file, in the order they are read, as a column. Across is the holarchy: what a brief's prose places, each [a reading of its own](../practice.md#11-a-file-is-one-linear-reading), standing to the right of the brief that placed it.
 
-An unfolded step holds a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them. So a flow that branches spreads across, and one that does not stays a column.
+So a file is a column and a body of files is a row of columns, and which of the two a reader is looking at is in the shape itself rather than in a mark upon it. A brief that holds both is drawn with its own row and, to its right, the readings it placed; its sections run down beneath it as before.
+
+An unfolded step holds a zone inside the column, beneath its own line, holding the steps of its level as a column again. A branch is the one place a level of sections is not a column: its conditions stand side by side, each a column of its own, and the zone is as wide as the widest row of them.
 
 ```
  Onboarding                        the scope root, the entry at the top
@@ -78,7 +80,7 @@ An unfolded step holds a zone inside the column, beneath its own line, holding t
 
 A zone is held by dashed edges that come out of the parent row's own sides, the row keeping its corners and standing centred over the zone, a nested row a step narrower per level so the nesting shows in the rows themselves, and a set wraps past three columns so no row grows past reading, at the author's suggestion once a first cut with a shifted, shaded zone had been seen, so the parent is seen to hold what stands under it and nothing shifts; pointing at its ground lights its edges, and pressing it folds the brief. The canvas itself keeps an edge, the rim an image keeps, so it is not cut off unseen. Whether the nodes read left to right instead is a setting or a mode to try, since a node-based layout going across feels more interesting to the author, and the direction of the drawer's scroll is what decides it. In use the canvas proved narrower than expected, since a flow that does not branch is a column.
 
-*The author's direction, 2026-09-15, from the session's drawing; the dashed edges the author's, the same day, on seeing the first cut.*
+*The author's direction, 2026-09-15, from the session's drawing; the dashed edges the author's, the same day, on seeing the first cut. Across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), once the boundary made the two kinds of part tell apart; what it cost is that a canvas laid across wants the middle to itself, which [what this leaves open](#8-what-this-leaves-open) carries.*
 
 ### 4.1 A folded node says how deep it is
 
@@ -143,6 +145,8 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 *The author's, 2026-09-15.*
 
 ## 8. What this leaves open
+
+The width. Laid across, a canvas is as wide as the holons it holds, and beside the lane it has a third of the page and reads too small to be of use. Whether the canvas should stand alone in the middle whenever it is chosen, or keep the pair and let the reader pan, is the author's to say once he has looked.
 
 How a jump edge is told apart from an offer, since both are links in prose. Which of several borrowers the reader came through, once the substrate holds a borrowed flow.
 

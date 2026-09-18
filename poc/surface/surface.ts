@@ -2445,12 +2445,19 @@ function canvasNodeHtml(b: Brief): string {
   const mark = placed ? `<span class="placed" data-tip="a reading of its own" ${hued(b.address)}>${icon("links")}</span>` : "";
   const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${mark}</div>`;
   const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
-  const zoneOf = kids;
-  const label = placed && whole && zoneOf.length ? `<div class="zlabel">${icon("links")}<span>a reading of its own</span></div>` : "";
+  // the two dimensions say two different things. Down is the linear reading: the sections of this file, in the order
+  // they are read. Across is the holarchy: what the prose places, each a reading of its own, standing to the right of
+  // the brief that placed it. So a file is a column and a body of files is a row of columns, and which of the two a
+  // reader is looking at is in the shape itself rather than in a mark on it.
+  const sections = kids.filter((k) => !isCard(k));
+  const cards = kids.filter(isCard);
   const set = b.set;
-  const zone = whole && zoneOf.length ? `<div class="czone${set ? " set" : ""}${placed ? " placed" : ""}" data-fold="${esc(b.address)}">${label}${zoneOf.map(canvasNodeHtml).join("")}</div>` : "";
-  // a nested row is a step narrower per level, so the nesting shows in the rows themselves and not only in the edges
-  return `<div class="cnode${zone ? " whole" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">${line}${zone}</div>`;
+  const zone = whole && sections.length ? `<div class="czone${set ? " set" : ""}${placed ? " placed" : ""}" data-fold="${esc(b.address)}">${sections.map(canvasNodeHtml).join("")}</div>` : "";
+  const across = whole && cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
+  return (
+    `<div class="cnode${zone ? " whole" : ""}${placed ? " placed" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">` +
+    `<div class="cwith">${line}${across}</div>${zone}</div>`
+  );
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -2475,7 +2482,14 @@ function drawCanvas(): void {
   // the entry is the scope's root, named at the top; at the root of the body there is nothing above the first brief, so
   // the column simply begins with it
   const entry = S ? `<div class="cnode entry" ${hued(S)}><div class="crow root${state.focus === S ? " here" : ""}" data-a="${esc(S)}"><span class="title">${esc(root.title)}</span></div></div>` : "";
-  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
+  // the scope's own level splits as every level does: its sections run down as the reading does, and what its prose
+  // places runs to the right, each a reading of its own
+  const kids = level(S);
+  const sections = kids.filter((k) => !isCard(k));
+  const cards = kids.filter(isCard);
+  const across = cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
+  const column = `<div class="ccol${root.set ? " set" : ""}">${entry}${sections.map(canvasNodeHtml).join("")}</div>`;
+  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="cwith">${column}${across}</div></div>`;
   if (fitted !== S) {
     fitCanvas();
     fitted = S;
@@ -2610,7 +2624,9 @@ function fitCanvas(): void {
   if (!st) return;
   const W = ui.canvas.clientWidth;
   const w = st.scrollWidth || 1;
-  view.k = clamp((W - 2 * CANVAS_INSET) / w, 0.6, 1);
+  // the floor was set when a body was a column and only ever as wide as one node; laid across it is as wide as the
+  // holons it holds, so the fit may go further down before it gives up and leaves the rest to the reader's panning
+  view.k = clamp((W - 2 * CANVAS_INSET) / w, 0.35, 1);
   view.x = Math.max(CANVAS_INSET, (W - w * view.k) / 2);
   view.y = canvasTop();
 }
@@ -4630,6 +4646,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a set is a row of columns, wrapping past three, since nothing in it stands on anything */
 .ccol.set, .czone.set { flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 24px 56px; max-width: 892px; }
 .cnode { display: flex; flex-direction: column; align-items: center; }
+/* a brief and what it places stand side by side: the brief's own row, and to its right the readings its prose placed,
+   each a column of its own. Down is the reading, across is the holarchy */
+.cwith { display: flex; align-items: flex-start; gap: 34px; }
+.cacross { display: flex; align-items: flex-start; gap: 28px; }
+/* a placed reading is held apart from the one that placed it, as a card is in the prose */
+.cnode.placed > .cwith > .cline > .crow { outline: 1px solid var(--rest); outline-offset: 3px; border-radius: 8px; }
 /* the zone's dashed edges emerge from the parent row's straight sides: the zone begins behind the row, above its rounded
    lower corners, and the row paints over it, so the row keeps its corners */
 .czone { margin-top: -8px; padding: 22px 24px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
