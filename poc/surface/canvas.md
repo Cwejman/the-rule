@@ -80,7 +80,15 @@ Folding is what they do afterwards, to a part they have read or do not want: fol
 
 *The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3-a-reading-is-laid-whole) as well, which is the session's reading of one state and is his to refuse.*
 
-### 4.4 A folded node says how deep it is
+### 4.4 A level may be opened to the right, by asking
+
+A file's level goes down, and that is the ordinary reading. Where a reader wants one level in front of them, the act opens it as a column of its own to the right, and it leaves the column it came from.
+
+So the step right is always the reader's choice: a placement leads to another reading and says so with its chevron, which a press opens; a level of this file opens only when they ask for it by the act, and closes back into its column the same way. The map never widens on its own.
+
+*The author's, 2026-09-18, wanted as a choice and not as a rule; as built the same day, on his reading that a piece could be gone to but not opened.*
+
+### 4.5 A folded node says how deep it is
 
 A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. As built, a folded row carries a bar per paragraph, a frame per image, and a tail as long as its level is heavy.
 
@@ -102,17 +110,21 @@ Pointing projects nothing. A projection of the next level was proposed and dropp
 
 The acts stand naked, and there is one field for them, the same in both grains, so that a desktop and a phone are not two designs and moving between the panes does not move the acts. The standing acts, the other pane and the settings, stand in that field beside the acts of whatever is selected.
 
-Under a finger an act is its glyph alone. On a desktop it is the glyph with what it does and the key that fires it, which is [the badge as it is drawn elsewhere](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the field stands within the canvas frame, centred at its foot, rather than at the foot of the page. Every act there is appears; none stands behind an opener.
+Under a finger an act is its glyph alone. On a desktop it is the glyph with what it does and the key that fires it, which is [the badge as it is drawn elsewhere](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the field stands within the canvas frame, centred at its foot, rather than at the foot of the page. Every act that can be taken appears; none stands behind an opener.
+
+The field is naked. No surface is drawn under it and no rim around it, since the page is flat and a bar of glass over a map is a second thing to look at; what keeps it readable is the page's own ground rising behind it, as the prose fades at its edges.
 
 So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
-*The author's decision, 2026-09-18; as built the same day on a desk, where the field stands within the canvas with its glyphs, words and keys. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
+*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
 ### 5.2 What is selected shows its face
 
 A node is a heading and a few marks, and a reader who has selected one still does not know what it holds. So what is selected shows its face, the title, its placement, its stamp and its first paragraph, with the figure it opens with where it has one.
 
-It stands in one fixed place and never over the nodes, since a card that follows the pointer covers the very thing being looked at. On a desktop that place is the top right within the canvas frame, small. On a phone it is a low card directly beneath the way down, which a press grows and a press puts back.
+It stands in one fixed place and never over the nodes, since a card that follows the pointer covers the very thing being looked at. On a desktop that place is the top right within the canvas frame, small, on the page's own ground rather than on a surface of its own. On a phone it is a low card directly beneath the way down, which a press grows and a press puts back.
+
+What is brought into view is brought into what the face and the field leave clear, so a reading that opens never lands beneath either.
 
 It hides into an eye in the field, in both grains, and comes back by the same eye.
 
@@ -194,13 +206,11 @@ Which of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-fi
 
 What becomes of the page's own strip on a desktop while the canvas stands, since the acts have a field of their own inside the frame.
 
-Whether a level of a file may be broken out into a column of its own where a reader asks for it, which the author wants as a choice rather than as a rule, and whether a placed part may be exploded in place rather than entered, which is the same act as exploding a card in the lane and waits with it.
+Whether a placed part may be exploded in place rather than entered, which is the same act as exploding a card in the lane and waits with it.
 
 The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
 The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
-
-How a reading that stands open is closed again, since opening a sibling replaces it and nothing else does; folding reaches a level within a file and not the column itself.
 
 A touch reading of the canvas beyond a drag that pans it, and [the pull past the top](lane.md#74-pull-past-the-top), which is built in the lane and not here.
 

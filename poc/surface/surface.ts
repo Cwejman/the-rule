@@ -1125,13 +1125,42 @@ const ACTIONS: Record<string, Action> = {
     can: () => scopeDepth() > 0,
     run: () => foldAll(),
   },
+  openNode: {
+    label: () => "open",
+    mark: () => ICON.openRight,
+    keys: [{ key: "ArrowRight" }],
+    help: () => "Opens what this piece holds as a column of its own to the right, without taking the reading there.",
+    also: "A press on a placement, which opens the reading it names.",
+    can: (a) => {
+      const x = acts(a);
+      return (a !== undefined ? canvasOn() : canvasAlone()) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
+    },
+    run: (a) => {
+      const x = acts(a);
+      pickNode(x, colOf.get(x) ?? chain.length);
+    },
+  },
+  closeNode: {
+    label: () => "close",
+    mark: () => ICON.closeRight,
+    keys: [{ key: "ArrowLeft" }],
+    help: () => "Closes the reading this piece opened, so the map ends here again.",
+    can: (a) => (a !== undefined ? canvasOn() : canvasAlone()) && chain.includes(acts(a)),
+    run: (a) => {
+      const x = acts(a);
+      chain = chain.slice(0, chain.indexOf(x));
+      picked = x;
+      drawCanvas();
+      bringIntoView(x);
+    },
+  },
   read: {
     label: () => "read",
     mark: () => ICON.lane,
     keys: [{ key: "Enter" }],
     help: () => "Takes the reading to what is selected on the canvas: the lane opens that reading and the address becomes it.",
     also: "A press again on what is already selected.",
-    can: (a) => canvasOn() && !!brief(acts(a)) && acts(a) !== state.focus,
+    can: (a) => (a !== undefined ? canvasOn() : canvasAlone()) && !!brief(acts(a)) && acts(a) !== state.focus,
     run: (a) => goTo(acts(a)),
   },
   face: {
@@ -1294,7 +1323,8 @@ function badgeHtml(id: string, a?: string, tight = false, marked = false): strin
   const aimed = a !== undefined && !marked;
   const chord = `<span class="chord">${capsOf(act.keys[0], aimed)}${aimed ? cap(MOUSE, "pointer") : ""}</span>`;
   // a badge that cannot be taken keeps its room and goes quiet, so a row of badges never shifts under the pointer
-  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${aimed ? ` data-a="${esc(a)}"` : ""}>${glyph}${chord}${said}${held}</span>`;
+  // the address travels with the badge whether or not the caps are aimed, since the act still falls on that brief
+  return `<span class="badge${tight ? " tight" : ""}${aimed ? " aimed" : ""}${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${glyph}${chord}${said}${held}</span>`;
 }
 
 /** Two acts that share a modifier, drawn as one unit: the modifier once, then a key for each, each its own press. */
@@ -1661,6 +1691,8 @@ const ICON: Record<string, string> = {
   fold: `<path d="M5.4 4.4 8 7l2.6-2.6M5.4 11.6 8 9l2.6 2.6"/>`,
   open: `<path d="M9.6 3.5h3v3M6.4 12.5h-3v-3M12.5 3.5 9 7M3.5 12.5 7 9"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
+  openRight: `<path d="M3.5 8h6M7 5.5 9.5 8 7 10.5M12.5 3.5v9"/>`,
+  closeRight: `<path d="M9.5 8h-6M6 5.5 3.5 8 6 10.5M12.5 3.5v9"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -2459,8 +2491,10 @@ const view: View = { x: 24, y: 24, k: 1 };
 let fitted: string | null = null;
 let followed = "";
 
-/** Which card of each column stands open, from the root outward: the reader's path across the map. */
+/** Which node of each column stands open, from the root outward: the reader's path across the map. */
 let chain: string[] = [];
+/** Which column each row was drawn in, filled as the canvas is drawn, so an act opens what is selected where it stands. */
+const colOf = new Map<string, number>();
 /** The node the reader has selected. It is not the focus, since opening something is not going to it. */
 let picked: string | null = null;
 
@@ -2512,6 +2546,8 @@ function marksHtml(b: Brief, hides: boolean): string {
 /** One row: its number counted from its column's head, its title, and the marks of what it does not show. */
 function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens: boolean; open: boolean; hides: boolean }): string {
   const a = b.address;
+  // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
+  if (!o.head) colOf.set(a, col);
   const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
@@ -2524,10 +2560,12 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
 function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   const a = b.address;
+  // a placement leads to a reading of its own and says so with a chevron; a level of this file goes down, and stands
+  // out to the right only where the reader has asked for it by the act
   const opens = isCard(b) && !head;
-  const open = opens && chain[col] === a;
-  const kids = opens ? [] : head || showsKids(b) ? level(a) : [];
-  const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 });
+  const open = !head && chain[col] === a;
+  const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
+  const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
   const beneath = kids.length ? `<div class="ckids">${kids.map((k) => nodeHtml(k, root, col)).join("")}</div>` : "";
   return `<div class="cnode">${row}${beneath}</div>`;
@@ -2544,7 +2582,7 @@ const TREE = { spine: { indent: 28, x: 12, tick: true }, thread: { indent: 16, x
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
-const FIELD_ACTS = ["read", "unfold", "open", "face"];
+const FIELD_ACTS = ["openNode", "closeNode", "read", "unfold", "face"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
@@ -2555,8 +2593,8 @@ function fieldHtml(): string {
   const b = a ? brief(a) : undefined;
   if (narrow() || !a || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
-  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)));
-  return `<div id="field" class="glass">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>`;
+  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
+  return acts.length ? `<div id="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
 }
 
 /**
@@ -2569,7 +2607,7 @@ function faceHtml(): string {
   if (narrow() || !b || state.settings.face === "hidden") return "";
   const stamp = stampOf(b);
   return (
-    `<div id="face" class="glass" ${hued(b.address)}>` +
+    `<div id="face" ${hued(b.address)}>` +
     `<div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${blocks(blocksOf(b).slice(0, 1))}</div>` +
     `</div>`
   );
@@ -2581,6 +2619,7 @@ function drawCanvas(): void {
   // the canvas draws the path the reader has opened; arriving from outside it lays the path of where they arrived
   if (!chainHolds(state.focus)) chain = cardPathOf(state.focus);
   if (picked === null || !brief(picked) || !chainHolds(picked)) picked = state.focus;
+  colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
     fitCanvas();
@@ -2632,10 +2671,10 @@ function drawEdges(): void {
     if (!row || !head) return;
     const p = at(row);
     const q = at(head);
-    const d = 22;
-    paths.push(
-      `<path class="open" ${hued(head.dataset.a ?? "")} d="M${(p.right + 1).toFixed(1)} ${mid(p).toFixed(1)}C${(p.right + d).toFixed(1)} ${mid(p).toFixed(1)},${(q.left - d).toFixed(1)} ${mid(q).toFixed(1)},${(q.left - 2).toFixed(1)} ${mid(q).toFixed(1)}"/>`,
-    );
+    // the two stand with their tops level, so the line is drawn on the first line of each rather than on their
+    // middles: a row that wrapped to two lines would otherwise tilt the line it leaves by half a line
+    const y = p.top + Math.min(p.bottom - p.top, q.bottom - q.top) / 2;
+    paths.push(`<path class="open" ${hued(head.dataset.a ?? "")} d="M${(p.right + 2).toFixed(1)} ${y.toFixed(1)}L${(q.left - 3).toFixed(1)} ${y.toFixed(1)}"/>`);
   });
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
@@ -2743,15 +2782,18 @@ function bringInto(el: HTMLElement, leftAt: number): void {
   const c = ui.canvas.getBoundingClientRect();
   const r = el.getBoundingClientRect();
   const top = canvasTop();
-  const fitsX = r.left >= c.left + CANVAS_INSET && r.right <= c.right - CANVAS_INSET;
-  const fitsY = r.top >= c.top + top && r.bottom <= c.bottom - CANVAS_INSET;
+  // the face and the acts stand over the map, so what is brought in is brought into what is left clear of them
+  const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#face")?.offsetWidth ?? 0);
+  const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#field") ? 44 : 0);
+  const fitsX = r.left >= c.left + CANVAS_INSET && r.right <= c.right - right;
+  const fitsY = r.top >= c.top + top && r.bottom <= c.bottom - foot;
   if (fitsX && fitsY) return;
   if (!fitsX) {
-    const want = clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - r.width - CANVAS_INSET));
+    const want = clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - r.width - right));
     view.x = Math.round(view.x + (c.left + want - r.left));
   }
   if (!fitsY) {
-    const want = clamp(c.height / 3, top, Math.max(top, c.height - r.height - CANVAS_INSET));
+    const want = clamp(c.height / 3, top, Math.max(top, c.height - r.height - foot));
     view.y = Math.round(view.y + (c.top + want - r.top));
   }
   applyView(true);
@@ -4750,11 +4792,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #canvas.bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
 #canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
+/* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
+#canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
 #stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 /* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
-#edges path { fill: none; stroke: var(--rim); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+#edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 #edges path.open { stroke: var(--door); stroke-width: 1.5; }
 /* a column is one file read top to bottom; a level stands beneath the brief that holds it, stepped in so the line
    that joins them has room to stand */
@@ -4764,11 +4808,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cnode.open { flex-direction: row; align-items: flex-start; gap: 54px; }
 .ckids { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; margin: 9px 0 0 var(--indent, 28px); }
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
-/* a row stands as wide as its name, to the measure a name reads in, and wraps rather than cutting: the map's one
-   currency is names, so nothing in it is ever spent on an ellipsis */
-.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .55em; max-width: 268px; padding: .5em .7em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s, background .15s; }
-/* the head of a column is the brief the file opens with, and it says so by its weight rather than by a shape */
-.crow.head { font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--rest); }
+/* a row is its name and nothing drawn around it: the lines carry the structure, and ink is spent only where the
+   reader has asked. The rows of a level share one width, so their chevrons line up and every edge leaves at one x */
+.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .5em; width: 252px; padding: .38em .5em; border-radius: 7px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: background .15s, box-shadow .15s; }
+/* the head of a column is the brief the file opens with, and it says so by its weight and its hue */
+.crow.head { width: auto; max-width: 300px; font-weight: calc(600 - var(--thin)); color: var(--ink); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
@@ -4777,40 +4821,38 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .num { flex: none; font-size: .85em; color: var(--faint); }
 .crow .title { flex: 0 1 auto; min-width: 0; }
 .crow.on .num { color: var(--on); }
-/* what the reading stands on takes the branch's hue; what the reader has selected on the canvas is filled, since the
-   two are different things and a reader may have selected one while reading another */
-.crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
-.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--door); }
-.crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
+/* what the reading stands on takes the branch's hue; what the reader has selected is filled, since the two are
+   different things and a reader may have selected one while reading another */
+.crow.here { color: var(--on); }
+.crow.here .num { color: var(--on); }
+.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1px var(--door); }
+.crow.lit, .crow:hover { background: var(--wash); }
 /* the marks say what a row does not show, and a row that hides a great deal would otherwise squeeze its own name
    away, so they yield first */
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: 0 1 auto; min-width: 0; max-width: 33%; overflow: hidden; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
-/* an opening says so with the chevron at its right, which is the side the edge leaves from */
-.crow .lead { flex: none; display: grid; place-items: center; width: 11px; height: 11px; color: var(--door); }
+/* an opening says so with the chevron at the row's right edge, which is where its edge leaves */
+.crow .lead { flex: none; margin-left: auto; display: grid; place-items: center; width: 11px; height: 11px; color: var(--door); }
 .crow .lead svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .crow.open .lead { color: var(--lit); }
-/* the acts of what is selected stand within the canvas at its foot, centred, rather than at the foot of the page:
-   every act it has, each with its glyph, its word and the key that fires it */
-#field { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 4px; padding: 5px 7px; border-radius: 12px; font-family: var(--sans); font-size: 12px; }
-#field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 8px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+/* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
+#field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
+#field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
 #field .badge:hover { background: var(--wash); color: var(--ink); }
-#field .badge.off { opacity: .35; cursor: default; }
-#field .badge.off:hover { background: none; color: var(--muted); }
 #field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
 #field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
 #field .badge .chord { display: flex; align-items: center; }
-/* the face of what is selected: one fixed place at the top right of the canvas, never over the nodes */
-#face { position: absolute; top: 14px; right: 14px; z-index: 4; width: 268px; max-height: 44%; overflow: hidden; padding: 12px 14px; border-radius: 12px; font-family: var(--sans); }
+/* the face of what is selected: one fixed place at the top right of the canvas, on the page's own ground */
+#face { position: absolute; top: 10px; right: 12px; z-index: 4; width: 262px; max-height: 42%; overflow: hidden; padding: 2px 0 0 14px; background: var(--ground); font-family: var(--sans); }
 #face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
 #face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-#face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--ink); }
-#face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--on); }
+#face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
+#face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
 #face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
-/* the face fades at its foot rather than cutting a line in half */
-#face::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; background: linear-gradient(to bottom, transparent, var(--glass)); pointer-events: none; }
+/* it fades at its foot rather than cutting a line in half */
+#face::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
