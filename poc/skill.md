@@ -47,7 +47,7 @@ Links are checked so that each resolves to a file and an anchor that exist, and 
 
 ### 3.3 Mounts
 
-Every mount is checked against [the practice's rules for mounts](practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry), and every mounted file against what a level holds. The files nothing mounts are listed too, not as faults, since [orphans are allowed](practice.md#35-what-stands-beside-an-entry-without-a-mount), but so that a part left unconnected is seen.
+Every mount is checked against [the practice's rules for mounts](practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry), and every mounted file against what a level holds. The files nothing mounts are listed too, not as faults, since [orphans are allowed](practice.md#36-what-stands-beside-an-entry-without-a-mount), but so that a part left unconnected is seen.
 
 *As built, 2026-09-14.*
 

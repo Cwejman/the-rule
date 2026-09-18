@@ -84,7 +84,7 @@ A folded node shows nothing of its level, so it wants marks for what it hides, a
 
 Three things in the markdown carry a flow, and nothing new is written for the canvas.
 
-A lone link last in a brief places a structure there, and [the first place is its home](../practice.md#36-a-second-lone-link-borrows-and-the-first-place-is-the-home); every later one borrows it, drawn as a zone that names its home. A branch is a step whose level holds one brief per condition, each placing or borrowing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose stays an offer, never a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
+A lone link last in a brief places a structure there, and [the first place is its home](../practice.md#37-a-second-lone-link-borrows-and-the-first-place-is-the-home); every later one borrows it, drawn as a zone that names its home. A branch is a step whose level holds one brief per condition, each placing or borrowing its path; a path ends inside its condition, and the flow continues at the next step of the level above. A link in prose stays an offer, never a step: two links in one paragraph are two offers, and they do not put the paragraph's content in line with the flow.
 
 *The author's decisions, 2026-09-15.*
 

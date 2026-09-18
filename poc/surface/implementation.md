@@ -30,7 +30,7 @@ The body is traced from a root and handed over as a flat list of briefs in readi
 
 The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-rule), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the mounts](../practice.md#3-every-part-is-mounted-by-one-brief-of-its-entry): every brief that ends with a lone link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
 
-So the body is whatever the root connects, and nothing is scanned. A file no mount reaches is simply not in it. A mount that names a missing or unstamped file is skipped, and the process says so rather than failing silently. So is a brief that mounts a part and holds subsections of its own, which [the practice forbids](../practice.md#32-a-mounting-brief-has-no-subsections), so no brief the page receives has more than one level.
+So the body is whatever the root connects, and nothing is scanned. A file no mount reaches is simply not in it. A mount that names a missing or unstamped file is skipped, and the process says so rather than failing silently. So is a brief that mounts a part and holds subsections of its own, which [the practice forbids](../practice.md#33-a-mounting-brief-has-no-subsections), so no brief the page receives has more than one level.
 
 *In force, the author's decision, 2026-09-12.*
 

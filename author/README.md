@@ -30,3 +30,13 @@ The next day's, begun with one: a sketch or an image as a substrate-native prese
 *The author's, ratified 2026-09-17.*
 
 [the level beneath](ideas-2026-09-17.md)
+
+## 4. Ideas of 2026-09-18
+
+The day the priority was laid. The pilot has shown what working in the substrate is; what it still cannot do, onboarding a newcomer and letting someone without a harness ratify, is named and set further out, and the surface may be near the limit of its stack.
+
+First comes one problem: everything on the page is unfoldable, and two holons each made to be read in one stretch, unfolded into one reading, are no longer whole. Where that break falls is open. After it comes the visual aesthetics, and with the boundary drawn the canvas can finally use its second dimension.
+
+*The author's, 2026-09-18, dictated and held as said; the priority is his, and he has not yet ratified the wording.*
+
+[the level beneath](ideas-2026-09-18.md)

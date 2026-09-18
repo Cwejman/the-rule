@@ -102,7 +102,7 @@ So it is not known whether this is a new dynamic in the substrate, or the existi
 
 ## 4. What was settled, and what is left open
 
-A child with several parents is [a borrow](../poc/practice.md#36-a-second-lone-link-borrows-and-the-first-place-is-the-home): a lone link last in a brief places a structure there, the first such place is its home, and every later one borrows it. Links in prose stay offers.
+A child with several parents is [a borrow](../poc/practice.md#37-a-second-lone-link-borrows-and-the-first-place-is-the-home): a lone link last in a brief places a structure there, the first such place is its home, and every later one borrows it. Links in prose stay offers.
 
 A branch is a step whose level holds one brief per condition, each placing or borrowing its path, and the flow continues at the next step of the level above; the level is [one of letters](../poc/practice.md#41-a-level-of-letters-is-a-set), which says only that no condition stands on another, and a flow reads that as a choice. All three are drawn by [the canvas](../poc/surface/canvas.md).
 
