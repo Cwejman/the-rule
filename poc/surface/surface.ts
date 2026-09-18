@@ -4847,7 +4847,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
 /* the name is given a width it fills rather than one it trails off in: two lines is what most names take here, and
    that is the room the node keeps, so a level of nodes reads as a set and none of them stands half empty */
-.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; min-height: 2.7em; }
+/* a node takes the room its name needs and no more, since room on the map is what there is least of: one line where
+   one line does, two where the name wants two, and past that the name is cut, which is what zooming out leaves anyway */
+.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 /* the foot of a node: where it stands in its reading, and what waits beneath it */
 .crow .foot { display: flex; align-items: center; gap: 6px; height: 6px; }
 .crow .title { color: var(--ink); }

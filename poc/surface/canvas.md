@@ -96,7 +96,9 @@ A chevron at the row's right was built first and refused: with the press already
 
 A node carries two things: its name, and what waits beneath it. The name stands at the top with the node's whole width, wrapping rather than cutting, and the foot carries where it stands in its reading and the figure of what it hides. Nothing else is in it, since what a node is for is finding the piece, not reading it.
 
-Its width is chosen so a name fills it rather than trailing off in one long line, and its height is the room two lines of name take, so a level of nodes reads as a set: 192 by 64, on a grid of four, with twelve between nodes, twenty-four for a level's step in, and forty-eight from a node to the reading it opened. The lines that join them run edge to edge with them.
+Room on the map is what there is least of, so a node takes what its name needs and no more: one width, 192, and a height of one line where one line does and two where the name wants two. Past two the name is cut, which is what an overview leaves anyway. The rest is one grid of four: twelve between nodes, twenty-four for a level's step in, forty-eight from a node to the reading it opened, and the lines that join them run edge to edge with them.
+
+A node held at two lines whatever its name was tried and refused: it stood half empty on every short name, and space kept for nothing is space taken from the map.
 
 A node that carried its name and the opening words of its face was tried and refused: it filled the node, but it made the map a page of prose to be read where what a reader wants of a map is to find their way in it. What the face says belongs to [a mode of its own](#10-what-this-leaves-open).
 
@@ -232,7 +234,7 @@ Whether a placed part may be exploded in place rather than entered, which is the
 
 The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
-Modes of the node. A node is a name and a figure now; the author wants the same map read at other grains, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all three.
+Modes of the node, and the least a node may be drawn at. A node is a name and a figure now; zooming out shrinks it with everything else, where what the author wants is a least size it holds to, the name cut to what that size reads, so the overview stands balanced rather than merely small. A node is a name and a figure now; the author wants the same map read at other grains, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all three.
 
 The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
 
