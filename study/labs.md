@@ -5,6 +5,12 @@ kind: brief
 
 # Where the search stands
 
+Ten labs run. What labs 03 to 07 had to teach reached the editions and stands in the law today, so their cold reads are no longer owed; what they owe instead is their provenance, [the grounds](grounds.md). Each lab is given with what it did and the verdict on it.
+
+The baseline pair comes first, since every later reading is judged against it. The rest are laid newest first, from ten down.
+
+*Seen, across the ten runs.*
+
 ## 1. The baseline pair
 
 Labs 01 and 02 read the same forty-five reports of the August sweep for the two things a reading can be for. The first cut the corpus by subject, to inform, and the second walked it as a narrative, to engage. The first informed but did not engage; the second engaged.

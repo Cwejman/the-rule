@@ -36,17 +36,15 @@ What it finds there it does not interpret. What counts as a brief, and what nest
 
 ## 3. Reading and orientation come apart
 
-A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.
+What the surface is handed settled, the first thing it decides is how that body is read, and everything beneath follows from it.
 
-*Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
+*Reasoned, the author's, 2026-09-13.*
 
 [the level beneath](lane.md)
 
 ## 4. Five areas, and what stands in them
 
-The lane is one of five areas in a row: a wing, a gutter, the lane, a gutter, a wing. The gutters hold what stands beside a brief, aligned with it and scrolling with it. The wings hold figures, the widgets that draw [the body](#2-what-it-is-handed) and stand on their own. A reader chooses what each area shows from a light row of icons at its foot, and settings are a figure like any other.
-
-That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
+With the reading apart from the orientation, what the orientation stands in comes next: the page's own small framework.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -54,19 +52,15 @@ That is a small framework, kept small on purpose. It is what lets a new drawing 
 
 ## 5. The widgets
 
-The widgets are what can stand in a wing or a gutter: the tree, the shape, the ahead, the links, the settings, the plate and the keys, each described once it exists. They keep one set of rules between them, so a reader learns a family rather than a stranger per figure.
+The framework gives the areas; what stands in them is the widgets, which is where most of the drawing is.
 
-*Reasoned, 2026-09-13; each widget carries its own grade beneath.*
+*Reasoned, 2026-09-13.*
 
 [the level beneath](widgets.md)
 
 ## 6. How it is built
 
-The surface is one page the browser manages, and one TypeScript file run with Bun makes it, standing beside this entry as [`surface.ts`](surface.ts). Run against a path in a working tree, the file serves the page live and tells it when a file changes. Run once with a flag, it writes the page with the body inside, and that is all the pipeline does on each commit.
-
-Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters).
-
-Either way the file reads [the stamped](#2-what-it-is-handed) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
+Everything above says what the surface gives a reader; this is the one file that makes it, and it stands after what it serves.
 
 *In force, the author's decision, 2026-09-12.*
 
@@ -74,7 +68,7 @@ Either way the file reads [the stamped](#2-what-it-is-handed) markdown and hands
 
 ## 7. The canvas
 
-The surface is going to have a few modes, and the second is a canvas: the body as nodes a reader moves among, with its scope and how far it explodes under their hand, and the prose read in place or in a drawer beside. It is asked for by work, whose pieces are reused and reached from several places, and it is not built.
+Past what is built stands the second mode, the canvas, which is where the work with two dimensions is going.
 
 *The author's, 2026-09-15; open.*
 
@@ -82,11 +76,9 @@ The surface is going to have a few modes, and the second is a canvas: the body a
 
 ## 8. A touch reading
 
-A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size. What it leaves is the reading, with one narrow rail beside it and one mark at the foot that opens everything else.
+Everything above assumed a pointer and room; the phone takes both away, and what every rule above becomes there is held apart rather than scattered through them.
 
-Every rule it moves is written beneath, and most of them are built. What it still owes is the reading of a real phone, which nobody has given it.
-
-*The author's, 2026-09-16; built the same day, on a browser told to pretend, and what is still open stands at its foot.*
+*The author's, 2026-09-16.*
 
 [the level beneath](touch.md)
 
@@ -106,10 +98,8 @@ What stands beside a brief in the left gutter. Commits and people belong there, 
 
 ## 10. What was tried and refused
 
-What the programs before this model reached for is kept beneath, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. That level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another, and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
+Last, and read only when someone proposes one of them again: what was reached for before this model and is not wanted.
 
-Two programs were built before this model. A reader and its nine briefs of specification were built in one sitting on 2026-09-11, before anything was specified first, each change made before the last had been used, and both were retired to git the next day. The first reading model was written on 2026-09-13 against a specification written first, a level to a pane, three abreast, and the author used it that day. Its trace of the body, the reading of the files that hands the page its briefs, and its figures carry into this model; its reading model does not.
-
-*Seen, in both programs and in the author's reading of them; each refusal beneath names the rule or the observation that grades it. [The study names running ahead](../../study/findings.md#7-building-runs-ahead-more-easily-than-writing-does) as a finding of its own for the same reason.*
+*Seen, in both programs and in the author's reading of them.*
 
 [the level beneath](refused.md)

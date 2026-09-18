@@ -6,6 +6,10 @@ status: in force
 
 # The skill
 
+What a session does to make a sketch: when one earns its place, the forms a sketch takes, the design language it is drawn in, and the loop from an outline to a sketch in `.img` with its text beneath.
+
+*In force, 2026-09-14.*
+
 ## 1. A sketch draws only what the text says
 
 Once a sketch [has earned its place](README.md#1-when-a-sketch-earns-its-place), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.

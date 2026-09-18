@@ -5,6 +5,12 @@ kind: brief
 
 # The grounds
 
+Every rule the rule carries came from somewhere, and the grounds are where that is kept: one entry per rule, saying what it rests on and how strongly it holds. They are the artifact the rule is to stand beside once the study is complete, so that a reader a year from now can ask of any rule whether it is proven, settled, or a preference nobody has challenged.
+
+They are also the one part of that artifact that cannot be composed at the end. The rule can be assembled from what the labs settled, but provenance exists only while the work is happening, so the grounds accumulate lab by lab or are not written at all.
+
+*In force; the largest debt the study carries.*
+
 ## 1. What an entry owes
 
 Every rule in the code gets one entry, and the entry answers four questions in this order: what the rule says, where it came from, what it rests on, and how strongly.

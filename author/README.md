@@ -13,11 +13,9 @@ Neither is law, and nothing beneath has been changed by them yet.
 
 ## 1. Second thoughts
 
-Where the author doubts what stands beneath the root, the doubt is written here rather than at the level it is about. A large part of what stands under the root was written by sessions and has not been read or ratified by him, and a doubt filed deep in such a level is one that has disappeared.
+The doubts come first, since they are about what stands beneath the root and a reader who is going there should carry them.
 
-Two stand open now, both about folding: that nothing on the page folds what a reader has just read, and that some levels ought to be entered and read rather than unfolded for a preview.
-
-*The author's, 2026-09-16; open, and nothing beneath has been changed to answer them.*
+*The author's, 2026-09-16; open.*
 
 [the level beneath](second-thoughts.md)
 
@@ -39,10 +37,8 @@ The next day's, begun with one: a sketch or an image as a substrate-native prese
 
 ## 4. Ideas of 2026-09-18
 
-The day the priority was laid. The pilot has shown what working in the substrate is; what it still cannot do, onboarding a newcomer and letting someone without a harness ratify, is named and set further out, and the surface may be near the limit of its stack.
+The latest day, and the one that laid the priority the work now follows.
 
-First comes one problem: everything on the page is unfoldable, and two holons each made to be read in one stretch, unfolded into one reading, are no longer whole. Where that break falls is open. After it comes the visual aesthetics, and with the boundary drawn the canvas can finally use its second dimension.
-
-*The author's, 2026-09-18, dictated and held as said; the priority is his, and he has not yet ratified the wording.*
+*The author's, 2026-09-18, dictated and held as said; he has not yet ratified the wording.*
 
 [the level beneath](ideas-2026-09-18.md)

@@ -5,6 +5,12 @@ kind: brief
 
 # How two holons drive each other
 
+The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321-the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322-the-link). Neither is two wholes driving each other at once.
+
+This asks how that is done, by asking it of the one field that has answered it in working machines, and brings back what the answer requires.
+
+*Derived 2026-09-11, from the author's question about resonance between the operators of a synthesizer.*
+
 ## 1. Direct coupling is forbidden, and for a reason
 
 Classic frequency-modulation synthesis lays its operators in a graph with no cycles *[Chowning 1973]*, and the one loop it allows is an operator feeding itself, reading not the present sample but the last two averaged, as the Yamaha DX7 does. Two operators modulating each other is refused.

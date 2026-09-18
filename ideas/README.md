@@ -13,11 +13,7 @@ They are held open. None of them is law, and nothing in the rule depends on them
 
 ## 1. Giving as a business
 
-The word for the stance is giving as a business: a service earns by what it lets its users compound, not by what it withholds from them.
-
-The author gives the name a second reading, glue as a business: what the walls of today's products sell as integrations, the glue between them, is under [the substrate](../rule.md#6-how-far-this-goes) the one honest service, the connecting itself, and a host that offers it is offering glue as a service. The two readings are one stance seen from the user's side and from the host's.
-
-The positions beneath are on how a model and a harness should be offered, begun 2026-09-11 from the labs' cost accounts so the first of them stand beside the numbers that provoked them.
+The stance on how any of this is offered comes first, since it bears on everything else here.
 
 *The author's, marked so, and open.*
 
@@ -25,9 +21,7 @@ The positions beneath are on how a model and a harness should be offered, begun 
 
 ## 2. Tenants beyond prose
 
-A tenant is a domain that lives in the substrate the way knowledge does. Knowledge is the first, and [the rule's sixth section](../rule.md#6-how-far-this-goes) says the shape reaches further.
-
-These are the cases as they occur, between the study and the project's vision: each named as it would look as entries in the substrate. Two are domains; the rest are not, and say so where they stand.
+Then how far the shape reaches past prose, which is the question the stance above is held for.
 
 *The author's, held open and marked so; begun 2026-09-11.*
 
@@ -35,9 +29,7 @@ These are the cases as they occur, between the study and the project's vision: e
 
 ## 3. How two holons drive each other
 
-The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321-the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322-the-link). Neither is two wholes driving each other at once.
-
-This asks how that is done, by asking it of the one field that has answered it in working machines, and brings back what the answer requires.
+One join the rule does not give is asked here, and it is the deepest of the questions the reach above raises.
 
 *Derived 2026-09-11, from the author's question about resonance between the operators of a synthesizer.*
 
@@ -68,7 +60,7 @@ In that pair the human's role is the art direction. That is what a person does f
 
 ## 6. Reading the substrate as a diff
 
-The surface was given git's history for a day, commits as briefs coloured by age, and it was taken out the same evening for its waiting time and for mixing a second substrate into the first. What was built, why it came out and what of it holds are kept here so the learning is not lost with the code.
+Last, and the only one of these that was built and taken out again, kept so the learning outlives the code.
 
 *Seen, 2026-09-17; postponed by the author.*
 

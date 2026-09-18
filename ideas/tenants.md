@@ -5,6 +5,12 @@ kind: brief
 
 # Tenants beyond prose
 
+A tenant is a domain that lives in the substrate the way knowledge does. Knowledge is the first, and [the rule's sixth section](../rule.md#6-how-far-this-goes) says the shape reaches further.
+
+These are the cases as they occur, between the study and the project's vision: each named as it would look as entries in the substrate. Two are domains; the rest are not, and say so where they stand.
+
+*The author's, held open and marked so; begun 2026-09-11.*
+
 ## 1. Sound
 
 Sound is the first tenant after knowledge, and a digital audio workstation is how the substrate would hold it. A patch, an instrument's configuration, is a brief: whole, readable alone, and a part of a track, which is a part of an arrangement, which is a part of a piece.

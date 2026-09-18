@@ -6,6 +6,10 @@ status: in force
 
 # Reading and orientation come apart
 
+A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.
+
+*Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
+
 ## 1. The lane holds one reading
 
 The lane holds one reading depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the scope's title and its first paragraph, stands first.

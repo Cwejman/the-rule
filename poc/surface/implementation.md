@@ -6,6 +6,14 @@ status: in force
 
 # How it is built
 
+The surface is one page the browser manages, and one TypeScript file run with Bun makes it, standing beside the entry as [`surface.ts`](surface.ts). Run against a path in a working tree, the file serves the page live and tells it when a file changes. Run once with a flag, it writes the page with the body inside, and that is all the pipeline does on each commit.
+
+Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters).
+
+Either way the file reads [the stamped](README.md#2-what-it-is-handed) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
+
+*In force, the author's decision, 2026-09-12.*
+
 ## 1. Nothing is rendered on a server for a request
 
 Everything a reader does happens in the browser: the lane and its folds, the widgets, and every move between them. So one client serves both moments of a repository, live and published, and the two differ only in where the body comes from, [beneath](#5-live-and-published-differ-only-in-where-the-body-comes-from).
@@ -33,6 +41,14 @@ The process is pointed at a file that carries [the stamp](../practice.md#2-a-fil
 So the body is whatever the root connects, and nothing is scanned. A file no mount reaches is simply not in it. A mount that names a missing or unstamped file is skipped, and the process says so rather than failing silently. So is a brief that mounts a part and holds subsections of its own, which [the practice forbids](../practice.md#33-a-mounting-brief-has-no-subsections), so no brief the page receives has more than one level.
 
 *In force, the author's decision, 2026-09-12.*
+
+#### 3.1.1 A mount carries the brief across, and that is the boundary
+
+A mounted file's own prose, what stands before its first section, is given to the brief that mounts it as what lies across the boundary. One address holds both sides, so nothing a link or a stored fold names has changed: the mount is that address in the entry's reading, and the brief across it is that address opened.
+
+That one field is the whole of the boundary in the data. A brief that carries it is a mount, the lane stops there and draws [a card](lane.md#12-a-mount-raises-a-card), the scope of any address is the nearest mount at or above it, and the shape draws the row apart. Nothing else had to be told where a file ends.
+
+*As built, 2026-09-18, on [the author's decision](../../author/ideas-2026-09-18.md#5-unfolding-everything-may-break-the-linear-whole) that a file is one reading.*
 
 ### 3.2 The address is the path of titles
 

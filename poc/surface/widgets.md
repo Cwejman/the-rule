@@ -6,6 +6,10 @@ status: in force
 
 # The widgets
 
+The widgets are what can stand in a wing or a gutter: the tree, the shape, the ahead, the links, the settings, the plate and the keys, each described once it exists. They keep one set of rules between them, so a reader learns a family rather than a stranger per figure.
+
+*Reasoned, 2026-09-13; each widget carries its own grade beneath.*
+
 ## 1. What every widget keeps
 
 Every shape is computed from the substrate and none is invented, because a picture a reader cannot trust is worse than no picture at all. What the widgets share beyond that is the rules beneath, and keeping them is what makes six drawings one family.

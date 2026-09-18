@@ -5,6 +5,10 @@ kind: brief
 
 # The project it began in
 
+The study began inside OpenLight, a project building a medium for knowledge, programs and interfaces, and much of what it reads assumes that project. What stands here is what a reader who arrives without it needs, with links to OpenLight for depth.
+
+*Written 2026-09-14, when the study moved with the rule to a repository of its own.*
+
 ## 1. What OpenLight is
 
 [OpenLight](https://github.com/Cwejman/OpenLight) is the project the study began in. It builds a medium in which knowledge, programs and interfaces live as typed, versioned structure, so that a model completes from a point in that medium rather than from a pasted transcript.

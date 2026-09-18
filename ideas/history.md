@@ -6,6 +6,10 @@ status: open
 
 # Reading the substrate as a diff
 
+The surface was given git's history for a day, commits as briefs coloured by age, and it was taken out the same evening for its waiting time and for mixing a second substrate into the first. What was built, why it came out and what of it holds are kept here so the learning is not lost with the code.
+
+*Seen, 2026-09-17; postponed by the author.*
+
 ## 1. What was built, and taken out the same day
 
 On 2026-09-17 the surface was given history: every brief its span of lines, git blame saying which of the last sixty commits last touched them, each block of prose the age of its own lines, and a hue per commit on one section of the wheel, the newest warmest, with everything older grey at its own lightness wherever a brief is drawn. The commits then stood in the body as a level of briefs, one per commit, each leading by links to every brief it touched with the first line of the change, with an act to read the body back to that commit and a widget as the level's miniature.

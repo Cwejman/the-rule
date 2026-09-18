@@ -6,15 +6,13 @@ status: open
 
 # Second thoughts
 
-## 1. Why they stand here and not where they belong
-
 A doubt about a level would ordinarily be written at that level's own foot. These stand at the root instead, because a large part of what this entry connects was written by sessions, and the author has neither read nor ratified all of it. A doubt of his own, filed deep in a file he may never open again, is a doubt that has disappeared.
 
 So they stand here until they are answered or dropped, and nothing beneath has been changed to answer them.
 
 *The author's, 2026-09-16, on his asking that they be placed far up; the session wrote them down.*
 
-## 2. There is no visible way to fold what you have read
+## 1. There is no visible way to fold what you have read
 
 A reader can unfold a brief because they would rather preview it than enter it. They scroll through it, reach its end and meet the next piece, and there is nothing there to fold what they have just read. The keys can do it, [shift with the space bar](../poc/surface/lane.md#64-the-keys) folding the brief above, but no act on the page can, and on a phone there are no keys at all.
 
@@ -22,7 +20,7 @@ The author does not know how to solve it either.
 
 *The author's, 2026-09-16; open.*
 
-## 3. Some levels are entered and read, not unfolded
+## 2. Some levels are entered and read, not unfolded
 
 The author is having second thoughts about how much of the body may be unfolded.
 

@@ -5,6 +5,10 @@ kind: brief
 
 # What the method has found
 
+The labs were run to learn how knowledge is best written, and they taught something else on the way: how to run the learning. These are the findings about the work itself, each settled by repetition rather than by one run.
+
+*Seen, across the ten runs; they feed [the practice](../poc/practice.md) and [the grounds](grounds.md).*
+
 ## 1. Heaviness is seen before it is read
 
 A reader judges a brief's difficulty from its shape, the size of its paragraphs and the density of the page, before spending any reading on it, and under the code that judgment is the verdict: a part that looks like too much is harder to understand, because comprehension follows confidence. So a piece can be failed at a glance, and it should be looked at blurred before it is read. This is the judgment the labs have failed most often, lab 10 included, and a rule has never fixed it: the writer cannot feel the weight of prose it is inside of, and a character count is a threshold rather than a feel. What serves it is a picture, and that is one of the things [the surface](../poc/surface/README.md) is for. The program built on 2026-09-11 drew every brief as the lines it actually is, and the heavy blocks showed before a word was read. Seen, across the labs; the count of paragraphs past five hundred characters is measured.

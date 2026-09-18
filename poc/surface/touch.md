@@ -6,6 +6,12 @@ status: in force
 
 # A touch reading
 
+A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size. What it leaves is the reading, with one narrow rail beside it and one mark at the foot that opens everything else.
+
+Every rule it moves is written beneath, and most of them are built. What it still owes is the reading of a real phone, which nobody has given it.
+
+*The author's, 2026-09-16; built the same day, on a browser told to pretend, and what is still open stands at its foot.*
+
 ## 1. What a phone changes
 
 Three things a phone takes away, and each one moves a rule rather than only a size. There is no pointer, so nothing can be told by hovering and no figure can answer for what the pointer rests on. There is no keyboard, so a key cap names nothing. And there is room for one thing at a time, so the panes are a choice rather than a pair.

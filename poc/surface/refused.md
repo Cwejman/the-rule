@@ -6,6 +6,12 @@ status: in force
 
 # What was tried and refused
 
+What the programs before this model reached for is kept here, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. This level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another, and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
+
+Two programs were built before this model. A reader and its nine briefs of specification were built in one sitting on 2026-09-11, before anything was specified first, each change made before the last had been used, and both were retired to git the next day. The first reading model was written on 2026-09-13 against a specification written first, a level to a pane, three abreast, and the author used it that day. Its trace of the body, the reading of the files that hands the page its briefs, and its figures carry into this model; its reading model does not.
+
+*Seen, in both programs and in the author's reading of them; each refusal beneath names the rule or the observation that grades it. [The study names running ahead](../../study/findings.md#7-building-runs-ahead-more-easily-than-writing-does) as a finding of its own for the same reason.*
+
 ## a. A pane holding one brief, with its siblings in a picker
 
 The first program gave a pane to a single brief and put the rest of its level in a list to choose from.

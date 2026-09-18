@@ -6,6 +6,12 @@ status: in force
 
 # Five areas, and what stands in them
 
+The lane is one of five areas in a row: a wing, a gutter, the lane, a gutter, a wing. The gutters hold what stands beside a brief, aligned with it and scrolling with it. The wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own. A reader chooses what each area shows from a light row of icons at its foot, and settings are a figure like any other.
+
+That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
+
+*Reasoned, the author's, 2026-09-13.*
+
 ## 1. Three kinds of widget
 
 A gutter, a wing and the middle want different contracts, and naming the difference is what keeps every widget small.

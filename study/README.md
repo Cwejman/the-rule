@@ -23,19 +23,17 @@ The search ends when the proof is lived, not argued. Three marks:
 
 ## 2. Where the search stands
 
-Ten labs run. What labs 03 to 07 had to teach reached the editions and stands in the law today, so their cold reads are no longer owed; what they owe instead is their provenance, [the grounds](#3-the-grounds). Each lab is given with what it did and the verdict on it.
+With the finish line held, what comes next is how far the search has got towards it, lab by lab.
 
-The baseline pair comes first, since every later reading is judged against it. The rest are laid newest first, from ten down.
-
-After the labs come the two artifacts of the finish line's second mark, and then the mark itself: the grounds, then the spec tree.
+*Seen, in ten labs.*
 
 [the level beneath](labs.md)
 
 ## 3. The grounds
 
-Every rule the code carries came from somewhere, and the grounds are where that is kept: one entry per rule, saying what it rests on and how strongly it holds. They are the artifact the code is to stand beside once the study is complete, so that a reader a year from now can ask of any rule whether it is proven, settled, or a preference nobody has challenged.
+What the labs settled is in the law already; what they cannot leave behind them is their provenance, and that is the artifact this level holds.
 
-They are also the one part of that artifact that cannot be composed at the end. The code can be assembled from what the labs settled, but provenance exists only while the work is happening, so the grounds accumulate lab by lab or are not written at all.
+*In force; the largest debt the study carries.*
 
 [the level beneath](grounds.md)
 
@@ -53,21 +51,23 @@ The grounds are the largest debt, and the only one that cannot wait. Every rule 
 
 ## 5. What the method has found
 
-The labs were run to learn how knowledge is best written, and they taught something else on the way: how to run the learning. These are the findings about the work itself, each settled by repetition rather than by one run. They feed [the practice](../poc/practice.md) and [the grounds](#3-the-grounds).
+Past what the study owes stands what it has already taught about the running of it rather than about the writing.
+
+*Seen, across the ten runs.*
 
 [the level beneath](findings.md)
 
 ## 6. What the study measures of itself
 
-The code makes two promises that can be counted rather than argued: that the biggest understanding comes first, so each level down holds more prose than the one above it, and that a brief stays as brief as its understanding allows. This record holds what counting finds.
+Beside what was found by reading stands what is found by counting, which needs nobody's judgment and is kept apart for that reason.
 
-It is machine work and needs nobody's judgment, which is why it is a record of its own rather than a verdict in the notebook.
+*Measured, each run.*
 
 [the level beneath](measured.md)
 
 ## 7. The project it began in
 
-The study began inside OpenLight, a project building a medium for knowledge, programs and interfaces, and much of what it reads assumes that project. This level gives a reader who arrives without it what they need, and links to OpenLight for depth.
+Last of the levels, for a reader who has met the study without the project it began inside and needs it to read the rest.
 
 *Written 2026-09-14, when the study moved with the rule to a repository of its own.*
 

@@ -6,6 +6,10 @@ status: open
 
 # The canvas
 
+The surface is going to have a few modes, and the second is a canvas: the body as nodes a reader moves among, with its scope and how far it explodes under their hand, and the prose read in place or in a drawer beside. It is asked for by work, whose pieces are reused and reached from several places, and it is not built.
+
+*The author's, 2026-09-15; open.*
+
 ## 1. Comprehension is not only head-on
 
 Comprehension does not always come from head-on analysis, from untangling a thought while resting on the focus of what is known. A person and an inference machine, as inference works today, are quite different in this. The author woke on 2026-09-15 with a wish, not an argument: a canvas on which to view the substrate and move about in it.

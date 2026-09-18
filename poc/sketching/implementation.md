@@ -6,6 +6,10 @@ status: in force
 
 # The tool
 
+One TypeScript file run with Bun, beside the entry, that writes a sketch's skeleton and stamps its style from the palette, measures a label's room, checks a sketch against the language, and renders it for the session to look at.
+
+*In force, 2026-09-14.*
+
 ## 1. One file, run with Bun
 
 [`sketch.ts`](sketch.ts) is one file in this folder, run with Bun from the proof of concept's folder, so a session needs nothing installed beyond what the arc's package file names. It has five commands:
