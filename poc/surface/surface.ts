@@ -2983,19 +2983,25 @@ function drawCrumb(): void {
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
   const above = run.length - kept.length;
-  // a step above the scope scopes out to it; one within it goes there; the brief in focus is where the reader stands
+  // the run says three things and draws them apart. A reading the reader is inside, the body's root and every card they
+  // opened to get here, stands as a chip in its branch's hue, the way the card they pressed stands in the prose. A
+  // section of the reading they are in stands as plain faint text, since it is a place within one thing rather than a
+  // thing entered. And the rightmost is where the highlight is, at full ink, whichever of the two it happens to be.
   const step = (a: string): string => {
-    const cls = a === state.focus ? "step now" : a === S ? "step root" : "step";
+    const cls = ["step", a === "" || isCard(brief(a)) ? "reading" : "section", ...(a === S ? ["root"] : []), ...(a === state.focus ? ["now"] : [])].join(" ");
     const takes = a === state.focus ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${esc(brief(a)!.title)}</span>`;
   };
+  // the acts of the rightmost stand after it: where it is a reading of its own, entering it and widening out of it are
+  // both there, since that is what enter and shift with enter do where the reader is standing
+  const ends = isCard(brief(state.focus)) ? badgeHtml("open", undefined, true) + badgeHtml("widen", undefined, true) : badgeHtml("widen", undefined, true);
   const place =
     (above ? `<span class="step more" data-tip="${above} level${above > 1 ? "s" : ""} above, cut at the root">…</span>${CHEVRON}` : "") +
     kept.filter((a) => brief(a)).map(step).join(CHEVRON);
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}${badgeHtml("widen", undefined, true)}</span>${depth}${way}${back}`;
+  ui.crumb.innerHTML = `<span class="place">${place}${ends}</span>${depth}${way}${back}`;
   placeCrumb();
   trimPlace();
 }
@@ -4568,9 +4574,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #crumb { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
 #crumb .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
 #crumb .step:hover, #crumb .step.lit { color: var(--on); }
+/* a reading the reader is inside stands as a chip outlined in its branch's hue, the form the card they pressed had, so
+   the crossings they made read apart from the places within the one they are in */
+#crumb .step.reading { flex: none; padding: 1px 7px; border-radius: 999px; outline: 1px solid var(--rest); outline-offset: -1px; color: var(--muted); }
+#crumb .step.reading:hover, #crumb .step.reading.lit { outline-color: var(--lit); color: var(--on); }
 #crumb .step.root { flex: none; color: var(--muted); }
 /* the last step is where the reader stands, so it is the one that is not faint */
 #crumb .step.now { flex: none; color: var(--ink); cursor: default; }
+#crumb .step.now.reading { color: var(--ink); outline-color: var(--door); }
 #crumb .step.now.lit { color: var(--on); }
 #crumb .step.root.lit { color: var(--on); }
 #crumb .place, #crumb .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }
