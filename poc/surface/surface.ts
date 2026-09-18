@@ -1007,10 +1007,14 @@ const beneathCount = (a: string): number => level(a).reduce((s, k) => s + 1 + be
 
 /** The level a brief unfolds onto. */
 const levelOf = (b: Brief): Brief[] => level(b.address);
-/** How many briefs a brief unfolds onto. */
+/** How many briefs a brief unfolds onto: its own, however deep, and a card as the one thing it is, since what a card holds waits past a boundary. */
+const beneathIn = (a: string): number => level(a).reduce((n, k) => n + 1 + (isCard(k) ? 0 : beneathIn(k.address)), 0);
+/** How many briefs stand beneath a brief at any depth, across every boundary. */
 const beneathOf = (b: Brief): number => beneathCount(b.address);
-/** Whether a brief unfolds at all: paragraphs past its face, or a level of its own. */
-const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelOf(b).length > 0;
+/** A brief's level as the lane lays it: its own briefs, never the cards its prose places, which are reached by opening. */
+const levelIn = (b: Brief): Brief[] => level(b.address).filter((k) => !isCard(k));
+/** Whether a brief unfolds at all: blocks past its face, the cards among them, or a level of its own. */
+const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelIn(b).length > 0;
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 /** The number a heading shows in the lane: counted from the scope, as the canvas counts, since a reader stands in the substrate and not in a file. */
@@ -1430,7 +1434,7 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
   // the room is what the line has left once its count and its acts have taken theirs, so the figure yields to the words
   // rather than running past the prose; the marks scale together into it and keep their lengths true against each other
   const MAX = figRoom();
-  const kids = kidsGiven ?? levelOf(b);
+  const kids = kidsGiven ?? levelIn(b);
   const blocks = rest.slice(0, FIG.shown).map((t) => ({ image: t.type === "image", w: markLength(t) }));
   const over = rest.length - blocks.length;
   const wide = (xs: { w: number }[]) => xs.reduce((n, x) => n + x.w + FIG.gap, 0);
@@ -1542,7 +1546,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   const d = Math.min(4, depthIn(b.address));
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
-  const beneath = beneathOf(b);
+  const beneath = beneathIn(b.address);
   // a folded brief says beneath its face that it unfolds: the badge for the key, a bar per paragraph it hides, a frame
   // per image, and how many briefs lie beneath; the badge for opening it as the scope stands at the end of the line
   const more =
@@ -2548,13 +2552,19 @@ function drawEdges(): void {
 
 // ### 3.11.1 The depth: every brief in the scope unfolded to a depth, and folded beyond it
 
-/** The deepest level beneath the scope root, counted from it. */
-const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter((b) => within(b.address, state.scope)).map((b) => depthIn(b.address)));
+/**
+ * The briefs of the reading the lane holds: within the scope and on this side of every boundary. A card is not one of
+ * them and neither is anything beneath it, since no unfolding reaches there and the depth must promise only what it gives.
+ */
+const ofReading = (b: Brief): boolean => within(b.address, state.scope) && !isCard(b) && fileRootOf(b.address) === fileRootOf(state.scope);
+
+/** The deepest level of the reading, counted from the scope root. */
+const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter(ofReading).map((b) => depthIn(b.address)));
 
 /** The depth the scope stands unfolded to: the largest such that every brief with a level above it is whole. */
 function unfoldedDepth(): number {
   let d = 0;
-  while (d < scopeDepth() && state.body!.briefs.every((b) => !within(b.address, state.scope) || depthIn(b.address) !== d || levelOf(b).length === 0 || gradeOf(b.address) === "whole")) d++;
+  while (d < scopeDepth() && state.body!.briefs.every((b) => !ofReading(b) || depthIn(b.address) !== d || levelIn(b).length === 0 || gradeOf(b.address) === "whole")) d++;
   return d;
 }
 
@@ -2569,7 +2579,7 @@ function depthHtml(): string {
 
 /** Unfolds every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
 function unfoldTo(n: number): void {
-  const inScope = state.body!.briefs.filter((b) => b.address !== state.scope && within(b.address, state.scope));
+  const inScope = state.body!.briefs.filter((b) => b.address !== state.scope && ofReading(b));
   refold(() => {
     inScope.filter((b) => depthIn(b.address) === n && inLane(b.address)).forEach((b) => setGrade(b.address, "face"));
     inScope
@@ -3048,8 +3058,15 @@ function placeCrumb(): void {
   // both sides rather than running into the left edge while the right one is a gap in from it
   const left = Math.max(Math.min(...edges.map((r) => r.left)), narrow() ? a0.left + state.settings.gap : -Infinity);
   const right = Math.max(...edges.map((r) => r.right));
+  // the bar is as wide as what it spans, and no wider until it has to be: where the run of names, the depth and the
+  // trail do not fit that, it grows to the right rather than cutting names, out to the page's own margin. So it stands
+  // over the prose in the ordinary case and reaches past it only when it is carrying more than the prose is wide
+  const gap = state.settings.gap;
+  const span = Math.round(Math.min(right, narrow() ? a0.right - gap : Infinity) - left);
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
-  ui.crumb.style.width = `${Math.round(Math.min(right, narrow() ? a0.right - state.settings.gap : Infinity) - left)}px`;
+  ui.crumb.style.width = "max-content";
+  ui.crumb.style.minWidth = `${span}px`;
+  ui.crumb.style.maxWidth = `${Math.max(span, Math.round(a0.width - (left - a0.left) - gap))}px`;
   // the pull's gauge lies over the top of the prose, just under the way down
   const lane = ui.lane.getBoundingClientRect();
   ui.pull.style.left = `${Math.round(lane.left - a0.left)}px`;

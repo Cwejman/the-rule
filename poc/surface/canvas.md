@@ -46,7 +46,9 @@ As in the lane, a reader enters [the scope](lane.md#7-scoping-the-lane) of somet
 
 As built, a strip in the way down holds a cell per level beneath the scope, the unfolded ones marked, and a press or a scrub across it unfolds the scope to that depth and folds beyond, in the lane as on the canvas, so it serves whichever pane is shown. The two keys that move it stand together past its cells, [as one pair with their shift drawn once](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), since the strip is the act's own picture and needs no word beside it.
 
-*The author's, 2026-09-15; the strip as built the same day.*
+The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole.
+
+*The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
 
 ## 4. Down for sequence, across for choice
 
