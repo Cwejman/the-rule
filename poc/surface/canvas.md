@@ -104,6 +104,14 @@ A folded node shows nothing of its level, so it wants marks for what it hides, a
 
 *The author's, 2026-09-15; the marks as built the same day.*
 
+### 4.7 A press is a press, and only the ground is dragged
+
+A press on a row was also the beginning of a pan, and any movement in it cancelled the press and dragged the map instead, so half of what a reader pressed did nothing. The ground alone is dragged now: a press on a row, on the acts or on the face is a press, whatever the hand does in it.
+
+Three things went with that fault. What counts as a movement is the distance travelled rather than the height alone, so a sideways pan moves at all. The pointer is held by the area rather than by what the press landed on, since a redraw between the press and its release would detach that element and the release would never arrive. And a selection left behind in the prose no longer swallows presses on the canvas, which selects nothing of its own.
+
+*The author's report, 2026-09-18, that pressing did not work; found and mended the same day.*
+
 ## 5. One press opens, two presses read
 
 Three things a reader wants of a node, and they are not one act. To see what is in there, which is what exploring is and what happens most. To go there and read it. And to know what it is before spending either.
@@ -201,14 +209,6 @@ The whole body drawn at once. [The chain](#3-the-path-the-reader-has-opened-and-
 The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#52-what-is-selected-shows-its-face).
 
 *Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above, and all four taken out of the code the same day.*
-
-### 4.7 A press is a press, and only the ground is dragged
-
-A press on a row was also the beginning of a pan, and any movement in it cancelled the press and dragged the map instead, so half of what a reader pressed did nothing. The ground alone is dragged now: a press on a row, on the acts or on the face is a press, whatever the hand does in it.
-
-Three things went with that fault. What counts as a movement is the distance travelled rather than the height alone, so a sideways pan moves at all. The pointer is held by the area rather than by what the press landed on, since a redraw between the press and its release would detach that element and the release would never arrive. And a selection left behind in the prose no longer swallows presses on the canvas, which selects nothing of its own.
-
-*The author's report, 2026-09-18, that pressing did not work; found and mended the same day.*
 
 ## 9. Two faults as built
 
