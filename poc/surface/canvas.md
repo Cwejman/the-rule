@@ -94,7 +94,9 @@ A row is a thing to look at and to press, so it keeps its own outline. What a ro
 
 A chevron at the row's right was built first and refused: with the press already opening what a row leads to, and the acts standing in the field, it said nothing a reader needed, and it never lined up against a name that wrapped.
 
-Every row is one size, 240 by 64, and the map is laid on one grid of four: twelve between rows, twenty-four for a level's step in, forty-eight from a row to the reading it opened. The name stands on one line of the row and the figure on the next, since a row is thin and a figure beside a name squeezes it; both begin at the row's own edge, and the lines that join rows run edge to edge with them.
+Every row is one size, 240 by 82, and the map is laid on one grid of four: twelve between rows, twenty-four for a level's step in, forty-eight from a row to the reading it opened. The lines that join rows run edge to edge with them.
+
+A row of one size is filled rather than padded. The name runs on into the opening words of the piece's own face, the two cut together at the third line, so a short name gives its room to what the piece says and the map is read rather than merely labelled. The figure stands on the line beneath, where it neither squeezes the name nor ends ragged.
 
 *The author's, 2026-09-18, on reading a canvas whose rows had lost their edges, whose chevrons did not line up and whose margins were each their own number; as built the same day.*
 

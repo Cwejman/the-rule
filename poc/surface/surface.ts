@@ -2553,8 +2553,12 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
   const n = o.head ? "" : numberIn(b, root);
   const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
+  // a row is one size, so it is filled rather than padded: the name runs on into the opening words of the face, and
+  // the two are cut together at the line the row holds, so a short name gives its room to what the piece says
+  const said = trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), 190);
+  const say = `<span class="say">${num}<b class="title">${esc(b.title)}</b> <span class="face">${esc(said)}</span></span>`;
   // the figure stands on a line of its own beneath the name, where it neither squeezes the name nor ends ragged
-  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}><span class="name">${num}<span class="title">${esc(b.title)}</span></span>${marksHtml(b, o.hides)}</div>`;
+  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}${marksHtml(b, o.hides)}</div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -4841,18 +4845,22 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
 .crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
-.crow .name { display: flex; align-items: baseline; gap: 8px; min-height: 2.7em; }
+/* the row is filled, not padded: the name runs on into what the piece says, and the two are cut together at the third
+   line, so every row is one size and none of it stands empty */
+.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; height: 4.05em; }
+.crow .title { font-weight: calc(500 - var(--thin)); color: var(--ink); }
+.crow .face { color: var(--muted); }
 /* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
 .crow.opens { box-shadow: inset 0 0 0 1px var(--door); }
 /* the head of a column is the brief the file opens with, and it says so by its weight */
-.crow.head { font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--door); }
+.crow.head .title { font-weight: calc(650 - var(--thin)); }
+.crow.head { box-shadow: inset 0 0 0 1px var(--door); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--track); color: var(--ink); }
 #depth .dc:hover { background: var(--muted); color: var(--ground); }
-.crow .num { flex: none; width: 1.7em; text-align: right; font-size: .85em; color: var(--faint); }
-.crow .title { flex: 0 1 auto; min-width: 0; }
+.crow .num { display: inline-block; width: 1.7em; margin-right: .2em; text-align: right; font-size: .85em; color: var(--faint); }
 .crow.on .num { color: var(--on); }
 /* what the reading stands on takes the branch's hue at full weight; what the reader has selected is filled as well,
    since the two are different things and a reader may have selected one while reading another */
