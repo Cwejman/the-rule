@@ -50,11 +50,11 @@ The strip counts the reading and not the body. A card's level lies past [a bound
 
 *The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
 
-## 4. Down for the reading, across for the holarchy
+## 4. Down for the reading, across for the depth
 
-The two dimensions say two different things, and that is the whole of the layout. Down is the linear reading: the sections of one file, in the order they are read, as a column. Across is the holarchy: what a brief's prose places, each [a reading of its own](../practice.md#11-a-file-is-one-linear-reading), standing to the right of the brief that placed it.
+The two dimensions say two different things, and that is the whole of the layout. Down is the reading: everything one file holds stands in one column, its own brief at the top, then its sections and the parts it places, in the order they are read. Across is depth in the holarchy, and nothing else moves right: a part placed here is [a reading of its own](../practice.md#11-a-file-is-one-linear-reading), so its row keeps its place in this column and the file it names opens as a column beside that row, level with it.
 
-So a file is a column and a body of files is a row of columns, and which of the two a reader is looking at is in the shape itself rather than in a mark upon it. A brief that holds both is drawn with its own row and, to its right, the readings it placed; its sections run down beneath it as before.
+So one column is one file read top to bottom, and each step right is one boundary crossed. A reader looking at a column is inside a reading; a reader looking across is looking at the holarchy. Which of the two they are doing is in the shape itself rather than in a mark upon it.
 
 The canvas draws the whole body and not the scope. It is one map a reader moves in, growing to the right as the holarchy does and down as each file reads, so what a placement leads to always stands beside it and nothing is entered and left to see the next thing. What folding governs is the column: a file's sections stand beneath it when it is whole, since a file's structure is what a reader asks to see. Scoping is theirs to choose when they want one reading in front of them and nothing else, and it is not the frame the map is drawn in.
 
@@ -150,7 +150,7 @@ At the top of a scope, pulling up beyond where the lane can go should fill a gau
 
 ## 8. What this leaves open
 
-A level of a file made a column of its own. Where a file's level is long, or is the thing a reader is comparing across, breaking it out beside the file rather than beneath it would give the layout a third use of the across. It is the author's idea of 2026-09-18, wanted where a reader asks for it rather than always, and no act has been given to it.
+A level of a file made a column of its own. Where a file's level is long, or is the thing a reader is comparing, breaking it out beside the file rather than beneath it would let a reader make a level explicit as the boundaries already are. It is the author's idea of 2026-09-18, wanted where a reader asks for it rather than always, and no act has been given to it.
 
 Whether a canvas beside the lane has the room to be read at all, since the map is wide by nature and the middle holds the two panes at half the page each.
 

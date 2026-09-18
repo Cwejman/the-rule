@@ -2445,22 +2445,24 @@ function canvasNodeHtml(b: Brief): string {
   const mark = placed ? `<span class="placed" data-tip="a reading of its own" ${hued(b.address)}>${icon("links")}</span>` : "";
   const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${mark}</div>`;
   const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
-  // the two dimensions say two different things. Down is the linear reading: the sections of this file, in the order
-  // they are read. Across is the holarchy: what the prose places, each a reading of its own, standing to the right of
-  // the brief that placed it. So a file is a column and a body of files is a row of columns, and which of the two a
-  // reader is looking at is in the shape itself rather than in a mark on it.
+  // The two dimensions say two different things. Down is the reading: everything one file holds stands in one column,
+  // its own brief at the top and its sections and the parts it places beneath, in the order they are read. Across is
+  // the holarchy: a part placed here is a reading of its own, so its row keeps its place in this column and the file it
+  // names opens as a column to the right of that row. Depth in the holarchy is the only thing that moves right.
   const sections = kids.filter((k) => !isCard(k));
   const cards = kids.filter(isCard);
   const set = b.set;
-  // the holarchy is the map itself, so what a brief places always stands to its right, however the brief is folded: the
-  // canvas is one body a reader moves in rather than a crop of it. A file's own sections are the column beneath, and
-  // that is what folding governs, since reading a file's structure is the thing a reader asks for.
-  const zone = whole && sections.length ? `<div class="czone${set ? " set" : ""}${placed ? " placed" : ""}" data-fold="${esc(b.address)}">${sections.map(canvasNodeHtml).join("")}</div>` : "";
-  const across = cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
-  return (
-    `<div class="cnode${zone ? " whole" : ""}${placed ? " placed" : ""}" style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}">` +
-    `<div class="cwith">${line}${across}</div>${zone}</div>`
-  );
+  const zone = whole && sections.length ? `<div class="czone${set ? " set" : ""}" data-fold="${esc(b.address)}">${sections.map(canvasNodeHtml).join("")}</div>` : "";
+  // what a brief places stands beneath it in this same column, since a placement is met where the prose put it
+  const places = cards.length ? `<div class="cplaced">${cards.map(canvasNodeHtml).join("")}</div>` : "";
+  const style = `style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}"`;
+  // a placed file is a column of its own beside the row that named it: its sections once the reader has opened it, and
+  // the parts it places in turn always, since those are the map carrying on
+  if (placed) {
+    const beside = zone + places;
+    return `<div class="cnode placed${zone ? " whole" : ""}" ${style}><div class="cpair">${line}${beside ? `<div class="cbeside">${beside}</div>` : ""}</div></div>`;
+  }
+  return `<div class="cnode${zone ? " whole" : ""}" ${style}>${line}${zone}${places}</div>`;
 }
 
 /** How many cells a port shows before the rest collapse into a count. */
@@ -2486,12 +2488,8 @@ function drawCanvas(): void {
   const S = "";
   const root = brief(S)!;
   const entry = "";
-  const kids = level(S);
-  const sections = kids.filter((k) => !isCard(k));
-  const cards = kids.filter(isCard);
-  const across = cards.length ? `<div class="cacross">${cards.map(canvasNodeHtml).join("")}</div>` : "";
-  const column = `<div class="ccol${root.set ? " set" : ""}">${entry}${sections.map(canvasNodeHtml).join("")}</div>`;
-  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="cwith">${column}${across}</div></div>`;
+  // the body's own file is the first column: its sections and the parts it places, in the order they are read
+  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
   if (fitted !== state.scope) {
     fitCanvas();
     fitted = state.scope;
@@ -4652,16 +4650,23 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #edges path.arrow { stroke: var(--rim); stroke-width: 1; stroke-linecap: butt; }
 /* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
    dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
-.ccol, .czone { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ccol, .czone { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
 /* a set is a row of columns, wrapping past three, since nothing in it stands on anything */
 .ccol.set, .czone.set { flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 24px 56px; max-width: 892px; }
 .cnode { display: flex; flex-direction: column; align-items: center; }
-/* a brief and what it places stand side by side: the brief's own row, and to its right the readings its prose placed,
-   each a column of its own. Down is the reading, across is the holarchy */
-.cwith { display: flex; align-items: flex-start; gap: 34px; }
-.cacross { display: flex; align-items: flex-start; gap: 28px; }
-/* a placed reading is held apart from the one that placed it, as a card is in the prose */
-.cnode.placed > .cwith > .cline > .crow { outline: 1px solid var(--rest); outline-offset: 3px; border-radius: 8px; }
+/* a placed reading keeps its row in the column that named it and opens as a column of its own to the right of that
+   row, so a file reads down and nothing but depth in the holarchy ever moves across */
+/* the gap between a row and the column beside it leaves room for that column's own in-ports, which hang off its left
+   edge, so what leads into a reading never lies over the row that named it */
+.cpair { display: flex; align-items: flex-start; gap: 62px; }
+/* the row keeps its own height beside a column that may be very tall, so its ports stay level with it rather than
+   drifting to the middle of everything it leads to */
+.cpair > .cline { align-self: flex-start; }
+.cbeside, .cplaced { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.cplaced { margin-top: 16px; }
+/* a column standing beside a row begins level with it */
+.cbeside > .cplaced { margin-top: 0; }
+.cnode.placed > .cpair > .cline > .crow { outline: 1px solid var(--rest); outline-offset: 3px; border-radius: 8px; }
 /* the zone's dashed edges emerge from the parent row's straight sides: the zone begins behind the row, above its rounded
    lower corners, and the row paints over it, so the row keeps its corners */
 .czone { margin-top: -8px; padding: 22px 24px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
@@ -4673,7 +4678,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .zlabel .name { color: var(--muted); }
 .cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
 /* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
-.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: max(180px, calc(260px - 16px * var(--d, 0))); padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
+.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 260px; padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
 /* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
 .port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
 .port.in { right: 100%; padding-right: 8px; }
@@ -4694,7 +4699,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
 .crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
 .crow.root:hover { box-shadow: none; }
-.crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+/* the marks say what a row hides, and a row that hides a great deal would otherwise squeeze its own name away, so they
+   yield first and take no more than a third of the row */
+.crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: 0 1 auto; min-width: 0; max-width: 33%; overflow: hidden; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
