@@ -899,6 +899,8 @@ type Settings = {
   /** the face of the headings, and of the prose */
   headings: Face;
   prose: Face;
+  /** which line draws the nesting within a file: a spine down the left, or one threading from row to row */
+  tree: "spine" | "thread";
   /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
   areas: Record<AreaName, string[]>;
 };
@@ -919,6 +921,7 @@ const DEFAULTS: Settings = {
   theme: "system",
   headings: "serif",
   prose: "serif",
+  tree: "spine",
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
 };
 
@@ -2054,7 +2057,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -2062,6 +2065,7 @@ const SWITCHES: Switch[] = [
   { key: "line", name: "reading line", values: ["middle", "ends"] },
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
+  { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
 ];
 
@@ -2403,111 +2407,125 @@ function plateSvg(W: number, H: number): string {
   return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}${centre}${labels.join("")}</svg>`;
 }
 
-// ## 3.11 The canvas: the scope as nodes
+// ## 3.11 The canvas: the path the reader has opened
 //
-// The scope's root stands at the top as the entry, and its level beneath it as
-// a column, each brief a node. Folded, a node is its row, with marks for what
-// it hides. Whole, its row holds a zone beneath it holding its level as a
-// column again, or as a row of columns when the level is a set. The nodes are
-// HTML laid out by the browser; one SVG over them draws the arrows from each
-// step to the next once the nodes are measured; and pan and zoom are one
+// The canvas draws where the reader is and not the whole body: the root's
+// column, and beside it the reading each opening led to. Down is the reading,
+// one column per file, its own brief at the head and its headings beneath it as
+// a tree; across is each opening, an edge from the row pressed to the head of
+// what it names. A press selects a node and opens it, a press again reads it in
+// the lane, and opening a sibling replaces the chain that stood to the right.
+// The nodes are HTML laid out by the browser, one SVG behind them draws the
+// nesting and the openings once the nodes are measured, and pan and zoom are one
 // transform on the stage, kept in the browser like the lane.
 
 type View = { x: number; y: number; k: number };
 const view: View = { x: 24, y: 24, k: 1 };
-/** The scope the canvas was last fitted to, so a change of scope fits again and a fold does not. */
+/** The body the canvas was last fitted to, so it fits when it is first drawn and never moves under a fold. */
 let fitted: string | null = null;
 let followed = "";
+
+/** Which card of each column stands open, from the root outward: the reader's path across the map. */
+let chain: string[] = [];
+/** The node the reader has selected. It is not the focus, since opening something is not going to it. */
+let picked: string | null = null;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
-/** A brief's number counted from the scope root, so the nesting reads from where the reader stands: 2.1 under the scope's second brief. */
-function scopedNumber(b: Brief): string {
+/** The readings on the way to an address: every card at or above it, the outermost first. */
+const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(brief(p)));
+
+/** Whether the chain already holds the way to an address, so a going within the map leaves the map as it stands. */
+const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => chain[i] === p);
+
+/**
+ * A brief's number counted from a root: in the lane from the scope, on the canvas from the head of its column. A card
+ * carries none and is not counted, since it is a placement in prose and not a heading of this file.
+ */
+function numberIn(b: Brief, root: string): string {
+  if (isCard(b)) return "";
   const parts = prefixesOf(b.address)
-    .filter((a) => a !== "" && within(a, state.scope) && a !== state.scope)
+    .filter((a) => a !== "" && within(a, root) && a !== root)
     .map((a) => {
       const parent = brief(parentOf(a));
-      const i = level(parentOf(a)).findIndex((k) => k.address === a);
+      const i = level(parentOf(a))
+        .filter((k) => !isCard(k))
+        .findIndex((k) => k.address === a);
       return parent?.set ? letterOf(i) : `${i + 1}`;
     });
   return parts.length === 1 ? `${parts[0]}.` : parts.join(".");
 }
 
-/** One node: its row, and beneath it its zone when it is whole and has a level. */
-function canvasNodeHtml(b: Brief): string {
-  const whole = gradeOf(b.address) === "whole";
-  const kids = level(b.address);
+/** A brief's number as the lane shows it: counted from the scope, since a reader stands in the substrate and not in a file. */
+const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
+
+/** Whether a brief's level stands beneath it in its column: a card's never does, and a folded brief's is folded away. */
+const showsKids = (b: Brief): boolean => !isCard(b) && gradeOf(b.address) !== "face" && level(b.address).length > 0;
+
+/** The marks a row carries for what it does not show: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy. */
+function marksHtml(b: Brief, hides: boolean): string {
   const rest = blocksOf(b).slice(1);
-  const beneath = beneathOf(b);
-  const on = prefixesOf(state.focus).includes(b.address);
-  // a folded node says what it hides: a bar per paragraph, a frame per image, and a tail as long as its level is heavy
-  const tail = beneath ? Math.round(Math.min(64, 8 + Math.log2(1 + (state.index!.branch.get(b.address) ?? 0) / 400) * 10)) : 0;
-  const marks =
-    !whole && (rest.length || beneath)
-      ? `<span class="marks">${rest.slice(0, 8).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("")}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`
-      : "";
-  const placed = isCard(b);
-  const mark = placed ? `<span class="placed" data-tip="a reading of its own" ${hued(b.address)}>${icon("links")}</span>` : "";
-  const row = `<div class="crow${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span>${marks}${mark}</div>`;
-  const line = `<div class="cline">${portHtml(b, "in")}${row}${portHtml(b, "out")}</div>`;
-  // The two dimensions say two different things. Down is the reading: everything one file holds stands in one column,
-  // its own brief at the top and its sections and the parts it places beneath, in the order they are read. Across is
-  // the holarchy: a part placed here is a reading of its own, so its row keeps its place in this column and the file it
-  // names opens as a column to the right of that row. Depth in the holarchy is the only thing that moves right.
-  const sections = kids.filter((k) => !isCard(k));
-  const cards = kids.filter(isCard);
-  const set = b.set;
-  const zone = whole && sections.length ? `<div class="czone${set ? " set" : ""}" data-fold="${esc(b.address)}">${sections.map(canvasNodeHtml).join("")}</div>` : "";
-  // what a brief places stands beneath it in this same column, since a placement is met where the prose put it
-  const places = cards.length ? `<div class="cplaced">${cards.map(canvasNodeHtml).join("")}</div>` : "";
-  const style = `style="--h:${hueOf(b.address)};--d:${Math.max(0, depthIn(b.address) - 1)}"`;
-  // a placed file is a column of its own beside the row that named it: its sections once the reader has opened it, and
-  // the parts it places in turn always, since those are the map carrying on
-  if (placed) {
-    const beside = zone + places;
-    return `<div class="cnode placed${zone ? " whole" : ""}" ${style}><div class="cpair">${line}${beside ? `<div class="cbeside">${beside}</div>` : ""}</div></div>`;
-  }
-  return `<div class="cnode${zone ? " whole" : ""}" ${style}>${line}${zone}${places}</div>`;
+  const weight = hides ? (state.index!.branch.get(b.address) ?? 0) : 0;
+  const tail = hides && beneathOf(b) ? Math.round(Math.min(64, 8 + Math.log2(1 + weight / 400) * 10)) : 0;
+  if (!rest.length && !tail) return "";
+  const bars = rest.slice(0, 8).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
+  return `<span class="marks">${bars}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`;
 }
 
-/** How many cells a port shows before the rest collapse into a count. */
-const PORT_SHOWN = 5;
-
-/** A node's port: what points at it on the left, what it points at on the right, a cell per brief in its hue. */
-function portHtml(b: Brief, side: "in" | "out"): string {
-  const ix = state.index!;
-  const backs = Array.from(ix.backlinks.get(b.address) ?? []);
-  const list = side === "in" ? backs : Array.from(new Set(linksIn(b.body).flatMap((l) => (l.to !== undefined && l.to !== b.address ? [l.to] : []))));
-  const shown = list.filter((a) => brief(a)).slice(0, list.length > PORT_SHOWN + 1 ? PORT_SHOWN : PORT_SHOWN + 1);
-  const more = list.length - shown.length;
-  const cells = shown.map((a) => `<i class="pc" data-a="${esc(a)}" ${hued(a)}></i>`).join("");
-  return `<span class="port ${side}">${side === "in" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}${cells}${side === "out" && more ? `<b class="pc more" data-tip="${more} more">+${more}</b>` : ""}</span>`;
+/** One row: its number counted from its column's head, its title, and the marks of what it does not show. */
+function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens: boolean; open: boolean; hides: boolean }): string {
+  const a = b.address;
+  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
+    .filter(Boolean)
+    .join(" ");
+  const n = o.head ? "" : numberIn(b, root);
+  const num = n ? `<span class="num">${esc(n)}</span>` : "";
+  const lead = o.opens ? `<span class="lead">${CHEVRON}</span>` : "";
+  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${num}<span class="title">${esc(b.title)}</span>${marksHtml(b, o.hides)}${lead}</div>`;
 }
 
-/** Draws the canvas whole from the state: the entry, the column beneath it, then the arrows; fits the view when the scope changed. */
+/** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
+function nodeHtml(b: Brief, root: string, col: number, head = false): string {
+  const a = b.address;
+  const opens = isCard(b) && !head;
+  const open = opens && chain[col] === a;
+  const kids = opens ? [] : head || showsKids(b) ? level(a) : [];
+  const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 });
+  if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
+  const beneath = kids.length ? `<div class="ckids">${kids.map((k) => nodeHtml(k, root, col)).join("")}</div>` : "";
+  return `<div class="cnode">${row}${beneath}</div>`;
+}
+
+/** One column: one file read top to bottom, its own brief at the head and its headings beneath it. */
+function columnHtml(root: string, col: number): string {
+  const b = brief(root);
+  return b ? `<div class="ccol" data-col="${col}">${nodeHtml(b, root, col, true)}</div>` : "";
+}
+
+/** How the nesting within a file is drawn: a spine down the left with the rows hanging into it, or one line threading from row to row. */
+const TREE = { spine: { indent: 28, x: 12, tick: true }, thread: { indent: 16, x: 26, tick: false } };
+const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
+
+/** Draws the canvas whole from the state: the root's column with the chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
-  // the canvas draws the whole body and not the scope. It is one map a reader moves in, growing to the right as the
-  // holarchy does and down as each file reads, and scoping is a thing they choose when they want only one reading in
-  // front of them rather than the frame the map is drawn in.
-  const S = "";
-  const root = brief(S)!;
-  const entry = "";
-  // the body's own file is the first column: its sections and the parts it places, in the order they are read
-  ui.canvas.innerHTML = `<div id="stage"><svg id="edges"></svg><div class="ccol${root.set ? " set" : ""}">${entry}${level(S).map(canvasNodeHtml).join("")}</div></div>`;
-  if (fitted !== state.scope) {
+  // the canvas draws the path the reader has opened; arriving from outside it lays the path of where they arrived
+  if (!chainHolds(state.focus)) chain = cardPathOf(state.focus);
+  if (picked === null || !brief(picked) || !chainHolds(picked)) picked = state.focus;
+  ui.canvas.innerHTML = `<div id="stage" style="--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>`;
+  if (fitted !== state.body.root) {
     fitCanvas();
-    fitted = state.scope;
+    fitted = state.body.root;
   }
   applyView(false);
-  // the map is wider than the pane, so the view is brought to where the reader stands rather than left at its left edge
-  followed = null;
+  // the map is wider than the pane, so the reading's own place is brought into view when it moves; a draw that only
+  // opened something leaves the view to the opening, which brings its own column in
   followFocus();
   drawEdges();
 }
 
-/** The arrows: from the foot of each node to the head of the next, in every column that is a sequence, measured under the transform. */
+/** The lines: the nesting within each file, and the opening from a row to the head of the reading it named. */
 function drawEdges(): void {
   const st = stage();
   const svg = st?.querySelector<SVGSVGElement>("#edges");
@@ -2518,59 +2536,57 @@ function drawEdges(): void {
     const r = el.getBoundingClientRect();
     return { left: (r.left - s0.left) / k, top: (r.top - s0.top) / k, right: (r.right - s0.left) / k, bottom: (r.bottom - s0.top) / k };
   };
-  const paths: string[] = [];
-  all<HTMLElement>(".ccol:not(.set), .czone:not(.set)", st).forEach((col) => {
-    const nodes = Array.from(col.children).filter((c) => c.classList.contains("cnode"));
-    nodes.slice(0, -1).forEach((n, i) => {
-      const a = at(n);
-      const row = nodes[i + 1].querySelector(".crow")!;
-      const b = at(row);
-      // flush with the node it leaves, short of the node it reaches, the head the end of its line
-      const x = (b.left + b.right) / 2;
-      const y1 = a.bottom;
-      const y2 = b.top - 4;
-      if (y2 - y1 < 6) return;
-      paths.push(`<path class="arrow" d="M${x.toFixed(1)} ${y1.toFixed(1)}L${x.toFixed(1)} ${(y2 - 3).toFixed(1)}M${(x - 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}L${x.toFixed(1)} ${y2.toFixed(1)}L${(x + 2.5).toFixed(1)} ${(y2 - 3).toFixed(1)}"/>`);
-    });
-  });
-  // the links of the highlighted node leave its right side and arrive at the target's right side, as a bracket in the
-  // margin, and the target's cell for it lights; an in-cell pointed at draws its line on the left side instead, from
-  // the cell to the source's left. Lines never cross the nodes
-  all<HTMLElement>(".pc.tie", st).forEach((c) => c.classList.remove("tie"));
-  const rowOf = (x: string) => st.querySelector<HTMLElement>(`.cline > .crow[data-a="${cssEsc(x)}"]`);
-  const bracket = (x1: number, y1: number, x2: number, y2: number, dir: 1 | -1, to: string) => {
-    const d = dir * (44 + Math.abs(y2 - y1) * 0.12);
-    return `<path class="link" ${hued(to)} d="M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + d).toFixed(1)} ${y1.toFixed(1)},${(x2 + d).toFixed(1)} ${y2.toFixed(1)},${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
-  };
   const mid = (q: { top: number; bottom: number }) => (q.top + q.bottom) / 2;
-  const hovIn = st.querySelector<HTMLElement>(".port.in .pc[data-a]:hover");
-  if (hovIn) {
-    const row = hovIn.closest(".cline")!.querySelector<HTMLElement>(".crow")!;
-    const from = rowOf(hovIn.dataset.a!);
-    if (from && from !== row) {
-      const r = at(row);
-      const q = at(from);
-      paths.push(bracket(r.left, mid(r), q.left, mid(q), -1, hovIn.dataset.a!));
-    }
-  } else {
-    const hovOut = st.querySelector<HTMLElement>(".port.out .pc[data-a]:hover");
-    const a = hovOut ? hovOut.closest(".cline")!.querySelector<HTMLElement>(".crow")!.dataset.a! : state.pointed ?? state.focus;
-    const row = rowOf(a);
-    if (row) {
-      const r = at(row);
-      const cells = hovOut ? [hovOut] : all<HTMLElement>(".port.out .pc[data-a]", row.parentElement!);
-      cells.forEach((c) => {
-        const t = rowOf(c.dataset.a!);
-        if (!t || t === row) return;
-        const q = at(t);
-        paths.push(bracket(r.right, mid(r), q.right, mid(q), 1, c.dataset.a!));
-        t.parentElement!.querySelector(`.port.in .pc[data-a="${cssEsc(a)}"]`)?.classList.add("tie");
+  const form = treeForm();
+  const paths: string[] = [];
+  // the nesting of a file: one line dropping from the brief that holds them, as a file tree draws it
+  all<HTMLElement>(".ckids", st).forEach((kids) => {
+    const row = kids.previousElementSibling;
+    const rows = Array.from(kids.children).flatMap((n) => {
+      const r = n.querySelector<HTMLElement>(":scope > .crow");
+      return r ? [r] : [];
+    });
+    if (!row || !rows.length) return;
+    const p = at(row);
+    const x = p.left + form.x;
+    const last = mid(at(rows[rows.length - 1]));
+    paths.push(`<path class="nest" d="M${x.toFixed(1)} ${(p.bottom + 2).toFixed(1)}L${x.toFixed(1)} ${last.toFixed(1)}"/>`);
+    if (form.tick)
+      rows.forEach((r) => {
+        const q = at(r);
+        paths.push(`<path class="nest" d="M${x.toFixed(1)} ${mid(q).toFixed(1)}L${(q.left - 2).toFixed(1)} ${mid(q).toFixed(1)}"/>`);
       });
-    }
-  }
+  });
+  // an opening: the edge from the row the reader pressed to the head of the reading it named
+  all<HTMLElement>(".cbeside", st).forEach((be) => {
+    const row = be.previousElementSibling;
+    const head = be.querySelector<HTMLElement>(".ccol > .cnode > .crow");
+    if (!row || !head) return;
+    const p = at(row);
+    const q = at(head);
+    const d = 22;
+    paths.push(
+      `<path class="open" ${hued(head.dataset.a ?? "")} d="M${(p.right + 1).toFixed(1)} ${mid(p).toFixed(1)}C${(p.right + d).toFixed(1)} ${mid(p).toFixed(1)},${(q.left - d).toFixed(1)} ${mid(q).toFixed(1)},${(q.left - 2).toFixed(1)} ${mid(q).toFixed(1)}"/>`,
+    );
+  });
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
   svg.innerHTML = paths.join("");
+}
+
+/**
+ * A press on a node: it is selected, and where it is an opening the reading it names opens beside it, replacing
+ * whatever stood to the right of its column. The prose does not move; a press again on what is selected reads it.
+ */
+function pickNode(a: string, col: number | null): void {
+  picked = a;
+  if (col !== null) chain = [...chain.slice(0, col), a];
+  drawCanvas();
+  // an opening brings the reading it opened into the pane, since that is what the press was for
+  const st = stage();
+  const opened = col === null ? null : st?.querySelector<HTMLElement>(`.cnode.open > .crow[data-a="${cssEsc(a)}"]`)?.nextElementSibling?.querySelector<HTMLElement>(".ccol");
+  if (opened) bringInto(opened, 0.42);
+  else bringIntoView(a);
 }
 
 // ### 3.11.1 The depth: every brief in the scope unfolded to a depth, and folded beyond it
@@ -2617,13 +2633,9 @@ function applyView(ease: boolean): void {
   const st = stage();
   if (!st) return;
   st.classList.toggle("easing", ease);
+  // one transform and nothing else: the type scales with the boxes, since counter-scaling it relaid every row at
+  // each step of the zoom and the whole map shifted in small jagged steps as it went
   st.style.transform = `translate(${view.x.toFixed(1)}px, ${view.y.toFixed(1)}px) scale(${view.k.toFixed(3)})`;
-  // the type shrinks slower than the boxes, by the square root of the zoom, so names stay readable as the overview grows
-  const kz = (1 / Math.sqrt(view.k)).toFixed(3);
-  if (st.style.getPropertyValue("--kz") !== kz) {
-    st.style.setProperty("--kz", kz);
-    requestAnimationFrame(drawEdges);
-  }
   rememberView();
 }
 
@@ -2645,19 +2657,35 @@ function fitCanvas(): void {
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
 function followFocus(): void {
-  const st = stage();
-  if (!st || followed === state.focus) return;
+  if (followed === state.focus) return;
   followed = state.focus;
-  const row = st.querySelector<HTMLElement>(`.crow[data-a="${cssEsc(state.focus)}"]`);
-  if (!row) return;
+  bringIntoView(state.focus);
+}
+
+/** Brings an address into view where the map has taken it out of sight: the last row that draws it, which is the head of a reading just opened. */
+function bringIntoView(a: string): void {
+  const st = stage();
+  if (!st) return;
+  const rows = all<HTMLElement>(`.crow[data-a="${cssEsc(a)}"]`, st);
+  if (rows.length) bringInto(rows[rows.length - 1], 0.5);
+}
+
+/** Eases the view until a part of the map stands in the pane, and leaves one already in view where it is. */
+function bringInto(el: HTMLElement, leftAt: number): void {
   const c = ui.canvas.getBoundingClientRect();
-  const r = row.getBoundingClientRect();
-  const inside = r.top >= c.top + canvasTop() && r.bottom <= c.bottom - CANVAS_INSET && r.left >= c.left && r.right <= c.right;
-  if (inside) return;
-  const s0 = st.getBoundingClientRect();
-  const y = (r.top - s0.top) / view.k;
-  view.y = Math.round(c.height / 3 - y * view.k);
-  if (r.left < c.left || r.right > c.right) view.x = Math.round(c.width / 2 - ((r.left - s0.left) / view.k + row.offsetWidth / 2) * view.k);
+  const r = el.getBoundingClientRect();
+  const top = canvasTop();
+  const fitsX = r.left >= c.left + CANVAS_INSET && r.right <= c.right - CANVAS_INSET;
+  const fitsY = r.top >= c.top + top && r.bottom <= c.bottom - CANVAS_INSET;
+  if (fitsX && fitsY) return;
+  if (!fitsX) {
+    const want = clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - r.width - CANVAS_INSET));
+    view.x = Math.round(view.x + (c.left + want - r.left));
+  }
+  if (!fitsY) {
+    const want = clamp(c.height / 3, top, Math.max(top, c.height - r.height - CANVAS_INSET));
+    view.y = Math.round(view.y + (c.top + want - r.top));
+  }
   applyView(true);
 }
 
@@ -2679,7 +2707,7 @@ function rememberView(): void {
   clearTimeout(viewTimer);
   viewTimer = setTimeout(() => {
     try {
-      localStorage.setItem(viewKey(), JSON.stringify({ ...view, scope: state.scope }));
+      localStorage.setItem(viewKey(), JSON.stringify({ ...view, chain }));
     } catch {}
   }, 150);
 }
@@ -2687,7 +2715,11 @@ function rememberView(): void {
 function recallView(): void {
   try {
     const kept = JSON.parse(localStorage.getItem(viewKey()) ?? "null");
-    if (kept && kept.scope === state.scope && typeof kept.k === "number") Object.assign(view, { x: kept.x, y: kept.y, k: kept.k }), (fitted = state.scope);
+    if (kept && typeof kept.k === "number") {
+      Object.assign(view, { x: kept.x, y: kept.y, k: kept.k });
+      fitted = state.body?.root ?? null;
+      if (Array.isArray(kept.chain)) chain = kept.chain.filter((a: string) => brief(a));
+    }
   } catch {}
 }
 
@@ -3433,7 +3465,7 @@ function point(a: string | null): void {
 // draws one. It comes a moment after the pointer rests, beneath the element and
 // never under the pointer, and goes with any scroll or press.
 
-const TIP_SEL = "[data-tip], [data-act], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .pc[data-a], .crow[data-a]";
+const TIP_SEL = "[data-tip], [data-act], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .crow[data-a]";
 let tipped: Element | null = null;
 let tipTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -3481,7 +3513,7 @@ function tip(e: PointerEvent): void {
   hideTip();
   tipped = el;
   // a port cell under the pointer draws its own line, so the edges follow the element and not only the brief pointed at
-  if (canvasOn() && (el?.classList.contains("pc") || el?.classList.contains("crow"))) drawEdges();
+
   if (!el) return;
   const html = tipHtml(el);
   if (html) tipTimer = setTimeout(() => showTip(el, html), 260);
@@ -3509,15 +3541,9 @@ function showTip(el: Element, html: string): void {
     left = wing.dataset.area === "wingL" ? f.right + 8 : f.left - w - 8;
     top = level();
   } else if (el.closest("#canvas")) {
-    // past the row, its ports and the dashed edge of the zone it sits in, as far as they actually reach, and no further
-    const line = el.closest(".cline");
-    const row = line?.getBoundingClientRect() ?? r;
-    const out = line?.querySelector(".port.out")?.getBoundingClientRect();
-    const into = line?.querySelector(".port.in")?.getBoundingClientRect();
-    const zone = line?.parentElement?.closest(".czone")?.getBoundingClientRect();
-    const right = Math.max(row.right, out?.right ?? 0, zone?.right ?? 0) + 12;
-    const leftOf = Math.min(row.left, into?.left ?? Infinity, zone?.left ?? Infinity) - w - 12;
-    left = right + w <= innerWidth - 8 ? right : leftOf;
+    // past the row itself, on whichever side the pane has room for it
+    const right = r.right + 12;
+    left = right + w <= innerWidth - 8 ? right : r.left - w - 12;
     top = level();
   } else {
     left = r.left + r.width / 2 - w / 2;
@@ -4081,18 +4107,21 @@ function wire(): void {
       // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
       return void (badge.closest(".strip") && drawChooser());
     }
-    // on the canvas a row goes, and where there is no room to read it, it also raises the card that says what it holds
+    // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) {
-      if (state.scrubbing || crow.classList.contains("root")) return;
+      if (state.scrubbing) return;
       const a = crow.dataset.a!;
       if (narrow() && !fits().lane) card.a = a;
-      goTo(a);
+      if (picked === a) {
+        goTo(a);
+        drawCard();
+        return void drawChooser();
+      }
+      pickNode(a, crow.dataset.open === undefined ? null : Number(crow.dataset.open));
       drawCard();
       return void drawChooser();
     }
-    const pc = t.closest<HTMLElement>(".pc[data-a]");
-    if (pc) return void goTo(pc.dataset.a!);
     // a press on the canvas that is not a row lets the card go, as pressing away from a thing lets it go anywhere
     if (t.closest("#canvas") && !t.closest("#card") && card.a !== null && !state.scrubbing) dropCard();
     const dc = t.closest<HTMLElement>("[data-depth]");
@@ -4651,68 +4680,45 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
-/* an arrow is neutral, since a step's order says nothing of where it stands; a link line takes its target's hue */
-#edges path { fill: none; stroke: var(--faint); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
-#edges path.arrow { stroke: var(--rim); stroke-width: 1; stroke-linecap: butt; }
-/* a level is a column of nodes; a set is a row of columns; a whole node's level is a zone beneath its row, held by
-   dashed edges that come out of the row's own sides, so the parent is seen to hold what stands under it */
-.ccol, .czone { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-/* a set is a row of columns, wrapping past three, since nothing in it stands on anything */
-.ccol.set, .czone.set { flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 24px 56px; max-width: 892px; }
-.cnode { display: flex; flex-direction: column; align-items: center; }
-/* a placed reading keeps its row in the column that named it and opens as a column of its own to the right of that
-   row, so a file reads down and nothing but depth in the holarchy ever moves across */
-/* the gap between a row and the column beside it leaves room for that column's own in-ports, which hang off its left
-   edge, so what leads into a reading never lies over the row that named it */
-.cpair { display: flex; align-items: flex-start; gap: 62px; }
-/* the row keeps its own height beside a column that may be very tall, so its ports stay level with it rather than
-   drifting to the middle of everything it leads to */
-.cpair > .cline { align-self: flex-start; }
-.cbeside, .cplaced { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.cplaced { margin-top: 16px; }
-/* a column standing beside a row begins level with it */
-.cbeside > .cplaced { margin-top: 0; }
-.cnode.placed > .cpair > .cline > .crow { outline: 1px solid var(--rest); outline-offset: 3px; border-radius: 8px; }
-/* the zone's dashed edges emerge from the parent row's straight sides: the zone begins behind the row, above its rounded
-   lower corners, and the row paints over it, so the row keeps its corners */
-.czone { margin-top: -8px; padding: 22px 24px 12px; cursor: pointer; border: 1px dashed var(--track); border-radius: 10px; transition: border-color .15s; }
-.czone:hover { border-color: var(--door); }
-
-.czone.placed { padding-top: 8px; }
-.zlabel { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: var(--sans); font-size: 11px; color: var(--faint); margin-bottom: 2px; }
-.zlabel .icon { width: 11px; height: 11px; }
-.zlabel .name { color: var(--muted); }
-.cline { position: relative; display: flex; align-items: stretch; z-index: 1; }
-/* a row's type follows the zoom as the prose does, and it stands tall enough to read at a distance */
-.crow { flex: none; display: flex; align-items: baseline; gap: .5em; width: 260px; padding: .7em .9em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .8 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s; }
-/* the ports: what points at a node to its left, what it points at to its right, a cell per brief, outside the row */
-.port { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 3px; }
-.port.in { right: 100%; padding-right: 8px; }
-.port.out { left: 100%; padding-left: 8px; }
-.pc { display: block; width: 8px; height: 8px; border-radius: 2px; background: var(--door); cursor: pointer; transition: background .15s; }
-.pc:hover, .pc.lit, .pc.tie { background: var(--lit); }
-.pc.more { width: auto; height: 8px; display: grid; align-items: center; background: none; color: var(--faint); font-family: var(--sans); font-size: 8.5px; line-height: 1; letter-spacing: -.02em; cursor: default; }
-#edges path.link { stroke: var(--lit); stroke-dasharray: 3 3; }
+/* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
+#edges path { fill: none; stroke: var(--rim); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+#edges path.open { stroke: var(--door); stroke-width: 1.5; }
+/* a column is one file read top to bottom; a level stands beneath the brief that holds it, stepped in so the line
+   that joins them has room to stand */
+.ccol { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+.cnode { display: flex; flex-direction: column; align-items: flex-start; }
+/* an opening holds its row and the reading it opened side by side, the reading beginning level with the row */
+.cnode.open { flex-direction: row; align-items: flex-start; gap: 54px; }
+.ckids { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; margin: 9px 0 0 var(--indent, 28px); }
+.cbeside { display: flex; flex-direction: column; align-items: flex-start; }
+/* a row stands as wide as its name, to the measure a name reads in, and wraps rather than cutting: the map's one
+   currency is names, so nothing in it is ever spent on an ellipsis */
+.crow { position: relative; z-index: 1; flex: none; display: flex; align-items: baseline; gap: .55em; max-width: 268px; padding: .5em .7em; border-radius: 8px; font-family: var(--sans); font-size: calc(var(--body) * .78); line-height: 1.35; color: var(--ink); cursor: pointer; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); transition: box-shadow .15s, background .15s; }
+/* the head of a column is the brief the file opens with, and it says so by its weight rather than by a shape */
+.crow.head { font-weight: calc(600 - var(--thin)); box-shadow: inset 0 0 0 1px var(--rest); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 #depth .dc.on { background: var(--track); color: var(--ink); }
 #depth .dc:hover { background: var(--muted); color: var(--ground); }
 .crow .num { flex: none; font-size: .85em; color: var(--faint); }
-.crow .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crow .title { flex: 0 1 auto; min-width: 0; }
 .crow.on .num { color: var(--on); }
+/* what the reading stands on takes the branch's hue; what the reader has selected on the canvas is filled, since the
+   two are different things and a reader may have selected one while reading another */
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
+.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--door); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
-.crow.root { width: auto; max-width: 320px; background: none; box-shadow: none; font-weight: calc(600 - var(--thin)); cursor: default; }
-.crow.root:hover { box-shadow: none; }
-/* the marks say what a row hides, and a row that hides a great deal would otherwise squeeze its own name away, so they
-   yield first and take no more than a third of the row */
+/* the marks say what a row does not show, and a row that hides a great deal would otherwise squeeze its own name
+   away, so they yield first */
 .crow .marks { display: inline-flex; align-items: center; gap: 3px; flex: 0 1 auto; min-width: 0; max-width: 33%; overflow: hidden; }
 .crow .marks i { display: block; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .crow .marks .tail { display: block; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
-.crow .placed { flex: none; color: var(--door); }
-.crow .placed .icon { width: 11px; height: 11px; }
+/* an opening says so with the chevron at its right, which is the side the edge leaves from */
+.crow .lead { flex: none; display: grid; place-items: center; width: 11px; height: 11px; color: var(--door); }
+.crow .lead svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.crow.open .lead { color: var(--lit); }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
