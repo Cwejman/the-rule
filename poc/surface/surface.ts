@@ -1164,7 +1164,7 @@ const ACTIONS: Record<string, Action> = {
     help: () => "Takes the reading to what is selected on the canvas: the lane opens that reading and the address becomes it.",
     also: "A press again on what is already selected.",
     can: (a) => (a !== undefined ? canvasOn() : canvasAlone()) && !!brief(acts(a)) && acts(a) !== state.focus,
-    run: (a) => goTo(acts(a)),
+    run: (a) => readOn(acts(a)),
   },
   face: {
     label: () => (state.settings.face === "shown" ? "hide the face" : "the face"),
@@ -2513,12 +2513,6 @@ const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(b
 const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => chain[i] === p);
 
 /**
- * The reading an address is met in. A card is met in the reading that placed it and not in its own: scrolling the
- * prose past a card is reading the file it stands in, so the map must not open what the reader only scrolled by.
- */
-const readingOf = (a: string): string => (isCard(brief(a)) ? fileRootOf(parentOf(a)) : fileRootOf(a));
-
-/**
  * A brief's number counted from a root: in the lane from the scope, on the canvas from the head of its column. A card
  * carries none and is not counted, since it is a placement in prose and not a heading of this file.
  */
@@ -2641,10 +2635,10 @@ function faceHtml(): string {
 /** Draws the canvas whole from the state: the root's column with the chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
-  // the canvas draws the path the reader has opened. Arriving in a reading the map does not hold lays the path to it;
-  // scrolling within one, past the cards it places, changes nothing, since a card met in the prose was not opened
-  const met = readingOf(state.focus);
-  if (!chainHolds(met)) chain = cardPathOf(met);
+  // the canvas draws the path the reader has opened, and it holds the reading the lane holds: going into a reading
+  // lays the path to it, and scrolling within one changes nothing, since the scope is what says where the reader is
+  const held = fileRootOf(state.scope);
+  if (!chainHolds(held)) chain = cardPathOf(held);
   if (picked === null || !brief(picked)) picked = state.focus;
   colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
@@ -3817,8 +3811,10 @@ function follow(to: string): void {
   record();
   move("link", target);
   if (within(target, state.scope)) {
-    enterHistory(hashFor(target));
+    // the history is entered after the arrival, since arriving may scope into another reading and the address a
+    // reader hands on has to carry the scope they ended in rather than the one they left
     arrive(target);
+    enterHistory(hashFor(target));
     return settleTrail();
   }
   arriving = true;
@@ -3839,6 +3835,22 @@ function backTo(i: number): void {
   record();
   enterHistory(hashFor(h.lane.focus, h.lane.scope));
   restore({ ...h.lane, trail: state.trail.slice(0, i) });
+}
+
+/**
+ * Going from the canvas: the reading is the prose, so the lane stands for it. Where the middle holds the canvas alone
+ * the lane joins it, or takes its place where there is room for one pane only, since a going that shows nothing is
+ * a going a reader cannot see.
+ */
+function readOn(a: string): void {
+  if (!fits().lane) {
+    const middle = narrow() ? ["lane"] : ["canvas", "lane"];
+    state.settings.areas = { ...state.settings.areas, middle };
+    saveSettings();
+    drawLayout();
+    drawChooser();
+  }
+  goTo(a);
 }
 
 /** Goes to an address from the tree or a figure: enters the history, then settles there, keeping what the reader folded. */
@@ -4285,12 +4297,9 @@ function wire(): void {
       if (state.scrubbing) return;
       const a = crow.dataset.a!;
       if (narrow() && !fits().lane) card.a = a;
-      const col = crow.dataset.open === undefined ? null : Number(crow.dataset.open);
-      // what a press does is read from the node and not from what was selected before it: a placement that does not
-      // stand open is opened, whatever else the reader had selected; one already open, or a piece with nothing on the
-      // other side, is read once it is what they have selected; anything else is selected
-      if (col !== null && chain[col] !== a) pickNode(a, col);
-      else if (picked === a) goTo(a);
+      // one press selects, two presses go. Opening a reading is an act of its own and never rides on a press, since a
+      // reader who presses to look at a node has not asked for the map to grow
+      if (picked === a) readOn(a);
       else pickNode(a, null);
       drawCard();
       return void drawChooser();
