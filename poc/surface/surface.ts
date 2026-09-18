@@ -2542,13 +2542,21 @@ const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
 /** Whether a brief's level stands beneath it in its column: a card's never does, and a folded brief's is folded away. */
 const showsKids = (b: Brief): boolean => !isCard(b) && gradeOf(b.address) !== "face" && level(b.address).length > 0;
 
-/** The marks a row carries for what it does not show: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy. */
+/**
+ * The figure a node carries for what it does not show, in one language: a bar per paragraph of its own prose, then a
+ * bar per brief of the level it hides, each as long as that brief's branch is heavy. Both are the branch's own hue,
+ * the level a step stronger than the prose, since they are two kinds of the same thing and not two kinds of thing.
+ */
 function marksHtml(b: Brief, hides: boolean): string {
   const rest = blocksOf(b).slice(1);
-  const weight = hides ? (state.index!.branch.get(b.address) ?? 0) : 0;
-  const tail = hides && beneathOf(b) ? Math.round(Math.min(64, 8 + Math.log2(1 + weight / 400) * 10)) : 0;
-  const bars = rest.slice(0, 10).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
-  return `<span class="marks">${bars}${tail ? `<b class="tail" style="--w:${tail}px"></b>` : ""}</span>`;
+  const kids = hides ? level(b.address) : [];
+  const bars = rest.slice(0, 6).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
+  const shown = kids.slice(0, kids.length > 6 ? 5 : 6);
+  const heavy = (a: string) => Math.round(clamp(6 + Math.log2(1 + (state.index!.branch.get(a) ?? 0) / 300) * 7, 6, 30));
+  const beneath = shown.map((k) => `<b class="brief" style="--w:${heavy(k.address)}px"></b>`).join("");
+  const more = kids.length - shown.length;
+  if (!bars && !beneath) return "";
+  return `<span class="marks">${bars}${bars && beneath ? `<i class="sep"></i>` : ""}${beneath}${more > 0 ? `<b class="more">+${more}</b>` : ""}</span>`;
 }
 
 /** One row: its number counted from its column's head, its title, and the marks of what it does not show. */
@@ -4905,7 +4913,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; min-width: 0; overflow: hidden; }
 .crow .marks i { display: block; flex: none; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-.crow .marks .tail { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--grey); }
+/* the level beneath is bars of its own, a brief each, in the branch's hue a step stronger than the prose's: the two
+   are kinds of the same thing, where one grey blob for the whole level said they were not */
+.crow .marks .brief { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--door); }
+.crow .marks .sep { width: 4px; background: none; }
+.crow .marks .more { flex: none; font-size: .72em; line-height: 1; color: var(--faint); background: none; }
 /* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
 #field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
 #field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }

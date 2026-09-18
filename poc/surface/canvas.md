@@ -108,9 +108,11 @@ A node that carried its name and the opening words of its face was tried and ref
 
 ### 4.6 A folded node says how deep it is
 
-A folded node shows nothing of its level, so it wants marks for what it hides, as [the shape's ticks and tail](widgets.md#31-a-folded-brief-tells-what-it-hides) say how many paragraphs and how heavy a level wait beneath a fold. As built, a folded row carries a bar per paragraph, a frame per image, and a tail as long as its level is heavy.
+A node that does not show its level draws a figure of what it hides, and the figure speaks one language throughout: a bar per paragraph of its own prose, a frame per image, then a bar per brief of the level, each as long as that brief's branch is heavy. Both stand in the branch's hue, the level a step stronger than the prose, since the two are kinds of the same thing.
 
-*The author's, 2026-09-15; the marks as built the same day.*
+One grey bar for the whole level was refused. Drawn beside paragraphs that each kept their own mark and their own colour, it said the briefs beneath were a different kind of thing, which they are not, and it gave a reader nothing of how that level divides.
+
+*The author's, 2026-09-15; the level drawn brief by brief on his reading of 2026-09-18 that the paragraphs had colour and separateness where the briefs beneath had neither.*
 
 ### 4.7 A press is a press, and only the ground is dragged
 
