@@ -5,11 +5,15 @@ kind: brief
 
 # The proof of concept
 
+The proof of concept is the rule put to use where we stand now, in the simplest medium there is: markdown files in folders, tracked in git, read by people and by sessions that begin by reading them.
+
+It is what can be done with the rule before any medium beyond that is built, and it grows as the work does.
+
+*In force; lived since 2026-09-11.*
+
 ## 1. The practice
 
-The practice is how the rule is run in markdown and git. It answers what the rule leaves open: how briefs divide, how deep they go, what an entry looks like, what a file says about itself.
-
-It is a first cut, reasoned from the studies and lived in the labs and in this arc so far. Each rule says how strongly it holds, as a claim does, and the ones marked open are being found out by observation.
+The practice stands first, because everything else here is run on the files it shapes and none of it can be written before the rule's open questions are answered in a medium that already exists.
 
 *Reasoned, the author's; lived since 2026-09-11.*
 
@@ -17,9 +21,7 @@ It is a first cut, reasoned from the studies and lived in the labs and in this a
 
 ## 2. The skill
 
-The skill is the harness side. It says what a session does with files under the rule, and what it leaves of its own work, the record and the note per step, in prose rather than in code, so that it writes the script it needs at the moment it needs it, in whatever language is at hand.
-
-Nothing in it need be kept as code: the substrate is prose, and a script is a sentence made exact for a minute.
+With the files shaped, the skill says what a session does with them; it stands here because it is the practice read from the harness's side rather than a second practice.
 
 *Reasoned, the author's; seen in the labs.*
 
@@ -27,27 +29,23 @@ Nothing in it need be kept as code: the substrate is prose, and a script is a se
 
 ## 3. The surface
 
-The surface is the interface a document and a directory listing are missing, the human side as the skill is the harness side.
+The practice and the skill say what is written and by whom; the surface is what it is read in, and it is by far the largest part of the proof of concept.
 
-Knowledge under the rule stands in a shape, and neither of those lets a reader move by that shape or see it: a document makes you scroll past whatever you meant to skip, a listing gives names and nothing of the shape they stand in, and neither tells you what a part will cost before you have spent the reading on it.
-
-So the surface reads a body in one lane of prose, each brief folded or unfolded as the reader chooses, and it orients from the sides: where the reader came from, what lies beneath, what a brief points at, as headings and shape rather than as more text. It stands on the markdown and the directories rather than replacing them, and a session's own work is read the same way once it is written down there.
-
-*In force, the author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use.*
+*In force, the author's, 2026-09-13.*
 
 [the level beneath](surface/README.md)
 
 ## 4. Sketching
 
-Sketching is how a session draws a structure or a flow a brief states, as an SVG in `.img` beside the brief, in the surface's own language. A model asked to draw what it wrote draws badly where it has to measure, so what is drawn is decided in prose and a thin file of code keeps the geometry exact.
+Sketching follows the surface, since a drawing is made in the surface's own language and read on its page.
 
-*Reasoned, the author's, 2026-09-14; the first sketch was drawn under it the same day.*
+*Reasoned, the author's, 2026-09-14.*
 
 [the level beneath](sketching/README.md)
 
 ## 5. The polish
 
-Much of the arc grew a decision at a time, and [its faces](practice.md#52-a-face-is-short) grew with it. The polish reads every file outside the rule and the study against the rule, in the order they stand on each other, and writes each again where it fails, before the arc moves. It is a plan written for a session that starts fresh, with the record of what that session did at its foot.
+The polish comes last of the work here, because it is what brings everything above back up to the rule once it stands.
 
 *In force, 2026-09-14.*
 

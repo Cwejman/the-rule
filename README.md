@@ -19,7 +19,7 @@ The rule is the law, and the place to start. It turns written knowledge into a m
 
 ## 2. The author's own
 
-What is the author's own and not yet read into the levels it bears on stands here, early: his second thoughts on what stands beneath the root, and the ideas of one day, dictated prompt by prompt and ratified as said. Neither is law, and nothing beneath has been changed by them yet.
+The author's own stands this early because it is not yet read into the levels it bears on, and a doubt of his filed deep in one of them is a doubt that has disappeared.
 
 *The author's, 2026-09-16.*
 
@@ -27,7 +27,7 @@ What is the author's own and not yet read into the levels it bears on stands her
 
 ## 3. The proof of concept
 
-The proof of concept is the rule put to use where we stand now, in the simplest medium there is: markdown files in folders, tracked in git, read by people and by sessions that begin by reading them. It is what can be done with the rule before any medium beyond that is built, and it grows as the work does.
+Holding the law and what the author still doubts of it, what comes next is the law lived: everything being done with the rule before any medium beyond markdown and git is built.
 
 *In force; lived since 2026-09-11.*
 
@@ -35,9 +35,7 @@ The proof of concept is the rule put to use where we stand now, in the simplest 
 
 ## 4. The study
 
-The study is where all of this is being found, and where it is still owed. It is the search for how knowledge is best structured, for people and AI alike, run as a series of labs on one shared corpus, a bounded set of research reports from a web sweep in August 2026. Each lab rewrites the same material under an edition of the rule and [a fresh head](rule.md#54-the-fresh-head) reads the result cold.
-
-What the study produces is the grounds, the reasons behind each principle of the rule, and in time the study retires into them. Its entry holds where the search stands, what it still owes, and what the running of it has taught.
+The study stands after what it grounds: its conclusions are already in the law above, and what waits here is the finding still going on, and what it still owes.
 
 *Seen, in ten labs since August 2026.*
 
@@ -45,7 +43,7 @@ What the study produces is the grounds, the reasons behind each principle of the
 
 ## 5. The ideas
 
-Beside the rule stand the author's ideas: positions on how a model and [a harness](rule.md#22-beginning-today) should be offered, the domains the shape reaches into, and questions it raises on the way. They are held open. None of them is law, and nothing in the rule depends on them.
+The ideas stand beside all of that rather than beneath it, since none of them is law and nothing above depends on them.
 
 *The author's, open.*
 
@@ -53,7 +51,7 @@ Beside the rule stand the author's ideas: positions on how a model and [a harnes
 
 ## 6. This repository
 
-The rule has a repository of its own as a pragmatic first step. Projects needed it as a submodule before the rule could be written again as its entry, so it moved whole, as it stands, with the rule left as ratified. What comes next is that writing.
+This late comes what is about the repository rather than about the knowledge in it, which a reader needs only once they are working in it.
 
 *In force, the author's decision, 2026-09-14.*
 
@@ -61,7 +59,7 @@ The rule has a repository of its own as a pragmatic first step. Projects needed 
 
 ## 7. Toolmaking
 
-Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles. It began in a project that depends on the rule and is built here from 2026-09-15, since nothing in it is secret and what serves one project serves the others.
+Last stands a second study of the same kind as the first, begun in a project that depends on the rule and built here because what serves one project serves the others.
 
 *The author's, 2026-09-15; the primitives ratified 2026-09-14, the rest open.*
 

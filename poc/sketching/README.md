@@ -6,6 +6,10 @@ status: in force
 
 # Sketching
 
+Sketching is how a session draws a structure or a flow a brief states, as an SVG in `.img` beside the brief, in the surface's own language. A model asked to draw what it wrote draws badly where it has to measure, so what is drawn is decided in prose and a thin file of code keeps the geometry exact.
+
+*Reasoned, the author's, 2026-09-14; the first sketch was drawn under it the same day.*
+
 ## 1. When a sketch earns its place
 
 A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the rule's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.

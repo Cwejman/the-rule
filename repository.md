@@ -6,6 +6,10 @@ status: in force
 
 # This repository
 
+The rule has a repository of its own as a pragmatic first step. Projects needed it as a submodule before the rule could be written again as its entry, so it moved whole, as it stands, with the rule left as ratified. What comes next is that writing.
+
+*In force, the author's decision, 2026-09-14.*
+
 ## 1. The name is the rule
 
 The repository is named the rule, since what it holds is more than a way to lay knowledge out. It is how knowledge is built, and with it how one moves into what is not yet known.

@@ -5,6 +5,12 @@ kind: brief
 
 # The study
 
+The study is where all of this is being found, and where it is still owed. It is the search for how knowledge is best structured, for people and AI alike, run as a series of labs on one shared corpus, a bounded set of research reports from a web sweep in August 2026. Each lab rewrites the same material under an edition of the rule and [a fresh head](../rule.md#54-the-fresh-head) reads the result cold.
+
+What the study produces is the grounds, the reasons behind each principle of the rule, and in time the study retires into them. What stands here is where the search stands, what it still owes, and what the running of it has taught.
+
+*Seen, in ten labs since August 2026.*
+
 ## 1. The finish line
 
 The search ends when the proof is lived, not argued. Three marks:

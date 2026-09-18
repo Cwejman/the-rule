@@ -279,6 +279,8 @@ type Brief = {
   set?: boolean;
   /** set by the trace when the brief's lone link names a level already placed elsewhere: the address of its home */
   borrow?: string;
+  /** set by the trace on a mount: the prose of the brief on the other side, which is the mounted file's own. Its presence is the boundary */
+  across?: Tok[];
 };
 
 /** The body: every brief in reading order, and what the trace had to say. */
@@ -342,6 +344,21 @@ const prefixesOf = (address: string): string[] =>
 
 /** The blocks of a brief's prose: every token that is not spacing. */
 const blocksOf = (b: Brief): Tok[] => b.body.filter((t) => t.type !== "space");
+
+/** Whether a brief mounts a reading of its own: its level lies in another file, so the lane stops at it and a card stands there. */
+const crosses = (b: Brief | undefined): boolean => b?.across !== undefined;
+
+/** The blocks of the brief on the other side of a mount. */
+const acrossOf = (b: Brief): Tok[] => (b.across ?? []).filter((t) => t.type !== "space");
+
+/** A brief's confidence line: the last block, where it is a paragraph that is nothing but italics. */
+const confidenceOf = (blocks: Tok[]): Tok | null => {
+  const last = blocks[blocks.length - 1];
+  return last?.type === "paragraph" && bare(last).length === 1 && bare(last)[0].type === "em" ? last : null;
+};
+
+/** The prose a brief gives its own reading: what stands across a mount, or its own. */
+const readingOf = (b: Brief): Tok[] => (crosses(b) ? acrossOf(b) : blocksOf(b));
 
 /** Every token of a kind in a run, however deep. */
 const tokensIn = (type: string, toks: Tok[] = []): Tok[] =>
@@ -553,9 +570,16 @@ async function trace(rootArg: string): Promise<Body> {
     const tfile = rel(target);
     if (r.cut.title === null) warn(`${tfile}: no title`);
     else if (r.cut.title !== brief.title) warn(`${tfile}: titled "${r.cut.title}", mounted by "${brief.title}"`);
-    if (r.cut.lead.some((t) => t.type !== "space")) warn(`${tfile}: prose before its first section; a mounted file holds only its parts, so it is dropped`);
     r.cut.strays.forEach((s) => warn(`${tfile}: a second title "${s}"; read as prose`));
     if (r.cut.sections.length === 0) return warn(`${tfile}: mounted by "${brief.title}" and has no section; a level with nothing in it`);
+    // the file carries its own brief, and that prose is what stands across the boundary: the card shows it, and it is
+    // the opening once the reader has gone there. The mount on this side says only where the part stands.
+    const lead = r.cut.lead.filter((t) => t.type !== "space");
+    if (lead.length === 0) warn(`${tfile}: no brief of its own; a mounted file opens with the prose that gives its understanding`);
+    else gather(r.cut.lead, target, tfile, r.cut.title ?? brief.title);
+    brief.across = r.cut.lead;
+    const said = blocksOf(brief).filter((t) => t !== confidenceOf(blocksOf(brief)));
+    if (said.length > 1) warn(`${file}: "${brief.title}" mounts ${m.href} in ${said.length} paragraphs; a mount says where its part stands, in one`);
     table.set(target, brief.address);
     if (r.cut.title !== null) table.set(`${target}#${slug(r.cut.title)}`, brief.address);
     brief.door = true;
@@ -1317,7 +1341,7 @@ function lay(address: string): void {
   g.clear();
   const S = state.scope;
   if (!within(address, S)) address = S;
-  const path = prefixesOf(address).filter((p) => within(p, S));
+  const path = prefixesOf(address).filter((p) => within(p, S) && opensInLane(p));
   g.set(S, "whole");
   path.forEach((p) => level(p).forEach((c) => g.set(c.address, path.includes(c.address) || p === parentOf(address) ? "whole" : "face")));
   closeLay();
@@ -1326,14 +1350,26 @@ function lay(address: string): void {
 /** Whether an address stands in the holon of another: the root itself, or beneath it. */
 const within = (a: string, root: string): boolean => root === "" || a === root || a.startsWith(root + "/");
 
+/**
+ * The reading an address stands in: the nearest mount at or above it, which is the root of its file, or the body's own
+ * root where none. The lane never holds more than one of these, so every arrival scopes to it.
+ */
+const fileRootOf = (a: string): string => prefixesOf(a).findLast((p) => crosses(brief(p))) ?? "";
+
+/** The scope an address is read in: the reader's, where it stands in the same reading, and that reading otherwise. */
+const scopeFor = (a: string): string => (within(a, state.scope) && fileRootOf(state.scope) === fileRootOf(a) ? state.scope : fileRootOf(a));
+
 /** Depth counted from the scope root, which is what the lane's registers and gaps follow. */
 const depthIn = (a: string): number => depthOf(a) - depthOf(state.scope);
 
-/** Every whole brief shows its level: children with no grade yet take a face. */
+/** Whether a brief's level stands in this reading: a mount's does not, unless the reader has opened it and it is the scope. */
+const opensInLane = (a: string): boolean => !crosses(brief(a)) || a === state.scope;
+
+/** Every whole brief shows its level: children with no grade yet take a face, and a mount's level is not in this reading. */
 function closeLay(): void {
   const g = state.grades;
   state.body!.briefs.forEach((b) => {
-    if (g.get(b.address) === "whole") level(b.address).forEach((c) => g.has(c.address) || g.set(c.address, "face"));
+    if (g.get(b.address) === "whole" && opensInLane(b.address)) level(b.address).forEach((c) => g.has(c.address) || g.set(c.address, "face"));
   });
 }
 
@@ -1384,11 +1420,11 @@ const markLength = (t: Tok): number => {
 const branchLength = (a: string): number => clamp(Math.sqrt(Math.max(1, (state.index!.branch.get(a) ?? 0) / LINE_CHARS)) * 4.4, 4, 44);
 
 /** The figure beside the action: what the press gives, then what lies further. */
-function actFigure(b: Brief, rest: Tok[]): string {
+function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
   // the room is what the line has left once its count and its acts have taken theirs, so the figure yields to the words
   // rather than running past the prose; the marks scale together into it and keep their lengths true against each other
   const MAX = figRoom();
-  const kids = levelOf(b);
+  const kids = kidsGiven ?? levelOf(b);
   const blocks = rest.slice(0, FIG.shown).map((t) => ({ image: t.type === "image", w: markLength(t) }));
   const over = rest.length - blocks.length;
   const wide = (xs: { w: number }[]) => xs.reduce((n, x) => n + x.w + FIG.gap, 0);
@@ -1433,9 +1469,50 @@ function actFigure(b: Brief, rest: Tok[]): string {
   return w <= 0 ? "" : `<svg class="fig marks" width="${w}" height="${FIG.h}" viewBox="0 0 ${w} ${FIG.h}">${marks}${overMark}${run}</svg>`;
 }
 
+/**
+ * The card a mount raises: the brief on the other side, presented where it is mounted, as a figure of its own. It
+ * carries the part's title, its face and its confidence line, since that is what decides whether to enter; unfolded it
+ * gives the whole of that brief, and past that the only act is to open it, which changes the reading.
+ */
+function cardHtml(b: Brief, g: Grade): string {
+  const blocks_ = acrossOf(b);
+  const [first, ...rest] = blocks_;
+  const conf = confidenceOf(blocks_);
+  // the face of the brief across, and its confidence line with it, since what it says is what decides whether to enter
+  const face = ([first, ...(conf && conf !== first ? [conf] : [])] as (Tok | undefined)[]).filter((t): t is Tok => t !== undefined);
+  const foldable = blocks_.length > face.length;
+  const shown = g === "whole" ? blocks_ : face;
+  const hidden = blocks_.filter((t) => !shown.includes(t));
+  const beneath = beneathCount(b.address);
+  const line =
+    `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(b.address)}"` : ""}>` +
+    (hidden.length ? actFigure(b, hidden, []) : "") +
+    (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
+    `<span class="acts">${foldable ? badgeHtml("unfold", b.address) : ""}${badgeHtml("open", b.address)}</span>` +
+    `</div>`;
+  return (
+    `<div class="card ${g}" data-card="${esc(b.address)}" ${hued(b.address)}>` +
+    `<h3 class="card-head">${esc(b.title)}</h3>` +
+    blocks(shown) +
+    line +
+    `</div>`
+  );
+}
+
 /** One brief in the lane at its grade: its face, the heading and the first block, then the rest when whole; `after` is the gap beneath it. */
 function articleHtml(b: Brief, g: Grade, after: number): string {
   const d = Math.min(4, depthIn(b.address));
+  // a mount is one paragraph of placement and is always given whole: what its grade governs is the card beneath it
+  if (crosses(b))
+    return (
+      `<article class="brief mount ${g}${prefixesOf(state.focus).includes(b.address) ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
+      `<div class="surface">` +
+      `<h2 class="head d${d}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
+      blocks(blocksOf(b)) +
+      `</div>` +
+      cardHtml(b, g) +
+      `</article>`
+    );
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
   const beneath = beneathOf(b);
@@ -1470,7 +1547,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}><h1>${esc(root.title)}</h1>${blocks(root.body)}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}><h1>${esc(root.title)}</h1>${blocks(readingOf(root))}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -1782,7 +1859,7 @@ function aheadTarget(): string | null {
 }
 
 /** A block as the ahead draws it: its kind, its height in lines of the lane, and its width as a share of the measure. */
-type ABlock = { kind: "head" | "para" | "image"; lines: number; width: number };
+type ABlock = { kind: "head" | "para" | "image" | "card"; lines: number; width: number };
 const HEAD_BLOCK: ABlock = { kind: "head", lines: 1.5, width: 0.6 };
 
 /** A block of prose as the lane would present it: text sized from its characters, an image at its own size at the lane's measure and its caption beneath as text. */
@@ -2045,8 +2122,8 @@ const aheadWidth = (): number => SHAPE.pad * 2 + (state.index?.depth ?? 0) * SHA
 
 /** One block drawn small: a heading a short bar, a paragraph a filled block, an image a frame, so no figure passes an image off as prose. */
 const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number): string =>
-  kind === "image"
-    ? `<rect class="image" x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
+  kind === "image" || kind === "card"
+    ? `<rect class="${kind}" x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
     : `<rect class="${kind}" x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" rx="1"/>`;
 
 /** The lane's briefs and their blocks as laid, in the scroll box's own coordinates; an image's width is its share of the lane's. */
@@ -2060,6 +2137,7 @@ function laidBlocks(): { a: string; top: number; height: number; blocks: { top: 
         const xr = x.getBoundingClientRect();
         return { top: xr.top - c, height: xr.height, kind, width };
       };
+      if (b.classList.contains("card")) return [at(b, "card")];
       if (b.tagName !== "FIGURE") return [at(b, b.tagName === "H1" || b.tagName === "H2" ? "head" : "para")];
       const img = b.querySelector("img, svg");
       const caption = b.querySelector("figcaption");
@@ -2100,7 +2178,7 @@ function shapeSvg(W: number, H: number): string {
     const ghost = folded ? "" : " ghost";
     const beyond = b ? blocksOf(b).slice(1) : [];
     const paras = beyond.length;
-    const hidden = b && level(l.a).length > 0 ? ix.branch.get(l.a)! - ix.own.get(l.a)! : 0;
+    const hidden = b && !crosses(b) && level(l.a).length > 0 ? ix.branch.get(l.a)! - ix.own.get(l.a)! : 0;
     const face = l.blocks[1] ?? l.blocks[0];
     const y = face ? (4 + face.top * k).toFixed(1) : "0";
     const h = face ? Math.max(1.2, face.height * k - 1).toFixed(1) : "1";
@@ -3507,8 +3585,8 @@ function goTo(a: string): void {
     drawChooser();
   }
   move("go", a);
-  // a target outside the scope widens the scope to the whole body first, laid afresh, and the step is on the way back
-  if (!within(a, state.scope)) scopeTo("");
+  // a target in another reading opens that reading; within this one, a target outside the scope widens to the file's root
+  if (scopeFor(a) !== state.scope) scopeTo(scopeFor(a));
   if (readHash() !== a || readScope() !== state.scope) enterHistory(hashFor(a));
   settle(a);
   settleTrail();
@@ -3519,7 +3597,7 @@ function settle(a: string): void {
   const target = brief(a) ? a : nearest(a);
   if (!inLane(target)) {
     if (!within(target, state.scope)) return arrive(target);
-    prefixesOf(target).filter((p) => within(p, state.scope)).forEach((p) => p !== target && gradeOf(p) !== "whole" && setGrade(p, "whole"));
+    prefixesOf(target).filter((p) => within(p, state.scope) && opensInLane(p)).forEach((p) => p !== target && gradeOf(p) !== "whole" && setGrade(p, "whole"));
     drawLane();
   }
   state.focus = target;
@@ -3561,13 +3639,13 @@ function resume(a: string, kept: { scope: string; grades: [string, Grade][]; tra
   arriving = true;
   state.trail = Array.isArray(kept.trail) ? kept.trail.filter((h) => h && typeof h.to === "string" && brief(h.to) && h.lane && h.kind) : [];
   const target = brief(a) ? a : nearest(a);
-  state.scope = brief(kept.scope) && within(target, kept.scope) ? kept.scope : "";
+  state.scope = brief(kept.scope) && within(target, kept.scope) && fileRootOf(kept.scope) === fileRootOf(target) ? kept.scope : fileRootOf(target);
   const S = state.scope;
   state.grades = new Map(kept.grades.filter(([x, g]) => brief(x) && within(x, S) && (g === "face" || g === "whole")));
   state.grades.set(S, "whole");
   state.body!.briefs.forEach((b) => b.address !== S && state.grades.has(b.address) && gradeOf(parentOf(b.address)) !== "whole" && state.grades.delete(b.address));
   prefixesOf(target)
-    .filter((p) => within(p, S) && p !== target)
+    .filter((p) => within(p, S) && p !== target && opensInLane(p))
     .forEach((p) => gradeOf(p) !== "whole" && setGrade(p, "whole"));
   closeLay();
   state.focus = target;
@@ -3580,7 +3658,7 @@ function resume(a: string, kept: { scope: string; grades: [string, Grade][]; tra
 function arrive(a: string): void {
   arriving = true;
   const target = brief(a) ? a : nearest(a);
-  if (!within(target, state.scope)) state.scope = "";
+  state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay(target);
   state.focus = target;
@@ -4578,6 +4656,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .brief.here { opacity: 1; }
 .surface p { margin-bottom: 12px; }
 .act { display: flex; align-items: center; gap: 10px; color: var(--ink); cursor: pointer; margin: -4px -8px 0; padding: 4px 8px; border-radius: 6px; transition: color .15s; }
+/* the card a mount raises: the brief on the other side, standing in the prose as a figure of its own rather than as
+   more of this reading. It is inset and ruled in its branch's own hue, so meeting a boundary never looks like a fold
+   within one, and it ends at its own act line, where the only way further is to open it */
+.brief.mount .card { margin: 6px 0 0; padding: 14px 16px 10px; border-radius: 8px; background: var(--wash); border-left: 2px solid var(--door); }
+.brief.mount .card:hover { border-left-color: var(--lit); }
+.brief.mount .card-head { font-family: var(--head-face); font-size: calc(var(--t) * .5); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0 0 .5em; letter-spacing: calc(-.008em * var(--head-tight)); }
+.brief.mount .card p { margin-bottom: 10px; }
+.brief.mount .card p:last-of-type { margin-bottom: 0; }
+.brief.mount .card-act { margin: 10px -8px 0; }
+
 .act:hover { color: var(--on); }
 /* the badge: the key drawn as a cap, and what it does beside it. Its room is kept on every line, and it inks only on
    the brief the reading line stands on, which is the brief a key acts on, so nothing reflows as the reader moves */
@@ -4739,10 +4827,14 @@ svg.shape .head { fill: var(--door); }
 svg.shape .cell.here .para { fill: var(--door); }
 svg.shape .cell.here .head { fill: var(--on); }
 svg.shape .cell.lit .para, svg.shape .cell.lit .head { fill: var(--lit); }
+/* a card is not prose of this reading, so it is drawn as an outline rather than a filled block: the shape says where
+   the lane stops before the reader reaches it, and a fold within one never looks like a crossing out of it */
+svg.shape .card { fill: none; stroke: var(--door); stroke-width: 1; }
+svg.shape .cell.here .card, svg.shape .cell.lit .card { stroke: var(--lit); }
 svg.shape .above .head { fill: var(--grey); }
 svg.shape .above.lit .head, svg.shape .above:hover .head { fill: var(--lit); }
 /* only the two regions take the pointer; the marks drawn over them never do */
-svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .tick, svg.shape .hidden { pointer-events: none; }
+svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .card, svg.shape .tick, svg.shape .hidden { pointer-events: none; }
 svg.shape .ghost { opacity: 0; transition: opacity .12s; }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .ghost { opacity: 1; }
 svg.shape .cell:has(.hit[data-press="fold"]:hover) .tick:not(.ghost), svg.shape .cell:has(.hit[data-press="fold"]:hover) .hidden:not(.ghost) { fill: var(--lit); }

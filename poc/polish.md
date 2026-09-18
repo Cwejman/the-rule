@@ -6,6 +6,10 @@ status: in force
 
 # The polish
 
+Much of the arc grew a decision at a time, and [its faces](practice.md#52-a-face-is-short) grew with it. The polish reads every file outside the rule and the study against the rule, in the order they stand on each other, and writes each again where it fails, before the arc moves. It is a plan written for a session that starts fresh, with the record of what that session did at its foot.
+
+*In force, 2026-09-14.*
+
 ## 1. Why the arc is polished now
 
 The knowledge arc, [everything its entry connects](../README.md), was written a decision at a time, and much of it grew by addition rather than being laid by the gradient. This plan brings it under [the rule](../rule.md) before it moves to [its own repository](../repository.md), and it is written for a session that starts with nothing but the files.

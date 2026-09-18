@@ -5,6 +5,12 @@ kind: brief
 
 # The ideas
 
+Beside the rule stand the author's ideas: positions on how a model and [a harness](../rule.md#22-beginning-today) should be offered, the domains the shape reaches into, and questions it raises on the way.
+
+They are held open. None of them is law, and nothing in the rule depends on them.
+
+*The author's, open.*
+
 ## 1. Giving as a business
 
 The word for the stance is giving as a business: a service earns by what it lets its users compound, not by what it withholds from them.

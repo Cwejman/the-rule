@@ -5,6 +5,12 @@ kind: brief
 
 # The practice
 
+The practice is how the rule is run in markdown and git. It answers what the rule leaves open: how briefs divide, how deep they go, what an entry looks like, what a file says about itself.
+
+It is a first cut, reasoned from the studies and lived in the labs and in this arc so far. Each rule says how strongly it holds, as a claim does, and the ones marked open are being found out by observation.
+
+*Reasoned, the author's; lived since 2026-09-11.*
+
 ## 1. Files, folders and commits
 
 The medium is what every tool and every practice already has, so nothing is built before the rule is lived. A brief is a markdown file or a section in one, a folder is a holon whose brief is its entry file, `README.md`, and git is the history, every change a commit.

@@ -6,6 +6,12 @@ status: open
 
 # Toolmaking
 
+Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles.
+
+It began in a project that depends on the rule and is built here from 2026-09-15, since nothing in it is secret and what serves one project serves the others.
+
+*The author's, 2026-09-15; the primitives ratified 2026-09-14, the rest open.*
+
 ## 1. Value is made by comprehension, and carried into tools
 
 Humans commonly generate value through comprehension, and toolmaking is what we do with it. A large part of the business world is the making of some tool, which business calls a product. So beside the rule stands a second study of the same kind, an ontological study of how tools are made, and it is the rule turned toward the things we build.

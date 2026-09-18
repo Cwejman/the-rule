@@ -5,6 +5,12 @@ kind: brief
 
 # The skill
 
+The skill is the harness side. It says what a session does with files under the rule, and what it leaves of its own work, the record and the note per step, in prose rather than in code, so that it writes the script it needs at the moment it needs it, in whatever language is at hand.
+
+Nothing in it need be kept as code: the substrate is prose, and a script is a sentence made exact for a minute.
+
+*Reasoned, the author's; seen in the labs.*
+
 ## 1. Read by depth
 
 A file is read the way [the gradient](../rule.md#31-the-gradient) is laid: its title and first paragraph, then each heading with the first paragraph under it, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
