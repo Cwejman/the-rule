@@ -126,6 +126,8 @@ Three things a reader wants of a node, and they are not one act. To see what is 
 
 So a press selects the node and opens it to the right, and the prose does not move. A press again on the node already selected goes there, and the lane takes that reading; enter does the same, and so does the act in the field. Going implies opening, so the two never fight: what is committed to is already open.
 
+What a press does is read from the node and never from what was selected before it. A placement that does not stand open is opened, whatever else the reader had selected; one already open is read once it is what they have selected. Read the other way round, a node that arrived already selected, because the reading stands on it, answered its first press by going where the reader already was, which is nothing happening.
+
 A node with nothing on the other side is only selected, and the field then offers reading it and nothing more.
 
 Pointing projects nothing. A projection of the next level was proposed and dropped the same day: a press already looks in, and a ghost that has to dodge what is drawn costs more than it gives.
@@ -161,6 +163,8 @@ It hides into an eye in the field, in both grains, and comes back by the same ey
 The canvas draws the same state the lane draws: the fold of every brief, the focus, the pointer and the scope. Folding on one is folding on the other, and a brief lit in one is lit in the other, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn).
 
 The two panes are in step as the reader moves: one focus between them, and a scroll in either brings the other to where it went.
+
+A card met while scrolling is not an opening. The reading a brief is met in is the file it stands in, and a card stands in the file that placed it, not in its own, so scrolling the prose past the cards a brief places leaves the map as it is. Without that the map opened each card as the reading line reached it and closed it again as it passed, which is a map jumping back and forth under a reader who is only reading.
 
 What the canvas holds of its own is the chain, which node of each column is open. It is not the focus, since opening is not going, and it is kept in the browser with the view.
 

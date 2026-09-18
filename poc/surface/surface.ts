@@ -2513,6 +2513,12 @@ const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(b
 const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => chain[i] === p);
 
 /**
+ * The reading an address is met in. A card is met in the reading that placed it and not in its own: scrolling the
+ * prose past a card is reading the file it stands in, so the map must not open what the reader only scrolled by.
+ */
+const readingOf = (a: string): string => (isCard(brief(a)) ? fileRootOf(parentOf(a)) : fileRootOf(a));
+
+/**
  * A brief's number counted from a root: in the lane from the scope, on the canvas from the head of its column. A card
  * carries none and is not counted, since it is a placement in prose and not a heading of this file.
  */
@@ -2627,11 +2633,13 @@ function faceHtml(): string {
 /** Draws the canvas whole from the state: the root's column with the chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
-  // the canvas draws the path the reader has opened; arriving from outside it lays the path of where they arrived
-  if (!chainHolds(state.focus)) chain = cardPathOf(state.focus);
-  if (picked === null || !brief(picked) || !chainHolds(picked)) picked = state.focus;
+  // the canvas draws the path the reader has opened. Arriving in a reading the map does not hold lays the path to it;
+  // scrolling within one, past the cards it places, changes nothing, since a card met in the prose was not opened
+  const met = readingOf(state.focus);
+  if (!chainHolds(met)) chain = cardPathOf(met);
+  if (picked === null || !brief(picked)) picked = state.focus;
   colOf.clear();
-  ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--gap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
     fitCanvas();
     fitted = state.body.root;
@@ -3851,6 +3859,7 @@ function settle(a: string): void {
     drawLane();
   }
   state.focus = target;
+  picked = target;
   drawWings();
   light();
   scrollToFocus(true);
@@ -3908,6 +3917,8 @@ function resume(a: string, kept: { scope: string; grades: [string, Grade][]; tra
 function arrive(a: string): void {
   arriving = true;
   const target = brief(a) ? a : nearest(a);
+  // an arrival is a going, so what is selected on the map goes with it; scrolling alone never moves the selection
+  picked = target;
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay();
@@ -4266,12 +4277,13 @@ function wire(): void {
       if (state.scrubbing) return;
       const a = crow.dataset.a!;
       if (narrow() && !fits().lane) card.a = a;
-      if (picked === a) {
-        goTo(a);
-        drawCard();
-        return void drawChooser();
-      }
-      pickNode(a, crow.dataset.open === undefined ? null : Number(crow.dataset.open));
+      const col = crow.dataset.open === undefined ? null : Number(crow.dataset.open);
+      // what a press does is read from the node and not from what was selected before it: a placement that does not
+      // stand open is opened, whatever else the reader had selected; one already open, or a piece with nothing on the
+      // other side, is read once it is what they have selected; anything else is selected
+      if (col !== null && chain[col] !== a) pickNode(a, col);
+      else if (picked === a) goTo(a);
+      else pickNode(a, null);
       drawCard();
       return void drawChooser();
     }
@@ -4853,11 +4865,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #edges path.open { stroke: var(--door); stroke-width: 1.5; }
 /* the map is laid on one grid: a row is one width, the room between rows is one gap, a level steps in by one, and a
    reading stands one across from the row that named it. Nothing in it is a number of its own */
-.ccol { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap); }
+.ccol { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ngap); }
 .cnode { display: flex; flex-direction: column; align-items: flex-start; }
 /* an opening holds its row and the reading it opened side by side, the reading beginning level with the row */
 .cnode.open { flex-direction: row; align-items: flex-start; gap: var(--across); }
-.ckids { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap); margin: var(--gap) 0 0 var(--indent); }
+.ckids { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ngap); margin: var(--ngap) 0 0 var(--indent); }
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
