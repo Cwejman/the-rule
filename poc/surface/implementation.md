@@ -34,7 +34,7 @@ The body is traced from a root and handed over as a flat list of briefs in readi
 
 *In force, the author's decision, 2026-09-12.*
 
-### 3.1 It is traced from a root, by its mounts
+### 3.1 It is traced from a root, by its placements
 
 The process is pointed at a file that carries [the stamp](../practice.md#2-a-file-says-it-is-under-the-rule), named directly or as a folder's `README.md`, and it does not run on anything unstamped. From there it follows [the placements](../practice.md#3-a-lone-link-places-a-part): every paragraph in a brief that is nothing but a link names a file or a folder's entry, and a stamped file named that way is parsed and traced in turn, until nothing new is reached.
 
@@ -42,13 +42,13 @@ So the body is whatever the root connects, and nothing is scanned. A file no lin
 
 *In force, the author's decision, 2026-09-12.*
 
-#### 3.1.1 A mount carries the brief across, and that is the boundary
+#### 3.1.1 A placed file becomes a brief, and its paragraph becomes a card
 
-A mounted file's own prose, what stands before its first section, is given to the brief that mounts it as what lies across the boundary. One address holds both sides, so nothing a link or a stored fold names has changed: the mount is that address in the entry's reading, and the brief across it is that address opened.
+A placed file's own prose becomes a brief of its own beneath the brief that placed it, marked as a card, and the paragraph that was the lone link is replaced in the body by a card block naming that brief's address. So the order of the prose is kept, the card is drawn where its link stood, and a brief may hold as many as its prose places.
 
-That one field is the whole of the boundary in the data. A brief that carries it is a mount, the lane stops there and draws [a card](lane.md#12-a-placed-part-raises-a-card), the scope of any address is the nearest mount at or above it, and the shape draws the row apart. Nothing else had to be told where a file ends.
+One flag is the whole of the boundary. A brief marked a card is never laid in the lane, the scope of any address is the nearest card at or above it, and the shape draws the row as an outline. A second lone link to a file already read makes another card block on the same address, since [a part stands in every place that links it](../practice.md#36-a-part-may-stand-in-several-places), and nothing is copied.
 
-*As built, 2026-09-18, on [the author's decision](../../author/ideas-2026-09-18.md#5-unfolding-everything-may-break-the-linear-whole) that a file is one reading.*
+*As built, 2026-09-18, on [the author's decisions](../../author/ideas-2026-09-18.md#5-unfolding-everything-may-break-the-linear-whole) that a file is one reading and that no layer of headings is forced.*
 
 ### 3.2 The address is the path of titles
 
@@ -66,7 +66,7 @@ Titles rather than positions, because a reader's history and a sent link hold ad
 
 ### 3.3 Links are rewritten to addresses
 
-A markdown link names a file, and sometimes a heading's anchor in it. As the trace walks, it keeps a table from each to the address it holds: a file and an anchor to that section, and a file alone to the brief that mounts it, since the file is that brief's level. When the trace is done, every link in every brief's tokens is rewritten through that table.
+A markdown link names a file, and sometimes a heading's anchor in it. As the trace walks, it keeps a table from each to the address it holds: a file and an anchor to that section, and a file alone to the brief its own prose became. When the trace is done, every link in every brief's tokens is rewritten through that table.
 
 A web address is left as it is. A link to a file the trace never reached is marked as leaving the body. A link with no target is a brief not yet written, which [the rule allows](../../rule.md#43-work-in-progress), and is marked as owed.
 
@@ -124,7 +124,7 @@ The markup is cleaned by Bun's HTML rewriter, since it is set into the page: onl
 
 The trace warns rather than failing silently, so a session hears of a broken rule before a reader does.
 
-It warns of a written heading number that disagrees with a brief's place, two briefs with one title in one level, a link of a scheme it does not follow, a mount it skipped, and every image fault above. Run with `--check`, it prints the warnings and the faces past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters), and serves nothing.
+It warns of a written heading number that disagrees with a brief's place, two briefs with one title in one level, a link of a scheme it does not follow, a placement it skipped, and every image fault above. Run with `--check`, it prints the warnings and the faces past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters), and serves nothing.
 
 *In force, 2026-09-14, as built.*
 
