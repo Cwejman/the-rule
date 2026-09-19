@@ -1192,24 +1192,24 @@ const ACTIONS: Record<string, Action> = {
       drawCanvas();
     },
   },
-  open: {
-    label: () => "open",
+  scope: {
+    label: () => "scope",
     mark: () => ICON.open,
     keys: [{ key: "Enter" }],
-    help: () => "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
-    shifted: "Shift widens the scope by a level instead.",
+    help: () => "Scopes the lane to the brief: its heading becomes the opening and everything above it leaves.",
+    shifted: "Shift goes back out of this reading instead.",
     // a key falls to the first act that will have it, so without this the map's return, once it had nothing left to
     // go to, was answered by the lane scoping instead
     can: (a) => (a === undefined && handOnMap() ? false : level(acts(a)).length > 0),
     run: (a) => scopeTo(acts(a)),
   },
-  widen: {
-    label: () => (handOnMap() ? "out" : "widen"),
+  out: {
+    label: () => "out",
     keys: [{ key: "Enter", shift: true }],
     help: () =>
       handOnMap()
         ? "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes."
-        : "Widens the scope to the level above, so what stood around this brief comes back.",
+        : "Goes out of this reading to the brief that placed it, so what stood around it comes back.",
     also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
     can: () => (handOnMap() ? closable() !== "" : state.scope !== ""),
     run: () => {
@@ -1666,7 +1666,7 @@ function cardHtml(a: string): string {
     `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(a)}"` : ""}>` +
     (hidden.length ? actFigure(b, hidden, []) : "") +
     (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("open", a)}</span>` +
+    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
     `</div>`;
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
@@ -1691,11 +1691,11 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        `<span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</span>` +
+        `<span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("scope", b.address)}</span>` +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</span></div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("scope", b.address)}</span></div>` : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
@@ -1908,7 +1908,7 @@ function pickNarrowHtml(k: string): string {
  * The acts the foot offers for a brief chosen on the canvas: the same two [the action line](lane.md#61-the-action-line-is-the-press)
  * draws beside a brief in the lane, since a node on the canvas has no line of its own to carry them.
  */
-const FOOT_ACTS = ["unfold", "open"];
+const FOOT_ACTS = ["unfold", "scope"];
 
 /**
  * An act in the foot's row: its glyph alone, in the round button the choices stand in, since the row is one grain and
@@ -2259,8 +2259,8 @@ const saveSettings = (): void =>
 // now is what it says.
 
 const KEY_GROUPS: { of: string; acts: string[] }[] = [
-  { of: "the brief", acts: ["unfold", "foldUp", "open"] },
-  { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "widen"] },
+  { of: "the brief", acts: ["unfold", "foldUp", "scope"] },
+  { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "out"] },
   { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
   { of: "the lane", acts: ["undo", "redo"] },
 ];
@@ -3402,13 +3402,13 @@ function drawCrumb(): void {
   // it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is.
   const step = (a: string): string => {
     const head = a === state.focus;
-    const cls = ["step", depthOf(a) <= depthOf(S) ? "scope" : "in", ...(a === S ? ["root"] : []), ...(head ? ["now", ...(ACTIONS.open.can(a) ? ["opens"] : [])] : [])].join(" ");
+    const cls = ["step", depthOf(a) <= depthOf(S) ? "scope" : "in", ...(a === S ? ["root"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].join(" ");
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${esc(brief(a)!.title)}</span>`;
   };
   // the acts of the rightmost stand after it: where it is a reading of its own, entering it and widening out of it are
   // both there, since that is what enter and shift with enter do where the reader is standing
-  const ends = isCard(brief(state.focus)) ? badgeHtml("open", undefined, true) + badgeHtml("widen", undefined, true) : badgeHtml("widen", undefined, true);
+  const ends = isCard(brief(state.focus)) ? badgeHtml("scope", undefined, true) + badgeHtml("out", undefined, true) : badgeHtml("out", undefined, true);
   const place =
     (above ? `<span class="step more" data-tip="${above} level${above > 1 ? "s" : ""} above, cut at the root">…</span>${CHEVRON}` : "") +
     kept.filter((a) => brief(a)).map(step).join(CHEVRON);
@@ -5207,8 +5207,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .brief .card.here, .brief .card.lit { color: var(--ink); outline-color: var(--lit); }
 /* opening is the act a press on the card already does, so its badge stands only where a key reaches it: on the card the
    reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
-.brief .card .acts [data-act="open"] { display: none; }
-.brief .card.here .acts [data-act="open"], .brief .card.lit .acts [data-act="open"] { display: inline-flex; }
+.brief .card .acts [data-act="scope"] { display: none; }
+.brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
 .brief .card { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
 .brief .card-top, .brief .card-act { grid-column: 1 / -1; }
 .brief .card-body { grid-column: 1; min-width: 0; }

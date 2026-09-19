@@ -178,7 +178,7 @@ Three of the moves are the map's own, since what they act on is the map's struct
 
 - Backspace asks for less of what the reader is inside, and leaves them on what held it. Within a file that is the brief above, folded; at the top of a reading there is no brief above, and the reading itself closes, as it does at its head or beside a card that stands open. Shift with the space bar is the same act, and in the lane, where it has always folded the brief above, both chords now do.
 
-- Return goes, and shift with return takes the prose out to the brief that placed this reading and closes behind it. In the lane the two scope in and widen out.
+- Return goes, and shift with return takes the prose out to the brief that placed this reading and closes behind it. In the lane the two scope in and go out.
 
 The last two divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
 
