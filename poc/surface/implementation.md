@@ -133,10 +133,10 @@ It warns of a written heading number that disagrees with a brief's place, two br
 The page's URL holds the address of the brief in focus, and after `?in=` [the scope](lane.md#7-scoping-the-lane), when the lane is scoped:
 
 ```
-surface.html#the-proof-of-concept/the-surface/reading-and-orientation-come-apart?in=the-proof-of-concept/the-surface
+surface.html#/the-proof-of-concept/the-surface/reading-and-orientation-come-apart?in=the-proof-of-concept/the-surface
 ```
 
-It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, its level at faces.
+It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, [its reading laid whole](lane.md#3-a-reading-is-laid-whole).
 
 The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5-arriving-lays-the-lane), and the folds a reader made are kept apart from it, [in the browser](#66-what-the-browser-keeps).
 

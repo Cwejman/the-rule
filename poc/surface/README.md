@@ -48,15 +48,15 @@ Everything above says what the surface is handed. What follows is what it does w
 
 *Reasoned, the author's, 2026-09-13.*
 
-## 4. What is not built, and what is not a screen
+## 4. A second pane, and what is not a screen
 
-Past what stands are two readings of their own. The canvas is the second mode, where the work with two dimensions is going. The phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size.
+Past the reading stand two readings of their own. The canvas is the second pane, the body as nodes, built and still being laid; the phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size.
 
 [The canvas](canvas.md)
 
 [A touch reading](touch.md)
 
-*The author's, 2026-09-15 and 2026-09-16; the canvas open, the touch reading built.*
+*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so.*
 
 ## 5. What this does not answer
 

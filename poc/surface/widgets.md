@@ -12,7 +12,7 @@ The widgets are what can stand in a wing or a gutter: the tree, the shape, the a
 
 ## 1. What every widget keeps
 
-Every shape is computed from the substrate and none is invented, because a picture a reader cannot trust is worse than no picture at all. What the widgets share beyond that is the rules beneath, and keeping them is what makes six drawings one family.
+Every shape is computed from the substrate and none is invented, because a picture a reader cannot trust is worse than no picture at all. What the widgets share beyond that is the rules beneath, and keeping them is what makes seven drawings one family.
 
 *Reasoned, 2026-09-13, carried whole from the first model's figures.*
 
@@ -52,7 +52,7 @@ No widget repeats what is in view, and a mark is spent in proportion to how live
 
 A cell in any figure, a step or a cell of the way down, an icon on a strip, and a link in the lane when no gutter tells of it, each says what it is a moment after the pointer rests on it: for a brief, its path drawn as the way down draws one, then its name, and for a link the opening words of its face.
 
-It is one element on the page's own ground, never under the pointer, and it goes with any scroll or press. Where it would hide what is looked at it moves aside: beside a figure, on the side nearest the lane and level with the cell, since a tooltip over the shape covers the very cell pointed at; beside a node on the canvas, past its ports; and beneath anything else. The ahead keeps naming its pointed cell beneath the figure as well.
+It is one element on the page's own ground, never under the pointer, and it goes with any scroll or press. Where it would hide what is looked at it moves aside: beside a figure, on the side nearest the lane and level with the cell, since a tooltip over the shape covers the very cell pointed at; beside a node on the canvas, clear of the reading it opens; and beneath anything else. The ahead keeps naming its pointed cell beneath the figure as well.
 
 *Reasoned, the author's ask of 2026-09-15; [an overlay that repeats what is in view](refused.md#j-an-overlay-at-all) stays refused, and this tells only what is not in view.*
 

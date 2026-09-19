@@ -48,7 +48,7 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross.
 
-Pressing a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Press on inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened.
+Going in at a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Go in again inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened. Going in is [an act of its own](#5-one-press-selects-two-presses-go) and never a press.
 
 Opening is not scoping. The canvas is not reframed around what was opened, nothing leaves the map, and the way back is the column the edge came from.
 
@@ -76,7 +76,7 @@ Two forms of that line stand against each other and are not decided. The line ma
 
 A file opened on the canvas shows its heading tree whole. The reader asked to see what is in there, and a level at a time would make them ask again for every level.
 
-Folding is what they do afterwards, to a part they have read or do not want: fold it from the acts, or shift with the arrows to fold the lot. Since the fold state is one, a file opened whole on the canvas stands unfolded in the lane as well.
+Folding is what they do afterwards, to a part they have read or do not want: fold it from the acts, or move [the depth](#61-the-depth-strip), which folds and unfolds the reading by levels. Since the fold state is one, a file opened whole on the canvas stands unfolded in the lane as well.
 
 *The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3-a-reading-is-laid-whole) as well, which is the session's reading of one state and is his to refuse.*
 
@@ -94,7 +94,7 @@ So the step right opens a card and nothing else, and the map never widens on its
 
 A row is a thing to look at and to press, so it keeps its own outline. What a row leads to is said by that outline rather than by a mark beside the name: a placement takes the branch's hue, as [the card in the lane does](lane.md#12-a-placed-part-raises-a-card), and a brief of this file keeps the quiet rim.
 
-A chevron at the row's right was built first and refused: with the press already opening what a row leads to, and the acts standing in the field, it said nothing a reader needed, and it never lined up against a name that wrapped.
+A chevron at the row's right was built first and refused: the row's own outline already says what it leads to, the acts stand in the field, and it never lined up against a name that wrapped. Its refusal was first written against a press that opened what a row led to, and it holds without that.
 
 A node carries two things: its name, and what waits beneath it. The name stands at the top with the node's whole width, wrapping rather than cutting, and the foot carries where it stands in its reading and the figure of what it hides. Nothing else is in it, since what a node is for is finding the piece, not reading it.
 
@@ -166,9 +166,9 @@ While the map stands the keys are the map's, and when it does not stand they are
 
 Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so. What that cost was the whole of this level: the keys were agreed, built and read, and they still did nothing where a reader met them.
 
-What it gives up is moving the lane's focus by the arrows while both panes stand. That is little, since the focus follows the scroll and [the two panes are kept in step](#6-one-state-and-the-lane-in-step-with-it).
+What it gives up is moving the reading line by the arrows while both panes stand: there they move the map, and the reading follows as [the two panes are kept in step](#6-one-state-and-the-lane-in-step-with-it). That is little, since a reading is moved through by scrolling.
 
-Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in both panes and act in whichever the hand is in.
+Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in both panes, and each acts in the pane the keys belong to.
 
 - Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
@@ -230,7 +230,7 @@ A lone link in a brief places a structure there, and [a structure may stand in s
 
 ### 7.1 A placement and a link both open, and the two are not alike
 
-Both kinds of link lead somewhere, so both open a column to the right, and what a reader presses is what they meant to follow. What differs is the claim each makes, and the drawing says which: a lone link places a part where the prose stands, which is deliberate, and a link in prose is an aboutness, an offer the reading did not need.
+Both kinds of link lead somewhere, so going in at either opens a column to the right, and what a reader goes in at is what they meant to follow. What differs is the claim each makes, and the drawing says which: a lone link places a part where the prose stands, which is deliberate, and a link in prose is an aboutness, an offer the reading did not need.
 
 Opening links as well as placements makes the map a graph, so a way may lead back to a column already open. The chain makes that harmless for now, since only one path is ever drawn; it is what has to be answered before the whole body is laid out at once.
 
@@ -238,9 +238,9 @@ Opening links as well as placements makes the map a graph, so a way may lead bac
 
 ### 7.2 A level of letters is independence, and a flow reads it as a choice
 
-The markdown does not say whether a level is a sequence or a set, and only a set is laid across. The author's proposal, taken up by the session on 2026-09-15: a level whose headings carry letters where a step carries a number, 4.a and 4.b under 4, so the mark stands where the claim of order already stands.
+The markdown does not say whether a level is a sequence or a set, and only a set is laid across. [A level of letters is a set](../practice.md#41-a-level-of-letters-is-a-set), which the practice gives whole: a letter says that no brief of the level stands on another, and that is all the substrate says.
 
-A number claims that a brief stands on the ones before it. A letter claims that no brief of the level stands on another: each is readable alone, in any order, and the parent stands on the set rather than on a chain. That is all the substrate says. What a reader makes of independence is the domain's reading: a flow reads a lettered level under a step as alternatives, take one, which [toolmaking](../../tool-making/README.md) can say for itself; a body of knowledge reads it as a set, take any or all, looked up rather than read through.
+What a reader makes of that independence is the domain's reading, and it is the part this level owes. A flow reads a lettered level under a step as alternatives, take one, which [toolmaking](../../tool-making/README.md) can say for itself; a body of knowledge reads it as a set, take any or all, looked up rather than read through.
 
 The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#6-the-programs-before-this-one) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
 

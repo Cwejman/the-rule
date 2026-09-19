@@ -212,9 +212,9 @@ The registers, the heading sizes that step down by depth as [the design language
 
 ### 7.2 Widening the scope
 
-Shift with enter widens the scope by one level, to the parent of the scope root. Going to a brief outside the scope, by a link or a row above, widens the scope to the whole body first. Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came.
+Shift with enter goes out of this reading, to the brief that placed it. Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came. What a link out of the scope does is [answered where links are](#9-following-a-link-moves-you), and not here.
 
-*Reasoned, 2026-09-13; what going outside the scope does is the builder's call.*
+*Reasoned, 2026-09-13; going out written again 2026-09-19, when the lane became one reading and there was no longer a scope to widen.*
 
 ### 7.3 The levels above stay in sight
 
