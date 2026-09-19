@@ -180,6 +180,8 @@ Three of the moves are the map's own, since what they act on is the map's struct
 
 - Return goes, and shift with return takes the prose out to the brief that placed this reading and closes behind it. In the lane the two scope in and go out.
 
+- The full stop takes the reader back to where they are: the selection returns to the reading line, the way to it is opened where the map had closed it, and anything folded over it is unfolded. With shift it leaves only that way, folding and closing everything else. A map that spreads needs both, since what the reader opened stays open until they say otherwise.
+
 The last two divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
 
 That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.

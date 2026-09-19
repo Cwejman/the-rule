@@ -1304,6 +1304,37 @@ const ACTIONS: Record<string, Action> = {
       if (step) pickNode(step.a, step.col, true);
     },
   },
+  wayHere: {
+    label: () => "the way here",
+    mark: () => ICON.unfold,
+    keys: [{ key: "." }],
+    help: () => "Takes the reader back to where they are: the selection returns to the reading line, the way to it is opened where the map had closed it, and anything folded over it is unfolded.",
+    shifted: "Shift folds and closes everything else with it, so only the way here stands.",
+    can: () => state.picked !== state.focus || state.onHead !== headFor(state.focus) || hiddenHere().folded.length > 0 || hiddenHere().shut.length > 0,
+    run: () => {
+      const { folded, shut } = hiddenHere();
+      shut.forEach((p) => state.opened.push(p));
+      if (folded.length) refold(() => folded.forEach((p) => setFold(p, "whole")));
+      if (canvasOn()) pickNode(state.focus, null, headFor(state.focus));
+      else if (!folded.length) drawAll();
+    },
+  },
+  onlyHere: {
+    label: () => "only the way here",
+    mark: () => ICON.fold,
+    keys: [{ key: ".", shift: true }],
+    help: () => "Leaves only where the reader is: everything off the way to it folded, and every other reading closed on the map.",
+    can: () => state.opened.some((p) => !wayHere().includes(p)) || laneOrder(state.scope).some((b) => !onWayHere(b.address) && foldOf(b.address) === "whole"),
+    run: () => {
+      state.opened = wayHere();
+      refold(() =>
+        state.body!.briefs.forEach(
+          (b) => b.address !== state.scope && within(b.address, state.scope) && unfolds(b) && setFold(b.address, onWayHere(b.address) ? "whole" : "face"),
+        ),
+      );
+      if (canvasOn()) pickNode(state.focus, null, headFor(state.focus));
+    },
+  },
   undo: {
     label: () => "undo",
     keys: [{ key: "Escape" }],
@@ -2265,6 +2296,7 @@ const KEY_GROUPS: { of: string; acts: string[] }[] = [
   { of: "the brief", acts: ["unfold", "foldUp", "scope"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "out"] },
   { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
+  { of: "the map", acts: ["wayHere", "onlyHere"] },
   { of: "the lane", acts: ["undo", "redo"] },
 ];
 
@@ -2577,6 +2609,18 @@ const canvasOn = (): boolean => !ui.canvas.hidden;
 const handOnMap = (): boolean => canvasOn();
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
+/** The way to the reading the prose stands in: what must stand open on the map for the reader to see where they are. */
+const wayHere = (): string[] => cardPathOf(fileRootOf(state.scope));
+
+/** Whether an address is on the way to where the reader is: the focus itself, or a brief it stands beneath. */
+const onWayHere = (a: string): boolean => prefixesOf(state.focus).includes(a);
+
+/** What hides where the reader is: the briefs on the way to it that stand folded, and the readings on that way the map has closed. */
+const hiddenHere = (): { folded: string[]; shut: string[] } => ({
+  folded: prefixesOf(state.focus).filter((p) => p !== state.focus && foldOf(p) === "face"),
+  shut: wayHere().filter((p) => !state.opened.includes(p)),
+});
+
 /** The readings on the way to an address: every card at or above it, the outermost first. */
 const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(brief(p)));
 
@@ -2760,7 +2804,7 @@ const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { inde
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
-const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "face"];
+const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere", "face"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
