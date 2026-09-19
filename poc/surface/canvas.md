@@ -172,11 +172,13 @@ Three of the moves are the map's own, since what they act on is the map's struct
 
 - Left steps back out and closes nothing: from a head onto the card that opened it, from a row onto the one it hangs beneath. In the lane it is the brief above.
 
-- Backspace closes the reading at hand, so the map ends at that card again and the reader stands on it.
+- Backspace asks for less of what the reader is inside, and leaves them on what held it. Within a file that is the brief above, folded; at the top of a reading there is no brief above, and the reading itself closes, as it does at its head or beside a card that stands open. Shift with the space bar is the same act, and in the lane, where it has always folded the brief above, both chords now do.
 
 - Return goes, and shift with return takes the prose out to the brief that placed this reading and closes behind it. In the lane the two scope in and widen out.
 
-The last two divide by where the prose stands. While the reader is only looking, backspace closes. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
+The last two divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
+
+That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.
 
 *The author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head.*
 
