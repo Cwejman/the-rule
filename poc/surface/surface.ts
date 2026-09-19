@@ -4343,6 +4343,14 @@ function onScroll(): void {
   const f = focusUnderLine();
   if (f === state.focus) return;
   state.focus = f;
+  // the highlight is one. A reader who scrolls has moved where they are, so what is selected on the map follows the
+  // reading line rather than staying where the arrows last left it, and return goes to where the reader is looking
+  // rather than back to where they were. Nothing opens and nothing closes: only where the reader stands moves
+  if (canvasOn() && brief(f)) {
+    state.picked = f;
+    state.onHead = headFor(f);
+    drawCanvas();
+  }
   if (!arriving) followHistory(hashFor(f));
   drawWings("focus");
   // the way down says where the reader stands, so it follows the reading

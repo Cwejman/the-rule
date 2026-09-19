@@ -202,7 +202,7 @@ It hides into an eye in the field, in both grains, and comes back by the same ey
 
 The canvas draws the same state the lane draws: the fold of every brief, the focus, the pointer and the scope. Folding on one is folding on the other, and a brief lit in one is lit in the other, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn).
 
-The two panes are in step as the reader moves: one focus between them, and a scroll in either brings the other to where it went.
+The two panes are in step as the reader moves: one focus between them, and a scroll in either brings the other to where it went. The highlight is that one focus, so scrolling the prose moves what is selected on the map, and the arrows move it without the prose following. Two highlights meant return went back to where the arrows had left the reader rather than to where they were looking.
 
 What the map holds is the reading the lane holds, which is the scope and not the reading line. Going into another reading, by a link, by a press again or by an address, lays the path to it; scrolling within one changes nothing, whatever cards the reading line passes on the way. Reading the reading line instead, the map opened each card as the line reached it and closed it again as it passed, which is a map jumping back and forth under a reader who is only reading.
 
