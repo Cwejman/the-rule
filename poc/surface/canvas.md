@@ -132,7 +132,9 @@ On the card a reader stands beside the reading. What lies above and below them i
 
 Holding only the address, the selection made the two one place, and the moves had nowhere to go from it: down walked the placing file's briefs while the reader was looking at the file they had opened, and right had no head to step to. Nothing in the substrate changed to mend it. It is still one brief with one address, [its own as the practice gives it](../practice.md#33-a-placed-file-carries-its-own-brief); what gained a second part is where the reader stands.
 
-Everything that says where the reader is answers to that one part. The reading line lights the row the reader stands on and not both of them, and going to a placed file stands them at its head, since going to a reading is going into it. One rule, so the selection and the reading line can never disagree.
+Everything that says where the reader is answers to that one part, and one rule decides it: the reader stands at the head while the prose is reading that very reading, and on the card while it is not. So going into a placed file leaves them at its head, and coming back out — by shift with return, or by pulling past the top — leaves them on its card, beside the reading rather than in it. The reading line lights that row and never both.
+
+It follows that where the reader already is, is a place and not an address. Standing on a card whose reading the prose is not showing is somewhere to go, though its address is the very one the reading line carries, and return takes them there.
 
 *The author's, 2026-09-19, on reading that the card and the file's own top were conflated; as built the same day.*
 

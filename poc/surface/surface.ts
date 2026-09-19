@@ -1180,7 +1180,9 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "Enter" }],
     help: () => "Takes the reading to what is selected on the canvas: the lane opens that reading and the address becomes it.",
     also: "A press again on what is already selected.",
-    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && !!brief(acts(a)) && acts(a) !== state.focus,
+    // somewhere to go is somewhere the going would take the reader: standing on a card whose reading the prose is not
+    // showing is a going, though its address is the very one the reading line carries
+    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && !!brief(acts(a)) && (scopeFor(acts(a)) !== state.scope || acts(a) !== state.focus),
     run: (a) => readOn(acts(a)),
   },
   face: {
@@ -2652,11 +2654,11 @@ const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
 const showsKids = (b: Brief): boolean => !isCard(b) && foldOf(b.address) !== "face" && level(b.address).length > 0;
 
 /**
- * Which of a placed file's two rows an address stands on when a going is what put the reader there: the head, since
- * going to a placed file is going into it. The root of the body is only ever drawn as a head. One rule, so that the
- * selection and the focus never disagree about where the reader is.
+ * Which of a placed file's two rows an address stands on: the head where the prose is reading that very reading, and
+ * the card where it is not. Going into a placed file scopes the lane to it, so the reader lands at its head; coming
+ * back out leaves them on its card, beside the reading rather than in it. The root is only ever drawn as a head.
  */
-const headFor = (a: string): boolean => a === "" || isCard(brief(a));
+const headFor = (a: string): boolean => a === "" || fileRootOf(state.scope) === a;
 
 /** The root of the column a node stands in: its own address at a head, else the nearest reading opened above it. */
 const colRootOf = (a: string, head: boolean): string =>
@@ -4477,6 +4479,10 @@ function scopeTo(S: string): void {
   move(depthOf(S) > depthOf(state.scope) ? "in" : "out", S);
   state.scope = S;
   if (!within(state.focus, S)) state.focus = S;
+  // the selection goes with the reader, as it does on every other way of arriving. Without it a scope change made by
+  // pulling past the top, or by a name in the way down, moved the prose and left the map's selection behind
+  state.picked = state.focus;
+  state.onHead = headFor(state.focus);
   lay();
   drawAll();
   scrollToFocus(false);
