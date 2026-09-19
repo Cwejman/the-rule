@@ -2577,7 +2577,10 @@ const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#s
 /** The readings on the way to an address: every card at or above it, the outermost first. */
 const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(brief(p)));
 
-/** Whether the state.chain already holds the way to an address, so a going within the map leaves the map as it stands. */
+/** The reading the chain was last laid for, so a going lays the path to it and every other draw leaves the map alone. */
+let chainLaidFor: string | null = null;
+
+/** Whether the chain already holds the way to an address, so a going within the map leaves the map as it stands. */
 const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => state.chain[i] === p);
 
 /**
@@ -2792,10 +2795,15 @@ function faceHtml(): string {
 /** Draws the canvas whole from the state: the root's column with the state.chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
-  // the canvas draws the path the reader has opened, and it holds the reading the lane holds: going into a reading
-  // lays the path to it, and scrolling within one changes nothing, since the scope is what says where the reader is
+  // The canvas draws the path the reader has opened, and going into another reading lays the path to it. Only going:
+  // this was asked on every draw, so the chain was thrown away and rebuilt from the lane's own path whenever it did
+  // not prefix it — which meant nothing outside the reading the lane stood in could be opened at all, since the act
+  // set the chain and the very next draw undid it.
   const held = fileRootOf(state.scope);
-  if (!chainHolds(held)) state.chain = cardPathOf(held);
+  if (chainLaidFor !== held) {
+    chainLaidFor = held;
+    if (!chainHolds(held)) state.chain = cardPathOf(held);
+  }
   if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = headFor(state.focus)));
   // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
   if (state.picked === "") state.onHead = true;
