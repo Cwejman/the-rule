@@ -1283,12 +1283,13 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "ArrowRight" }],
     help: () =>
       handOnMap()
-        ? "Goes in: opens the reading this card leads to as a column of its own and stands you at its head."
+        ? "Goes in: stands you at the head of the reading this card leads to, opening it first where it is not open yet."
         : "Moves the reading into the first brief beneath this one, when it stands in the lane.",
-    can: () => (handOnMap() ? picked !== null && ACTIONS.openNode.can(picked) : level(state.focus).length > 0),
+    can: () => (handOnMap() ? stepsIn() !== null : level(state.focus).length > 0),
     run: () => {
       if (!handOnMap()) return down();
-      if (picked !== null && ACTIONS.openNode.can(picked)) ACTIONS.openNode.run(picked);
+      const step = stepsIn();
+      if (step) pickNode(step.a, step.col, true);
     },
   },
   undo: {
@@ -2663,6 +2664,19 @@ const foldsUp = (): { a: string; head: boolean } | null => {
   return b && unfolds(b) ? at : null;
 };
 
+/**
+ * Where the right arrow goes in from: the card the selection stands on, with the column to open it in where its
+ * reading is not open yet, and none where it already stands open. Going in is the same move either way, since what the
+ * reader asked for is to be at the head; whether the reading had to be opened to get there is the map's business.
+ */
+const stepsIn = (): { a: string; col: number | null } | null => {
+  if (picked === null || onHead) return null;
+  const b = brief(picked);
+  const col = colOf.get(picked);
+  if (!b || !isCard(b) || level(picked).length === 0 || col === undefined) return null;
+  return { a: picked, col: chain[col] === picked ? null : col };
+};
+
 /** Closes a reading: the map ends at the card that opened it, and the selection steps back onto that card. */
 function closeReading(r: string): void {
   if (!r) return;
@@ -2884,7 +2898,7 @@ function pickNode(a: string, col: number | null, head = false): void {
   requestAnimationFrame(() => {
     const pair = col === null ? null : (stage()?.querySelector<HTMLElement>(`.cnode.open > .crow[data-a="${cssEsc(a)}"]`)?.parentElement ?? null);
     if (pair) bringInto(pair, 0.06);
-    else bringIntoView(a);
+    else bringIntoView(a, head);
   });
 }
 
@@ -2973,12 +2987,18 @@ function followFocus(): void {
   bringIntoView(state.focus);
 }
 
-/** Brings an address into view where the map has taken it out of sight: the last row that draws it, which is the head of a reading just opened. */
-function bringIntoView(a: string): void {
+/**
+ * Brings an address into view where the map has taken it out of sight. A placed file draws two rows, so which one is
+ * named matters: the selection says whether it stands on the card or on the head, and stepping between them moved the
+ * reader to a row the view never brought in. Where nothing is said, the last row is taken, which is the head of a
+ * reading just opened.
+ */
+function bringIntoView(a: string, head?: boolean): void {
   const st = stage();
   if (!st) return;
   const rows = all<HTMLElement>(`.crow[data-a="${cssEsc(a)}"]`, st);
-  if (rows.length) bringInto(rows[rows.length - 1], 0.5);
+  const want = head === undefined ? rows[rows.length - 1] : (rows.find((r) => (r.dataset.head === "1") === head) ?? rows[rows.length - 1]);
+  if (want) bringInto(want, 0.5);
 }
 
 /**

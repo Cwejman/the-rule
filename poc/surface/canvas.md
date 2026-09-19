@@ -168,7 +168,7 @@ Three of the moves are the map's own, since what they act on is the map's struct
 
 - Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
-- Right opens: the reading [the card](#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) leads to stands as a column of its own, and the reader stands at its head. It opens nothing else, since [a level of a file waits](#44-a-level-of-a-file-opened-to-the-right-waits).
+- Right goes in: it stands the reader at the head of the reading [the card](#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) leads to, opening it first where it is not open yet. Going in is the same move either way, since what was asked for is to be at the head and whether the reading had to be opened is the map's business. It goes nowhere else, since [a level of a file waits](#44-a-level-of-a-file-opened-to-the-right-waits).
 
 - Left steps back out and closes nothing: from a head onto the card that opened it, from a row onto the one it hangs beneath. In the lane it is the brief above.
 
@@ -180,7 +180,7 @@ The last two divide by where the prose stands. While the reader is only looking,
 
 That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.
 
-*The author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head.*
+*The author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
 
 ### 5.3 What is selected shows its face
 
