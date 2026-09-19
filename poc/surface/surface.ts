@@ -1091,7 +1091,7 @@ type Action = {
 const acts = (a?: string): string =>
   a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : handOnMap() && picked !== null && brief(picked) ? picked : state.focus);
 
-/** Whether an act falls on the map: a badge in the canvas's own field always does, and a key does where the hand is. */
+/** Whether an act falls on the map: a badge in the canvas's own field always does, and a key does while the map stands. */
 const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap());
 
 const ACTIONS: Record<string, Action> = {
@@ -2561,16 +2561,17 @@ let picked: string | null = null;
 let onHead = false;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
-/** Whether the canvas is the pane standing alone. */
-const canvasAlone = (): boolean => canvasOn() && ui.scroll.classList.contains("off");
 
-/** Which pane the reader last acted in, which is the one a key acts on: the map, or the reading. */
-let hand: "lane" | "canvas" = "lane";
 /**
- * Whether a key acts on the map. It does where the canvas stands alone, and where the reader's hand is last on the
- * map, so the keys go on acting where they were acting rather than on whichever pane happens to stand.
+ * Whether a key acts on the map: it does whenever the map stands. The map is how a body is moved in and the lane is
+ * how one reading of it is read, and a reading is moved through by scrolling, which needs no key. So the keys belong
+ * to the map while it stands and to the lane when it does not, and there is nothing to be in the wrong half of.
+ *
+ * It was the pane the reader last acted in until 2026-09-19. That made every key modal on something the page never
+ * showed: a reader who opened the canvas and pressed an arrow moved the prose, because their hand had never been put
+ * on the map, and nothing on the page could tell them so.
  */
-const handOnMap = (): boolean => canvasOn() && (canvasAlone() || hand === "canvas");
+const handOnMap = (): boolean => canvasOn();
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
 /** The readings on the way to an address: every card at or above it, the outermost first. */
@@ -4465,9 +4466,6 @@ function wire(): void {
   document.addEventListener("click", (e) => {
     hideTip();
     const t = e.target as HTMLElement;
-    // the reader's hand moves to the pane they press in, and the keys follow it
-    if (t.closest("#canvas")) hand = "canvas";
-    else if (t.closest("#scroll")) hand = "lane";
     // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
     const inner = t.closest<HTMLAnchorElement>('a[href^="#/"]');
     if (inner && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
@@ -4607,7 +4605,6 @@ function wire(): void {
     drag.moved = true;
     state.scrubbing = true;
     if (drag.kind === "canvas") {
-      hand = "canvas";
       view.x = drag.vx! + (e.clientX - drag.x);
       view.y = drag.vy! + (e.clientY - drag.y);
       applyView(false);
@@ -4660,12 +4657,6 @@ function wire(): void {
     },
     { passive: false },
   );
-
-  // A wheel is the reader themself, reading the prose or panning the map, so it moves their hand to that pane and the
-  // keys with it. A scroll the page made of its own, settling on a brief or arriving at one a key went to, is not the
-  // reader reading, and it leaves the hand where it was: otherwise going to a node handed the keys back to the lane,
-  // and the act that undoes the going could not be taken.
-  document.addEventListener("wheel", (e) => (hand = (e.target as HTMLElement).closest("#canvas") ? "canvas" : "lane"), { passive: true });
 
   // the wheel scrolls the lane wherever the pointer rests, except over a meter, which turns instead
   document.addEventListener(

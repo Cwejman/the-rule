@@ -158,11 +158,13 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 *The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
-### 5.2 The keys act where the hand is, and the moves are each pane's own
+### 5.2 The keys belong to the map while it stands, and the moves are each pane's own
 
-A key acts in the pane the reader last acted in: pressing or panning the map puts their hand on it, a wheel over the prose brings it back to the lane, and where the canvas stands alone it is always the map.
+While the map stands the keys are the map's, and when it does not stand they are the lane's. The map is how a body is moved in; the lane is how one reading of it is read, and a reading is moved through by scrolling, which asks for no key at all.
 
-A scroll the page made of its own is not the reader reading, and it leaves the hand where it was. Without that, a key that went to a node scrolled the prose to it and handed the keys straight back to the lane, so the act that undoes the going could not be taken.
+Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so. What that cost was the whole of this level: the keys were agreed, built and read, and they still did nothing where a reader met them.
+
+What it gives up is moving the lane's focus by the arrows while both panes stand. That is little, since the focus follows the scroll and [the two panes are kept in step](#6-one-state-and-the-lane-in-step-with-it).
 
 Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in both panes and act in whichever the hand is in.
 
