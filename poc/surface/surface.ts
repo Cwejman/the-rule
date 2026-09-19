@@ -1132,31 +1132,26 @@ const ACTIONS: Record<string, Action> = {
     label: () => "open",
     mark: () => ICON.openRight,
     keys: [],
-    help: () => "Opens what this piece holds as a column of its own to the right, without taking the reading there.",
-    also: "The right arrow, where the canvas stands alone.",
+    help: () => "Opens the reading this card leads to as a column of its own, and stands you at its head without taking the prose there.",
+    also: "The right arrow, and a press on the card.",
     can: (a) => {
       const x = acts(a);
-      return (a !== undefined ? canvasOn() : handOnMap()) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
+      const b = brief(x);
+      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
     },
     run: (a) => {
       const x = acts(a);
-      pickNode(x, colOf.get(x) ?? chain.length);
+      pickNode(x, colOf.get(x) ?? chain.length, true);
     },
   },
   closeNode: {
     label: () => "close",
     mark: () => ICON.closeRight,
-    keys: [],
-    help: () => "Closes the reading this piece opened, so the map ends here again.",
-    also: "The left arrow, where the canvas stands alone.",
-    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && chain.includes(acts(a)),
-    run: (a) => {
-      const x = acts(a);
-      chain = chain.slice(0, chain.indexOf(x));
-      picked = x;
-      drawCanvas();
-      requestAnimationFrame(() => bringIntoView(x));
-    },
+    keys: [{ key: "Backspace" }],
+    help: () => "Closes the reading you are in, so the map ends at the card again and you stand on it.",
+    also: "The left arrow steps back onto the card and leaves the reading open; shift with return closes a reading the prose stands in.",
+    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && closable(a) !== "" && !laneIsIn(closable(a)),
+    run: (a) => closeReading(closable(a)),
   },
   read: {
     label: () => "read",
@@ -1189,15 +1184,24 @@ const ACTIONS: Record<string, Action> = {
     run: (a) => scopeTo(acts(a)),
   },
   widen: {
-    label: () => (handOnMap() ? "close" : "widen"),
+    label: () => (handOnMap() ? "out" : "widen"),
     keys: [{ key: "Enter", shift: true }],
     help: () =>
       handOnMap()
-        ? "Closes the reading this node opened, which is what going in with return undoes."
+        ? "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes."
         : "Widens the scope to the level above, so what stood around this brief comes back.",
     also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
-    can: () => (handOnMap() ? picked !== null && ACTIONS.closeNode.can(picked) : state.scope !== ""),
-    run: () => (handOnMap() && picked !== null && ACTIONS.closeNode.can(picked) ? ACTIONS.closeNode.run(picked) : popUp()),
+    can: () => (handOnMap() ? closable() !== "" : state.scope !== ""),
+    run: () => {
+      if (!handOnMap()) return popUp();
+      const r = closable();
+      if (!r) return;
+      // the prose is taken out first: the map holds the reading the lane holds, so a close made before the going
+      // would be laid again by the very next draw
+      const holder = parentOf(r);
+      if (brief(holder)) readOn(holder);
+      closeReading(r);
+    },
   },
   deeper: {
     label: () => "a level more",
@@ -1218,29 +1222,49 @@ const ACTIONS: Record<string, Action> = {
   next: {
     label: () => "next",
     keys: [{ key: "ArrowDown" }],
-    help: () => (handOnMap() ? "Moves to the next node of this level on the canvas." : "Moves the reading on to the next brief in the lane, folding nothing."),
+    help: () => (handOnMap() ? "Moves to the next node down this column of the map, which within a file is its reading order." : "Moves the reading on to the next brief in the lane, folding nothing."),
     can: () => true,
     run: () => (handOnMap() ? stepPick(1) : step(1)),
   },
   previous: {
     label: () => "previous",
     keys: [{ key: "ArrowUp" }],
-    help: () => (handOnMap() ? "Moves back to the node before this one on this level of the canvas." : "Moves the reading back to the brief before this one in the lane, folding nothing."),
+    help: () => (handOnMap() ? "Moves back to the node before this one up this column of the map." : "Moves the reading back to the brief before this one in the lane, folding nothing."),
     can: () => true,
     run: () => (handOnMap() ? stepPick(-1) : step(-1)),
+  },
+  nextLevel: {
+    label: () => "next of this level",
+    keys: [{ key: "ArrowDown", shift: true }],
+    help: () =>
+      handOnMap()
+        ? "Moves to the next node at this level of the map, passing over whatever hangs beneath it."
+        : "Moves the reading to the next brief at this level, passing over whatever stands beneath it.",
+    can: () => true,
+    run: () => (handOnMap() ? stepLevel(1) : stepSibling(1)),
+  },
+  previousLevel: {
+    label: () => "previous of this level",
+    keys: [{ key: "ArrowUp", shift: true }],
+    help: () =>
+      handOnMap()
+        ? "Moves back to the node before this one at this level of the map, passing over whatever hangs beneath it."
+        : "Moves the reading back to the brief before this one at this level, passing over whatever stands beneath it.",
+    can: () => true,
+    run: () => (handOnMap() ? stepLevel(-1) : stepSibling(-1)),
   },
   above: {
     label: () => "out",
     keys: [{ key: "ArrowLeft" }],
     help: () =>
       handOnMap()
-        ? "Goes back out: closes the reading this node opened, or moves to the node it stands under."
+        ? "Steps back out without closing anything: from the head of a reading onto the card that opened it, and from a row onto the one it hangs beneath."
         : "Moves the reading up to the brief this one stands beneath, folding nothing.",
-    can: () => (handOnMap() ? picked !== null && (ACTIONS.closeNode.can(picked) || !!brief(parentOf(picked))) : state.focus !== state.scope),
+    can: () => (handOnMap() ? picked !== null && outOf(picked, onHead) !== null : state.focus !== state.scope),
     run: () => {
       if (!handOnMap()) return up();
-      if (picked !== null && ACTIONS.closeNode.can(picked)) return ACTIONS.closeNode.run(picked);
-      if (picked) pickNode(parentOf(picked), null);
+      const out = picked === null ? null : outOf(picked, onHead);
+      if (out) pickNode(out.a, null, out.head);
     },
   },
   beneath: {
@@ -1248,15 +1272,12 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "ArrowRight" }],
     help: () =>
       handOnMap()
-        ? "Goes in: opens what this node holds as a column of its own, and steps into it once it stands open."
+        ? "Goes in: opens the reading this card leads to as a column of its own and stands you at its head."
         : "Moves the reading into the first brief beneath this one, when it stands in the lane.",
-    can: () => (handOnMap() ? picked !== null && level(picked).length > 0 : level(state.focus).length > 0),
+    can: () => (handOnMap() ? picked !== null && ACTIONS.openNode.can(picked) : level(state.focus).length > 0),
     run: () => {
       if (!handOnMap()) return down();
-      if (picked === null) return;
-      if (ACTIONS.openNode.can(picked)) return ACTIONS.openNode.run(picked);
-      const first = level(picked)[0];
-      if (first) pickNode(first.address, null);
+      if (picked !== null && ACTIONS.openNode.can(picked)) ACTIONS.openNode.run(picked);
     },
   },
   undo: {
@@ -2520,6 +2541,12 @@ let chain: string[] = [];
 const colOf = new Map<string, number>();
 /** The node the reader has selected. It is not the focus, since opening something is not going to it. */
 let picked: string | null = null;
+/**
+ * Whether the selection stands on the head of its own column rather than on the card that named it. A placed file is
+ * one brief drawn as two rows, the card in the prose that placed it and the head of the reading it opens, so the
+ * selection says which of the two the reader stands on: beside the reading, or inside it.
+ */
+let onHead = false;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 /** Whether the canvas is the pane standing alone. */
@@ -2564,6 +2591,53 @@ const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
 /** Whether a brief's level stands beneath it in its column: a card's never does, and a folded brief's is folded away. */
 const showsKids = (b: Brief): boolean => !isCard(b) && gradeOf(b.address) !== "face" && level(b.address).length > 0;
 
+/** The root of the column a node stands in: its own address at a head, else the nearest reading opened above it. */
+const colRootOf = (a: string, head: boolean): string =>
+  head ? a : (prefixesOf(a).filter((p) => p !== a).findLast((p) => isCard(brief(p))) ?? "");
+
+/** The rows a column draws beneath its head, in the order they are drawn: one file read top to bottom. */
+const columnRows = (root: string): Brief[] => level(root).flatMap((b) => [b, ...(showsKids(b) ? columnRows(b.address) : [])]);
+
+/** The column a node stands in, head first, as the map lays it: the order down and up walk. */
+const columnOf = (a: string, head: boolean): { a: string; head: boolean }[] => {
+  const root = colRootOf(a, head);
+  return [{ a: root, head: true }, ...columnRows(root).map((b) => ({ a: b.address, head: false }))];
+};
+
+/** Where a step out lands: the head steps out to its card, a row at the top of a column onto that head, any other row onto the row it hangs beneath. */
+const outOf = (a: string, head: boolean): { a: string; head: boolean } | null => {
+  if (head) return a === "" ? null : { a, head: false };
+  const root = colRootOf(a, false);
+  const p = parentOf(a);
+  return p === root ? { a: root, head: true } : { a: p, head: false };
+};
+
+/**
+ * The reading an act would close. A card that stands open closes the reading it opened, which is what a reader
+ * standing beside one means by closing; anywhere else the reading the reader stands in closes, and they step back
+ * onto the card that opened it. The two are one act seen from either side of the boundary.
+ */
+const closable = (a?: string): string => {
+  if (a !== undefined) return chain.includes(a) ? a : "";
+  if (picked === null) return "";
+  if (!onHead && chain.includes(picked)) return picked;
+  const r = colRootOf(picked, onHead);
+  return r !== "" && chain.includes(r) ? r : "";
+};
+
+/**
+ * Whether the prose stands inside a reading. The map holds the reading the lane holds, so closing one the lane is
+ * reading would be undone by the next draw; that reading is closed by taking the prose out of it first.
+ */
+const laneIsIn = (r: string): boolean => r !== "" && cardPathOf(fileRootOf(state.scope)).includes(r);
+
+/** Closes a reading: the map ends at the card that opened it, and the selection steps back onto that card. */
+function closeReading(r: string): void {
+  if (!r) return;
+  chain = chain.slice(0, chain.indexOf(r));
+  pickNode(r, null, false);
+}
+
 /**
  * The figure a node carries for what it does not show, in one language: a bar per paragraph of its own prose, then a
  * bar per brief of the level it hides, each as long as that brief's branch is heavy. Both are the branch's own hue,
@@ -2586,7 +2660,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const a = b.address;
   // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
   if (!o.head) colOf.set(a, col);
-  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
+  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked && o.head === onHead ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
@@ -2597,7 +2671,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
   // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
   // width and a name that wraps needs no hanging indent
-  return `<div class="${cls}" data-a="${esc(a)}" ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
+  return `<div class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -2667,7 +2741,10 @@ function drawCanvas(): void {
   // lays the path to it, and scrolling within one changes nothing, since the scope is what says where the reader is
   const held = fileRootOf(state.scope);
   if (!chainHolds(held)) chain = cardPathOf(held);
-  if (picked === null || !brief(picked)) picked = state.focus;
+  if (picked === null || !brief(picked)) ((picked = state.focus), (onHead = isCard(brief(state.focus))));
+  // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
+  if (picked === "") onHead = true;
+  else if (onHead && !chain.includes(picked)) onHead = false;
   colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
@@ -2730,21 +2807,42 @@ function drawEdges(): void {
   svg.innerHTML = paths.join("");
 }
 
-/** Moves the selection along the level it stands in, as the reading moves brief by brief in the lane. */
+/**
+ * Moves the selection down or up the column it stands in, row by row as the map draws them, which within a file is its
+ * reading order, as the lane moves brief by brief. It never crosses into a reading opened beside it: that is entered.
+ */
 function stepPick(by: number): void {
-  if (picked === null) return void (level("")[0] && pickNode(level("")[0].address, null));
+  if (picked === null) return void (brief("") && pickNode("", null, true));
+  const rows = columnOf(picked, onHead);
+  const i = rows.findIndex((r) => r.a === picked && r.head === onHead);
+  const next = rows[i + by];
+  if (next) pickNode(next.a, null, next.head);
+}
+
+/** Moves the selection to the node before or after it at its own level, passing over whatever hangs beneath them. */
+function stepLevel(by: number): void {
+  if (picked === null || onHead) return;
   const sibs = level(parentOf(picked));
   const i = sibs.findIndex((b) => b.address === picked);
   const next = sibs[i + by];
-  if (next) pickNode(next.address, null);
+  if (next) pickNode(next.address, null, false);
+}
+
+/** The same move in the lane: the brief before or after the focus at its own level, never one nested inside them. */
+function stepSibling(by: number): void {
+  const sibs = level(parentOf(state.focus)).filter((b) => inLane(b.address) && !isCard(b));
+  const i = sibs.findIndex((b) => b.address === state.focus);
+  const next = sibs[i + by];
+  if (next) moveTo(next.address);
 }
 
 /**
  * A press on a node: it is selected, and where it is an opening the reading it names opens beside it, replacing
  * whatever stood to the right of its column. The prose does not move; a press again on what is selected reads it.
  */
-function pickNode(a: string, col: number | null): void {
+function pickNode(a: string, col: number | null, head = false): void {
   picked = a;
+  onHead = head;
   if (col !== null) chain = [...chain.slice(0, col), a];
   drawCanvas();
   // an opening brings the reading it opened into the pane, since that is what the press was for
@@ -3917,6 +4015,10 @@ function settle(a: string): void {
   }
   state.focus = target;
   picked = target;
+  onHead = target === "" || isCard(brief(target));
+  // the selection went with the going, so the map draws again: without it the row lit on the map was the one the
+  // reader left, and the next key acted on a node other than the one they could see was theirs
+  if (canvasOn()) drawCanvas();
   drawWings();
   light();
   scrollToFocus(true);
@@ -3976,6 +4078,7 @@ function arrive(a: string): void {
   const target = brief(a) ? a : nearest(a);
   // an arrival is a going, so what is selected on the map goes with it; scrolling alone never moves the selection
   picked = target;
+  onHead = target === "" || isCard(brief(target));
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay();
@@ -4154,8 +4257,6 @@ const pointer = { x: -1, y: -1, still: false };
 
 /** Scrolling moves the focus and nothing else; the address follows without entering the history. */
 function onScroll(): void {
-  // reading is acting in the lane, so a scroll brings the reader's hand back to it and the keys with it
-  if (!arriving) hand = "lane";
   // a scroll takes the tooltip away, except the callout, which is the finger's own answer to the scrubbing it caused
   if (!ui.tip.classList.contains("callout")) hideTip();
   markAway();
@@ -4338,11 +4439,12 @@ function wire(): void {
     if (crow) {
       if (state.scrubbing) return;
       const a = crow.dataset.a!;
+      const head = crow.dataset.head === "1";
       if (narrow() && !fits().lane) card.a = a;
       // one press selects, two presses go. Opening a reading is an act of its own and never rides on a press, since a
       // reader who presses to look at a node has not asked for the map to grow
-      if (picked === a) readOn(a);
-      else pickNode(a, null);
+      if (picked === a && onHead === head) readOn(a);
+      else pickNode(a, null, head);
       drawCard();
       return void drawChooser();
     }
@@ -4506,6 +4608,12 @@ function wire(): void {
     },
     { passive: false },
   );
+
+  // A wheel is the reader themself, reading the prose or panning the map, so it moves their hand to that pane and the
+  // keys with it. A scroll the page made of its own, settling on a brief or arriving at one a key went to, is not the
+  // reader reading, and it leaves the hand where it was: otherwise going to a node handed the keys back to the lane,
+  // and the act that undoes the going could not be taken.
+  document.addEventListener("wheel", (e) => (hand = (e.target as HTMLElement).closest("#canvas") ? "canvas" : "lane"), { passive: true });
 
   // the wheel scrolls the lane wherever the pointer rests, except over a meter, which turns instead
   document.addEventListener(
