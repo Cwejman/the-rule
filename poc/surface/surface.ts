@@ -3601,8 +3601,11 @@ const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt
 /** The brief under the reading line, or the nearest above it. */
 function focusUnderLine(): string {
   const y = readingLine();
-  // a card is a thing of the reading like a brief, so the line falls on it and it is the innermost that wins
-  const arts = all<HTMLElement>(".brief, .card", ui.lane);
+  // A card stands in the prose as a figure does, and no figure takes the reading line: the line falls on the brief
+  // whose prose places it. The arrows already walk the reading this way, and while the line fell on cards too the two
+  // disagreed — scrolling past a brief that places parts bounced the address, the map's selection and the view from
+  // the brief to each card and back again.
+  const arts = all<HTMLElement>(".brief", ui.lane);
   const under = arts.filter((el) => {
     const r = el.getBoundingClientRect();
     return r.top <= y && r.bottom > y;

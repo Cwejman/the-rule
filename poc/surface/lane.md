@@ -38,6 +38,8 @@ The card takes one unfolding, to the whole of the brief on the other side, and n
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
+A card does not take [the reading line](#4-where-you-are-is-the-brief-in-focus). It stands in the prose as a figure does, and no figure does; the line falls on the brief whose prose places it, which is what the arrow keys already walk. While it fell on cards as well, scrolling through a brief that places parts bounced the address, the map's selection and the map's own view from the brief to each card and back again.
+
 A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which is read through; a card is looked at directly, and one too faint to read has failed at the one thing it is for. So the card the reading stands on takes full ink and its outline takes the branch's hue, and every other card stays quiet and legible. Pointing at a card holds the brief it sits in at full ink as well, since the brief's own fading would take the card down with it.
 
 *The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed.*
