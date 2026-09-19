@@ -109,7 +109,9 @@ Every choice is always drawn, so the row never changes length as the screen does
 
 Every widget reads one state and nothing else, and acts through the same four verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the grade of every brief in the lane, and the settings. The verbs are to go to an address, to point at one, to fold one, and to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane).
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the grade of every brief in the lane, the settings, and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
+
+Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 
 Everything drawn that names a brief carries that brief's address. That one convention is what keeps the widgets in step: pointing at a brief in any of them lights it in all of them, and pressing it anywhere goes.
 

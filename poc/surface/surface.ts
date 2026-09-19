@@ -413,7 +413,7 @@ type Cut = { title: string | null; lead: Tok[]; sections: Section[]; strays: str
 
 function cut(toks: Tok[]): Cut {
   const out: Cut = { title: null, lead: [], sections: [], strays: [] };
-  const open: Section[] = []; // the chain of sections a token falls under, shallowest first
+  const open: Section[] = []; // the state.chain of sections a token falls under, shallowest first
   toks.forEach((t) => {
     const isHeading = t.type === "heading";
     if (isHeading && t.depth === 1 && out.title === null) return void (out.title = textOf(t.tokens));
@@ -948,6 +948,15 @@ const state = {
   scope: "",
   /** how the reader came here: every move they made, oldest first, each with the lane as it stood before it */
   trail: [] as Hop[],
+  /** the node the reader stands on in the map. It is not the focus, since opening something is not going to it */
+  picked: null as string | null,
+  /**
+   * Which of a placed file's two rows the selection stands on: one brief is drawn twice, as the card in the prose
+   * that placed it and as the head of the reading it opens, and the two are different places to stand.
+   */
+  onHead: false,
+  /** which node of each column stands open, from the root outward: the reader's path across the map */
+  chain: [] as string[],
 };
 
 // A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than
@@ -1089,7 +1098,7 @@ type Action = {
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
 /** The brief an act falls on when none is named: the one under the pointer while one is pointed at, else the focus, since [pointing overrides the focus](lane.md#43-pointing-overrides-the-focus) for the acts as for the highlight. */
 const acts = (a?: string): string =>
-  a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : handOnMap() && picked !== null && brief(picked) ? picked : state.focus);
+  a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : handOnMap() && state.picked !== null && brief(state.picked) ? state.picked : state.focus);
 
 /** Whether an act falls on the map: a badge in the canvas's own field always does, and a key does while the map stands. */
 const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap());
@@ -1157,11 +1166,11 @@ const ACTIONS: Record<string, Action> = {
     can: (a) => {
       const x = acts(a);
       const b = brief(x);
-      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && colOf.has(x) && chain[colOf.get(x)!] !== x;
+      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && colOf.has(x) && state.chain[colOf.get(x)!] !== x;
     },
     run: (a) => {
       const x = acts(a);
-      pickNode(x, colOf.get(x) ?? chain.length, true);
+      pickNode(x, colOf.get(x) ?? state.chain.length, true);
     },
   },
   read: {
@@ -1271,10 +1280,10 @@ const ACTIONS: Record<string, Action> = {
       handOnMap()
         ? "Steps back out without closing anything: from the head of a reading onto the card that opened it, and from a row onto the one it hangs beneath."
         : "Moves the reading up to the brief this one stands beneath, folding nothing.",
-    can: () => (handOnMap() ? picked !== null && outOf(picked, onHead) !== null : state.focus !== state.scope),
+    can: () => (handOnMap() ? state.picked !== null && outOf(state.picked, state.onHead) !== null : state.focus !== state.scope),
     run: () => {
       if (!handOnMap()) return up();
-      const out = picked === null ? null : outOf(picked, onHead);
+      const out = state.picked === null ? null : outOf(state.picked, state.onHead);
       if (out) pickNode(out.a, null, out.head);
     },
   },
@@ -2536,7 +2545,7 @@ function plateSvg(W: number, H: number): string {
 // one column per file, its own brief at the head and its headings beneath it as
 // a tree; across is each opening, an edge from the row pressed to the head of
 // what it names. A press selects a node and opens it, a press again reads it in
-// the lane, and opening a sibling replaces the chain that stood to the right.
+// the lane, and opening a sibling replaces the state.chain that stood to the right.
 // The nodes are HTML laid out by the browser, one SVG behind them draws the
 // nesting and the openings once the nodes are measured, and pan and zoom are one
 // transform on the stage, kept in the browser like the lane.
@@ -2547,18 +2556,8 @@ const view: View = { x: 24, y: 24, k: 1 };
 let fitted: string | null = null;
 let followed = "";
 
-/** Which node of each column stands open, from the root outward: the reader's path across the map. */
-let chain: string[] = [];
 /** Which column each row was drawn in, filled as the canvas is drawn, so an act opens what is selected where it stands. */
 const colOf = new Map<string, number>();
-/** The node the reader has selected. It is not the focus, since opening something is not going to it. */
-let picked: string | null = null;
-/**
- * Whether the selection stands on the head of its own column rather than on the card that named it. A placed file is
- * one brief drawn as two rows, the card in the prose that placed it and the head of the reading it opens, so the
- * selection says which of the two the reader stands on: beside the reading, or inside it.
- */
-let onHead = false;
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 
@@ -2577,8 +2576,8 @@ const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#s
 /** The readings on the way to an address: every card at or above it, the outermost first. */
 const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(brief(p)));
 
-/** Whether the chain already holds the way to an address, so a going within the map leaves the map as it stands. */
-const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => chain[i] === p);
+/** Whether the state.chain already holds the way to an address, so a going within the map leaves the map as it stands. */
+const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => state.chain[i] === p);
 
 /**
  * A brief's number counted from a root: in the lane from the scope, on the canvas from the head of its column. A card
@@ -2631,11 +2630,11 @@ const outOf = (a: string, head: boolean): { a: string; head: boolean } | null =>
  * onto the card that opened it. The two are one act seen from either side of the boundary.
  */
 const closable = (a?: string): string => {
-  if (a !== undefined) return chain.includes(a) ? a : "";
-  if (picked === null) return "";
-  if (!onHead && chain.includes(picked)) return picked;
-  const r = colRootOf(picked, onHead);
-  return r !== "" && chain.includes(r) ? r : "";
+  if (a !== undefined) return state.chain.includes(a) ? a : "";
+  if (state.picked === null) return "";
+  if (!state.onHead && state.chain.includes(state.picked)) return state.picked;
+  const r = colRootOf(state.picked, state.onHead);
+  return r !== "" && state.chain.includes(r) ? r : "";
 };
 
 /**
@@ -2656,8 +2655,8 @@ const shuts = (): string => (closable() !== "" && !laneIsIn(closable()) ? closab
  * placed this one, and folding a brief of a reading the reader is not in is not what the act means.
  */
 const foldsUp = (): { a: string; head: boolean } | null => {
-  if (picked === null || onHead) return null;
-  const at = outOf(picked, false);
+  if (state.picked === null || state.onHead) return null;
+  const at = outOf(state.picked, false);
   // a row at the top of a column has no brief above it within this reading: the head is the reading itself, and
   // folding it there would change the lane while the map went on drawing the column whole. That step is the close
   if (!at || at.head) return null;
@@ -2671,17 +2670,17 @@ const foldsUp = (): { a: string; head: boolean } | null => {
  * reader asked for is to be at the head; whether the reading had to be opened to get there is the map's business.
  */
 const stepsIn = (): { a: string; col: number | null } | null => {
-  if (picked === null || onHead) return null;
-  const b = brief(picked);
-  const col = colOf.get(picked);
-  if (!b || !isCard(b) || level(picked).length === 0 || col === undefined) return null;
-  return { a: picked, col: chain[col] === picked ? null : col };
+  if (state.picked === null || state.onHead) return null;
+  const b = brief(state.picked);
+  const col = colOf.get(state.picked);
+  if (!b || !isCard(b) || level(state.picked).length === 0 || col === undefined) return null;
+  return { a: state.picked, col: state.chain[col] === state.picked ? null : col };
 };
 
 /** Closes a reading: the map ends at the card that opened it, and the selection steps back onto that card. */
 function closeReading(r: string): void {
   if (!r) return;
-  chain = chain.slice(0, chain.indexOf(r));
+  state.chain = state.chain.slice(0, state.chain.indexOf(r));
   pickNode(r, null, false);
 }
 
@@ -2707,7 +2706,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const a = b.address;
   // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
   if (!o.head) colOf.set(a, col);
-  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === picked && o.head === onHead ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
+  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
@@ -2727,7 +2726,7 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   // a placement leads to a reading of its own and says so with a chevron; a level of this file goes down, and stands
   // out to the right only where the reader has asked for it by the act
   const opens = isCard(b) && !head;
-  const open = !head && chain[col] === a;
+  const open = !head && state.chain[col] === a;
   const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
   const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
@@ -2757,7 +2756,7 @@ const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "face"];
  * each with its glyph, its word and the key that fires it. Every act it has appears; none stands behind an opener.
  */
 function fieldHtml(): string {
-  const a = picked;
+  const a = state.picked;
   const b = a ? brief(a) : undefined;
   if (narrow() || !a || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
@@ -2771,7 +2770,7 @@ function fieldHtml(): string {
  * pointer covers the very thing being looked at.
  */
 function faceHtml(): string {
-  const b = picked ? brief(picked) : undefined;
+  const b = state.picked ? brief(state.picked) : undefined;
   if (narrow() || !b || state.settings.face === "hidden") return "";
   const stamp = stampOf(b);
   return (
@@ -2781,17 +2780,17 @@ function faceHtml(): string {
   );
 }
 
-/** Draws the canvas whole from the state: the root's column with the chain opened through it, then the lines between. */
+/** Draws the canvas whole from the state: the root's column with the state.chain opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   // the canvas draws the path the reader has opened, and it holds the reading the lane holds: going into a reading
   // lays the path to it, and scrolling within one changes nothing, since the scope is what says where the reader is
   const held = fileRootOf(state.scope);
-  if (!chainHolds(held)) chain = cardPathOf(held);
-  if (picked === null || !brief(picked)) ((picked = state.focus), (onHead = isCard(brief(state.focus))));
+  if (!chainHolds(held)) state.chain = cardPathOf(held);
+  if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = isCard(brief(state.focus))));
   // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
-  if (picked === "") onHead = true;
-  else if (onHead && !chain.includes(picked)) onHead = false;
+  if (state.picked === "") state.onHead = true;
+  else if (state.onHead && !state.chain.includes(state.picked)) state.onHead = false;
   colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
@@ -2859,18 +2858,18 @@ function drawEdges(): void {
  * reading order, as the lane moves brief by brief. It never crosses into a reading opened beside it: that is entered.
  */
 function stepPick(by: number): void {
-  if (picked === null) return void (brief("") && pickNode("", null, true));
-  const rows = columnOf(picked, onHead);
-  const i = rows.findIndex((r) => r.a === picked && r.head === onHead);
+  if (state.picked === null) return void (brief("") && pickNode("", null, true));
+  const rows = columnOf(state.picked, state.onHead);
+  const i = rows.findIndex((r) => r.a === state.picked && r.head === state.onHead);
   const next = rows[i + by];
   if (next) pickNode(next.a, null, next.head);
 }
 
 /** Moves the selection to the node before or after it at its own level, passing over whatever hangs beneath them. */
 function stepLevel(by: number): void {
-  if (picked === null || onHead) return;
-  const sibs = level(parentOf(picked));
-  const i = sibs.findIndex((b) => b.address === picked);
+  if (state.picked === null || state.onHead) return;
+  const sibs = level(parentOf(state.picked));
+  const i = sibs.findIndex((b) => b.address === state.picked);
   const next = sibs[i + by];
   if (next) pickNode(next.address, null, false);
 }
@@ -2888,9 +2887,9 @@ function stepSibling(by: number): void {
  * whatever stood to the right of its column. The prose does not move; a press again on what is selected reads it.
  */
 function pickNode(a: string, col: number | null, head = false): void {
-  picked = a;
-  onHead = head;
-  if (col !== null) chain = [...chain.slice(0, col), a];
+  state.picked = a;
+  state.onHead = head;
+  if (col !== null) state.chain = [...state.chain.slice(0, col), a];
   drawCanvas();
   // an opening brings the reading it opened into the pane, since that is what the press was for
   // the row that was pressed and the reading it opened are brought in together, so the reader keeps the place they
@@ -3052,7 +3051,7 @@ function rememberView(): void {
   clearTimeout(viewTimer);
   viewTimer = setTimeout(() => {
     try {
-      localStorage.setItem(viewKey(), JSON.stringify({ ...view, chain }));
+      localStorage.setItem(viewKey(), JSON.stringify({ ...view, chain: state.chain }));
     } catch {}
   }, 150);
 }
@@ -3063,7 +3062,7 @@ function recallView(): void {
     if (kept && typeof kept.k === "number") {
       Object.assign(view, { x: kept.x, y: kept.y, k: kept.k });
       fitted = state.body?.root ?? null;
-      if (Array.isArray(kept.chain)) chain = kept.chain.filter((a: string) => brief(a));
+      if (Array.isArray(kept.chain)) state.chain = kept.chain.filter((a: string) => brief(a));
     }
   } catch {}
 }
@@ -4067,8 +4066,8 @@ function settle(a: string): void {
     drawLane();
   }
   state.focus = target;
-  picked = target;
-  onHead = target === "" || isCard(brief(target));
+  state.picked = target;
+  state.onHead = target === "" || isCard(brief(target));
   // the selection went with the going, so the map draws again: without it the row lit on the map was the one the
   // reader left, and the next key acted on a node other than the one they could see was theirs
   if (canvasOn()) drawCanvas();
@@ -4130,8 +4129,8 @@ function arrive(a: string): void {
   arriving = true;
   const target = brief(a) ? a : nearest(a);
   // an arrival is a going, so what is selected on the map goes with it; scrolling alone never moves the selection
-  picked = target;
-  onHead = target === "" || isCard(brief(target));
+  state.picked = target;
+  state.onHead = target === "" || isCard(brief(target));
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay();
@@ -4483,7 +4482,7 @@ function wire(): void {
       return void (badge.closest(".strip") && drawChooser());
     }
     // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
-    if (t.closest("#face") && picked && brief(picked)) return void goTo(picked);
+    if (t.closest("#face") && state.picked && brief(state.picked)) return void goTo(state.picked);
     // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) {
@@ -4493,7 +4492,7 @@ function wire(): void {
       if (narrow() && !fits().lane) card.a = a;
       // one press selects, two presses go. Opening a reading is an act of its own and never rides on a press, since a
       // reader who presses to look at a node has not asked for the map to grow
-      if (picked === a && onHead === head) readOn(a);
+      if (state.picked === a && state.onHead === head) readOn(a);
       else pickNode(a, null, head);
       drawCard();
       return void drawChooser();
