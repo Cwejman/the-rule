@@ -80,13 +80,15 @@ Folding is what they do afterwards, to a part they have read or do not want: fol
 
 *The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3-a-reading-is-laid-whole) as well, which is the session's reading of one state and is his to refuse.*
 
-### 4.4 A level may be opened to the right, by asking
+### 4.4 A level of a file opened to the right waits
 
-A file's level goes down, and that is the ordinary reading. Where a reader wants one level in front of them, the act opens it as a column of its own to the right, and it leaves the column it came from.
+A file's level goes down, and that is the ordinary reading. Opening one level in front of the reader instead, as a column of its own to the right, was built on 2026-09-18 and is taken out again. It could not be told apart from the opening that crosses a boundary, and the two are not alike: one enters another reading, the other rearranges this one.
 
-So the step right is always the reader's choice: a placement leads to another reading and opens on a press; a level of this file opens only when they ask for it by the act, and closes back into its column the same way. The map never widens on its own.
+What the author wants of it, when it comes, is a whole level of a file becoming a virtual column, mixed as the reader wishes. What that costs is disassociation, the level standing away from the reading it belongs to, and that is why it waits rather than being kept as it was.
 
-*The author's, 2026-09-18, wanted as a choice and not as a rule; as built the same day, on his reading that a piece could be gone to but not opened.*
+So the step right opens a card and nothing else, and the map never widens on its own.
+
+*The author's, 2026-09-19: the feature is open and is not to be implemented yet. The virtual column and its cost in disassociation are his words; it was built 2026-09-18 and taken out of the key the day after.*
 
 ### 4.5 A row keeps its edge, and says what it leads to by it
 
@@ -122,11 +124,21 @@ Three things went with that fault. What counts as a movement is the distance tra
 
 *The author's report, 2026-09-18, that pressing did not work; found and mended the same day.*
 
+### 4.8 A card and the head of its reading are two places to stand
+
+A placed file is one brief, and the map draws it twice: as the card standing in the prose that placed it, and as the head of the column that card opens. Those are two places for a reader to stand, and which of them they are on is what the keys act from.
+
+On the card a reader stands beside the reading. What lies above and below them is the briefs of the file that placed it, and the way on is in. At the head they stand inside it. What lies below them is that file's own briefs, and the way on is back out.
+
+Holding only the address, the selection made the two one place, and the moves had nowhere to go from it: down walked the placing file's briefs while the reader was looking at the file they had opened, and right had no head to step to. Nothing in the substrate changed to mend it. It is still one brief with one address, [its own as the practice gives it](../practice.md#33-a-placed-file-carries-its-own-brief); what gained a second part is where the reader stands.
+
+*The author's, 2026-09-19, on reading that the card and the file's own top were conflated; as built the same day.*
+
 ## 5. One press selects, two presses go
 
 Three things a reader wants of a node, and they are not one act. To know what it is. To go there and read it. To see what it holds without leaving where they are.
 
-So a press selects the node: its face stands, its acts stand, and nothing else moves. A press again on the node already selected goes there, and the lane takes that reading; enter does the same, and so does the act in the field. Opening is neither of those: it is [its own act](#44-a-level-may-be-opened-to-the-right-by-asking), and it never rides on a press, since a reader who presses a node to look at it has not asked the map to grow.
+So a press selects the node: its face stands, its acts stand, and nothing else moves. A press again on the node already selected goes there, and the lane takes that reading; enter does the same, and so does the act in the field. Opening is neither of those: it is an act of its own, taken by the right arrow or from the field, and it never rides on a press, since a reader who presses a node to look at it has not asked the map to grow.
 
 Going takes the reader to the prose, so where the middle holds the canvas alone the lane stands for it, beside the canvas or in its place where there is room for one pane only. A going that shows nothing is a going a reader cannot see.
 
@@ -146,21 +158,27 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 *The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
-### 5.2 The keys act where the hand is, and take the same shape in both panes
+### 5.2 The keys act where the hand is, and the moves are each pane's own
 
-A key acts in the pane the reader last acted in: pressing or panning the map puts their hand on it, scrolling or pressing the prose brings it back to the lane, and where the canvas stands alone it is always the map. Without that the keys were dead whenever the prose stood beside the map, which is how a reader reads.
+A key acts in the pane the reader last acted in: pressing or panning the map puts their hand on it, a wheel over the prose brings it back to the lane, and where the canvas stands alone it is always the map.
 
-The four moves keep one shape across the panes, each acting on that pane's own object: the reading in the lane, what is selected on the map.
+A scroll the page made of its own is not the reader reading, and it leaves the hand where it was. Without that, a key that went to a node scrolled the prose to it and handed the keys straight back to the lane, so the act that undoes the going could not be taken.
 
-- Down and up move where the reader is: the next brief of the lane, the next node of this level.
+Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in both panes and act in whichever the hand is in.
 
-- Right goes in: into the first brief beneath in the lane; on the map it opens what the node holds as a column of its own, and steps into that column once it stands open.
+- Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
-- Left goes back out: to the brief above in the lane; on the map it closes the reading this node opened, or moves to the node it stands under.
+- Right opens: the reading [the card](#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) leads to stands as a column of its own, and the reader stands at its head. It opens nothing else, since [a level of a file waits](#44-a-level-of-a-file-opened-to-the-right-waits).
 
-- Return commits and shift with it takes that back: the lane scopes in and widens out, the map goes to what is selected and closes what it opened.
+- Left steps back out and closes nothing: from a head onto the card that opened it, from a row onto the one it hangs beneath. In the lane it is the brief above.
 
-*The author's, 2026-09-18, that the keys be aligned with the canvas's acts and the prose's; as built the same day, after they had been left acting only where the canvas stood alone.*
+- Backspace closes the reading at hand, so the map ends at that card again and the reader stands on it.
+
+- Return goes, and shift with return takes the prose out to the brief that placed this reading and closes behind it. In the lane the two scope in and widen out.
+
+The last two divide by where the prose stands. While the reader is only looking, backspace closes. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
+
+*The author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head.*
 
 ### 5.3 What is selected shows its face
 
