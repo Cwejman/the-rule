@@ -1091,6 +1091,9 @@ type Action = {
 const acts = (a?: string): string =>
   a ?? (state.pointed !== null && brief(state.pointed) ? state.pointed : handOnMap() && picked !== null && brief(picked) ? picked : state.focus);
 
+/** Whether an act falls on the map: a badge in the canvas's own field always does, and a key does where the hand is. */
+const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap());
+
 const ACTIONS: Record<string, Action> = {
   unfold: {
     label: (a) => (gradeOf(acts(a)) === "whole" ? "fold" : "unfold"),
@@ -1106,11 +1109,28 @@ const ACTIONS: Record<string, Action> = {
     run: (a) => cycle(acts(a)),
   },
   foldUp: {
-    label: () => "fold above",
-    keys: [{ key: " ", shift: true }],
-    help: () => "Folds the brief above the one in focus, its parent, which takes you up to it.",
-    can: () => state.focus !== state.scope && !!brief(parentOf(state.focus)),
-    run: () => cycle(parentOf(state.focus)),
+    label: (a) => (onMap(a) && !foldsUp() ? "close" : "fold above"),
+    mark: (a) => (onMap(a) && !foldsUp() ? ICON.closeRight : ICON.fold),
+    keys: [{ key: "Backspace" }, { key: " ", shift: true }],
+    help: (a) =>
+      onMap(a) && !foldsUp()
+        ? "Closes the reading you are in, so the map ends at the card again and you stand on it."
+        : "Folds the brief above the one you are on, its parent, which takes you up to it.",
+    also: "Shift with the space bar does the same. The left arrow steps up without folding, and shift with return closes a reading the prose stands in.",
+    can: (a) => (onMap(a) ? foldsUp() !== null || shuts() !== "" : state.focus !== state.scope && !!brief(parentOf(state.focus))),
+    run: (a) => {
+      if (!onMap(a)) return cycle(parentOf(state.focus));
+      // within a file the brief above folds; at the top of a reading there is none, and the reading itself closes. One
+      // act, and the boundary is what decides which of the two the reader gets
+      const up = foldsUp();
+      if (up) {
+        // it folds and never unfolds, since the reader asked for less
+        if (gradeOf(up.a) !== "face") cycle(up.a);
+        return pickNode(up.a, null, up.head);
+      }
+      const r = shuts();
+      if (r) closeReading(r);
+    },
   },
   unfoldAll: {
     label: () => "unfold the scope",
@@ -1143,15 +1163,6 @@ const ACTIONS: Record<string, Action> = {
       const x = acts(a);
       pickNode(x, colOf.get(x) ?? chain.length, true);
     },
-  },
-  closeNode: {
-    label: () => "close",
-    mark: () => ICON.closeRight,
-    keys: [{ key: "Backspace" }],
-    help: () => "Closes the reading you are in, so the map ends at the card again and you stand on it.",
-    also: "The left arrow steps back onto the card and leaves the reading open; shift with return closes a reading the prose stands in.",
-    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && closable(a) !== "" && !laneIsIn(closable(a)),
-    run: (a) => closeReading(closable(a)),
   },
   read: {
     label: () => "read",
@@ -2631,6 +2642,27 @@ const closable = (a?: string): string => {
  */
 const laneIsIn = (r: string): boolean => r !== "" && cardPathOf(fileRootOf(state.scope)).includes(r);
 
+/**
+ * The reading the act closes where the selection stands: the one at hand where a card stands open, else the one the
+ * reader is in. Never a reading the prose is standing in, since that one is closed by taking the prose out of it first.
+ */
+const shuts = (): string => (closable() !== "" && !laneIsIn(closable()) ? closable() : "");
+
+/**
+ * The brief the act would fold where nothing stands open to close: the one above the selection, which is the node the
+ * reader is left on. At a head there is none, since the brief above a head lies past the boundary, in the file that
+ * placed this one, and folding a brief of a reading the reader is not in is not what the act means.
+ */
+const foldsUp = (): { a: string; head: boolean } | null => {
+  if (picked === null || onHead) return null;
+  const at = outOf(picked, false);
+  // a row at the top of a column has no brief above it within this reading: the head is the reading itself, and
+  // folding it there would change the lane while the map went on drawing the column whole. That step is the close
+  if (!at || at.head) return null;
+  const b = brief(at.a);
+  return b && unfolds(b) ? at : null;
+};
+
 /** Closes a reading: the map ends at the card that opened it, and the selection steps back onto that card. */
 function closeReading(r: string): void {
   if (!r) return;
@@ -2703,7 +2735,7 @@ const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { inde
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
-const FIELD_ACTS = ["openNode", "closeNode", "read", "unfold", "face"];
+const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "face"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
