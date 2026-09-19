@@ -2611,6 +2611,13 @@ const canvasOn = (): boolean => !ui.canvas.hidden;
 const handOnMap = (): boolean => canvasOn();
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
+/**
+ * The brief of the reading a line stands on. A card is drawn in its holder's prose, so the holder is the brief the
+ * reader is in — but the scope's own root is a card too, and there it is the reading's opening rather than a
+ * placement inside one, so the climb stops at the scope.
+ */
+const lineBrief = (a: string): string => (a !== state.scope && isCard(brief(a)) ? parentOf(a) : a);
+
 /** The way to the reading the prose stands in: what must stand open on the map for the reader to see where they are. */
 const wayHere = (): string[] => cardPathOf(fileRootOf(state.scope));
 
@@ -3601,11 +3608,8 @@ const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt
 /** The brief under the reading line, or the nearest above it. */
 function focusUnderLine(): string {
   const y = readingLine();
-  // A card stands in the prose as a figure does, and no figure takes the reading line: the line falls on the brief
-  // whose prose places it. The arrows already walk the reading this way, and while the line fell on cards too the two
-  // disagreed — scrolling past a brief that places parts bounced the address, the map's selection and the view from
-  // the brief to each card and back again.
-  const arts = all<HTMLElement>(".brief", ui.lane);
+  // a card is a thing of the reading like a brief, so the line falls on it and it is the innermost that wins
+  const arts = all<HTMLElement>(".brief, .card", ui.lane);
   const under = arts.filter((el) => {
     const r = el.getBoundingClientRect();
     return r.top <= y && r.bottom > y;
@@ -4400,13 +4404,20 @@ function onScroll(): void {
   }
   const f = focusUnderLine();
   if (f === state.focus) return;
+  const was = state.focus;
   state.focus = f;
-  // the highlight is one. A reader who scrolls has moved where they are, so what is selected on the map follows the
-  // reading line rather than staying where the arrows last left it, and return goes to where the reader is looking
-  // rather than back to where they were. Nothing opens and nothing closes: only where the reader stands moves
+  // The highlight is one. A reader who scrolls has moved where they are, so what is selected on the map follows the
+  // reading line rather than staying where the arrows last left it, and return goes to where the reader is looking.
+  // Nothing opens and nothing closes: only where the reader stands moves.
+  //
+  // The view follows the reading rather than every step of the line. A brief that places parts holds cards in its own
+  // prose, and the line crosses each of them and comes back; easing the map to every one of those and back again made
+  // it jump under a reader who was only scrolling. So a card the line crosses lights on the map and does not move it,
+  // and the map eases only where the line reaches another brief.
   if (canvasOn() && brief(f)) {
     state.picked = f;
     state.onHead = headFor(f);
+    if (lineBrief(f) === lineBrief(was)) followed = f;
     drawCanvas();
   }
   if (!arriving) followHistory(hashFor(f));
