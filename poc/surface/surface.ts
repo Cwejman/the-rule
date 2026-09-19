@@ -414,7 +414,7 @@ type Cut = { title: string | null; lead: Tok[]; sections: Section[]; strays: str
 
 function cut(toks: Tok[]): Cut {
   const out: Cut = { title: null, lead: [], sections: [], strays: [] };
-  const open: Section[] = []; // the state.chain of sections a token falls under, shallowest first
+  const open: Section[] = []; // the state.opened of sections a token falls under, shallowest first
   toks.forEach((t) => {
     const isHeading = t.type === "heading";
     if (isHeading && t.depth === 1 && out.title === null) return void (out.title = textOf(t.tokens));
@@ -956,8 +956,11 @@ const state = {
    * that placed it and as the head of the reading it opens, and the two are different places to stand.
    */
   onHead: false,
-  /** which node of each column stands open, from the root outward: the reader's path across the map */
-  chain: [] as string[],
+  /**
+   * Every reading standing open on the map. Opening adds to it and never takes away, so the map spreads as a tree
+   * where the reader opens and stays a single path where they close behind them; which of the two it is, is theirs.
+   */
+  opened: [] as string[],
 };
 
 // A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than
@@ -1164,11 +1167,11 @@ const ACTIONS: Record<string, Action> = {
     can: (a) => {
       const x = acts(a);
       const b = brief(x);
-      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && colOf.has(x) && state.chain[colOf.get(x)!] !== x;
+      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && colOf.has(x) && !state.opened.includes(x);
     },
     run: (a) => {
       const x = acts(a);
-      pickNode(x, colOf.get(x) ?? state.chain.length, true);
+      pickNode(x, colOf.get(x) ?? 0, true);
     },
   },
   read: {
@@ -2546,7 +2549,7 @@ function plateSvg(W: number, H: number): string {
 // one column per file, its own brief at the head and its headings beneath it as
 // a tree; across is each opening, an edge from the row pressed to the head of
 // what it names. A press selects a node and opens it, a press again reads it in
-// the lane, and opening a sibling replaces the state.chain that stood to the right.
+// the lane, and opening a sibling replaces the state.opened that stood to the right.
 // The nodes are HTML laid out by the browser, one SVG behind them draws the
 // nesting and the openings once the nodes are measured, and pan and zoom are one
 // transform on the stage, kept in the browser like the lane.
@@ -2578,10 +2581,7 @@ const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#s
 const cardPathOf = (a: string): string[] => prefixesOf(a).filter((p) => isCard(brief(p)));
 
 /** The reading the chain was last laid for, so a going lays the path to it and every other draw leaves the map alone. */
-let chainLaidFor: string | null = null;
-
-/** Whether the chain already holds the way to an address, so a going within the map leaves the map as it stands. */
-const chainHolds = (a: string): boolean => cardPathOf(a).every((p, i) => state.chain[i] === p);
+let waysLaidFor: string | null = null;
 
 /**
  * A brief's number counted from a root: in the lane from the scope, on the canvas from the head of its column. A card
@@ -2642,9 +2642,9 @@ const outOf = (a: string, head: boolean): { a: string; head: boolean } | null =>
  */
 const closable = (): string => {
   if (state.picked === null) return "";
-  if (!state.onHead && state.chain.includes(state.picked)) return state.picked;
+  if (!state.onHead && state.opened.includes(state.picked)) return state.picked;
   const r = colRootOf(state.picked, state.onHead);
-  return r !== "" && state.chain.includes(r) ? r : "";
+  return r !== "" && state.opened.includes(r) ? r : "";
 };
 
 /**
@@ -2684,13 +2684,14 @@ const stepsIn = (): { a: string; col: number | null } | null => {
   const b = brief(state.picked);
   const col = colOf.get(state.picked);
   if (!b || !isCard(b) || level(state.picked).length === 0 || col === undefined) return null;
-  return { a: state.picked, col: state.chain[col] === state.picked ? null : col };
+  return { a: state.picked, col: state.opened.includes(state.picked) ? null : col };
 };
 
 /** Closes a reading: the map ends at the card that opened it, and the selection steps back onto that card. */
 function closeReading(r: string): void {
   if (!r) return;
-  state.chain = state.chain.slice(0, state.chain.indexOf(r));
+  // what stood open inside it goes with it, since nothing there can be reached once its way is shut
+  state.opened = state.opened.filter((a) => a !== r && !a.startsWith(r + "/"));
   pickNode(r, null, false);
 }
 
@@ -2736,7 +2737,7 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   // a placement leads to a reading of its own and says so with a chevron; a level of this file goes down, and stands
   // out to the right only where the reader has asked for it by the act
   const opens = isCard(b) && !head;
-  const open = !head && state.chain[col] === a;
+  const open = !head && state.opened.includes(a);
   const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
   const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
@@ -2792,7 +2793,7 @@ function faceHtml(): string {
   );
 }
 
-/** Draws the canvas whole from the state: the root's column with the state.chain opened through it, then the lines between. */
+/** Draws the canvas whole from the state: the root's column with the state.opened opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   // The canvas draws the path the reader has opened, and going into another reading lays the path to it. Only going:
@@ -2800,14 +2801,14 @@ function drawCanvas(): void {
   // not prefix it — which meant nothing outside the reading the lane stood in could be opened at all, since the act
   // set the chain and the very next draw undid it.
   const held = fileRootOf(state.scope);
-  if (chainLaidFor !== held) {
-    chainLaidFor = held;
-    if (!chainHolds(held)) state.chain = cardPathOf(held);
+  if (waysLaidFor !== held) {
+    waysLaidFor = held;
+    cardPathOf(held).forEach((p) => state.opened.includes(p) || state.opened.push(p));
   }
   if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = headFor(state.focus)));
   // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
   if (state.picked === "") state.onHead = true;
-  else if (state.onHead && !state.chain.includes(state.picked)) state.onHead = false;
+  else if (state.onHead && !state.opened.includes(state.picked)) state.onHead = false;
   colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   if (fitted !== state.body.root) {
@@ -2906,7 +2907,7 @@ function stepSibling(by: number): void {
 function pickNode(a: string, col: number | null, head = false): void {
   state.picked = a;
   state.onHead = head;
-  if (col !== null) state.chain = [...state.chain.slice(0, col), a];
+  if (col !== null && !state.opened.includes(a)) state.opened.push(a);
   drawCanvas();
   // an opening brings the reading it opened into the pane, since that is what the press was for
   // the row that was pressed and the reading it opened are brought in together, so the reader keeps the place they
@@ -3068,7 +3069,7 @@ function rememberView(): void {
   clearTimeout(viewTimer);
   viewTimer = setTimeout(() => {
     try {
-      localStorage.setItem(viewKey(), JSON.stringify({ ...view, chain: state.chain }));
+      localStorage.setItem(viewKey(), JSON.stringify({ ...view, opened: state.opened }));
     } catch {}
   }, 150);
 }
@@ -3079,7 +3080,7 @@ function recallView(): void {
     if (kept && typeof kept.k === "number") {
       Object.assign(view, { x: kept.x, y: kept.y, k: kept.k });
       fitted = state.body?.root ?? null;
-      if (Array.isArray(kept.chain)) state.chain = kept.chain.filter((a: string) => brief(a));
+      if (Array.isArray(kept.opened)) state.opened = kept.opened.filter((a: string) => brief(a));
     }
   } catch {}
 }

@@ -36,7 +36,7 @@ The surface is going to have a few modes, chosen perhaps from a centred menu at 
 
 ## 3. The path the reader has opened, and not the whole body
 
-The canvas draws where the reader is: the root's column, and beside it the chain of places they have opened to arrive here. Nothing else is laid out, so the map is as large as the way taken and no larger.
+The canvas draws where the reader has been: the root's column, and beside it every reading they have opened. Nothing else is laid out, so the map is as large as what they opened and no larger.
 
 The first build drew the whole body as one map, every placement standing beside the row that named it whether or not anyone had asked for it. Laid out at once a body reads as a wall, and the foundation wanted is not the wall but the path. Drawing everything is a later question, and one the chain does not foreclose.
 
@@ -54,13 +54,13 @@ Opening is not scoping. The canvas is not reframed around what was opened, nothi
 
 *The author's decision, 2026-09-18, as built the same day; across for the holarchy is [his decision of 2026-09-18](../../author/ideas-2026-09-18.md#7-the-canvas-gains-its-second-dimension), taken further the same day into the opening.*
 
-### 4.1 An opening replaces what stood to the right
+### 4.1 Opening adds, and only closing takes away
 
-A column holds several nodes that can be opened, and only one of them is open at a time. Opening a second replaces the chain that stood to the right of that column, so there is one path across the map and never a spreading tree.
+What the reader opens stays open. A column may hold several readings open at once, each standing beside the row that named it, so the map spreads as a tree where the reader opens and stays one path where they close behind them. Which of the two it is, is theirs, and it is said by which act they take rather than by a rule.
 
-That is what lets the chain be the reader's place in the map: where they are is which node of each column is open, which is a run of names and nothing more.
+Closing is the only thing that takes a reading off the map, and it takes what stood open inside it with it, since nothing there can be reached once its way is shut. Backspace closes the reading at hand; shift with return closes the one the prose stands in and takes the prose out of it.
 
-*The author's decision, 2026-09-18, as built the same day.*
+*The author's, 2026-09-19. It supersedes the chain of 2026-09-18, under which opening a second node replaced everything to the right of its column: that made one path and no tree, so a reader who opened three branches to hold them side by side could not, and the acts that close had nothing left to do.*
 
 ### 4.2 Within a file the hierarchy goes down, drawn as a file tree
 
@@ -206,7 +206,7 @@ The two panes are in step as the reader moves: one focus between them, and a scr
 
 What the map holds is the reading the lane holds, which is the scope and not the reading line. Going into another reading, by a link, by a press again or by an address, lays the path to it; scrolling within one changes nothing, whatever cards the reading line passes on the way. Going is the only thing that lays it. Asked instead on every draw, the map could open nothing that did not stand on the lane's own path: the act set the way and the next draw threw it away, so a reader who walked out to the top of the body and tried to go into something else was refused with no sign of why. Reading the reading line instead, the map opened each card as the line reached it and closed it again as it passed, which is a map jumping back and forth under a reader who is only reading.
 
-What the canvas holds of its own is the chain, which node of each column is open. It is not the focus, since opening is not going, and it is kept in the browser with the view.
+What the canvas holds of its own is what stands open. It is not the focus, since opening is not going, and it is kept in the browser with the view.
 
 *The author's, 2026-09-15; the panes in step with the scroll his of 2026-09-18.*
 
@@ -232,7 +232,7 @@ A lone link in a brief places a structure there, and [a structure may stand in s
 
 Both kinds of link lead somewhere, so going in at either opens a column to the right, and what a reader goes in at is what they meant to follow. What differs is the claim each makes, and the drawing says which: a lone link places a part where the prose stands, which is deliberate, and a link in prose is an aboutness, an offer the reading did not need.
 
-Opening links as well as placements makes the map a graph, so a way may lead back to a column already open. The chain makes that harmless for now, since only one path is ever drawn; it is what has to be answered before the whole body is laid out at once.
+Opening links as well as placements makes the map a graph, so a way may lead back to a reading already open. What happens then is not answered, and it waits with the whole body being laid out at once.
 
 *The author's, 2026-09-18; how the two are told apart in the drawing is open, and the first build's answer, cells in a port, is [replaced](#8-what-the-first-build-did-that-goes).*
 
