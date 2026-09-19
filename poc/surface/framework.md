@@ -67,7 +67,7 @@ As the screen narrows the areas give way in one order: the canvas first, when it
 
 A gutter narrows before it gives way, and comes back when a wing gives way and frees its room, since a narrower gutter is still a gutter, aligned to its lines and scrolling with them.
 
-An area given no room is gone from the row until the screen widens, and [its icon says so](#31-four-grades-of-ink) rather than leaving the foot.
+An area given no room is gone from the row until the screen widens, and [its icon says so](#31-four-weights-of-ink) rather than leaving the foot.
 
 The order has one exception at its end, and it is written where it was found: where the lane would stand alone, [a touch reading](touch.md#9-what-this-asks-of-the-framework) keeps one narrow figure beside it, the shape as a rail.
 
@@ -97,11 +97,11 @@ The row stands where the middle stands, which is always, so no choice is ever ou
 
 *Reasoned, the author's decision of 2026-09-16, from a survey of [the row per area](refused.md#x-a-row-of-icons-at-the-foot-of-every-area) across eighteen widths and seven configurations.*
 
-### 3.1 Four grades of ink
+### 3.1 Four weights of ink
 
-The row is light at rest, so the page stays the prose and what orients it. Four grades say what a reader may do: what cannot stand at this width is quietest, what can stand is light, what the pointer rests on is darker, and what is in use is darkest.
+The row is light at rest, so the page stays the prose and what orients it. Four weights say what a reader may do: what cannot stand at this width is quietest, what can stand is light, what the pointer rests on is darker, and what is in use is darkest.
 
-Every choice is always drawn, so the row never changes length as the screen does, and one that cannot be had says why on pointing. The whole row lifts a step while the pointer is on it, so what is out of reach is still seen by whoever looks for it. A widget the reader has asked for that the width denies stands between the two grades, since the choice holds and only the room is missing.
+Every choice is always drawn, so the row never changes length as the screen does, and one that cannot be had says why on pointing. The whole row lifts a step while the pointer is on it, so what is out of reach is still seen by whoever looks for it. A widget the reader has asked for that the width denies stands between the two weights, since the choice holds and only the room is missing.
 
 *Reasoned, the author's asks of 2026-09-16.*
 
@@ -109,7 +109,7 @@ Every choice is always drawn, so the row never changes length as the screen does
 
 Every widget reads one state and nothing else, and acts through the same four verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the grade of every brief in the lane, the settings, and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
 
 Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 

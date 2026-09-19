@@ -42,15 +42,15 @@ A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which i
 
 *The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed.*
 
-## 2. Two grades
+## 2. Folded to its face, or whole
 
-Every brief in the lane stands at one of two grades: its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and its level standing beneath it.
+Every brief in the lane stands in one of two states: folded to its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and its level standing beneath it.
 
 A brief never folds past its face, so nothing in the lane is ever a bare name, and folding is one act with one inverse.
 
 Org-mode has cycled a heading between folded, children and whole for twenty years, so folding at a heading is a gesture readers already hold. The face is what it lacks, and it is the rule's own unit; the bare heading is what this model leaves out.
 
-*Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third grade, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
+*Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third state, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 
 ## 3. A reading is laid whole
 
@@ -112,7 +112,7 @@ The fade at the top comes in with the reading line, since nothing stands above t
 
 Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-a-reading-is-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
 
-Scrolling afterwards moves the focus and changes no grade, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the history, and the history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7-scoping-the-lane). The browser's back and forward walk them.
+Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the history, and the history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7-scoping-the-lane). The browser's back and forward walk them.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -134,9 +134,9 @@ Scrolling alone is not a change, and a new change clears what was undone.
 
 ## 6. Folding and unfolding
 
-Folding takes a brief to its face and unfolding takes it whole, [the two grades](#2-two-grades), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
+Folding takes a brief to its face and unfolding takes it whole, [the two states](#2-folded-to-its-face-or-whole), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
-[A card](#12-a-placed-part-raises-a-card) carries the same line and takes the same two grades, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
+[A card](#12-a-placed-part-raises-a-card) carries the same line and takes the same two states, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
 
 *Reasoned, the author's, 2026-09-13; pressing the face is the author's lean, and the best gesture is not yet known; the card, 2026-09-18.*
 

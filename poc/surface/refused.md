@@ -110,9 +110,9 @@ The author could not read what it meant. [One step](lane.md#4-where-you-are-is-t
 
 ## q. Folding to the heading alone
 
-A third grade beneath the face: the brief as a bare name.
+A third state beneath the face: the brief as a bare name.
 
-Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [two grades](lane.md#2-two-grades) suffice, and folding becomes one act with one inverse.
+Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [the two states](lane.md#2-folded-to-its-face-or-whole) suffice, and folding becomes one act with one inverse.
 
 ## r. A fold mark beside the heading
 

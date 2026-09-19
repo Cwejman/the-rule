@@ -834,7 +834,7 @@ const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.fla
 //
 // The page draws from a small shared state and nothing else: the body and its
 // index, the address in focus, the address the pointer rests on, the scope, the
-// grade of every brief in the lane, and the settings. Five areas stand in a row, a wing,
+// fold of every brief in the lane, and the settings. Five areas stand in a row, a wing,
 // a gutter, the lane, a gutter, a wing. The lane is prose; the rest is widgets,
 // plain functions in one table, chosen per area from a strip of icons at its
 // foot, and a closed area takes no room, leaving its icons where it would open. Everything drawn that
@@ -852,8 +852,8 @@ type Index = {
   depth: number;
 };
 
-/** A brief in the lane stands at its face or whole; a brief not in the lane has no grade. */
-type Grade = "face" | "whole";
+/** A brief in the lane stands at its face or whole; a brief not in the lane has no fold. */
+type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
 /** The panes the middle can hold, in the order they stand: the canvas at the left, the lane at the right. */
@@ -938,8 +938,8 @@ const state = {
   /** the brief under the reading line; its address is the page's address */
   focus: "",
   pointed: null as string | null,
-  /** every brief in the lane and its grade; a brief absent here is not drawn */
-  grades: new Map<string, Grade>(),
+  /** every brief in the lane and its fold; a brief absent here is not drawn */
+  folds: new Map<string, Fold>(),
   settings: { ...DEFAULTS, areas: { ...DEFAULTS.areas } } as Settings,
   /** set while a drag is in progress, so pointing does not fight it */
   scrubbing: false,
@@ -1008,12 +1008,12 @@ function indexBody(body: Body): Index {
 
 const level = (a: string): Brief[] => state.index?.children.get(a) ?? [];
 const brief = (a: string): Brief | undefined => state.index?.by.get(a);
-const gradeOf = (a: string): Grade | null => state.grades.get(a) ?? null;
-const inLane = (a: string): boolean => state.grades.has(a);
+const foldOf = (a: string): Fold | null => state.folds.get(a) ?? null;
+const inLane = (a: string): boolean => state.folds.has(a);
 
 /** The briefs the lane lays, in reading order: a brief, then its level, then the next. A card is drawn in its holder's prose rather than laid, so it is never one of them. */
 const laneOrder = (parent = ""): Brief[] =>
-  level(parent).flatMap((b) => (inLane(b.address) && !isCard(b) ? [b, ...(gradeOf(b.address) === "whole" ? laneOrder(b.address) : [])] : []));
+  level(parent).flatMap((b) => (inLane(b.address) && !isCard(b) ? [b, ...(foldOf(b.address) === "whole" ? laneOrder(b.address) : [])] : []));
 
 /** The nearest address that resolves, for a link or a hash that no longer does. */
 const nearest = (a: string): string => prefixesOf(a).findLast((p) => brief(p)) ?? "";
@@ -1103,11 +1103,11 @@ const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap
 
 const ACTIONS: Record<string, Action> = {
   unfold: {
-    label: (a) => (gradeOf(acts(a)) === "whole" ? "fold" : "unfold"),
-    mark: (a) => (gradeOf(acts(a)) === "whole" ? ICON.fold : ICON.unfold),
+    label: (a) => (foldOf(acts(a)) === "whole" ? "fold" : "unfold"),
+    mark: (a) => (foldOf(acts(a)) === "whole" ? ICON.fold : ICON.unfold),
     keys: [{ key: " " }],
     help: (a) =>
-      gradeOf(acts(a)) === "whole"
+      foldOf(acts(a)) === "whole"
         ? "Folds the brief back to its face; the same key unfolds it again."
         : "Unfolds the brief: the paragraphs its face hides, and the level beneath it.",
     also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
@@ -1132,7 +1132,7 @@ const ACTIONS: Record<string, Action> = {
       const up = foldsUp();
       if (up) {
         // it folds and never unfolds, since the reader asked for less
-        if (gradeOf(up.a) !== "face") cycle(up.a);
+        if (foldOf(up.a) !== "face") cycle(up.a);
         return pickNode(up.a, null, up.head);
       }
       const r = shuts();
@@ -1370,7 +1370,7 @@ function badgeHtml(id: string, a?: string, tight = false, marked = false): strin
   // a badge keeps its room when it cannot be taken so that no row shifts under the pointer; with no pointer there is
   // nothing to shift under, and the room is wanted for the words, so a phone draws only what can be taken
   if (touch && !act.can(a)) return "";
-  // the badge's third grade, beside the worded and the tight: a phone has no key, so the badge carries the word alone
+  // the badge's third grain, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
   if (touch)
     return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${glyph}<span class="label">${esc(act.label(a))}</span></span>`;
@@ -1472,8 +1472,8 @@ const BLOCK: Record<string, (t: Tok) => string> = {
 
 // ## 3.3 The lane
 //
-// The lane holds the body depth first, each brief at its grade. Arriving lays
-// the grades afresh; folding changes one brief or one level; scrolling changes
+// The lane holds the body depth first, each brief at its fold. Arriving lays
+// the folds afresh; folding changes one brief or one level; scrolling changes
 // nothing but the focus.
 
 /**
@@ -1482,7 +1482,7 @@ const BLOCK: Record<string, (t: Tok) => string> = {
  * want. A card stays at its face, since what it holds waits past a boundary.
  */
 function lay(): void {
-  const g = state.grades;
+  const g = state.folds;
   g.clear();
   const S = state.scope;
   g.set(S, "whole");
@@ -1512,29 +1512,29 @@ const depthIn = (a: string): number => depthOf(a) - depthOf(state.scope);
 /** Whether a brief's level stands in this reading: a mount's does not, unless the reader has opened it and it is the scope. */
 const opensInLane = (a: string): boolean => !isCard(brief(a)) || a === state.scope;
 
-/** Every whole brief shows its level: children with no grade yet take a face, and a mount's level is not in this reading. */
+/** Every whole brief shows its level: children with no fold yet take a face, and a mount's level is not in this reading. */
 function closeLay(): void {
-  const g = state.grades;
+  const g = state.folds;
   state.body!.briefs.forEach((b) => {
     if (g.get(b.address) === "whole" && opensInLane(b.address)) level(b.address).forEach((c) => g.has(c.address) || g.set(c.address, "face"));
   });
 }
 
-/** Sets one brief's grade; past its face its level leaves the lane, and whole lays its level at faces. */
-function setGrade(a: string, grade: Grade): void {
-  const g = state.grades;
-  g.set(a, grade);
-  if (grade !== "whole") state.body!.briefs.forEach((b) => b.address.startsWith(a + "/") && g.delete(b.address));
+/** Sets one brief's fold; past its face its level leaves the lane, and whole lays its level at faces. */
+function setFold(a: string, fold: Fold): void {
+  const g = state.folds;
+  g.set(a, fold);
+  if (fold !== "whole") state.body!.briefs.forEach((b) => b.address.startsWith(a + "/") && g.delete(b.address));
   else closeLay();
 }
 
-const nextGrade = (grade: Grade | null): Grade => (grade === "whole" ? "face" : "whole");
+const nextFold = (fold: Fold | null): Fold => (fold === "whole" ? "face" : "whole");
 
 const CHEVRON = `<svg viewBox="0 0 10 10"><path d="M3.2 1.8 6.6 5 3.2 8.2"/></svg>`;
 
 /** A tree row's fold mark, the one place a mark folds: a chevron that turns down when whole and points right at a face. */
 const foldMark = (b: Brief): string =>
-  `<button class="mark ${gradeOf(b.address) ?? "none"}${b.door ? "" : " leaf"}" data-fold="${esc(b.address)}" data-tip="fold or unfold">${CHEVRON}</button>`;
+  `<button class="mark ${foldOf(b.address) ?? "none"}${b.door ? "" : " leaf"}" data-fold="${esc(b.address)}" data-tip="fold or unfold">${CHEVRON}</button>`;
 
 /** The gap after a brief, by the depth of the level the next brief begins: tighter the deeper, so what lies beneath a brief sits together and its siblings stand apart. */
 const gapAfter = (nextDepth: number): number => [56, 56, 40, 28, 20][Math.min(4, nextDepth)] ?? 16;
@@ -1651,7 +1651,7 @@ function cardMap(a: string): string {
 function cardHtml(a: string): string {
   const b = brief(a);
   if (!b) return `<p class="chrome dim">a part that is not in the body</p>`;
-  const g = gradeOf(a) ?? "face";
+  const g = foldOf(a) ?? "face";
   // what the card shows is the brief's own prose: the parts it places in turn lie past this boundary and are not drawn
   const all = blocksOf(b).filter((t) => t.type !== "card");
   const [first] = all;
@@ -1678,8 +1678,8 @@ function cardHtml(a: string): string {
   );
 }
 
-/** One brief in the lane at its grade: its face, the heading and the first block, then the rest when whole; `after` is the gap beneath it. */
-function articleHtml(b: Brief, g: Grade, after: number): string {
+/** One brief in the lane at its fold: its face, the heading and the first block, then the rest when whole; `after` is the gap beneath it. */
+function articleHtml(b: Brief, g: Fold, after: number): string {
   const d = Math.min(4, depthIn(b.address));
   const [first, ...rest] = blocksOf(b);
   const on = prefixesOf(state.focus).includes(b.address);
@@ -1708,7 +1708,7 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
   );
 }
 
-/** The lane as a whole: the root's opening, then every brief in reading order at its grade. */
+/** The lane as a whole: the root's opening, then every brief in reading order at its fold. */
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
@@ -1719,7 +1719,7 @@ function laneHtml(): string {
   return (
     opening +
     order
-      .map((b, i) => (opensRecord(b) ? recordNote(parentOf(b.address)) : "") + articleHtml(b, gradeOf(b.address)!, gapAfter(order[i + 1] ? depthIn(order[i + 1].address) : 1)))
+      .map((b, i) => (opensRecord(b) ? recordNote(parentOf(b.address)) : "") + articleHtml(b, foldOf(b.address)!, gapAfter(order[i + 1] ? depthIn(order[i + 1].address) : 1)))
       .join("")
   );
 }
@@ -1976,7 +1976,7 @@ function chooseNarrow(k: string): void {
 function treeHtml(): string {
   const node = (b: Brief, d: number): string => {
     if (!inLane(b.address)) return "";
-    const whole = gradeOf(b.address) === "whole";
+    const whole = foldOf(b.address) === "whole";
     const on = prefixesOf(state.focus).includes(b.address);
     return (
       `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--d:${d}">` +
@@ -2007,12 +2007,12 @@ function treeHtml(): string {
 
 let aheadRoot: string | null = null;
 
-/** What a brief hides at its grade: paragraphs beyond its face, and its level beneath, when either is out of the lane; set to always, the ahead answers for any brief with anything beneath it. */
+/** What a brief hides at its fold: paragraphs beyond its face, and its level beneath, when either is out of the lane; set to always, the ahead answers for any brief with anything beneath it. */
 const hides = (a: string): boolean => {
   const b = brief(a);
   if (!b) return false;
   if (state.settings.ahead === "always") return blocksOf(b).length > 1 || level(a).length > 0;
-  return gradeOf(a) !== "whole" && (blocksOf(b).length > 1 || (level(a).length > 0 && !level(a).some((k) => inLane(k.address))));
+  return foldOf(a) !== "whole" && (blocksOf(b).length > 1 || (level(a).length > 0 && !level(a).some((k) => inLane(k.address))));
 };
 
 /** The brief the ahead answers for: the pointed brief when it hides something, otherwise the focus; a cell inside the figure never re-roots it. */
@@ -2344,7 +2344,7 @@ function shapeSvg(W: number, H: number): string {
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
     // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
     const b = brief(l.a);
-    const folded = b !== undefined && gradeOf(l.a) === "face";
+    const folded = b !== undefined && foldOf(l.a) === "face";
     const ghost = folded ? "" : " ghost";
     const beyond = b ? blocksOf(b).slice(1) : [];
     const paras = beyond.length;
@@ -2602,7 +2602,7 @@ function numberIn(b: Brief, root: string): string {
 const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
 
 /** Whether a brief's level stands beneath it in its column: a card's never does, and a folded brief's is folded away. */
-const showsKids = (b: Brief): boolean => !isCard(b) && gradeOf(b.address) !== "face" && level(b.address).length > 0;
+const showsKids = (b: Brief): boolean => !isCard(b) && foldOf(b.address) !== "face" && level(b.address).length > 0;
 
 /**
  * Which of a placed file's two rows an address stands on when a going is what put the reader there: the head, since
@@ -2925,7 +2925,7 @@ const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter(ofRead
 /** The depth the scope stands unfolded to: the largest such that every brief with a level above it is whole. */
 function unfoldedDepth(): number {
   let d = 0;
-  while (d < scopeDepth() && state.body!.briefs.every((b) => !ofReading(b) || depthIn(b.address) !== d || levelIn(b).length === 0 || gradeOf(b.address) === "whole")) d++;
+  while (d < scopeDepth() && state.body!.briefs.every((b) => !ofReading(b) || depthIn(b.address) !== d || levelIn(b).length === 0 || foldOf(b.address) === "whole")) d++;
   return d;
 }
 
@@ -2942,11 +2942,11 @@ function depthHtml(): string {
 function unfoldTo(n: number): void {
   const inScope = state.body!.briefs.filter((b) => b.address !== state.scope && ofReading(b));
   refold(() => {
-    inScope.filter((b) => depthIn(b.address) === n && inLane(b.address)).forEach((b) => setGrade(b.address, "face"));
+    inScope.filter((b) => depthIn(b.address) === n && inLane(b.address)).forEach((b) => setFold(b.address, "face"));
     inScope
       .filter((b) => depthIn(b.address) < n && unfolds(b))
       .sort((x, y) => depthOf(x.address) - depthOf(y.address))
-      .forEach((b) => setGrade(b.address, "whole"));
+      .forEach((b) => setFold(b.address, "whole"));
   });
 }
 
@@ -3931,7 +3931,7 @@ const enterHistory = (hash: string): void => history.pushState(null, "", hash);
 const followHistory = (hash: string): void => (history.replaceState(null, "", hash), rememberLane());
 
 /** The lane as it stood: its scope, every fold, the focus and the scroll. */
-type Lane = { scope: string; grades: [string, Grade][]; focus: string; scroll: number };
+type Lane = { scope: string; folds: [string, Fold][]; focus: string; scroll: number };
 /** A move: a going, a scoping in or out, or a link followed. Folds and scrolls are not moves. */
 type Move = "go" | "in" | "out" | "link";
 /** One hop of the trail: a move, where it went, and the lane as it stood before it. */
@@ -3950,10 +3950,10 @@ function settleTrail(): void {
 type Snapshot = Lane & { trail: Hop[] };
 const undos: Snapshot[] = [];
 const redos: Snapshot[] = [];
-const laneNow = (): Lane => ({ scope: state.scope, grades: Array.from(state.grades), focus: state.focus, scroll: ui.scroll.scrollTop });
+const laneNow = (): Lane => ({ scope: state.scope, folds: Array.from(state.folds), focus: state.focus, scroll: ui.scroll.scrollTop });
 const snapshot = (): Snapshot => ({ ...laneNow(), trail: state.trail.slice() });
 const sameSnapshot = (x: Snapshot, y: Snapshot): boolean =>
-  x.scope === y.scope && x.focus === y.focus && x.scroll === y.scroll && JSON.stringify(x.grades) === JSON.stringify(y.grades) && JSON.stringify(x.trail) === JSON.stringify(y.trail);
+  x.scope === y.scope && x.focus === y.focus && x.scroll === y.scroll && JSON.stringify(x.folds) === JSON.stringify(y.folds) && JSON.stringify(x.trail) === JSON.stringify(y.trail);
 
 /**
  * Records the lane as it stands, before a change the reader makes: a fold or an unfolding, a change of scope, a going or
@@ -3972,7 +3972,7 @@ function restore(s: Snapshot): void {
   arriving = true;
   state.holding = null;
   state.scope = brief(s.scope) ? s.scope : "";
-  state.grades = new Map(s.grades.filter(([a]) => brief(a)));
+  state.folds = new Map(s.folds.filter(([a]) => brief(a)));
   state.focus = brief(s.focus) ? s.focus : state.scope;
   state.trail = s.trail.filter((h) => brief(h.to));
   drawAll();
@@ -4073,7 +4073,7 @@ function settle(a: string): void {
   const target = brief(a) ? a : nearest(a);
   if (!inLane(target)) {
     if (!within(target, state.scope)) return arrive(target);
-    prefixesOf(target).filter((p) => within(p, state.scope) && opensInLane(p)).forEach((p) => p !== target && gradeOf(p) !== "whole" && setGrade(p, "whole"));
+    prefixesOf(target).filter((p) => within(p, state.scope) && opensInLane(p)).forEach((p) => p !== target && foldOf(p) !== "whole" && setFold(p, "whole"));
     drawLane();
   }
   state.focus = target;
@@ -4096,16 +4096,16 @@ function rememberLane(): void {
   clearTimeout(laneTimer);
   laneTimer = setTimeout(() => {
     try {
-      localStorage.setItem(laneKey(), JSON.stringify({ hash: location.hash, scope: state.scope, grades: Array.from(state.grades), trail: state.trail }));
+      localStorage.setItem(laneKey(), JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail }));
     } catch {}
   }, 150);
 }
 
 /** The lane as the reader left it, when they left it at the address the page now stands at. */
-function recalledLane(): { scope: string; grades: [string, Grade][]; trail?: Hop[] } | null {
+function recalledLane(): { scope: string; folds: [string, Fold][]; trail?: Hop[] } | null {
   try {
     const kept = JSON.parse(localStorage.getItem(laneKey()) ?? "null");
-    return kept && kept.hash === location.hash && Array.isArray(kept.grades) ? kept : null;
+    return kept && kept.hash === location.hash && Array.isArray(kept.folds) ? kept : null;
   } catch {
     return null;
   }
@@ -4116,18 +4116,18 @@ function recalledLane(): { scope: string; grades: [string, Grade][]; trail?: Hop
  * come back. What no longer resolves is dropped, a brief whose parent is not unfolded leaves with it, and the way to
  * the focus stands unfolded.
  */
-function resume(a: string, kept: { scope: string; grades: [string, Grade][]; trail?: Hop[] }): void {
+function resume(a: string, kept: { scope: string; folds: [string, Fold][]; trail?: Hop[] }): void {
   arriving = true;
   state.trail = Array.isArray(kept.trail) ? kept.trail.filter((h) => h && typeof h.to === "string" && brief(h.to) && h.lane && h.kind) : [];
   const target = brief(a) ? a : nearest(a);
   state.scope = brief(kept.scope) && within(target, kept.scope) && fileRootOf(kept.scope) === fileRootOf(target) ? kept.scope : fileRootOf(target);
   const S = state.scope;
-  state.grades = new Map(kept.grades.filter(([x, g]) => brief(x) && within(x, S) && (g === "face" || g === "whole")));
-  state.grades.set(S, "whole");
-  state.body!.briefs.forEach((b) => b.address !== S && state.grades.has(b.address) && gradeOf(parentOf(b.address)) !== "whole" && state.grades.delete(b.address));
+  state.folds = new Map(kept.folds.filter(([x, g]) => brief(x) && within(x, S) && (g === "face" || g === "whole")));
+  state.folds.set(S, "whole");
+  state.body!.briefs.forEach((b) => b.address !== S && state.folds.has(b.address) && foldOf(parentOf(b.address)) !== "whole" && state.folds.delete(b.address));
   prefixesOf(target)
     .filter((p) => within(p, S) && p !== target && opensInLane(p))
-    .forEach((p) => gradeOf(p) !== "whole" && setGrade(p, "whole"));
+    .forEach((p) => foldOf(p) !== "whole" && setFold(p, "whole"));
   closeLay();
   state.focus = target;
   drawAll();
@@ -4351,7 +4351,7 @@ function onScroll(): void {
   if (narrow() && !fits().lane) drawChooser();
 }
 
-/** Changes grades under a function, keeping the acted-on brief's heading where it stood on the screen. */
+/** Changes folds under a function, keeping the acted-on brief's heading where it stood on the screen. */
 function refold(change: () => void, anchor: string = state.focus, jump = false): void {
   record();
   const at = (a: string) => ui.lane.querySelector<HTMLElement>(`.brief[data-a="${cssEsc(a)}"]`)?.getBoundingClientRect().top;
@@ -4380,21 +4380,21 @@ function cycle(a: string): void {
   const b = brief(a);
   if (a === "" || !b || !unfolds(b)) return;
   // only a fold that takes away what stood under the reader moves them; unfolding, or folding elsewhere, never scrolls
-  const jump = gradeOf(a) === "whole" && within(state.focus, a);
+  const jump = foldOf(a) === "whole" && within(state.focus, a);
   refold(
     () => {
-      // in the lane a fold is the brief's grade. Where the lane does not hold it, the canvas drew it from another
-      // reading, and there an absent grade means its level stands, so folding sets a face and unfolding takes it away
-      if (inLane(a)) return setGrade(a, nextGrade(gradeOf(a)));
-      if (gradeOf(a) === "face") state.grades.delete(a);
-      else state.grades.set(a, "face");
+      // in the lane a fold is the brief's fold. Where the lane does not hold it, the canvas drew it from another
+      // reading, and there an absent fold means its level stands, so folding sets a face and unfolding takes it away
+      if (inLane(a)) return setFold(a, nextFold(foldOf(a)));
+      if (foldOf(a) === "face") state.folds.delete(a);
+      else state.folds.set(a, "face");
     },
     a,
     jump,
   );
 }
 
-/** Moves the focus to an address that is in the lane, without changing any grade. */
+/** Moves the focus to an address that is in the lane, without changing any fold. */
 function moveTo(a: string): void {
   if (a === state.focus || !(a === "" || inLane(a))) return;
   state.focus = a;
@@ -4433,13 +4433,13 @@ const HOLD = 450;
 /** Space held: every brief in the scope unfolded whole, the heading in focus kept where it stands. */
 function unfoldAll(): void {
   refold(() =>
-    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && unfolds(b) && setGrade(b.address, "whole")),
+    state.body!.briefs.forEach((b) => b.address !== state.scope && within(b.address, state.scope) && unfolds(b) && setFold(b.address, "whole")),
   );
 }
 
 /** Shift and space held: every brief in the scope folded to its face, the reader taken up with what they stood in. */
 function foldAll(): void {
-  refold(() => level(state.scope).forEach((b) => setGrade(b.address, "face")), state.focus, true);
+  refold(() => level(state.scope).forEach((b) => setFold(b.address, "face")), state.focus, true);
 }
 
 /** The previous or the next brief in the lane's order. */
@@ -4865,10 +4865,10 @@ function setBody(body: Body): void {
     recallView();
     return kept ? resume(readHash(), kept) : arrive(readHash());
   }
-  // the lane is drawn again from the new body, keeping the grades that still resolve and the scroll
-  const kept = new Map(Array.from(state.grades).filter(([a]) => state.index!.by.has(a)));
+  // the lane is drawn again from the new body, keeping the folds that still resolve and the scroll
+  const kept = new Map(Array.from(state.folds).filter(([a]) => state.index!.by.has(a)));
   const top = ui.scroll.scrollTop;
-  state.grades = kept;
+  state.folds = kept;
   closeLay();
   if (!inLane(state.focus)) state.focus = nearestInLane(state.focus);
   drawAll();
@@ -5162,7 +5162,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 #strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 8; pointer-events: none; }
 /* one row, centred at the foot, holding every choice once: the panes, the adjuncts, the figures, three groups spaced
-   apart by nothing but room. Four grades of ink: what cannot stand, what can, what is under the pointer, what is in use */
+   apart by nothing but room. Four weights of ink: what cannot stand, what can, what is under the pointer, what is in use */
 .strip { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; pointer-events: auto; }
 .strip .group { display: flex; gap: 7px; }
 .strip .group + .group { margin-left: 20px; }

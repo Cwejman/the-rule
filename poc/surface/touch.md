@@ -170,7 +170,7 @@ Let down past the least it is held at, it goes, and what was chosen goes with it
 
 The foot is one row, and what stands in it follows what the reader has chosen: the mark alone, ordinarily; the pill of choices while the mark is pressed; the acts of what was chosen, as [the same buttons the action line draws](#24-the-acts-take-a-row-of-their-own), when a card stands.
 
-Everything in the row is one size and one shape: round buttons of forty, in a pill of forty-eight beside a mark of forty-eight. Worded acts made the row taller than the mark beside it and read badly, so an act in the row is its glyph, which is [the badge's fourth grade](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands); what is being acted on is named on the card above it, so nothing is lost by dropping the word.
+Everything in the row is one size and one shape: round buttons of forty, in a pill of forty-eight beside a mark of forty-eight. Worded acts made the row taller than the mark beside it and read badly, so an act in the row is its glyph, which is [the badge's fourth grain](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands); what is being acted on is named on the card above it, so nothing is lost by dropping the word.
 
 The mark keeps its place at the row's end in each of the three, so the chooser is never lost and never has to be looked for. It carries a cross while the pill stands open, since there it is the way to close. With a card up the row stands on it, which is why the card keeps room beneath its prose.
 
@@ -272,7 +272,7 @@ A knob is turned by a finger that covers it, and the value it is turning to stan
 
 ## 8. A badge without a key
 
-[A badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) carries a key and a word. A phone has no key, so it carries the word alone, and the cap's room goes with the cap. That is the badge's third grade beside the worded and the tight, and a tight badge, which is its keys alone, falls back to the word, since its keys were all it had to show.
+[A badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) carries a key and a word. A phone has no key, so it carries the word alone, and the cap's room goes with the cap. That is the badge's third grain beside the worded and the tight, and a tight badge, which is its keys alone, falls back to the word, since its keys were all it had to show.
 
 A badge that cannot be taken is not drawn at all. It keeps its room on a desk so that no row shifts under the pointer, and a phone has no pointer to shift under, where it has a line of 226 that the words want.
 

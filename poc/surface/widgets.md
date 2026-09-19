@@ -66,7 +66,7 @@ Beside a brief the cap says how that brief is reached. On the brief the reading 
 
 A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
 
-Where there is no key to draw, the badge carries the word alone, which is [its third grade](touch.md#8-a-badge-without-a-key); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
+Where there is no key to draw, the badge carries the word alone, which is [its third grain](touch.md#8-a-badge-without-a-key); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
 
 *The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
 

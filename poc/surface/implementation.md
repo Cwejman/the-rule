@@ -188,7 +188,7 @@ The page draws from [the shared state](framework.md#4-one-shared-state-and-four-
 
 ### 6.1 The lane is HTML in one scroll box, with its gutters inside
 
-The lane, the gutter on either side of it and the prose between are one scroll box, so the gutters scroll with the text for free. The prose is a column of articles in reading order, each drawn at its grade, and the gutters are columns beside it in which each [adjunct](framework.md#1-three-kinds-of-widget) is placed at the height of the line it belongs to, pushed down where two would overlap.
+The lane, the gutter on either side of it and the prose between are one scroll box, so the gutters scroll with the text for free. The prose is a column of articles in reading order, each drawn at its fold, and the gutters are columns beside it in which each [adjunct](framework.md#1-three-kinds-of-widget) is placed at the height of the line it belongs to, pushed down where two would overlap.
 
 Folding draws the lane again whole and then scrolls so that [the heading of the brief acted on stands where it stood](lane.md#65-the-heading-acted-on-keeps-its-place). [The way down to the scope](lane.md#75-the-way-down-stands-over-the-lane) stands over the scroll box rather than in it, and the prose's fade clears beneath it.
 
@@ -268,9 +268,9 @@ With the lane taken out of the middle it is kept laid out of sight rather than h
 
 Three things outlive a draw, and none of them is in the address, so that the address says only where a reader stands. The settings are kept in the browser's storage, once for every body.
 
-The lane as laid, its scope and every grade, is kept there too, keyed by the page and the body, with the address it was laid at, and a reload at that same address lays it again; at any other address it is set aside.
+The lane as laid, its scope and every fold, is kept there too, keyed by the page and the body, with the address it was laid at, and a reload at that same address lays it again; at any other address it is set aside.
 
-And every change a reader makes is recorded as the lane stood before it, the scope, the grades, the focus and the scroll, for [escape to undo](lane.md#52-escape-is-an-undo) and shift with escape to redo. That record lives only in memory, holds the last two hundred changes, and is gone with a reload.
+And every change a reader makes is recorded as the lane stood before it, the scope, the folds, the focus and the scroll, for [escape to undo](lane.md#52-escape-is-an-undo) and shift with escape to redo. That record lives only in memory, holds the last two hundred changes, and is gone with a reload.
 
 *In force, 2026-09-14, as built; keeping only what differs from the defaults, 2026-09-16, when a lengthened fade could not reach a reader whose browser held the old one.*
 
