@@ -2603,6 +2603,13 @@ const scopedNumber = (b: Brief): string => numberIn(b, state.scope);
 /** Whether a brief's level stands beneath it in its column: a card's never does, and a folded brief's is folded away. */
 const showsKids = (b: Brief): boolean => !isCard(b) && gradeOf(b.address) !== "face" && level(b.address).length > 0;
 
+/**
+ * Which of a placed file's two rows an address stands on when a going is what put the reader there: the head, since
+ * going to a placed file is going into it. The root of the body is only ever drawn as a head. One rule, so that the
+ * selection and the focus never disagree about where the reader is.
+ */
+const headFor = (a: string): boolean => a === "" || isCard(brief(a));
+
 /** The root of the column a node stands in: its own address at a head, else the nearest reading opened above it. */
 const colRootOf = (a: string, head: boolean): string =>
   head ? a : (prefixesOf(a).filter((p) => p !== a).findLast((p) => isCard(brief(p))) ?? "");
@@ -2706,7 +2713,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const a = b.address;
   // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
   if (!o.head) colOf.set(a, col);
-  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
+  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus && o.head === headFor(a) ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
@@ -2757,8 +2764,10 @@ const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "face"];
  */
 function fieldHtml(): string {
   const a = state.picked;
-  const b = a ? brief(a) : undefined;
-  if (narrow() || !a || !b) return "";
+  const b = a === null ? undefined : brief(a);
+  // the root's address is the empty string, so a field that tested it for truth left the root with no acts at all,
+  // and the eye that brings a hidden face back stands only in this field
+  if (narrow() || a === null || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
   const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
   return acts.length ? `<div id="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
@@ -2770,7 +2779,7 @@ function fieldHtml(): string {
  * pointer covers the very thing being looked at.
  */
 function faceHtml(): string {
-  const b = state.picked ? brief(state.picked) : undefined;
+  const b = state.picked === null ? undefined : brief(state.picked);
   if (narrow() || !b || state.settings.face === "hidden") return "";
   const stamp = stampOf(b);
   return (
@@ -2787,7 +2796,7 @@ function drawCanvas(): void {
   // lays the path to it, and scrolling within one changes nothing, since the scope is what says where the reader is
   const held = fileRootOf(state.scope);
   if (!chainHolds(held)) state.chain = cardPathOf(held);
-  if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = isCard(brief(state.focus))));
+  if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = headFor(state.focus)));
   // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
   if (state.picked === "") state.onHead = true;
   else if (state.onHead && !state.chain.includes(state.picked)) state.onHead = false;
@@ -3554,7 +3563,9 @@ function drawFocusMarks(): void {
   const holder = isCard(brief(state.focus)) ? parentOf(state.focus) : null;
   all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
-    el.classList.toggle("here", el.dataset.a === state.focus || (el.classList.contains("brief") && el.dataset.a === holder));
+    // a placed file is drawn twice on the map, so the focus lights the row the reader stands on and not both of them
+    const onRow = !el.classList.contains("crow") || (el.dataset.head === "1") === headFor(state.focus);
+    el.classList.toggle("here", (el.dataset.a === state.focus && onRow) || (el.classList.contains("brief") && el.dataset.a === holder));
   });
   if (canvasOn()) (followFocus(), drawEdges());
   all<HTMLElement>("svg.fig [data-a]", ui.areas).forEach((el) => {
@@ -4067,7 +4078,7 @@ function settle(a: string): void {
   }
   state.focus = target;
   state.picked = target;
-  state.onHead = target === "" || isCard(brief(target));
+  state.onHead = headFor(target);
   // the selection went with the going, so the map draws again: without it the row lit on the map was the one the
   // reader left, and the next key acted on a node other than the one they could see was theirs
   if (canvasOn()) drawCanvas();
@@ -4130,7 +4141,7 @@ function arrive(a: string): void {
   const target = brief(a) ? a : nearest(a);
   // an arrival is a going, so what is selected on the map goes with it; scrolling alone never moves the selection
   state.picked = target;
-  state.onHead = target === "" || isCard(brief(target));
+  state.onHead = headFor(target);
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay();

@@ -132,6 +132,8 @@ On the card a reader stands beside the reading. What lies above and below them i
 
 Holding only the address, the selection made the two one place, and the moves had nowhere to go from it: down walked the placing file's briefs while the reader was looking at the file they had opened, and right had no head to step to. Nothing in the substrate changed to mend it. It is still one brief with one address, [its own as the practice gives it](../practice.md#33-a-placed-file-carries-its-own-brief); what gained a second part is where the reader stands.
 
+Everything that says where the reader is answers to that one part. The reading line lights the row the reader stands on and not both of them, and going to a placed file stands them at its head, since going to a reading is going into it. One rule, so the selection and the reading line can never disagree.
+
 *The author's, 2026-09-19, on reading that the card and the file's own top were conflated; as built the same day.*
 
 ## 5. One press selects, two presses go
