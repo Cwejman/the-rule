@@ -160,7 +160,7 @@ Nothing it serves may be kept by the browser. The page carries the whole of the 
 
 #### 5.1.1 A restart reaches the page
 
-The process reads its own file once, when it starts, so a change to `surface.ts` reaches the page only when the process is started again. The stream's first word names the page the process serves, a hash of its own file, so a page left open across a restart that brings a different page reloads itself, and the lane is laid again as it was left.
+The process reads its own file once, when it starts, so a change to `surface.ts` reaches the page only when the process is started again. The stream's first word names the page the process serves, a hash of the script and the style it hands over, so a page left open across a restart that brings a different page reloads itself, and the lane is laid again as it was left. The style is named because it is served in the page rather than in the script: hashing the script alone left every change to the palette unable to reach a page already open.
 
 *In force, as built 2026-09-14.*
 

@@ -130,7 +130,7 @@ Neither press is there under a finger, where [the rail takes none](touch.md#53-t
 
 ## 4. The ahead
 
-The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on.
+The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on. It stops where the lane stops: what a card leads to waits past a boundary and no fold reaches it, so the ahead never draws it.
 
 *Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view.*
 

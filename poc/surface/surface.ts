@@ -125,7 +125,8 @@ async function serve(rootArg: string, port: number): Promise<void> {
   const rootDir = dirname(rootFileOf(rootArg));
   const script = await clientScript();
   // the page a process serves, named, so a page left open across a restart with new code knows to load it
-  const version = `version ${Bun.hash(script).toString(36)}`;
+  // the style is served in the page rather than in the script, so a palette edit reaches an open page only if it is named here too
+  const version = `version ${Bun.hash(script + CSS).toString(36)}`;
   const listeners = new Set<(s: string) => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   // a change to the markdown or to an image the body may hold is a change to the body
@@ -565,7 +566,7 @@ async function trace(rootArg: string): Promise<Body> {
       const standing = table.get(anchor ? `${target}#${anchor}` : target);
       if (standing !== undefined) {
         if (standing === holder.address) return void warn(`${said}, which is itself; the link is skipped`);
-        return void Object.assign(para, { type: "card", to: standing, tokens: undefined });
+        return void Object.assign(para, { type: "card", to: standing, tokens: undefined, text: undefined });
       }
       if (anchor) return void warn(`${said}, a heading the reading has not met; the link is skipped`);
       const r = read(target);
@@ -586,7 +587,7 @@ async function trace(rootArg: string): Promise<Body> {
       table.set(target, address);
       table.set(`${target}#${slug(r.cut.title)}`, address);
       gather(r.cut.lead, target, tfile, r.cut.title);
-      Object.assign(para, { type: "card", to: address, tokens: undefined });
+      Object.assign(para, { type: "card", to: address, tokens: undefined, text: undefined });
       tracePlacements(brief, target, tfile);
       traceLevel(r.cut.sections, brief, target, tfile, r.kind);
     });
@@ -1023,14 +1024,11 @@ const nearestInLane = (a: string): string => prefixesOf(a).findLast((p) => inLan
 /** How many briefs stand beneath an address, at any depth. */
 const beneathCount = (a: string): number => level(a).reduce((s, k) => s + 1 + beneathCount(k.address), 0);
 
-/** The level a brief unfolds onto. */
-const levelOf = (b: Brief): Brief[] => level(b.address);
 /** How many briefs a brief unfolds onto: its own, however deep, and a card as the one thing it is, since what a card holds waits past a boundary. */
 const beneathIn = (a: string): number => level(a).reduce((n, k) => n + 1 + (isCard(k) ? 0 : beneathIn(k.address)), 0);
-/** How many briefs stand beneath a brief at any depth, across every boundary. */
-const beneathOf = (b: Brief): number => beneathCount(b.address);
 /** A brief's level as the lane lays it: its own briefs, never the cards its prose places, which are reached by opening. */
 const levelIn = (b: Brief): Brief[] => level(b.address).filter((k) => !isCard(k));
+
 /** Whether a brief unfolds at all: blocks past its face, the cards among them, or a level of its own. */
 const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelIn(b).length > 0;
 
@@ -1126,9 +1124,9 @@ const ACTIONS: Record<string, Action> = {
         ? "Closes the reading you are in, so the map ends at the card again and you stand on it."
         : "Folds the brief above the one you are on, its parent, which takes you up to it.",
     also: "Shift with the space bar does the same. The left arrow steps up without folding, and shift with return closes a reading the prose stands in.",
-    can: (a) => (onMap(a) ? foldsUp() !== null || shuts() !== "" : state.focus !== state.scope && !!brief(parentOf(state.focus))),
+    can: (a) => (onMap(a) ? foldsUp() !== null || shuts() !== "" : acts(a) !== state.scope && !!brief(parentOf(acts(a)))),
     run: (a) => {
-      if (!onMap(a)) return cycle(parentOf(state.focus));
+      if (!onMap(a)) return cycle(parentOf(acts(a)));
       // within a file the brief above folds; at the top of a reading there is none, and the reading itself closes. One
       // act, and the boundary is what decides which of the two the reader gets
       const up = foldsUp();
@@ -1200,7 +1198,9 @@ const ACTIONS: Record<string, Action> = {
     keys: [{ key: "Enter" }],
     help: () => "Opens the brief as the whole of the lane: its heading becomes the opening and everything above it leaves.",
     shifted: "Shift widens the scope by a level instead.",
-    can: (a) => level(acts(a)).length > 0,
+    // a key falls to the first act that will have it, so without this the map's return, once it had nothing left to
+    // go to, was answered by the lane scoping instead
+    can: (a) => (a === undefined && handOnMap() ? false : level(acts(a)).length > 0),
     run: (a) => scopeTo(acts(a)),
   },
   widen: {
@@ -1691,11 +1691,11 @@ function articleHtml(b: Brief, g: Grade, after: number): string {
       ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
         actFigure(b, rest) +
         (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        `<span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span>` +
+        `<span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</span>` +
         `</div>`
       : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${ACTIONS.open.can(b.address) ? badgeHtml("open", b.address) : ""}</span></div>` : "";
+  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("open", b.address)}</span></div>` : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
@@ -2047,8 +2047,9 @@ function aheadSvg(W: number, H: number): string {
   const t = brief(target)!;
   // the rows: the brief itself with the paragraphs its face hides, then everything beneath it, in reading order
   const rows: ARow[] = [{ a: target, depth: 0, blocks: [HEAD_BLOCK, ...blocksOf(t).slice(1).flatMap(aheadBlocks)], hidden: 0 }];
+  // a card's reading waits past a boundary and no fold reaches it, so the ahead stops where the lane stops
   const walk = (parent: string, d: number): void =>
-    level(parent).forEach((k) => {
+    level(parent).filter((k) => !isCard(k)).forEach((k) => {
       rows.push({ a: k.address, depth: d, blocks: [HEAD_BLOCK, ...blocksOf(k).flatMap(aheadBlocks)], hidden: 0 });
       walk(k.address, d + 1);
     });
@@ -2260,7 +2261,7 @@ const saveSettings = (): void =>
 const KEY_GROUPS: { of: string; acts: string[] }[] = [
   { of: "the brief", acts: ["unfold", "foldUp", "open"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "widen"] },
-  { of: "the reading", acts: ["previous", "next", "above", "beneath"] },
+  { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
   { of: "the lane", acts: ["undo", "redo"] },
 ];
 
@@ -2636,8 +2637,7 @@ const outOf = (a: string, head: boolean): { a: string; head: boolean } | null =>
  * standing beside one means by closing; anywhere else the reading the reader stands in closes, and they step back
  * onto the card that opened it. The two are one act seen from either side of the boundary.
  */
-const closable = (a?: string): string => {
-  if (a !== undefined) return state.chain.includes(a) ? a : "";
+const closable = (): string => {
   if (state.picked === null) return "";
   if (!state.onHead && state.chain.includes(state.picked)) return state.picked;
   const r = colRootOf(state.picked, state.onHead);
@@ -2713,7 +2713,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const a = b.address;
   // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
   if (!o.head) colOf.set(a, col);
-  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", o.open ? "open" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus && o.head === headFor(a) ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
+  const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus && o.head === headFor(a) ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
   // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
@@ -2724,7 +2724,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
   // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
   // width and a name that wraps needs no hanging indent
-  return `<div class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}${o.opens ? ` data-open="${col}"` : ""}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
+  return `<div class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -2993,7 +2993,7 @@ function fitCanvas(): void {
 function followFocus(): void {
   if (followed === state.focus) return;
   followed = state.focus;
-  bringIntoView(state.focus);
+  bringIntoView(state.focus, headFor(state.focus));
 }
 
 /**
