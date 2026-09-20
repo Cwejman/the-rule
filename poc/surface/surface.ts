@@ -1380,6 +1380,9 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowDown: { glyph: `<path d="M8 3.8v7.9M5 8.7l3 3 3-3"/>`, name: "down" },
   ArrowLeft: { glyph: `<path d="M12.2 8H4.3M7.3 11 4.3 8l3-3"/>`, name: "left" },
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
+  Backspace: { glyph: `<path d="M13.2 4.7H6.7L3.4 8l3.3 3.3h6.5z"/><path d="m8.9 6.7 2.7 2.6M11.6 6.7 8.9 9.3"/>`, name: "backspace" },
+  // the full stop is a dot, and a dot drawn at its own weight would read as an empty cap, so it is filled
+  ".": { glyph: `<circle cx="8" cy="9.8" r="1.9" fill="currentColor" stroke="none"/>`, name: "the full stop" },
 };
 
 const cap = (glyph: string, kind = ""): string => `<span class="cap${kind ? " " + kind : ""}"><svg viewBox="0 0 16 16">${glyph}</svg></span>`;
