@@ -2810,8 +2810,14 @@ function columnHtml(root: string, col: number): string {
 /** How the nesting within a file is drawn: a spine down the left with the rows hanging into it, or one line threading from row to row. */
 /** The map's measures, all on one grid of four: the width of a row, the room between rows, how far a level steps in, and how far a reading stands from the row that named it. */
 const NODE = { w: 192, gap: 12, indent: 24, across: 48 };
-/** The least the type on the map is drawn at, whatever the zoom: past it the nodes go on shrinking and the names are cut instead. */
+/** The least the type on the map is drawn at while it can be held: past this the nodes go on shrinking and the names are cut instead. */
 const TYPE_FLOOR = 10.5;
+/**
+ * How far the type may resist the view before it yields. Held at twice its size the name is cut to one line, which is
+ * the room two lines had, so the node never grows; resisting further would grow every node and with it the whole map,
+ * and zooming out would give back what it took. Past this the map shrinks whole, which is what an overview is.
+ */
+const TYPE_HOLD = 2;
 const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false } };
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
@@ -3033,6 +3039,9 @@ function applyView(ease: boolean): void {
   if (!st) return;
   st.classList.toggle("easing", ease);
   st.style.transform = `translate(${view.x.toFixed(1)}px, ${view.y.toFixed(1)}px) scale(${view.k.toFixed(3)})`;
+  // every line on the map keeps one weight, whatever the view: a rim divided by the scale is drawn at the width it was
+  // written at, so zooming out thins nothing and zooming in fattens nothing
+  st.style.setProperty("--k", view.k.toFixed(3));
   // the type has a floor. Zooming out shrinks the nodes and not the names, so an overview reads rather than merely
   // being small, and a name that no longer fits its node is cut. It steps rather than sliding, since every change of
   // the type lays the rows again, and sliding it laid them at every notch of the wheel
@@ -3040,10 +3049,14 @@ function applyView(ease: boolean): void {
   if (row) {
     const kzNow = Number(st.style.getPropertyValue("--kz") || 1);
     const base = parseFloat(getComputedStyle(row).fontSize) / (kzNow || 1);
-    const want = Math.max(1, TYPE_FLOOR / (base * view.k));
+    const want = clamp(TYPE_FLOOR / (base * view.k), 1, TYPE_HOLD);
     const kz = (Math.round(want * 20) / 20).toFixed(2);
     if (st.style.getPropertyValue("--kz") !== kz) {
       st.style.setProperty("--kz", kz);
+      // the node keeps the room it had, so a name held at a larger type is cut to one line rather than wrapping into a
+      // taller node. Held at two lines, every node grew as the type resisted and the whole map grew with it: the map
+      // was laid 7031 tall at the floor against 3004 at life size, so zooming out gave back exactly what it took
+      st.style.setProperty("--lines", Number(kz) > 1 ? "1" : "2");
       requestAnimationFrame(drawEdges);
     }
   }
@@ -5177,11 +5190,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
 /* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
 #canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
-#stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; }
+/* a rim is written at the weight it is drawn at and divided by the view, so every line on the map keeps one weight however far it is zoomed */
+#stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; --hair: calc(1px / var(--k, 1)); --hair-on: calc(1.5px / var(--k, 1)); }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 #edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 /* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
-#edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+#edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 #edges path.open { stroke: var(--door); stroke-width: 1.5; }
 /* the way from the root down to where the reader stands, in the branch's own ink over the grey of the rest */
 #edges path.on { stroke: var(--on); stroke-width: 1.5; }
@@ -5195,20 +5209,20 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
-.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
+.crow { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; width: var(--node); padding: 8px 12px; border-radius: 8px; background: var(--ground); box-shadow: inset 0 0 0 var(--hair) var(--rim); font-family: var(--sans); font-size: calc(var(--body) * .78 * var(--kz, 1)); line-height: 1.35; color: var(--ink); cursor: pointer; transition: box-shadow .15s, background .15s; }
 /* the name is given a width it fills rather than one it trails off in: two lines is what most names take here, and
    that is the room the node keeps, so a level of nodes reads as a set and none of them stands half empty */
 /* a node takes the room its name needs and no more, since room on the map is what there is least of: one line where
    one line does, two where the name wants two, and past that the name is cut, which is what zooming out leaves anyway */
-.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--lines, 2); line-clamp: var(--lines, 2); overflow: hidden; }
 /* the foot of a node: where it stands in its reading, and what waits beneath it */
 .crow .foot { display: flex; align-items: center; gap: 6px; height: 6px; }
 .crow .title { color: var(--ink); }
 /* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
-.crow.opens { box-shadow: inset 0 0 0 1px var(--door); }
+.crow.opens { box-shadow: inset 0 0 0 var(--hair) var(--door); }
 /* the head of a column is the brief the file opens with, and it says so by its weight */
 .crow.head .title { font-weight: calc(650 - var(--thin)); }
-.crow.head { box-shadow: inset 0 0 0 1px var(--door); }
+.crow.head { box-shadow: inset 0 0 0 var(--hair) var(--door); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
 #depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
 #depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
@@ -5221,10 +5235,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow[data-a=""] .title { color: var(--ink); }
 /* what the reading stands on takes the branch's hue at full weight; what the reader has selected is filled as well,
    since the two are different things and a reader may have selected one while reading another */
-.crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }
-.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--door); }
-.crow.picked.here { box-shadow: inset 0 0 0 1.5px var(--on); }
-.crow.lit, .crow:hover { box-shadow: inset 0 0 0 1.5px var(--lit); }
+.crow.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
+.crow.picked { background: var(--wash); box-shadow: inset 0 0 0 var(--hair-on) var(--door); }
+.crow.picked.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
+.crow.lit, .crow:hover { box-shadow: inset 0 0 0 var(--hair-on) var(--lit); }
 /* the figure: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy, on its own
    line and beginning at the row's own edge, so a level's figures read against each other */
 .crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; min-width: 0; overflow: hidden; }

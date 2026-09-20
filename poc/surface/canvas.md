@@ -100,7 +100,11 @@ A node carries two things: its name, and what waits beneath it. The name stands 
 
 Room on the map is what there is least of, so a node takes what its name needs and no more: one width, 192, and a height of one line where one line does and two where the name wants two. Past two the name is cut, which is what an overview leaves anyway. The rest is one grid of four: twelve between nodes, twenty-four for a level's step in, forty-eight from a node to the reading it opened, and the lines that join them run edge to edge with them.
 
-The type has a floor of its own. Zooming out shrinks the nodes and not the names: the type is scaled back against the view until it would fall under what reads, and past that the node goes on shrinking while the name stays legible and is cut to what the node still holds. So an overview is balanced rather than merely small. It steps rather than sliding, since every change of the type lays the rows again, and sliding it laid them at every notch of the wheel.
+The type has a floor of its own, and it yields before the map does. Zooming out, the type is scaled back against the view so that the names hold at what reads while the nodes shrink, and the name is cut to one line as soon as it does, since the room two lines had is the room one line at twice the size takes. It steps rather than sliding, since every change of the type lays the rows again, and sliding it laid them at every notch of the wheel.
+
+It holds to twice the size and no further, because a type that never yields is a map that never shrinks. Held against the view whatever it cost, every node grew as its name did and the map grew with them: it was laid 7031 tall at the floor against 3004 at life size, so zooming out gave back exactly what it took and an overview could not be had. Past the hold the type goes small with everything else, which is what zooming out is for.
+
+Every line on the map keeps one weight, whatever the view: a rim and a line are drawn at the width they were written at, divided by the scale, so zooming out thins nothing and zooming in fattens nothing. Weight on a map says what a thing is, and a weight that changes with the view says it differently at every zoom.
 
 A node held at two lines whatever its name was tried and refused: it stood half empty on every short name, and space kept for nothing is space taken from the map.
 
