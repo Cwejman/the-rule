@@ -2892,6 +2892,10 @@ function drawEdges(): void {
   const mid = (q: { top: number; bottom: number }) => (q.top + q.bottom) / 2;
   const form = treeForm();
   const paths: string[] = [];
+  // the way from the root down to where the reader stands, drawn over the rest in the branch's own ink: a line a reader
+  // can follow back is what says where they are, where a map of one grey weight leaves them to work it out
+  const way = new Set(prefixesOf(state.focus));
+  const lit: string[] = [];
   // the nesting of a file: one line dropping from the brief that holds them, as a file tree draws it
   all<HTMLElement>(".ckids", st).forEach((kids) => {
     const row = kids.previousElementSibling;
@@ -2909,6 +2913,12 @@ function drawEdges(): void {
         const q = at(r);
         paths.push(`<path class="nest" d="M${x.toFixed(1)} ${mid(q).toFixed(1)}L${q.left.toFixed(1)} ${mid(q).toFixed(1)}"/>`);
       });
+    // only one row of a level can lie on the way, so the lit line stops at it rather than running the level's whole drop
+    const on = rows.find((r) => way.has(r.dataset.a ?? "\u0000"));
+    if (on && way.has((row as HTMLElement).dataset.a ?? "\u0000")) {
+      const q = at(on);
+      lit.push(`<path class="nest on" ${hued(on.dataset.a ?? "")} d="M${x.toFixed(1)} ${p.bottom.toFixed(1)}L${x.toFixed(1)} ${mid(q).toFixed(1)}L${q.left.toFixed(1)} ${mid(q).toFixed(1)}"/>`);
+    }
   });
   // an opening: the edge from the row the reader pressed to the head of the reading it named
   all<HTMLElement>(".cbeside", st).forEach((be) => {
@@ -2920,11 +2930,13 @@ function drawEdges(): void {
     // the two stand with their tops level, so the line is drawn on the first line of each rather than on their
     // middles: a row that wrapped to two lines would otherwise tilt the line it leaves by half a line
     const y = p.top + Math.min(p.bottom - p.top, q.bottom - q.top) / 2;
-    paths.push(`<path class="open" ${hued(head.dataset.a ?? "")} d="M${p.right.toFixed(1)} ${y.toFixed(1)}L${q.left.toFixed(1)} ${y.toFixed(1)}"/>`);
+    const a = head.dataset.a ?? "";
+    const d = `M${p.right.toFixed(1)} ${y.toFixed(1)}L${q.left.toFixed(1)} ${y.toFixed(1)}`;
+    (way.has(a) ? lit : paths).push(`<path class="open${way.has(a) ? " on" : ""}" ${hued(a)} d="${d}"/>`);
   });
   svg.setAttribute("width", `${Math.ceil(st.scrollWidth)}`);
   svg.setAttribute("height", `${Math.ceil(st.scrollHeight)}`);
-  svg.innerHTML = paths.join("");
+  svg.innerHTML = paths.join("") + lit.join("");
 }
 
 /**
@@ -5171,6 +5183,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
 #edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 #edges path.open { stroke: var(--door); stroke-width: 1.5; }
+/* the way from the root down to where the reader stands, in the branch's own ink over the grey of the rest */
+#edges path.on { stroke: var(--on); stroke-width: 1.5; }
 /* the map is laid on one grid: a row is one width, the room between rows is one gap, a level steps in by one, and a
    reading stands one across from the row that named it. Nothing in it is a number of its own */
 .ccol { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ngap); }
@@ -5201,7 +5215,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #depth .dc.on { background: var(--track); color: var(--ink); }
 #depth .dc:hover { background: var(--muted); color: var(--ground); }
 .crow .num { flex: none; font-size: .8em; line-height: 1; color: var(--faint); }
-.crow.on .num { color: var(--on); }
+/* a row on the way from the root to where the reader stands says so in its own name, as the line that reaches it does */
+.crow.on .num, .crow.on .title { color: var(--on); }
+/* the root stands under no branch, so it takes no branch's ink, though the way to anywhere begins at it */
+.crow[data-a=""] .title { color: var(--ink); }
 /* what the reading stands on takes the branch's hue at full weight; what the reader has selected is filled as well,
    since the two are different things and a reader may have selected one while reading another */
 .crow.here { box-shadow: inset 0 0 0 1.5px var(--on); }

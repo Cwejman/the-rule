@@ -138,6 +138,16 @@ It follows that where the reader already is, is a place and not an address. Stan
 
 *The author's, 2026-09-19, on reading that the card and the file's own top were conflated; as built the same day.*
 
+### 4.9 The way from the root to where the reader stands is lit
+
+A map of one weight leaves the reader to work out where they are in it. So the way from the root down to the brief the prose stands on is drawn in the branch's own ink over the grey of everything else.
+
+The rows on it take that ink in their names, the line down a file stops at the row that carries the way on rather than running the level's whole drop, and the opening to each reading on the way is drawn in it too. The root takes no branch's ink, since it stands under none.
+
+It is the way down said on the map. What the run of names gives as text, the lines give as a path a reader can follow back, and both answer to where the prose stands rather than to what is selected, since the selection is free to go exploring.
+
+*The author's ask of 2026-09-20, that the lines from the root to where you are be explicit; as built the same day.*
+
 ## 5. One press selects, two presses go
 
 Three things a reader wants of a node, and they are not one act. To know what it is. To go there and read it. To see what it holds without leaving where they are.
