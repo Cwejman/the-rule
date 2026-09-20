@@ -222,6 +222,8 @@ The canvas draws the same state the lane draws: the fold of every brief, the foc
 
 The two panes are in step as the reader moves: one focus between them, and a scroll in either brings the other to where it went. The highlight is that one focus, so scrolling the prose moves what is selected on the map, and the arrows move it without the prose following. Two highlights meant return went back to where the arrows had left the reader rather than to where they were looking.
 
+Being in step is a state and not a law, and [going looking on the map leaves it](#62-going-looking-takes-the-map-off-the-reading).
+
 What the map holds is the reading the lane holds, which is the scope and not the reading line. Going into another reading, by a link, by a press again or by an address, lays the path to it; scrolling within one changes nothing, whatever cards the reading line passes on the way. Going is the only thing that lays it. Asked instead on every draw, the map could open nothing that did not stand on the lane's own path: the act set the way and the next draw threw it away, so a reader who walked out to the top of the body and tried to go into something else was refused with no sign of why. Reading the reading line instead, the map opened each card as the line reached it and closed it again as it passed, which is a map jumping back and forth under a reader who is only reading.
 
 What the canvas holds of its own is what stands open. It is not the focus, since opening is not going, and it is kept in the browser with the view.
@@ -237,6 +239,18 @@ The two keys that move it stand together past its cells, [as one pair with their
 The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole.
 
 *The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
+
+### 6.2 Going looking takes the map off the reading
+
+A map is for going looking where the prose is not, and while it followed the reading it could not be used for that: a reader who moved the selection away had it taken back by the next small scroll of the lane, since the two are one highlight.
+
+So the map is on the reading or astray, and what says which is where the selection stands. While it stands where the prose stands the map follows the reading: a scroll moves the selection with it and brings it into view. Once the reader moves it themselves, by a key or a press, or moves the view by hand, the map is astray and stays exactly as they left it, however far the prose scrolls on without them.
+
+Astray, the map still says where the prose is. [The way to it stays lit](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) and the row it stands on keeps its mark, so a reader looking about can always see the reading they left, and what they have is two marks rather than one.
+
+Coming back is an act, and it is one they already have: the full stop returns the selection to the reading, and return takes the reading to the selection. So the two panes are joined by the reader's own act in either direction, and nothing drags anything.
+
+*The author's, 2026-09-20, given as the map detaching once you go elsewhere, with syncing as an act; as built the same day. Being astray is read from where the selection stands rather than remembered, so nothing can say the map is following while it is not.*
 
 ## 7. What the substrate gives the canvas
 

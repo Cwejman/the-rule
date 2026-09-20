@@ -1315,6 +1315,8 @@ const ACTIONS: Record<string, Action> = {
     can: () => state.picked !== state.focus || state.onHead !== headFor(state.focus) || hiddenHere().folded.length > 0 || hiddenHere().shut.length > 0,
     run: () => {
       const { folded, shut } = hiddenHere();
+      // asking for the way here is asking the map to take up the reading again, view and all
+      attach();
       shut.forEach((p) => state.opened.push(p));
       if (folded.length) refold(() => folded.forEach((p) => setFold(p, "whole")));
       if (canvasOn()) pickNode(state.focus, null, headFor(state.focus));
@@ -1328,6 +1330,7 @@ const ACTIONS: Record<string, Action> = {
     help: () => "Leaves only where the reader is: everything off the way to it folded, and every other reading closed on the map.",
     can: () => state.opened.some((p) => !wayHere().includes(p)) || laneOrder(state.scope).some((b) => !onWayHere(b.address) && foldOf(b.address) === "whole"),
     run: () => {
+      attach();
       state.opened = wayHere();
       refold(() =>
         state.body!.briefs.forEach(
@@ -2595,7 +2598,25 @@ type View = { x: number; y: number; k: number };
 const view: View = { x: 24, y: 24, k: 1 };
 /** The body the canvas was last fitted to, so it fits when it is first drawn and never moves under a fold. */
 let fitted: string | null = null;
-let followed = "";
+/** The focus the view was last brought to; null until the first draw, so arriving always brings the reader into view. */
+let followed: string | null = null;
+/** Whether the reader has moved the view by hand. It is half of going astray, the other half being a selection off the reading. */
+let panned = false;
+
+/**
+ * Whether the reader has taken the map off the reading: the selection stands somewhere the prose is not, or they have
+ * moved the view themselves. While the map is on the reading it follows it, so scrolling the prose moves the selection
+ * and brings it into view; gone astray it stays exactly where they left it, and a scroll in the lane no longer pulls
+ * them back from where they went looking. The way back is an act, the full stop, and so is the way forward, return.
+ *
+ * Nothing else is remembered for it: standing where the prose stands is what being on the reading means.
+ */
+const astray = (): boolean => panned || state.picked === null || state.picked !== state.focus || state.onHead !== headFor(state.focus);
+
+/** The map takes up the reading again: what a going, an arrival or the act of asking for the way here all mean. */
+function attach(): void {
+  panned = false;
+}
 
 /** Which column each row was drawn in, filled as the canvas is drawn, so an act opens what is selected where it stands. */
 const colOf = new Map<string, number>();
@@ -3081,7 +3102,8 @@ function fitCanvas(): void {
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
 function followFocus(): void {
-  if (followed === state.focus) return;
+  // a reader who went looking elsewhere keeps the view they went looking with, until they ask for the way here
+  if (astray() || followed === state.focus) return;
   followed = state.focus;
   bringIntoView(state.focus, headFor(state.focus));
 }
@@ -4172,6 +4194,8 @@ function settle(a: string): void {
   state.focus = target;
   state.picked = target;
   state.onHead = headFor(target);
+  // a going is the reader and the map arriving together, so whatever looking about they had done is over
+  attach();
   // the selection went with the going, so the map draws again: without it the row lit on the map was the one the
   // reader left, and the next key acted on a node other than the one they could see was theirs
   if (canvasOn()) drawCanvas();
@@ -4223,6 +4247,10 @@ function resume(a: string, kept: { scope: string; folds: [string, Fold][]; trail
     .forEach((p) => foldOf(p) !== "whole" && setFold(p, "whole"));
   closeLay();
   state.focus = target;
+  // a reload stands the reader where they were, so the map takes up that reading rather than the view's last wandering
+  state.picked = target;
+  state.onHead = headFor(target);
+  attach();
   drawAll();
   scrollToFocus(false);
   arriving = false;
@@ -4235,6 +4263,7 @@ function arrive(a: string): void {
   // an arrival is a going, so what is selected on the map goes with it; scrolling alone never moves the selection
   state.picked = target;
   state.onHead = headFor(target);
+  attach();
   state.scope = scopeFor(target);
   notice(target === a ? "" : `No brief at ${a}; showing ${target || "the root"} instead.`);
   lay();
@@ -4436,6 +4465,8 @@ function onScroll(): void {
   const f = focusUnderLine();
   if (f === state.focus) return;
   const was = state.focus;
+  // asked before the reading moves, since standing where the prose stood is what says the map is still on the reading
+  const off = astray();
   state.focus = f;
   // The highlight is one. A reader who scrolls has moved where they are, so what is selected on the map follows the
   // reading line rather than staying where the arrows last left it, and return goes to where the reader is looking.
@@ -4445,11 +4476,20 @@ function onScroll(): void {
   // prose, and the line crosses each of them and comes back; easing the map to every one of those and back again made
   // it jump under a reader who was only scrolling. So a card the line crosses lights on the map and does not move it,
   // and the map eases only where the line reaches another brief.
+  //
+  // None of it happens once the reader has gone astray on the map. There the selection is theirs, and a scroll in the
+  // lane would take it back from wherever they went looking; what still follows the reading is the lit way to it and
+  // the row it stands on, so the map goes on saying where the prose is while they look elsewhere.
   if (canvasOn() && brief(f)) {
-    state.picked = f;
-    state.onHead = headFor(f);
-    if (lineBrief(f) === lineBrief(was)) followed = f;
-    drawCanvas();
+    if (off) {
+      drawFocusMarks();
+      drawEdges();
+    } else {
+      state.picked = f;
+      state.onHead = headFor(f);
+      if (lineBrief(f) === lineBrief(was)) followed = f;
+      drawCanvas();
+    }
   }
   if (!arriving) followHistory(hashFor(f));
   drawWings("focus");
@@ -4528,6 +4568,7 @@ function scopeTo(S: string): void {
   // pulling past the top, or by a name in the way down, moved the prose and left the map's selection behind
   state.picked = state.focus;
   state.onHead = headFor(state.focus);
+  attach();
   lay();
   drawAll();
   scrollToFocus(false);
@@ -4727,6 +4768,8 @@ function wire(): void {
     drag.moved = true;
     state.scrubbing = true;
     if (drag.kind === "canvas") {
+      // dragging the ground is going looking, as panning by the wheel is
+      panned = true;
       view.x = drag.vx! + (e.clientX - drag.x);
       view.y = drag.vy! + (e.clientY - drag.y);
       applyView(false);
@@ -4802,6 +4845,8 @@ function wire(): void {
     (e) => {
       e.preventDefault();
       hideTip();
+      // moving the map by hand is going looking: from here the reading no longer drags the view back
+      panned = true;
       if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
       view.x -= e.deltaX;
       view.y -= e.deltaY;
