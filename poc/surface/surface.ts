@@ -2894,6 +2894,11 @@ function drawCanvas(): void {
   else if (state.onHead && !state.opened.includes(state.picked)) state.onHead = false;
   colOf.clear();
   ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
+  // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
+  // neither read nor reach
+  const field = ui.canvas.querySelector<HTMLElement>("#field");
+  if (field) field.classList.toggle("tight", field.offsetWidth > ui.canvas.clientWidth - 2 * CANVAS_INSET);
   if (fitted !== state.body.root) {
     fitCanvas();
     fitted = state.body.root;
@@ -5301,6 +5306,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
 #field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
 #field .badge .chord { display: flex; align-items: center; }
+/* tight: the glyph and the key alone, which is the badge's own answer to a room too narrow for its word */
+#field.tight .badge .label { display: none; }
+#field.tight .badge { gap: 3px; padding: 4px 6px; }
 /* the face of what is selected: one fixed place at the top right of the canvas, a thing standing over the map, so it
    keeps its own edge; pressing it reads what it shows */
 #face { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }

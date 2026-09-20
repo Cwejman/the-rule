@@ -170,6 +170,8 @@ The acts stand naked, and there is one field for them, the same in both grains, 
 
 Under a finger an act is its glyph alone. On a desktop it is the glyph with what it does and the key that fires it, which is [the badge as it is drawn elsewhere](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the field stands within the canvas frame, centred at its foot, rather than at the foot of the page. Every act that can be taken appears; none stands behind an opener.
 
+Where the frame is too narrow for the words, the badges fall back to their glyph and their key, which is [what a badge does anywhere the room is tight](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands). The field kept its words until 2026-09-20, and beside the lane, where the canvas stands at its floor, it ran 652 wide in 360 and was cut at both ends, naming acts a reader could neither read nor reach.
+
 The field is naked. No surface is drawn under it and no rim around it, since the page is flat and a bar of glass over a map is a second thing to look at; what keeps it readable is the page's own ground rising behind it, as the prose fades at its edges. The face is not naked: it is a thing standing over the map rather than a row of acts at its edge, so it keeps its own rim.
 
 So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
