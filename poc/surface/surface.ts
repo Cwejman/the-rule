@@ -1360,6 +1360,16 @@ const ACTIONS: Record<string, Action> = {
 
 const same = (x: Chord, y: Chord): boolean => x.key === y.key && !!x.shift === !!y.shift && !!x.hold === !!y.hold;
 
+/**
+ * The key that was pressed, where what it said is not it. Shift on a printable key changes the character reported: the
+ * full stop says `>` on one layout and `:` on another, so a chord named by the character was never met with shift held.
+ * A chord is named by the key, so the key is read from the board's own position, which every layout agrees on. It is
+ * asked only where the character named no act, so a layout that puts a key somewhere else keeps its own character.
+ */
+const POSITION: Record<string, string> = { Period: ".", Comma: ",", Slash: "/", Semicolon: ";", Minus: "-", Equal: "=", BracketLeft: "[", BracketRight: "]", Backquote: "`" };
+const pressed = (e: KeyboardEvent): string =>
+  e.key.length !== 1 ? e.key : e.code.startsWith("Key") ? e.code.slice(3).toLowerCase() : e.code.startsWith("Digit") ? e.code.slice(5) : (POSITION[e.code] ?? e.key);
+
 /** The action a chord fires, if any. */
 const actionFor = (c: Chord): Action | undefined => Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)));
 
@@ -4929,7 +4939,8 @@ function wire(): void {
       return;
     }
     // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
-    const chord: Chord = { key: e.key, shift: e.shiftKey };
+    const said: Chord = { key: e.key, shift: e.shiftKey };
+    const chord = actionFor(said) ? said : { key: pressed(e), shift: e.shiftKey };
     if (!actionFor(chord)) return;
     if (e.key !== "Escape") e.preventDefault();
     take(chord);
