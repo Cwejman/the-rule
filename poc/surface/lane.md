@@ -216,9 +216,13 @@ The registers, the heading sizes that step down by depth as [the design language
 
 ### 7.2 Widening the scope
 
-Shift with enter goes out of this reading, to the brief that placed it. Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came. What a link out of the scope does is [answered where links are](#9-following-a-link-moves-you), and not here.
+Shift with enter goes out of this reading, to the brief that placed it: the lane takes the reading that brief stands in, and the reader is left on [the card](#12-a-placed-part-raises-a-card), beside the reading rather than inside it, which is where going in left from.
 
-*Reasoned, 2026-09-13; going out written again 2026-09-19, when the lane became one reading and there was no longer a scope to widen.*
+Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came. What a link out of the scope does is [answered where links are](#9-following-a-link-moves-you), and not here.
+
+It went to the parent brief until 2026-09-20, which is a heading inside the placing file and not a reading: the lane was laid from a section of a run nobody composed, and the reader was left at an address it no longer held. The boundary is what going out crosses, so the reading on the other side of it is where it lands.
+
+*Reasoned, 2026-09-13; going out written again 2026-09-19, when the lane became one reading and there was no longer a scope to widen; the reading rather than the parent brief, 2026-09-20.*
 
 ### 7.3 The levels above stay in sight
 
@@ -228,11 +232,13 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 ### 7.4 Pull past the top
 
-At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken up a level, as some applications refresh when pulled past their top.
+At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken [out of this reading](#72-widening-the-scope), as some applications refresh when pulled past their top.
 
 A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-where-only-the-lane-fits).
 
-*The author's ask of 2026-09-15; as built the same day, and eased on 2026-09-16, when the author could not reach it by hand: a shorter way, a shorter dead zone, and a gap a quick second swipe can make.*
+One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands in is scrolled to the card it left, so every event after it met a lane that was no longer at its top, drained the pull and armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for the hand to let go, which is a push the other way or the quiet the gauge already springs back after, and the rest of that movement does not scroll the reading it landed in either, since it was carrying the reader off the card the pull had put them on.
+
+*The author's ask of 2026-09-15; as built the same day, and eased on 2026-09-16, when the author could not reach it by hand: a shorter way, a shorter dead zone, and a gap a quick second swipe can make. One movement as one pull, on his report of 2026-09-20 that pulling took him all the way to the root.*
 
 ### 7.5 The way down stands over the lane
 

@@ -4290,7 +4290,10 @@ function arrive(a: string): void {
 
 let holdTimer: ReturnType<typeof setTimeout> | undefined;
 function scrollToFocus(smooth: boolean): void {
-  const art = ui.lane.querySelector<HTMLElement>(`.brief[data-a="${cssEsc(state.focus)}"]`);
+  // a card is a place to stand as a brief is, and it is drawn as a card and not as a brief: asking for the brief alone,
+  // a going that landed on one scrolled nowhere and left the reader wherever the lane happened to stand
+  const at = cssEsc(state.focus);
+  const art = ui.lane.querySelector<HTMLElement>(`.brief[data-a="${at}"], .card[data-a="${at}"]`);
   if (!art) return;
   const top = art.getBoundingClientRect().top - ui.content.getBoundingClientRect().top;
   const target = scrollFor(top + 24);
@@ -4320,6 +4323,8 @@ let lastWheelAt = 0;
 let pushing = false;
 /** The gap in the stream that means a gesture has begun: momentum never pauses this long, and a finger touching the pad stops it dead. */
 const PULL_GAP = 50;
+/** Whether a pull has already taken the reader out and the hand has not yet let go: one movement of the hand is one act. */
+let spent = false;
 
 /**
  * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
@@ -4337,6 +4342,17 @@ function pull(e: WheelEvent): void {
   const now = performance.now();
   const gap = now - lastWheelAt;
   lastWheelAt = now;
+  const rest = notched(e) ? 1500 : 1000;
+  // One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands
+  // in is scrolled to the card it left, so the events after it met a lane no longer at its top, drained the pull and
+  // armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for
+  // the hand to let go, which is a push the other way or the quiet the gauge already springs back after — and neither
+  // is the lane merely standing somewhere else, so it is asked before anything about where the lane stands.
+  if (spent) {
+    if (e.deltaY > 0) spent = false;
+    else pullTimer = setTimeout(restPull, rest);
+    return drainPull();
+  }
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
   // the momentum of a scroll that reaches the top must never count. Momentum is an unbroken stream of events, and a
   // finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top
@@ -4347,18 +4363,28 @@ function pull(e: WheelEvent): void {
   drawPull(false);
   if (pulled >= PULL) {
     pulled = 0;
+    spent = true;
+    pushing = false;
     drawPull(true);
+    pullTimer = setTimeout(restPull, rest);
     return popUp();
   }
   // a swipe with its momentum seldom reaches the whole pull, so the pull is held long enough for the next swipe to continue it
-  pullTimer = setTimeout(drainPull, notched(e) ? 1500 : 1000);
+  pullTimer = setTimeout(restPull, rest);
 }
 
+/** The gauge springs back. */
 function drainPull(): void {
   pushing = false;
   if (pulled === 0) return;
   pulled = 0;
   drawPull(true);
+}
+
+/** The hand has let go: the gauge springs back and a spent pull can be made again. */
+function restPull(): void {
+  spent = false;
+  drainPull();
 }
 
 /** The gauge: a line over the top of the lane that fills from its middle out past the dead zone, and eases back when it drains. */
@@ -4573,12 +4599,15 @@ const up = (): void => moveTo(parentOf(state.focus));
 const down = (): void => moveTo(level(state.focus)[0]?.address ?? state.focus);
 
 /** Scopes the lane to a brief: its holon becomes the whole, its heading the opening, and the registers count from it. */
-function scopeTo(S: string): void {
+function scopeTo(S: string, at?: string): void {
   if (S === state.scope || !brief(S)) return;
   record();
   move(depthOf(S) > depthOf(state.scope) ? "in" : "out", S);
   state.scope = S;
-  if (!within(state.focus, S)) state.focus = S;
+  // where the act says where the reader stands afterwards, that stands: going out of a reading leaves them on the card
+  // that placed it, which lies within the new scope and so would otherwise keep a focus the lane no longer holds
+  if (at !== undefined) state.focus = at;
+  else if (!within(state.focus, S)) state.focus = S;
   // the selection goes with the reader, as it does on every other way of arriving. Without it a scope change made by
   // pulling past the top, or by a name in the way down, moved the prose and left the map's selection behind
   state.picked = state.focus;
@@ -4592,8 +4621,24 @@ function scopeTo(S: string): void {
   settleTrail();
 }
 
-/** Shift and enter: the scope widens by one level, to the parent of the scope root. */
-const popUp = (): void => void (state.scope !== "" && scopeTo(parentOf(state.scope)));
+/**
+ * Going out of this reading: the lane takes the reading that placed it, and the reader stands on the card, beside the
+ * reading rather than inside it, which is where going in with return left from.
+ *
+ * It went to the parent brief until 2026-09-20, which is a heading inside the placing file rather than the reading
+ * itself, so the lane was laid from a section of a run nobody composed and the reader was left at an address the lane
+ * no longer held. The boundary is what going out crosses, so the reading above it is where it lands.
+ */
+function popUp(): void {
+  const card = state.scope;
+  if (card === "") return;
+  const out = fileRootOf(parentOf(card));
+  if (out === card) return;
+  scopeTo(out, card);
+  // the lane is measured as it is laid, and what a card draws of the reading behind it settles a frame later, so the
+  // landing is taken again once it has: without it the card came to rest a card's height below the reading line
+  requestAnimationFrame(() => void (state.focus === card && scrollToFocus(false)));
+}
 
 /** How long the space bar is held before it acts on the whole scope rather than the brief in focus. */
 const HOLD = 450;
@@ -4852,7 +4897,18 @@ function wire(): void {
     },
     { passive: false },
   );
-  ui.scroll.addEventListener("wheel", pull, { passive: true });
+  // over the lane the browser scrolls it, and the pull only watches — except once a pull has been spent, where the rest
+  // of the same movement would scroll the reading it just landed in away from the card it put the reader on
+  ui.scroll.addEventListener(
+    "wheel",
+    (e) => {
+      pull(e);
+      // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
+      // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
+      if (spent && e.deltaY < 0) e.preventDefault();
+    },
+    { passive: false },
+  );
 
   // over the canvas the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
   ui.canvas.addEventListener(
