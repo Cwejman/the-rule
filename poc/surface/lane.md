@@ -38,7 +38,9 @@ The card takes one unfolding, to the whole of the brief on the other side, and n
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
-A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map. A brief that places parts holds its cards in its own prose, so the line crosses each of them and comes back, and a map that eased to every one of those and back again jumped under a reader who was only scrolling. The map follows the reading rather than each step of the line, and eases only where the line reaches another brief.
+A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
+
+The line holds the last thing it has reached, and never falls back. A card stands inside the prose of the brief that places it, so a line asking what it is inside of answered the card while it crossed one and the brief again in the prose after it: an entry that places six parts bounced the address, the way down and the map's selection between the parent and one card after another, thirteen times in one scroll of this body's root, where the reading has seven places to stand. A reading is passed through in one direction, so where the reader stands moves in one direction too.
 
 A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which is read through; a card is looked at directly, and one too faint to read has failed at the one thing it is for. So the card the reading stands on takes full ink and its outline takes the branch's hue, and every other card stays quiet and legible. Pointing at a card holds the brief it sits in at full ink as well, since the brief's own fading would take the card down with it.
 

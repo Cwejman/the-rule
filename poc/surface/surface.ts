@@ -3605,17 +3605,20 @@ let hang = 0;
 /** The reading line, where it stands on the screen now. */
 const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt(ui.scroll.scrollTop);
 
-/** The brief under the reading line, or the nearest above it. */
+/**
+ * The last thing of the reading the line has reached: a brief, or a card, which is a thing of the reading like a brief
+ * and lights as the reader comes to it.
+ *
+ * It is the last one reached and not the innermost one under the line, because a card stands inside the prose of the
+ * brief that places it. Taking the innermost, the line fell back onto that brief in the prose after each card and
+ * forward onto the next card after it, so a brief placing several parts bounced the address, the way down and the map's
+ * selection between the parent and one card after another while the reader was only scrolling. A reading is passed
+ * through in one direction, so where the reader stands moves in one direction too.
+ */
 function focusUnderLine(): string {
   const y = readingLine();
-  // a card is a thing of the reading like a brief, so the line falls on it and it is the innermost that wins
   const arts = all<HTMLElement>(".brief, .card", ui.lane);
-  const under = arts.filter((el) => {
-    const r = el.getBoundingClientRect();
-    return r.top <= y && r.bottom > y;
-  }).at(-1);
-  const above = arts.filter((el) => el.getBoundingClientRect().top <= y).at(-1);
-  return (under ?? above)?.dataset.a ?? "";
+  return arts.filter((el) => el.getBoundingClientRect().top <= y).at(-1)?.dataset.a ?? "";
 }
 
 /** Marks the path and the focus wherever rows and articles stand, and moves the tree's line, without drawing again. */
