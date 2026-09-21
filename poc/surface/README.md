@@ -56,7 +56,7 @@ Past the reading stand two readings of their own. The canvas is the second pane,
 
 [A touch reading](touch.md)
 
-Git's history is a reading of its own as well, stories told over runs of commits, opened as a view apart rather than mounted into the body. It is designed and not built.
+Git's history is a reading of its own as well, stories told over runs of commits, opened apart from the body rather than placed in it. Its data is built, and its drawing is not.
 
 [History](history.md)
 
