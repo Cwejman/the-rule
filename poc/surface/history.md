@@ -106,11 +106,13 @@ It is one file, `history.json`, loaded once when the view opens, and enough to d
 
 ### 4.2 The deep tier is had a commit at a time
 
-The lines a commit changed, mapped to the briefs they fall in, one file per commit, fetched only when a reader opens that commit in the lane.
+The lines a commit changed in the stamped files, brief by brief, one file per commit at `commits/<hash>.json`, fetched only when a reader opens that commit in the lane. A change that runs across a heading is cut there, each line going to the brief it stood in, and a change of nothing but blank lines is none.
+
+Only the substrate is held. What a commit did to code or to images is counted in the light tier and not carried here, since the lane shows the prose in place and nothing else.
 
 Should a view ever want lines across many commits at once, they are packed in runs of fixed length instead, fifty to a file, so a finished run never changes and only the newest grows. That waits until a view asks for it.
 
-*Measured by the session, 2026-09-21: every diff together is 10.5 MB; one commit's is 7.6 KB at the median, 47 KB at the ninetieth percentile and 758 KB at the most.*
+*As built, 2026-09-21. Measured on 460 commits: 3.6 MB together, 761 bytes at the median, 14 KB at the ninetieth percentile and 305 KB at the most; read cold in 0.24 seconds and warm in 0.04. Every diff with the code in it had been 10.5 MB. The whole build, both tiers with the page, takes 4.6 seconds.*
 
 ### 4.3 The body is measured before and after
 
