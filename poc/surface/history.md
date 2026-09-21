@@ -8,7 +8,7 @@ status: open
 
 History is how the knowledge came to be what it is where a reader stands: which commits touched it, and the stories told over them. Git's history is read as a holarchy of its own, with the stories as its briefs and the commits as the leaves beneath them.
 
-Its data is built; the trace of its stories and its drawing on the page are not. What stands beneath is the design settled in talk, and the data built to answer what the view will ask of it.
+Its data is built; the trace of its stories and its drawing on the page are not.
 
 *Preferred, the author's design, settled in discussion with the session 2026-09-21; the data as built the same day, and the rest open.*
 
@@ -22,15 +22,15 @@ So this time nothing of git enters the body, and the data comes before any view,
 
 ### 1.1 The body is measured before and after
 
-Before anything of this is built, the time `/body` takes and the weight of the built page are measured, and after it they are measured again. Neither may move.
+Before anything of this is built, the time the live process takes to hand the page its body and the weight of the built page are measured, and after it they are measured again. Neither may move.
 
-*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: `/body` stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte.*
+*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte.*
 
 ## 2. The history is a holarchy
 
-Commits are one level, and the low one, and gathering them in a git branch does not lift them. What lifts them is prose: a story tells what a run of commits did together, a larger story holds smaller ones, and the commits are the leaves at the foot of it all.
+Commits are one level, and the low one, and gathering them under a git branch leaves them at that level. What raises them is prose: a story tells what a run of commits did together, a larger story holds smaller ones, and the commits are the leaves at the foot of it all.
 
-So the history is a reading like any other, and only its leaves are a kind of their own.
+So the history is drawn as any reading is, and only its leaves are a kind of their own.
 
 *Preferred, the author's, 2026-09-21: [commits are one level](../../author/ideas-2026-09-21.md#10-commits-are-one-level-and-the-low-one) and [a substrate for commits](../../author/ideas-2026-09-21.md#11-a-substrate-for-commits); that it is a holon with a holarchy is his of the same day.*
 
@@ -82,7 +82,7 @@ The history's file is [a record](../practice.md#21-the-stamp-says-the-kind): its
 
 Commits no story tells yet stand among the stories in the order of time, each where it happened, and a story takes their place once it is written. So nothing is missing before it has been told, and the untold, mostly the newest, stand where a reader looks first.
 
-And it [never retires](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs), as other records do: a record retires once its conclusion stands in other briefs, and the history's conclusions are its own stories, so it is substrate for as long as the repository is.
+And it [never retires](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs), as other records do: it is substrate.
 
 *Preferred, the session's proposal taken by the author, 2026-09-21; that it never retires, since it is substrate, is the author's.*
 
@@ -122,17 +122,17 @@ A commit's figure draws a bar for every reading it touched, each in that reading
 
 #### 4.1.2 A story stands wherever any of its commits touched
 
-A story tells a stretch of time, not a place, so it holds whatever its run holds. From an address it stands if any of its commits touched there, and the commits of it that did not fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
+A story tells a stretch of time, not a place, so it holds whatever its run holds. From an address it stands if any of its commits touched there, and the commits of it that did not touch there fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
 
 *Preferred, the session's proposal taken by the author, 2026-09-21.*
 
 ### 4.2 A selection shows what it touched
 
-Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs as nodes to go to; and the lane shows the change in place.
+Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs it holds as nodes to go to; and the lane shows the change in place.
 
-In place, the first cut marks the blocks that changed and leaves the rest as it is, and what was removed is shown only when asked. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
+In place, the blocks that changed are marked at first and leaves the rest as it is, and what was removed is shown only when asked. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 
-A change in place fetches exactly the commits it shows, one for a commit and ten for a story of ten, so what it asks is bounded by the story and never by the history.
+A change in place fetches from [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) exactly the commits it shows, one for a commit and ten for a story of ten, so what it asks is bounded by the story and never by the history.
 
 *Preferred, the author's, 2026-09-21: [how a change affected the field](../../author/ideas-2026-09-21.md#9-how-a-change-affected-the-field) and [a selection shows the pieces affected](../../author/ideas-2026-09-21.md#15-a-selection-shows-the-pieces-affected); the first cut of the change in place and giving up a hue per commit are the session's proposals, taken; that a story's change in place fetches its commits one by one is the session's, from a fresh head finding it unsaid.*
 
@@ -146,21 +146,21 @@ The history is drawn down the column, as any reading is, so the canvas stays one
 
 What a reader sees decides what is fetched. The canvas, the colouring and the filter by address span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
 
-Locally both are read on demand and kept by the commit's hash, which never goes stale since a commit never changes. Published, the pipeline writes them as files beside the page, since a static host answers no query.
+Locally both are read on demand, each commit once, and kept by its hash, which never goes stale since a commit never changes. Published, the pipeline writes them as files beside the page, since a static host answers no query.
 
 *Preferred, the author's, 2026-09-21: [a shallow set and a deep set](../../author/ideas-2026-09-21.md#2-a-shallow-set-and-a-deep-set), [cached locally, files when published](../../author/ideas-2026-09-21.md#4-cached-locally-files-when-published); the split by what a view needs is the session's, on his asking whether a file per commit would bottleneck the canvas. As built the same day.*
 
 ### 5.1 The light tier is had whole
 
-What a view needs of every commit at once is small, so it is had in one file, loaded once when the history is opened: every commit that touched the root, its hash, parents, author, date and subject, the files it changed, and in a stamped file the briefs it touched.
+What a view needs of every commit at once is small, so it is had in one file, loaded once when the history is opened: every commit that touched the root, its hash, parents, author, date and subject, the files it changed with how many lines, code and images among them, and in a stamped file the briefs it touched.
 
-The file is `history.json`, which shares a name with the stories' `history.md` and nothing else. The root is the path the surface is handed, and each root keeps its own. It never stands inside the page, since it weighs a quarter of it.
+The file is `history.json`, which shares a name with the stories' `history.md` and nothing else. The root is the path the surface is handed, and each root keeps a light tier of its own. It never stands inside the page, since it weighs a quarter of it.
 
 *Measured, 2026-09-21, on 460 commits: 378 KB, 73 KB gzipped; read cold in 1.5 to 3.5 seconds and warm in 0.15 to 0.35. The headings are found by their lines rather than by lexing each version whole, which took 31 seconds, and the briefs so found match the trace's addresses in every stamped file.*
 
 ### 5.2 The heavy tier is had a commit at a time
 
-The lines a commit changed in the stamped files, brief by brief, one file per commit at `commits/<hash>.json`, fetched only when a reader opens that commit in the lane. A change that runs across a heading is cut there, each line going to the brief it stood in, and a change of nothing but blank lines is none.
+The lines a commit changed in the stamped files, brief by brief, one file per commit at `commits/<hash>.json`, fetched only for [a change shown in place](#42-a-selection-shows-what-it-touched). A change that runs across a heading is cut there, each line going to the brief it stood in, and a change of nothing but blank lines is none.
 
 Only the substrate is held. What a commit did to code or to images is counted in the light tier and not carried here, since the lane shows the prose in place and nothing else.
 
@@ -168,8 +168,12 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 ## 6. What this leaves open
 
-How overlapping stories would be drawn, and so whether stories may overlap at all, or run in several directions, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
+How overlapping stories would be drawn, and so whether stories may overlap at all, or group commits along more than one line at once, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
 
 Whether lines across more commits than a story holds are ever wanted at once; if they are, the heavy tier is packed in runs of fixed length, fifty to a file, so a finished run never changes and only the newest grows.
+
+How the history is opened: as a pane of its own, from the strip, or as what the canvas draws when asked.
+
+Whether the map opens the way to a touched brief the reader has not opened, or lights only what it holds.
 
 *Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice.*
