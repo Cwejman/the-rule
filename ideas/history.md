@@ -34,4 +34,4 @@ The data layer's shape held and is worth keeping in mind: blame gives every line
 
 The direction stands in the author's ideas: [history built in](../author/ideas-2026-09-17.md#2-history-is-built-in), [commits are briefs](../author/ideas-2026-09-17.md#3-commits-are-briefs), and [commits visible](../author/ideas-2026-09-16.md#25-commits-are-visible). What is postponed is the building, until the data layer is resolved for a built page and the view is designed for comprehension.
 
-*Reasoned, 2026-09-17, the session's; postponed by the author's decision.*
+*Reasoned, 2026-09-17, the session's; postponed by the author's decision. Taken up again 2026-09-21 in [the surface's history](../poc/surface/history.md), its data first and resolved for a built page, its drawing not yet begun.*
