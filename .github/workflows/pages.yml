@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        # the whole history, since the page ships history's light tier beside it and a shallow clone holds one commit
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       # the warnings are printed for whoever reads the run, and never stop the ship
