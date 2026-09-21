@@ -39,13 +39,13 @@ The judgement never excuses a flat file.
 
 *Preferred, the author's; revised 2026-09-18 by [the boundary](#11-a-file-is-one-linear-reading), and unmeasured.*
 
-### 1.3 A commit is one purpose on one piece
+### 1.3 A commit is one purpose
 
-A commit tells one thing: an interaction with one piece of the holarchy, for one purpose. Two pieces touched for two purposes are two commits, and two sessions are never one. A change that propagates into the field for one reason is still one commit, however many briefs it reaches, and briefs only added may go in one.
+A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file, and no commit holds the work of two sessions.
 
-So a commit is seen where its work is. [History](surface/history.md) shows a reader only the commits that touched where they stand, and a commit with a local purpose is met there and nowhere else.
+One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a run of briefs only added, since adding them is one making.
 
-Many small commits are not a fault: feedback on feedback on feedback is a true record of how the work went. What they cost is answered by the story written over them, never by fewer commits.
+What it buys is that a commit is read where its work is: whoever looks at a part of the holarchy finds the commits made for it there, and none made for something else. Many small commits are no fault, since each is true to how the work went; what their number costs is answered by [the history told over them](surface/history.md#24-a-session-writes-the-story-as-its-debrief).
 
 *Preferred, the author's, 2026-09-21, from [his thinking that day](../author/ideas-2026-09-21.md#7-commits-at-a-granularity-that-does-not-conflate); where exactly the line falls between one purpose and two he leaves open.*
 
