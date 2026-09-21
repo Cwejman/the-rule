@@ -41,7 +41,7 @@ The judgement never excuses a flat file.
 
 ### 1.3 A commit is one purpose
 
-A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief); where two sessions' commits fall between each other's is [still open](surface/history.md#6-what-this-leaves-open).
+A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief); where two sessions' commits fall between each other's is [still open](surface/history.md#7-what-this-leaves-open).
 
 One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a new file whose briefs were all added for one purpose.
 
@@ -69,7 +69,7 @@ A record's entries may be holons themselves, each with its level beneath it, as 
 
 ### 2.2 A record retires once its conclusion is in the briefs
 
-A record is an event: a ratification, a review's findings, a feedback note each amends the state of the tree. Once its conclusion is in the briefs it amends, the record has done its work and retires from the tree, so the tree stays what stands and not what happened. Git keeps it.
+A record is most often an event: a ratification, a review's findings, a feedback note each amends the state of the tree. Once its conclusion is in the briefs it amends, the record has done its work and retires from the tree, so the tree stays what stands and not what happened. Git keeps it.
 
 A record whose conclusions are its own briefs has nothing to retire into, and stands as substrate: [the history](surface/history.md#24-it-is-a-record-whose-entries-are-holons) is that record.
 
@@ -135,6 +135,8 @@ A placed part has a level to hold, as sections of its own, as parts its prose pl
 
 Two kinds of file stand beside an entry that nothing places, and a reader meets both. A file under the rule that no link places is an orphan: the root of a body of its own, so it keeps its own opening. Orphans are allowed for now, since a part can be worked on alone and connected when it is ready.
 
+One file beside the root's entry is unplaced by design and is no orphan: [the history](surface/history.md#21-it-stands-at-the-root-and-is-never-placed-in-the-body), `history.md`, which the surface reads as the history rather than as a body of its own.
+
 A file not under the rule, one without [the stamp](#2-a-file-says-it-is-under-the-rule), is not governed by it at all. A brief reaches it by a link in prose and never by a placement, and it stays as it was written.
 
 *Preferred, the author's, 2026-09-12; whether orphans stay allowed is open.*
@@ -149,7 +151,7 @@ There is no borrowing and no lesser copy: the file is one, and the places that l
 
 ### 3.7 A lone link to a commit places it, in the history
 
-In [the history](surface/history.md#22-a-story-places-its-commits), and nowhere else, a lone link may name a commit or a run of commits instead of a file. It places them as a file is placed, whole where the link stands, and they stand as leaves rather than cards, since a commit is not a reading to enter.
+In [the history](surface/history.md#22-a-story-places-its-commits), and nowhere else, a lone link may name a commit or a run of commits instead of a file. It places them as a file is placed, whole where the link stands, and they stand as leaves: each drawn as a brief is, with a face and a figure, and raising no card, since a commit is not a reading to enter.
 
 *Preferred, the author's, 2026-09-21, as the history was settled; placement taken past files is named here so it has one home.*
 
