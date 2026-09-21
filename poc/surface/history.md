@@ -96,7 +96,9 @@ Locally both are computed on demand and cached by the commit's hash, which never
 
 ### 4.1 The shallow tier is had whole
 
-Every commit that touched the root: its hash, parents, author, date and subject, the files it changed, and for a stamped file the briefs within it. A brief is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page lays that path onto the body when it draws. The commit leaves of the history's reading are made from these records when the history is traced.
+Every commit that touched the root: its hash, parents, author, date and subject, the files it changed, and for a stamped file the briefs within it.
+
+A brief is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page lays that path onto the body when it draws. The commit leaves of the history's reading are made from these records when the history is traced.
 
 It is one file, `history.json`, loaded once when the view opens, and enough to draw the canvas, colour the shape and filter by address. It is built by addition: a commit is read once, kept by its hash in the repository's git folder, a keeping per root, and never read again. It stands beside the page and never inside it, since it weighs a quarter of the page.
 
