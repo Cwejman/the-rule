@@ -39,6 +39,16 @@ The judgement never excuses a flat file.
 
 *Preferred, the author's; revised 2026-09-18 by [the boundary](#11-a-file-is-one-linear-reading), and unmeasured.*
 
+### 1.3 A commit is one purpose on one piece
+
+A commit tells one thing: an interaction with one piece of the holarchy, for one purpose. Two pieces touched for two purposes are two commits, and two sessions are never one. A change that propagates into the field for one reason is still one commit, however many briefs it reaches, and briefs only added may go in one.
+
+So a commit is seen where its work is. [History](surface/history.md) shows a reader only the commits that touched where they stand, and a commit with a local purpose is met there and nowhere else.
+
+Many small commits are not a fault: feedback on feedback on feedback is a true record of how the work went. What they cost is answered by the story written over them, never by fewer commits.
+
+*Preferred, the author's, 2026-09-21, from [his thinking that day](../author/ideas-2026-09-21.md#7-commits-at-a-granularity-that-does-not-conflate); where exactly the line falls between one purpose and two he leaves open.*
+
 ## 2. A file says it is under the rule
 
 A repository holds more than knowledge, so a file declares itself: frontmatter at its head stamps it as written under the rule, and a reader, a program or a published site digests only what carries the stamp. The writer's intent lives in the file rather than in a tool's guess, and what a repository holds as knowledge becomes countable.
