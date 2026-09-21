@@ -41,11 +41,11 @@ The judgement never excuses a flat file.
 
 ### 1.3 A commit is one purpose
 
-A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made.
+A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief).
 
-One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a file made by only adding its briefs for one purpose.
+One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a new file whose briefs were all added for one purpose.
 
-What it buys is that a commit is read where its work is: whoever looks at a part of the holarchy finds the commits made for it there, and none made for something else. Many small commits are no fault, since each is true to how the work went; what their number costs is answered by [the story a session tells over them](surface/history.md#25-a-session-writes-the-story-as-its-debrief).
+What it buys is that a commit is read where its work is: whoever looks at a part of the holarchy finds the commits made for it there, and none made for something else. Many small commits are no fault, since each is true to how the work went; what their number costs is answered by that story.
 
 *Preferred, the author's, 2026-09-21, from [his thinking that day](../author/ideas-2026-09-21.md#7-commits-at-a-granularity-that-does-not-conflate); where exactly the line falls between one purpose and two he leaves open.*
 
@@ -63,7 +63,9 @@ Not everything under the rule is a brief, and the stamp says which kind a file i
 
 A record is an array of entries in time, newest first or oldest first, and reading it by the gradient is reading it wrongly: its order is chronology, not importance, and its sections are moments rather than parts of one understanding. A reader that knows the kind can show a record as the sequence it is and a brief as the holarchy it is, instead of conflating them.
 
-*Reasoned, the author's.*
+A record's entries may be holons themselves, each with its level beneath it, as [the history's stories](surface/history.md#24-it-is-a-record-whose-entries-are-holons) are. Then the record still orders them by time, and each is read as the holarchy it is.
+
+*Reasoned, the author's; entries that are holons, the session's reading of the history, 2026-09-21.*
 
 ### 2.2 A record retires once its conclusion is in the briefs
 
