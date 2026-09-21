@@ -56,7 +56,11 @@ Past the reading stand two readings of their own. The canvas is the second pane,
 
 [A touch reading](touch.md)
 
-*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so.*
+Git's history is a reading of its own as well, stories told over runs of commits, opened as a view apart rather than mounted into the body. It is designed and not built.
+
+[History](history.md)
+
+*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open.*
 
 ## 5. What this does not answer
 
