@@ -308,7 +308,7 @@ Whether the functions grow into components is left until their use asks for it.
 
 ## 9. Git waits for history
 
-Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), drawing where a reader has been, and [history](history.md), whose light tier is the first thing taken up, by the live process asking the git CLI.
+Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), drawing where a reader has been, and [history](history.md), whose data is the first thing taken up, both its tiers read by the live process asking the git CLI.
 
 A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and three things make it the harder road here. It carries commits and not the working tree, so a live reading would lag behind a session's writing until the next commit. A static host serves no smart HTTP, and the client cannot read a `.git` folder served as plain files. And it brings a library, a filesystem in the browser, and a clone of the whole repository where the surface wants only the stamped files under one path.
 
