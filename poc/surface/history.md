@@ -68,9 +68,9 @@ The history's file is stamped as [a record](../practice.md#21-the-stamp-says-the
 
 Commits no story tells yet stand among the stories in the order of time, each where it happened, and a story takes their place once it is written. So nothing is missing before it has been told, and the untold, mostly the newest, stand where a reader looks first.
 
-The practice [retires a record](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs) once its conclusion is in the briefs. This one does not: what it would retire into is git, which it is the telling of, and its conclusions are its own stories.
+The practice [retires a record](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs) once its conclusion is in the briefs. The history never retires: it is substrate, and its stories are the briefs.
 
-*Preferred, the session's proposal taken by the author, 2026-09-21; that it does not retire is the session's reasoning, and the author's to confirm.*
+*Preferred, the session's proposal taken by the author, 2026-09-21; that it never retires, since it is substrate, is the author's.*
 
 ### 2.4 A session writes the story as its debrief
 
@@ -165,8 +165,6 @@ The history is drawn down the column, as any reading is, so the canvas stays one
 ## 6. What this leaves open
 
 How overlapping stories would be drawn, and so whether stories may overlap at all, or run in several directions, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
-
-Whether the history, a record, is right not to retire.
 
 Whether lines across many commits at once are ever wanted; if they are, the heavy tier is packed in runs of fixed length, fifty to a file, so a finished run never changes and only the newest grows.
 
