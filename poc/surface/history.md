@@ -36,7 +36,7 @@ So the history is drawn as any reading is, and only its leaves are a kind of the
 
 ### 2.1 It stands at the root of the repository, and is never placed
 
-The stories live at the root of the repository, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places them, and the surface knows the history by where it stands: it is traced only when the history is opened, never into the body, and the check does not list it as an orphan. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
+The stories live at the root of the repository, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places them, and the surface knows the history by where it stands: it is traced only when the history is opened, and never into the body. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
 
 *Preferred, the author's, 2026-09-21; the file first on the session's proposal, taken.*
 
@@ -44,7 +44,7 @@ The stories live at the root of the repository, as `history.md` first, and as a 
 
 A story is a brief of that file, a heading and its prose, and a larger story holds smaller ones as briefs beneath it, as any brief holds its level. A story names its commits as [a lone link places a part](../practice.md#3-a-lone-link-places-a-part): a paragraph that is nothing but a link to a commit, or to a run of them, stands the commits there as leaves.
 
-So the author can talk about the last three commits, a session adds a story of those three, and later a story of the last ten holds it beside a story of the ten before.
+So the author can talk about the last three commits, a session adds a story of those three, and later a story of the last ten holds it, standing beside a story of the ten before.
 
 A run is a sequence, from one commit to another with nothing left out between, and no two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap. How an overlap would be drawn is not known, and until it is there is none.
 
@@ -68,9 +68,9 @@ The trace resolves a short hash, and warns where one is ambiguous, where a run i
 
 ### 2.3 A commit is a brief of its own kind
 
-A commit leaf is a brief like any other in what the surface holds of it: an address, which is the story's with the commit's hash beneath it, a title, which is its subject, and a parent, the story that placed it. What it carries instead of prose is the briefs it touched, and a way to the lines it changed in [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time).
+A commit leaf is a brief like any other in what the surface holds of it: a parent, which is the story that placed it, or the history's own brief for a commit no story tells yet; an address, which is its parent's with the commit's hash beneath it; and a title, which is its subject. What it carries instead of prose is the briefs it touched, and a way to the lines it changed in [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time).
 
-A brief it touched is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page finds the brief by joining that path to where the file's own brief stands in the body.
+A brief it touched is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page finds the brief by joining that path to where the file's own brief stands in the body, in every place the file is placed, and a file the body does not reach is shown by its path alone.
 
 Its face and its figure are the only things drawn for it alone. The face says the subject, the author and the date; the figure says what it touched, where a folded brief's figure says what it hides.
 
@@ -78,13 +78,13 @@ Its face and its figure are the only things drawn for it alone. The face says th
 
 ### 2.4 It is a record whose entries are holons
 
-The history's file is [a record](../practice.md#21-the-stamp-says-the-kind): its order is time and not importance, the newest first, as a debrief keeps its entries, so now is what a reader meets, and [the lane reads a record so](lane.md#8-a-record-is-ordered-by-time). What sets it apart from other records is that each entry is a holon, a story with its level beneath it, and within a story the commits keep time too.
+The history's file is [a record whose entries are holons](../practice.md#21-the-stamp-says-the-kind): its order is time and not importance, the newest first, so now is what a reader meets, and [the lane reads a record so](lane.md#8-a-record-is-ordered-by-time). Each entry is a story with its level beneath it, and within a story the commits of a run stand newest first as well; where separate links place commits out of time's order, the trace warns.
 
 Commits no story tells yet stand among the stories in the order of time, each where it happened, and a story takes their place once it is written. So nothing is missing before it has been told, and the untold, mostly the newest, stand where a reader looks first.
 
-And it [never retires](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs), as other records do: it is substrate.
+And it [never retires](../practice.md#22-a-record-retires-once-its-conclusion-is-in-the-briefs), as other records do.
 
-*Preferred, the session's proposal taken by the author, 2026-09-21; that it never retires, since it is substrate, is the author's.*
+*Preferred, the session's proposal taken by the author, 2026-09-21; that it never retires is the author's.*
 
 ### 2.5 A session writes the story as its debrief
 
@@ -130,7 +130,7 @@ A story tells a stretch of time, not a place, so it holds whatever its run holds
 
 Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs it holds as nodes to go to; and the lane shows the change in place.
 
-In place, the blocks that changed are marked at first and leaves the rest as it is, and what was removed is shown only when asked. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
+In place, the blocks that changed are marked and the rest is left as it is, and what was removed is shown only when asked; a finer marking may come later. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 
 A change in place fetches from [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) exactly the commits it shows, one for a commit and ten for a story of ten, so what it asks is bounded by the story and never by the history.
 
@@ -171,6 +171,8 @@ Only the substrate is held. What a commit did to code or to images is counted in
 How overlapping stories would be drawn, and so whether stories may overlap at all, or group commits along more than one line at once, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
 
 Whether lines across more commits than a story holds are ever wanted at once; if they are, the heavy tier is packed in runs of fixed length, fifty to a file, so a finished run never changes and only the newest grows.
+
+How a session tells its story where another session's commits fall between its own, since a run leaves nothing out and stories do not overlap.
 
 How the history is opened: as a pane of its own, from the strip, or as what the canvas draws when asked.
 
