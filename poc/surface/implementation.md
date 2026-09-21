@@ -150,7 +150,7 @@ Whether the body is served to the page or written into it is the only difference
 
 ### 5.1 Live, the process serves and watches
 
-The process answers four requests: the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, and the images the body holds. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
+The process answers five requests: the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, the images the body holds, and [history's light tier](history.md#41-the-shallow-tier-is-had-whole), asked for apart from the body. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
 
 An image is served only when the last trace reached it, so the process hands out nothing else under the path, and its address carries the file's modification time, so a changed image is fetched again rather than kept from before.
 
@@ -174,7 +174,7 @@ The page is written with the body inside it, in a script tag that holds data rat
 
 The browser never runs that tag, so nothing in a brief can become code. Every `<` in the JSON is written as `\u003c`, since a brief containing the closing tag would otherwise end it early. On start the client reads the tag if it is there, and asks the process for the body if it is not.
 
-A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
+A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). History's light tier is written beside the page as `history.json`, the path the live process answers at too, and never inside it. Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
 
 The rule's own page is built this way on every commit to its main branch, by a workflow in `.github/workflows/pages.yml`, and served at [its GitHub Pages address](https://cwejman.github.io/the-rule/). The workflow runs the check first, so its warnings stand in the run, and ships the page whatever they say.
 
@@ -308,11 +308,11 @@ Whether the functions grow into components is left until their use asks for it.
 
 ## 9. Git waits for history
 
-Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), and drawing where a reader has been. When those are taken up, the live process asking the git CLI is the likely road.
+Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), drawing where a reader has been, and [history](history.md), whose light tier is the first thing taken up, by the live process asking the git CLI.
 
 A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and three things make it the harder road here. It carries commits and not the working tree, so a live reading would lag behind a session's writing until the next commit. A static host serves no smart HTTP, and the client cannot read a `.git` folder served as plain files. And it brings a library, a filesystem in the browser, and a clone of the whole repository where the surface wants only the stamped files under one path.
 
-*Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day.*
+*Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day. The CLI road taken for history, 2026-09-21.*
 
 ## 10. What is not settled yet
 
