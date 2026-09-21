@@ -41,7 +41,7 @@ The judgement never excuses a flat file.
 
 ### 1.3 A commit is one purpose
 
-A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief).
+A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief); where two sessions' commits fall between each other's is [still open](surface/history.md#6-what-this-leaves-open).
 
 One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a new file whose briefs were all added for one purpose.
 
