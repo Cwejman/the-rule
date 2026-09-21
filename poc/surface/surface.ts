@@ -180,6 +180,8 @@ async function serve(rootArg: string, port: number): Promise<void> {
     fetch: (req) => {
       const path = new URL(req.url).pathname;
       if (path.startsWith("/asset/")) return asset(path);
+      const hash = /^\/commits\/([0-9a-f]{40})\.json$/.exec(path)?.[1];
+      if (hash) return commitOf(rootArg, hash).then((c) => (c ? Response.json(c, { headers: fresh }) : new Response("no commit under the root", { status: 404 })));
       return (routes[path] ?? (() => new Response(page(null, script), { headers: { "content-type": "text/html; charset=utf-8", ...fresh } })))();
     },
   });
@@ -217,7 +219,12 @@ async function build(rootArg: string, out: string): Promise<void> {
   try {
     const past = await historyOf(rootArg);
     writeFileSync(join(outDir, "history.json"), JSON.stringify(past));
-    console.log(`${past.commits.length} commits → ${join(outDir, "history.json")}`);
+    // the heavy tier is a file per commit, read in one pass, at the path the live process answers too
+    const { cwd, prefix } = await repoOf(rootArg);
+    const heavy = await changesOf(cwd, prefix, past.commits.map((c) => c.hash));
+    mkdirSync(join(outDir, "commits"), { recursive: true });
+    heavy.forEach((c, hash) => writeFileSync(join(outDir, "commits", `${hash}.json`), JSON.stringify(c)));
+    console.log(`${past.commits.length} commits → ${join(outDir, "history.json")}, and what each changed → ${join(outDir, "commits")}`);
   } catch (e) {
     console.warn(`  no history written: ${(e as Error).message}`);
   }
@@ -327,6 +334,12 @@ type Commit = {
 
 /** History's light tier: every commit that touched the root, newest first. */
 type History = { head: string; commits: Commit[]; traced: string };
+
+/** What a commit changed in one brief: where the change began in the file before and after, and the lines it took and gave. */
+type Change = { brief: string; old: number; new: number; removed: string[]; added: string[] };
+
+/** History's heavy tier for one commit: what it changed in every stamped file under the root, brief by brief. */
+type Changes = { hash: string; files: { path: string; changes: Change[] }[] };
 
 /** GitHub's anchor for a heading, which is also how an address segment is written. */
 const slug = (s: string): string =>
@@ -866,10 +879,12 @@ const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.fla
 //
 // Git's history is a second substrate, a view apart, so nothing here enters the
 // body, the trace or the check. Its light tier is every commit that touched the
-// root with the files and the briefs it changed, and a commit's briefs are read
-// from its own diff laid against the headings of each file as it stood before
-// and after. A commit never changes, so what is read of it is kept in the
-// repository's git folder and read again only for commits not yet kept.
+// root with the files and the briefs it changed, had whole; its heavy tier is
+// what one commit changed in the stamped files, line by line and brief by
+// brief, had a commit at a time. Both are read from a commit's own diff laid
+// against the headings of each file as it stood before and after. A commit
+// never changes, so what is read of it is kept in the repository's git folder
+// and read again only for commits not yet kept.
 
 /** Runs git in a folder and hands back what it printed, or throws what it said. */
 async function git(cwd: string, args: string[], input?: string): Promise<Buffer> {
@@ -919,8 +934,11 @@ async function blobs(cwd: string, names: string[]): Promise<Map<string, string>>
   return out;
 }
 
-/** Where a commit's diff falls in one file: the lines it took from the old blob and gave to the new, blank lines left out. */
-type FileDiff = { path: string; old: string; new: string; add: number; del: number; binary: boolean; taken: number[]; given: number[] };
+/** One hunk of a diff: where it begins in the file before and after, and the lines it took and gave. */
+type Hunk = { old: number; new: number; removed: string[]; added: string[] };
+
+/** What a commit's diff did to one file: its blobs before and after, "" where there was none, and its hunks. */
+type FileDiff = { path: string; old: string; new: string; add: number; del: number; hunks: Hunk[] };
 
 /** Parses `git log -p -U0 --full-index` output, each commit opened by a record separator and its hash, into the files each changed. */
 function parseDiffs(text: string): Map<string, FileDiff[]> {
@@ -930,62 +948,124 @@ function parseDiffs(text: string): Map<string, FileDiff[]> {
     const files: FileDiff[] = [];
     out.set(lines[0].trim(), files);
     let f: FileDiff | undefined;
-    let o = 0, n = 0, inHunk = false;
+    let h: Hunk | undefined;
     lines.slice(1).forEach((l) => {
-      if (l.startsWith("diff --git ")) return void ((inHunk = false), files.push((f = { path: "", old: "", new: "", add: 0, del: 0, binary: false, taken: [], given: [] })));
+      if (l.startsWith("diff --git ")) return void ((h = undefined), files.push((f = { path: "", old: "", new: "", add: 0, del: 0, hunks: [] })));
       if (!f) return;
-      const h = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(l);
-      if (h) return void ((inHunk = true), (o = Number(h[1])), (n = Number(h[2])));
+      const at = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(l);
+      if (at) return void f.hunks.push((h = { old: Number(at[1]), new: Number(at[2]), removed: [], added: [] }));
       // the header of a file's diff stands before its first hunk, so a removed line that reads "-- " is never taken for one
-      if (!inHunk) {
+      if (!h) {
         const idx = /^index ([0-9a-f]+)\.\.([0-9a-f]+)/.exec(l);
         if (idx) return void ((f.old = /^0+$/.test(idx[1]) ? "" : idx[1]), (f.new = /^0+$/.test(idx[2]) ? "" : idx[2]));
         if (l.startsWith("--- ")) return void (l !== "--- /dev/null" && (f.path = l.slice(6)));
         if (l.startsWith("+++ ")) return void (l !== "+++ /dev/null" && (f.path = l.slice(6)));
-        if (l.startsWith("Binary files ")) return void ((f.binary = true), (f.path ||= / and b\/(.*) differ$/.exec(l)?.[1] ?? / a\/(.*) and /.exec(l)?.[1] ?? ""));
+        if (l.startsWith("Binary files ")) return void (f.path ||= / and b\/(.*) differ$/.exec(l)?.[1] ?? / a\/(.*) and /.exec(l)?.[1] ?? "");
         return;
       }
-      if (l.startsWith("-")) return void (f.del++, l.slice(1).trim() && f.taken.push(o), o++);
-      if (l.startsWith("+")) return void (f.add++, l.slice(1).trim() && f.given.push(n), n++);
+      if (l.startsWith("-")) return void (f.del++, h.removed.push(l.slice(1)));
+      if (l.startsWith("+")) return void (f.add++, h.added.push(l.slice(1)));
     });
   });
   return out;
 }
 
-/** Reads the commits not yet kept: their diffs in one git process, the files they changed in another, and the briefs from both. */
-async function readCommits(cwd: string, prefix: string, heads: { hash: string; parents: string[]; author: string; date: string; subject: string }[]): Promise<Commit[]> {
-  if (!heads.length) return [];
-  const log = await git(cwd, ["log", "--no-walk=unsorted", "--stdin", "-p", "-U0", "--full-index", "--no-renames", "--no-color", "--no-ext-diff", "--diff-merges=first-parent", "--format=%x1e%H", "--", "."], heads.map((h) => h.hash).join("\n") + "\n");
+/** Commits' diffs read and laid against the headings: the diffs in one git process, the files as they stood in another. */
+async function readDiffs(cwd: string, hashes: string[]): Promise<{ diffs: Map<string, FileDiff[]>; underRule: (f: FileDiff) => boolean; briefOf: (f: FileDiff, side: "old" | "new", line: number) => string }> {
+  const log = await git(cwd, ["log", "--no-walk=unsorted", "--stdin", "-p", "-U0", "--full-index", "--no-renames", "--no-color", "--no-ext-diff", "--diff-merges=first-parent", "--format=%x1e%H", "--", "."], hashes.join("\n") + "\n");
   const diffs = parseDiffs(log.toString("utf8"));
   const md = (p: string) => /\.md$/i.test(p);
   const names = [...new Set([...diffs.values()].flat().filter((f) => md(f.path)).flatMap((f) => [f.old, f.new].filter(Boolean)))];
   const text = await blobs(cwd, names);
   const lined = new Map<string, { line: number; path: string }[]>();
   const linesOf = (blob: string) => (lined.has(blob) ? lined.get(blob)! : (lined.set(blob, briefLines(text.get(blob) ?? "")), lined.get(blob)!));
-  const underRule = (blob: string) => !!blob && stamped(text.get(blob) ?? "") !== null;
+  const stampedBlob = (blob: string) => !!blob && stamped(text.get(blob) ?? "") !== null;
+  return {
+    diffs,
+    underRule: (f) => md(f.path) && (stampedBlob(f.old) || stampedBlob(f.new)),
+    briefOf: (f, side, line) => briefAt(linesOf(side === "old" ? f.old : f.new), line),
+  };
+}
+
+/**
+ * What a commit changed in a stamped file, brief by brief: a hunk that runs across a heading is cut there, each line
+ * going to the brief it stands in, and a run of nothing but blank lines is no change.
+ */
+function changesIn(f: FileDiff, briefOf: (f: FileDiff, side: "old" | "new", line: number) => string): Change[] {
+  return f.hunks.flatMap((h) => {
+    const by = new Map<string, Change>();
+    const put = (brief: string, side: "removed" | "added", text: string, line: number) => {
+      const c = by.get(brief) ?? (by.set(brief, { brief, old: h.old, new: h.new, removed: [], added: [] }), by.get(brief)!);
+      if (!c[side].length) c[side === "removed" ? "old" : "new"] = line;
+      c[side].push(text);
+    };
+    h.removed.forEach((t, i) => put(briefOf(f, "old", h.old + i), "removed", t, h.old + i));
+    h.added.forEach((t, i) => put(briefOf(f, "new", h.new + i), "added", t, h.new + i));
+    return [...by.values()].filter((c) => [...c.removed, ...c.added].some((t) => t.trim()));
+  });
+}
+
+/** Reads the commits not yet kept into history's light tier: the files each changed, and in a stamped file the briefs. */
+async function readCommits(cwd: string, prefix: string, heads: { hash: string; parents: string[]; author: string; date: string; subject: string }[]): Promise<Commit[]> {
+  if (!heads.length) return [];
+  const { diffs, underRule, briefOf } = await readDiffs(cwd, heads.map((h) => h.hash));
   return heads.map((h) => ({
     ...h,
     files: (diffs.get(h.hash) ?? [])
       .filter((f) => f.path.startsWith(prefix))
       .map((f) => {
-        const briefs = md(f.path) && (underRule(f.old) || underRule(f.new))
-          ? [...new Set([...f.taken.map((l) => briefAt(linesOf(f.old), l)), ...f.given.map((l) => briefAt(linesOf(f.new), l))])]
-          : undefined;
+        const briefs = underRule(f) ? [...new Set(changesIn(f, briefOf).map((c) => c.brief))] : undefined;
         return { path: f.path.slice(prefix.length), add: f.add, del: f.del, ...(briefs ? { briefs } : {}) };
       }),
   }));
 }
 
-/** What the cache is written in; a change to how a commit is read changes it, and every kept commit is read again. */
-const HISTORY_FORM = 1;
-
-/** History's light tier for the root: every commit that touched it, newest first, reading only what the cache does not hold. */
-async function historyOf(rootArg: string): Promise<History> {
+/** Where a root stands in its repository, and where what is kept of its history lives in the repository's git folder. */
+async function repoOf(rootArg: string): Promise<{ cwd: string; prefix: string; kept: (name: string) => Promise<string> }> {
   const cwd = dirname(rootFileOf(rootArg));
   const prefix = (await git(cwd, ["rev-parse", "--show-prefix"])).toString().trim();
   // a commit is read for the files under one root, so each root keeps its own
-  const cachePath = (await git(cwd, ["rev-parse", "--git-path", `surface/history${prefix ? "-" + prefix.replace(/\/$/, "").replace(/\//g, "-") : ""}.json`])).toString().trim();
-  const cacheFile = resolve(cwd, cachePath);
+  const tag = prefix ? "-" + prefix.replace(/\/$/, "").replace(/\//g, "-") : "";
+  return { cwd, prefix, kept: async (name) => resolve(cwd, (await git(cwd, ["rev-parse", "--git-path", `surface/${name.replace("*", tag)}`])).toString().trim()) };
+}
+
+/** History's heavy tier for commits, keyed by hash: what each changed in the stamped files under the root, line by line. */
+async function changesOf(cwd: string, prefix: string, hashes: string[]): Promise<Map<string, Changes>> {
+  const { diffs, underRule, briefOf } = await readDiffs(cwd, hashes);
+  return new Map(
+    hashes.map((hash) => [
+      hash,
+      {
+        hash,
+        files: (diffs.get(hash) ?? []).filter((f) => f.path.startsWith(prefix) && underRule(f)).map((f) => ({ path: f.path.slice(prefix.length), changes: changesIn(f, briefOf) })),
+      },
+    ]),
+  );
+}
+
+/** One commit's heavy tier, read once and kept by its hash; a hash no commit under the root holds is none. */
+async function commitOf(rootArg: string, hash: string): Promise<Changes | null> {
+  const { cwd, prefix, kept } = await repoOf(rootArg);
+  const file = await kept(`commits*/${hash}.json`);
+  try {
+    const c = JSON.parse(readFileSync(file, "utf8"));
+    if (c.form === HISTORY_FORM) return c.changes;
+  } catch {}
+  const listed = (await git(cwd, ["log", "--format=%H", "--", "."])).toString().split("\n");
+  if (!listed.includes(hash)) return null;
+  const changes = (await changesOf(cwd, prefix, [hash])).get(hash)!;
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify({ form: HISTORY_FORM, changes }));
+  return changes;
+}
+
+/** What the cache is written in; a change to how a commit is read changes it, and every kept commit is read again. */
+const HISTORY_FORM = 2;
+
+/** History's light tier for the root: every commit that touched it, newest first, reading only what the cache does not hold. */
+async function historyOf(rootArg: string): Promise<History> {
+  const { cwd, prefix, kept: keptAt } = await repoOf(rootArg);
+  const cacheFile = await keptAt("history*.json");
   let kept: Record<string, Commit> = {};
   try {
     const c = JSON.parse(readFileSync(cacheFile, "utf8"));
