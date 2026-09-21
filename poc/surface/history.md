@@ -34,19 +34,21 @@ So the history is drawn as any reading is, and only its leaves are a kind of the
 
 *Preferred, the author's, 2026-09-21: [commits are one level](../../author/ideas-2026-09-21.md#10-commits-are-one-level-and-the-low-one) and [a substrate for commits](../../author/ideas-2026-09-21.md#11-a-substrate-for-commits); that it is a holon with a holarchy is his of the same day.*
 
-### 2.1 It stands at the root of the repository, and is never placed
+### 2.1 It stands at the root, and is never placed in the body
 
-The stories live at the root of the repository, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places them, and the surface knows the history by where it stands: it is traced only when the history is opened, and never into the body. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
+The stories live beside the entry of the root the surface is handed, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places the file in the body, and the surface knows it by where it stands: it is traced only when the history is opened. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
 
-*Preferred, the author's, 2026-09-21; the file first on the session's proposal, taken.*
+The history there is the root's own: the commits that touched what lies under the root, which for this repository is the whole of it.
+
+*Preferred, the author's, 2026-09-21; the file first on the session's proposal, taken; the root's own history, rather than the repository's, the session's from a fresh head, as the data was built.*
 
 ### 2.2 A story places its commits
 
-A story is a brief of that file, a heading and its prose, and a larger story holds smaller ones as briefs beneath it, as any brief holds its level. A story names its commits as [a lone link places a part](../practice.md#3-a-lone-link-places-a-part): a paragraph that is nothing but a link to a commit, or to a run of them, stands the commits there as leaves.
+A story is a brief of that file, a heading and its prose, and a larger story holds smaller ones as briefs beneath it, as any brief holds its level. A story names its commits by [placing them](../practice.md#37-a-lone-link-to-a-commit-places-it-in-the-history), each lone link standing a commit or a run of them there as leaves.
 
 So the author can talk about the last three commits, a session adds a story of those three, and later a story of the last ten holds it, standing beside a story of the ten before.
 
-A run is a sequence, from one commit to another with nothing left out between, and no two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap. How an overlap would be drawn is not known, and until it is there is none.
+A story's commits, all its links together, are one run: a sequence in the root's history with nothing left out between its first and its last. A larger story's run is its own commits and its smaller stories' together, and is one run as well. No two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap. How an overlap would be drawn is not known, and until it is there is none.
 
 *Preferred, the author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his, since nobody knows yet how to draw it.*
 
@@ -72,9 +74,9 @@ A commit leaf is a brief like any other in what the surface holds of it: a paren
 
 A brief it touched is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page finds the brief by joining that path to where the file's own brief stands in the body, in every place the file is placed, and a file the body does not reach is shown by its path alone.
 
-Its face and its figure are the only things drawn for it alone. The face says the subject, the author and the date; the figure says what it touched, where a folded brief's figure says what it hides.
+Its face and its figure are the only things drawn for it alone. The face says the subject, the author and the date. The figure says what it touched, where a folded brief's figure says what it hides: a bar for every reading it touched, each in that reading's branch hue. A local commit is one bar, and one that reached many readings a row of hues, whether one purpose propagated or several were conflated; the story over it says which.
 
-*Preferred, the author's, 2026-09-21; the face, the figure and the naming are the session's reading of it.*
+*Preferred, the author's, 2026-09-21; the face, the figure and the naming are the session's reading of it, and that a row of hues does not itself say conflated is a fresh head's, taken.*
 
 ### 2.4 It is a record whose entries are holons
 
@@ -108,19 +110,13 @@ A reader sees the history from where they stand, and what they select shows what
 
 ### 4.1 Only the commits that touch where you stand
 
-Opening the history from an address shows only the commits that touched it, and the stories that hold them. For a reading, that is read from the files each commit touched; for a brief selected within it, from the briefs each commit touched.
+Opening the history from an address shows only the commits that touched it, and the stories that hold them. For a reading, that is read from the files each commit touched; for a brief selected within it, from the briefs each commit touched. A commit that touched several readings is among the commits of each.
 
 The filter is as true as the commits are, which is why [a commit is one purpose](../practice.md#13-a-commit-is-one-purpose).
 
 *Preferred, the author's, 2026-09-21: [the address shows only the commits that affect it](../../author/ideas-2026-09-21.md#16-the-address-shows-only-the-commits-that-affect-it).*
 
-#### 4.1.1 A commit across many readings shows it by its figure
-
-A commit's figure draws a bar for every reading it touched, each in that reading's branch hue. A local commit is one bar, and one that reached many readings a row of hues, whether one purpose propagated or several were conflated; the story over it says which. Opened from any reading it touched, it is among that reading's commits.
-
-*Preferred, the session's proposal taken by the author, 2026-09-21; that a row of hues does not itself say conflated is the fresh head's reading, taken by the session.*
-
-#### 4.1.2 A story stands wherever any of its commits touched
+#### 4.1.1 A story stands wherever any of its commits touched
 
 A story tells a stretch of time, not a place, so it holds whatever its run holds. From an address it stands if any of its commits touched there, and the commits of it that did not touch there fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
 
@@ -128,7 +124,7 @@ A story tells a stretch of time, not a place, so it holds whatever its run holds
 
 ### 4.2 A selection shows what it touched
 
-Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs it holds as nodes to go to; and the lane shows the change in place.
+Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there.
 
 In place, the blocks that changed are marked and the rest is left as it is, and what was removed is shown only when asked; a finer marking may come later. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 
