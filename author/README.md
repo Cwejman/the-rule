@@ -22,3 +22,5 @@ Then the days of dictated thinking, oldest first, since each day is read in the 
 [Ideas of 2026-09-17](ideas-2026-09-17.md)
 
 [Ideas of 2026-09-18](ideas-2026-09-18.md)
+
+[Ideas of 2026-09-21](ideas-2026-09-21.md)
