@@ -32,9 +32,23 @@ So the history is a reading like any other, and only its leaves are a kind of th
 
 A story names the commits it tells as [a lone link places a part](../practice.md#3-a-lone-link-places-a-part): a paragraph that is nothing but a link to a commit, or to a run of them, stands the commits there as leaves. So the author can talk about the last three commits, a session adds a story of those three, and later a story of the last ten holds it beside a story of the ten before.
 
-A run is a sequence for now, from one commit to another with nothing left out between, so stories nest cleanly and draw as layers. Whether a story may gather commits that are not neighbours, or two stories overlap, [waits](#6-what-this-leaves-open).
+A run is a sequence, from one commit to another with nothing left out between, and no two stories overlap: a story may hold a smaller story whole, and that is nesting, never overlap. So stories nest cleanly and draw as layers. How an overlap would be drawn is not known, and until it is there is none.
 
-*The author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous for now on the session's proposal, which he took. How the link to a commit is written is owed to the practice and not settled.*
+*The author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his, since nobody knows yet how to draw it.*
+
+#### 2.1.1 The link names a commit or a run
+
+The link's target is a commit's hash, or a run's first and last joined by two dots, after `git:`:
+
+```markdown
+[The keys belong to the map](git:d7a1138)
+
+[The canvas spreads as a tree](git:152713e..b0b54e6)
+```
+
+A run holds both of its ends, which git's own two dots do not, so the practice says so. The target names no host, so it holds in every repository that takes this one in; on GitHub it reads as a link that goes nowhere, and the text still reads. The trace resolves a short hash, and warns where one is ambiguous, where a run is not a sequence in the history, and where two stories overlap.
+
+*The session's proposal, 2026-09-21, taken by the author; a compare address on GitHub was weighed and refused, since it ties the substrate to one host.*
 
 ### 2.2 A commit is a brief of its own kind
 
@@ -48,15 +62,23 @@ Its face and its figure are the only things drawn for it alone. The face says th
 
 The history is stamped as [a record](../practice.md#21-the-stamp-says-the-kind), whose order is time and not importance, and [the lane already reads a record so](lane.md#8-a-record-is-ordered-by-time). The newest stands first, as a debrief keeps its entries, so now is what a reader meets.
 
-Commits no story tells yet gather at the end of the history's own level, so nothing is missing from it before it has been told.
+Commits no story tells yet stand among the stories in the order of time, each where it happened, and a story takes their place once it is written. So nothing is missing before it has been told, and the untold, mostly the newest, stand where a reader looks first.
 
-*The session's proposal, 2026-09-21, taken by the author.*
+*The session's proposal, 2026-09-21, taken by the author; it replaces gathering the untold at the end of the level, proposed the same day.*
 
-### 2.4 It stands at the root, and is never mounted
+### 2.4 A session writes the story as its debrief
 
-The stories live at the root of the repository, as `history.md` or as a folder `history/` once one reading no longer holds them. Nothing places them, and the surface knows the history by its place: it is traced only when the view is opened, never into the body, and the check does not list it as an orphan.
+A stretch of work ends with [its debrief](../../rule.md#55-the-debrief): the conclusion goes to the surface and the detail stays beneath. Over commits, the story is that conclusion and the commits are the detail, so a session writes the story of its own commits before it ends, and the author ratifies it or comments on it.
 
-*The author's, 2026-09-21; which of the two forms comes first is not decided.*
+So the history is told as the work is done, not afterwards, and the bloat of many small commits is answered by the story over them rather than by fewer commits.
+
+*The session's proposal, 2026-09-21, taken by the author; that bloat is solved by something else is [his](../../author/ideas-2026-09-21.md#8-bloat-is-valuable-information-and-is-solved-by-something-else).*
+
+### 2.5 It stands at the root, and is never mounted
+
+The stories live at the root of the repository, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places them, and the surface knows the history by its place: it is traced only when the view is opened, never into the body, and the check does not list it as an orphan.
+
+*The author's, 2026-09-21; the file first on the session's proposal, taken.*
 
 ## 3. One code for both
 
@@ -108,6 +130,18 @@ That is also why a commit with a local purpose should stay local: then it is see
 
 *The author's, 2026-09-21: [the address shows only the commits that affect it](../../author/ideas-2026-09-21.md#16-the-address-shows-only-the-commits-that-affect-it).*
 
+#### 5.1.1 A commit across many readings shows it by its figure
+
+A commit's figure draws a bar for every reading it touched, each in that reading's branch hue. A local commit is one bar, and a conflated one a row of hues, so it is seen for what it is without anything saying so. Filtered by an address, it stands in every reading it touched, and so it is met in more places as well.
+
+*The session's proposal, 2026-09-21, taken by the author.*
+
+#### 5.1.2 A story stands wherever any of its commits touched
+
+A story tells a stretch of time, not a place, so it holds whatever its run holds. From an address it stands if any of its commits touched there, and the commits of it that did not fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
+
+*The session's proposal, 2026-09-21, taken by the author.*
+
 ### 5.2 A selection shows its field
 
 Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs as nodes to go to; and the lane shows the change in place.
@@ -124,14 +158,6 @@ The history is drawn as any reading is, down the column, so the canvas stays one
 
 ## 6. What this leaves open
 
-How a commit that touches many readings shows, so that a conflated commit is seen for what it is without the view scolding.
+How overlapping stories would be drawn, and so whether stories may overlap at all, or run in several directions, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
 
-Whether a story may tell commits across several readings, and how it stands from an address only some of them touched.
-
-Whether a run may be spread out, and whether stories must partition the commits so the whole reads as a directed graph, or may overlap and run in several directions, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
-
-Where the granularity of a commit is told: one purpose on one piece of the holarchy, a change that propagates for one reason still one commit, sessions never conflated. It is [the author's](../../author/ideas-2026-09-21.md#7-commits-at-a-granularity-that-does-not-conflate), and belongs in the practice once it is settled.
-
-How a link to a commit or a run is written, and which of `history.md` and `history/` comes first.
-
-*Open, 2026-09-21.*
+*Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose-on-one-piece) went to the practice.*
