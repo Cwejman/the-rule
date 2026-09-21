@@ -8,7 +8,7 @@ status: open
 
 History is how the knowledge came to be what it is where a reader stands: which commits touched it, and the stories told over them. Git's history is read as a holarchy of its own, with the stories as its briefs and the commits as the leaves beneath them.
 
-Its data is built; the trace of its stories and its drawing on the page are not.
+Its data is built; the trace of its stories and its drawing on the page are not, and nothing of it is yet seen on the page. [What comes next](#6-what-comes-next) says in what order.
 
 *Preferred, the author's design, settled in discussion with the session 2026-09-21; the data as built the same day, and the rest open.*
 
@@ -22,7 +22,7 @@ So this time nothing of git enters the body, and the data comes before any view,
 
 ### 1.1 The body is measured before and after
 
-Before anything of this is built, the time the live process takes to hand the page its body and the weight of the built page are measured, and after it they are measured again. Neither may move.
+Around anything of this that is built, the time the live process takes to hand the page its body and the weight of the built page are measured before and after. Neither may move.
 
 *In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte.*
 
@@ -50,7 +50,7 @@ So the author can talk about the last three commits, a session adds a story of t
 
 A story's commits, all its links together, are one run: a sequence in the root's history with nothing left out between its first and its last. A larger story's run is its own commits and its smaller stories' together, and is one run as well. No two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap. How an overlap would be drawn is not known, and until it is there is none.
 
-*Preferred, the author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his, since nobody knows yet how to draw it.*
+*Preferred, the author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his.*
 
 #### 2.2.1 The link names a commit or a run
 
@@ -70,7 +70,9 @@ The trace resolves a short hash, and warns where one is ambiguous, where a run i
 
 ### 2.3 A commit is a brief of its own kind
 
-A commit leaf is a brief like any other in what the surface holds of it: a parent, which is the story that placed it, or the history's own brief for a commit no story tells yet; an address, which is its parent's with the commit's hash beneath it; and a title, which is its subject. What it carries instead of prose is the briefs it touched, and a way to the lines it changed in [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time).
+A commit leaf is a brief like any other in what the surface holds of it, which is what lets [one code draw both](#3-one-code-for-both): a parent, which is the story that placed it, or the history's own brief for a commit no story tells yet; an address, which is its parent's with the commit's hash beneath it; and a title, which is its subject.
+
+What it carries instead of prose is the briefs it touched, and a way to the lines it changed in [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time).
 
 A brief it touched is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page finds the brief by joining that path to where the file's own brief stands in the body, in every place the file is placed, and a file the body does not reach is shown by its path alone.
 
@@ -104,7 +106,7 @@ The body and the history are the same structure, so the same code draws both: th
 
 ## 4. What a reader sees
 
-A reader sees the history from where they stand, and what they select shows what it touched.
+A reader sees the history from where they stand, what they select shows what it touched, and it is laid as any reading is.
 
 *Preferred, the author's, 2026-09-21.*
 
@@ -150,7 +152,7 @@ Locally both are read on demand, each commit once, and kept by its hash, which n
 
 What a view needs of every commit at once is small, so it is had in one file, loaded once when the history is opened: every commit that touched the root, its hash, parents, author, date and subject, the files it changed with how many lines, code and images among them, and in a stamped file the briefs it touched.
 
-The file is `history.json`, which shares a name with the stories' `history.md` and nothing else. The root is the path the surface is handed, and each root keeps a light tier of its own. It never stands inside the page, since it weighs a quarter of it.
+The file is `history.json`, which shares a name with the stories' `history.md` and nothing else. Each root keeps a light tier of its own. It never stands inside the page, since it weighs a quarter of it.
 
 *Measured, 2026-09-21, on 460 commits: 378 KB, 73 KB gzipped; read cold in 1.5 to 3.5 seconds and warm in 0.15 to 0.35. The headings are found by their lines rather than by lexing each version whole, which took 31 seconds, and the briefs so found match the trace's addresses in every stamped file.*
 
@@ -162,7 +164,21 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 *Measured, 2026-09-21, on 460 commits: 3.6 MB together, 761 bytes at the median and 305 KB at the most; a commit read cold in 0.24 seconds and warm in 0.04.*
 
-## 6. What this leaves open
+## 6. What comes next
+
+The data stands, and what is next is laid in the order each step stands on the one before. A session taking this up begins at the first step not done.
+
+1. Trace the history: read `history.md` when it is asked for, resolve its `git:` links against the light tier, make the commit leaves, stand the untold commits among the stories by time, and warn as [the link says](#221-the-link-names-a-commit-or-a-run). Tested alone, as the data was, before anything is drawn.
+
+2. Write the first stories, over the commits that built the data, as [a session's debrief](#25-a-session-writes-the-story-as-its-debrief), so the trace has a real history to read.
+
+3. Draw it: open the history on the canvas, top-down, with [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), after [how it is opened](#7-what-this-leaves-open) is settled with the author.
+
+4. Show what a selection touched, on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
+
+*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; none of the four is begun.*
+
+## 7. What this leaves open
 
 How overlapping stories would be drawn, and so whether stories may overlap at all, or group commits along more than one line at once, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
 
