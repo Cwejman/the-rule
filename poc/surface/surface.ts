@@ -26,7 +26,7 @@
 // coherent, declarative over imperative, data over logic, pure functions with
 // their side effects kept apart, flat data with one source of truth.
 
-import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync, mkdirSync, copyFileSync } from "node:fs";
+import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync, mkdirSync, copyFileSync, renameSync } from "node:fs";
 import { resolve, dirname, relative, join, sep, basename } from "node:path";
 import { marked } from "marked";
 
@@ -166,7 +166,8 @@ async function serve(rootArg: string, port: number): Promise<void> {
   const fresh = { "cache-control": "no-store, must-revalidate" };
   const body = async () => Response.json(await retrace(), { headers: fresh });
   // history is asked for apart from the body, and only when a view wants it, at the one path it has published as well
-  const past = async () => Response.json(await historyOf(rootArg), { headers: fresh });
+  const none = (e: unknown) => new Response((e as Error).message, { status: 404, headers: fresh });
+  const past = () => historyOf(rootArg).then((h) => Response.json(h, { headers: fresh }), none);
   const asset = (path: string) => {
     const file = decodeURIComponent(path.slice("/asset/".length));
     return held.has(file) ? new Response(Bun.file(join(rootDir, file)), { headers: { "cache-control": "no-cache" } }) : new Response("not an image the body holds", { status: 404 });
@@ -180,8 +181,11 @@ async function serve(rootArg: string, port: number): Promise<void> {
     fetch: (req) => {
       const path = new URL(req.url).pathname;
       if (path.startsWith("/asset/")) return asset(path);
-      const hash = /^\/commits\/([0-9a-f]{40})\.json$/.exec(path)?.[1];
-      if (hash) return commitOf(rootArg, hash).then((c) => (c ? Response.json(c, { headers: fresh }) : new Response("no commit under the root", { status: 404 })));
+      if (path.startsWith("/commits/")) {
+        const hash = /^\/commits\/([0-9a-f]{40}|[0-9a-f]{64})\.json$/.exec(path)?.[1];
+        if (!hash) return none(new Error("not a commit's full hash"));
+        return commitOf(rootArg, hash).then((c) => (c ? Response.json(c, { headers: fresh }) : none(new Error("no commit under the root"))), none);
+      }
       return (routes[path] ?? (() => new Response(page(null, script), { headers: { "content-type": "text/html; charset=utf-8", ...fresh } })))();
     },
   });
@@ -335,8 +339,8 @@ type Commit = {
 /** History's light tier: every commit that touched the root, newest first. */
 type History = { head: string; commits: Commit[]; traced: string };
 
-/** What a commit changed in one brief: where the change began in the file before and after, and the lines it took and gave. */
-type Change = { brief: string; old: number; new: number; removed: string[]; added: string[] };
+/** What a commit changed in one brief: the lines it took and gave, and the line each run began on in the file before and after, on a side that has lines. */
+type Change = { brief: string; old?: number; new?: number; removed: string[]; added: string[] };
 
 /** History's heavy tier for one commit: what it changed in every stamped file under the root, brief by brief. */
 type Changes = { hash: string; files: { path: string; changes: Change[] }[] };
@@ -886,30 +890,65 @@ const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.fla
 // never changes, so what is read of it is kept in the repository's git folder
 // and read again only for commits not yet kept.
 
+/**
+ * What a reader's own git settings would change in what is parsed here, pinned: paths unquoted and prefixed a/ and b/,
+ * diffs of the whole repository rather than of the folder asked from, and no signatures in the log.
+ */
+const GIT_PINNED = ["core.quotepath=false", "diff.noprefix=false", "diff.mnemonicPrefix=false", "diff.relative=false", "log.showSignature=false", "color.ui=never"].flatMap((c) => ["-c", c]);
+
 /** Runs git in a folder and hands back what it printed, or throws what it said. */
 async function git(cwd: string, args: string[], input?: string): Promise<Buffer> {
-  const p = Bun.spawn(["git", ...args], { cwd, stdin: input === undefined ? "ignore" : new Blob([input]), stdout: "pipe", stderr: "pipe" });
+  const p = Bun.spawn(["git", ...GIT_PINNED, ...args], { cwd, stdin: input === undefined ? "ignore" : new Blob([input]), stdout: "pipe", stderr: "pipe" });
   const [out, err, code] = await Promise.all([new Response(p.stdout).arrayBuffer(), new Response(p.stderr).text(), p.exited]);
   if (code !== 0) throw new Error(`git ${args[0]}: ${err.trim()}`);
   return Buffer.from(out);
 }
 
-/** The line each brief of a markdown file begins on, in order, with its path within the file; "" is the title and what precedes the first section. */
+/**
+ * The line each brief of a markdown file begins on, in order, with its path within the file as the trace addresses it;
+ * "" is the title and what precedes the first section. Lexing every version of every file whole cost thirty seconds on
+ * this repository's history, and lexing its blocks alone no less, so the headings are found by their lines: outside the
+ * stamp and the fences, not inside a list, written with hashes or underlined. Only a heading's own lines are lexed,
+ * with the file's link definitions, so its slug is the trace's, and a slug a sibling already took is suffixed as the
+ * trace suffixes it.
+ */
 function briefLines(src: string): { line: number; path: string }[] {
-  // lexing every version of every file whole cost thirty seconds on this repository's history, so the headings are
-  // found by their lines, outside fences, and only a heading's own line is lexed, so its slug is the trace's
+  const lines = src.split(/\r?\n/);
   const out = [{ line: 1, path: "" }];
-  const open: { depth: number; slug: string }[] = [];
+  const open: { depth: number; path: string }[] = [];
+  const taken = new Set<string>();
+  const stamp = /^---\r?\n[\s\S]*?\r?\n---(\r?\n|$)/.exec(src);
+  const from = stamp ? stamp[0].split(/\r?\n/).length - (stamp[1] ? 1 : 0) : 0;
+  const defs = lines.filter((l) => /^ {0,3}\[[^\]]+\]:\s*\S/.test(l)).join("\n");
+  const heading = (text: string, depth: number, line: number) => {
+    const tok = (marked.lexer(text.includes("[") && defs ? `${text}\n\n${defs}` : text) as unknown as Tok[]).find((t) => t.type === "heading");
+    if (!tok || depth < 2) return;
+    open.length = open.findLastIndex((o) => o.depth < depth) + 1;
+    const parent = open.length ? open[open.length - 1].path : "";
+    const base = (parent ? parent + "/" : "") + slug(splitHeading(textOf(tok.tokens)).title);
+    const path = [base, ...Array.from({ length: 99 }, (_, k) => `${base}-${k + 2}`)].find((a) => !taken.has(a))!;
+    taken.add(path);
+    open.push({ depth, path });
+    out.push({ line, path });
+  };
   let fence = "";
-  src.split("\n").forEach((l, i) => {
-    const f = /^ {0,3}(`{3,}|~{3,})/.exec(l)?.[1];
-    if (f && (!fence || (f[0] === fence[0] && f.length >= fence.length))) return void (fence = fence ? "" : f);
-    const h = !fence && /^ {0,3}(#{2,6})[ \t]/.exec(l);
-    if (!h) return;
-    const tok = (marked.lexer(l.trim()) as unknown as Tok[])[0];
-    open.length = open.findLastIndex((o) => o.depth < h[1].length) + 1;
-    open.push({ depth: h[1].length, slug: slug(splitHeading(textOf(tok?.tokens)).title) });
-    out.push({ line: i + 1, path: open.map((o) => o.slug).join("/") });
+  let para = -1; // where the paragraph being read began, or -1
+  let list = false;
+  lines.forEach((l, i) => {
+    if (i < from) return;
+    const f = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(l);
+    if (fence) return void (f && f[1][0] === fence[0] && f[1].length >= fence.length && !f[2].trim() && (fence = ""));
+    if (f && !(f[1][0] === "`" && f[2].includes("`"))) return void ((fence = f[1]), (para = -1));
+    if (!l.trim()) return void (para = -1);
+    const indented = /^[ \t]/.test(l);
+    if (/^ {0,3}([-*+]|\d{1,9}[.)])([ \t]|$)/.test(l)) return void ((list = true), (para = -1));
+    if (!indented && para < 0) list = false;
+    if (list && indented) return;
+    const atx = /^ {0,3}(#{1,6})(?:[ \t]|$)/.exec(l);
+    if (atx) return void ((list = false), (para = -1), heading(l.trim(), atx[1].length, i + 1));
+    const under = /^ {0,3}(=+|-+)[ \t]*$/.exec(l);
+    if (under && para >= 0) return void (heading(lines.slice(para, i + 1).join("\n"), under[1][0] === "=" ? 1 : 2, para + 1), (para = -1));
+    if (para < 0 && !/^ {0,3}>/.test(l)) para = i;
   });
   return out;
 }
@@ -940,6 +979,24 @@ type Hunk = { old: number; new: number; removed: string[]; added: string[] };
 /** What a commit's diff did to one file: its blobs before and after, "" where there was none, and its hunks. */
 type FileDiff = { path: string; old: string; new: string; add: number; del: number; hunks: Hunk[] };
 
+/** A path git wrote in C's quoting, where it has characters it will not write bare. */
+const unquote = (q: string): string => {
+  const bytes: number[] = [];
+  const esc: Record<string, number> = { n: 10, t: 9, r: 13, a: 7, b: 8, f: 12, v: 11, '"': 34, "\\": 92 };
+  for (let i = 1; i < q.length - 1; i++) {
+    if (q[i] !== "\\") bytes.push(...new TextEncoder().encode(q[i]));
+    else if (/[0-7]/.test(q[i + 1])) bytes.push(parseInt(q.slice(i + 1, i + 4), 8)), (i += 3);
+    else bytes.push(esc[q[i + 1]] ?? q.charCodeAt(i + 1)), i++;
+  }
+  return new TextDecoder().decode(new Uint8Array(bytes));
+};
+
+/** The one path of `a/P b/P`, the two halves of a diff's first line, quoted or bare. */
+const pathOfDiff = (rest: string): string => {
+  if (rest.startsWith('"')) return unquote(/^"(?:[^"\\]|\\.)*"/.exec(rest)![0]).slice(2);
+  return rest.slice(2, 2 + (rest.length - 5) / 2);
+};
+
 /** Parses `git log -p -U0 --full-index` output, each commit opened by a record separator and its hash, into the files each changed. */
 function parseDiffs(text: string): Map<string, FileDiff[]> {
   const out = new Map<string, FileDiff[]>();
@@ -950,7 +1007,8 @@ function parseDiffs(text: string): Map<string, FileDiff[]> {
     let f: FileDiff | undefined;
     let h: Hunk | undefined;
     lines.slice(1).forEach((l) => {
-      if (l.startsWith("diff --git ")) return void ((h = undefined), files.push((f = { path: "", old: "", new: "", add: 0, del: 0, hunks: [] })));
+      // renames are off, so both sides name one path; it is read here, where a change of mode or an empty file has it too
+      if (l.startsWith("diff --git ")) return void ((h = undefined), files.push((f = { path: pathOfDiff(l.slice(11)), old: "", new: "", add: 0, del: 0, hunks: [] })));
       if (!f) return;
       const at = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(l);
       if (at) return void f.hunks.push((h = { old: Number(at[1]), new: Number(at[2]), removed: [], added: [] }));
@@ -958,9 +1016,6 @@ function parseDiffs(text: string): Map<string, FileDiff[]> {
       if (!h) {
         const idx = /^index ([0-9a-f]+)\.\.([0-9a-f]+)/.exec(l);
         if (idx) return void ((f.old = /^0+$/.test(idx[1]) ? "" : idx[1]), (f.new = /^0+$/.test(idx[2]) ? "" : idx[2]));
-        if (l.startsWith("--- ")) return void (l !== "--- /dev/null" && (f.path = l.slice(6)));
-        if (l.startsWith("+++ ")) return void (l !== "+++ /dev/null" && (f.path = l.slice(6)));
-        if (l.startsWith("Binary files ")) return void (f.path ||= / and b\/(.*) differ$/.exec(l)?.[1] ?? / a\/(.*) and /.exec(l)?.[1] ?? "");
         return;
       }
       if (l.startsWith("-")) return void (f.del++, h.removed.push(l.slice(1)));
@@ -972,7 +1027,7 @@ function parseDiffs(text: string): Map<string, FileDiff[]> {
 
 /** Commits' diffs read and laid against the headings: the diffs in one git process, the files as they stood in another. */
 async function readDiffs(cwd: string, hashes: string[]): Promise<{ diffs: Map<string, FileDiff[]>; underRule: (f: FileDiff) => boolean; briefOf: (f: FileDiff, side: "old" | "new", line: number) => string }> {
-  const log = await git(cwd, ["log", "--no-walk=unsorted", "--stdin", "-p", "-U0", "--full-index", "--no-renames", "--no-color", "--no-ext-diff", "--diff-merges=first-parent", "--format=%x1e%H", "--", "."], hashes.join("\n") + "\n");
+  const log = await git(cwd, ["log", "--no-walk=unsorted", "--stdin", "-p", "-U0", "--full-index", "--no-renames", "--no-color", "--no-ext-diff", "--diff-merges=off", "--format=%x1e%H", "--", "."], hashes.join("\n") + "\n");
   const diffs = parseDiffs(log.toString("utf8"));
   const md = (p: string) => /\.md$/i.test(p);
   const names = [...new Set([...diffs.values()].flat().filter((f) => md(f.path)).flatMap((f) => [f.old, f.new].filter(Boolean)))];
@@ -995,7 +1050,7 @@ function changesIn(f: FileDiff, briefOf: (f: FileDiff, side: "old" | "new", line
   return f.hunks.flatMap((h) => {
     const by = new Map<string, Change>();
     const put = (brief: string, side: "removed" | "added", text: string, line: number) => {
-      const c = by.get(brief) ?? (by.set(brief, { brief, old: h.old, new: h.new, removed: [], added: [] }), by.get(brief)!);
+      const c = by.get(brief) ?? (by.set(brief, { brief, removed: [], added: [] }), by.get(brief)!);
       if (!c[side].length) c[side === "removed" ? "old" : "new"] = line;
       c[side].push(text);
     };
@@ -1023,9 +1078,11 @@ async function readCommits(cwd: string, prefix: string, heads: { hash: string; p
 /** Where a root stands in its repository, and where what is kept of its history lives in the repository's git folder. */
 async function repoOf(rootArg: string): Promise<{ cwd: string; prefix: string; kept: (name: string) => Promise<string> }> {
   const cwd = dirname(rootFileOf(rootArg));
-  const prefix = (await git(cwd, ["rev-parse", "--show-prefix"])).toString().trim();
-  // a commit is read for the files under one root, so each root keeps its own
-  const tag = prefix ? "-" + prefix.replace(/\/$/, "").replace(/\//g, "-") : "";
+  const [prefix, shallow] = (await git(cwd, ["rev-parse", "--show-prefix", "--is-shallow-repository"])).toString().split("\n");
+  // a clone of a few commits would tell a history that never happened, the first of them adding every file there is
+  if (shallow === "true") throw new Error("a shallow clone holds only part of its history, so none is read");
+  // a commit is read for the files under one root, so each root keeps its own, named by the root's path
+  const tag = prefix ? "-" + Bun.hash(prefix).toString(36) : "";
   return { cwd, prefix, kept: async (name) => resolve(cwd, (await git(cwd, ["rev-parse", "--git-path", `surface/${name.replace("*", tag)}`])).toString().trim()) };
 }
 
@@ -1043,6 +1100,14 @@ async function changesOf(cwd: string, prefix: string, hashes: string[]): Promise
   );
 }
 
+/** Writes what is kept whole or not at all, so a request that reads it while another writes it never reads half. */
+const keep = (file: string, data: unknown): void => {
+  mkdirSync(dirname(file), { recursive: true });
+  const part = `${file}.${process.pid}.${Math.random().toString(36).slice(2)}`;
+  writeFileSync(part, JSON.stringify(data));
+  renameSync(part, file);
+};
+
 /** One commit's heavy tier, read once and kept by its hash; a hash no commit under the root holds is none. */
 async function commitOf(rootArg: string, hash: string): Promise<Changes | null> {
   const { cwd, prefix, kept } = await repoOf(rootArg);
@@ -1051,16 +1116,15 @@ async function commitOf(rootArg: string, hash: string): Promise<Changes | null> 
     const c = JSON.parse(readFileSync(file, "utf8"));
     if (c.form === HISTORY_FORM) return c.changes;
   } catch {}
-  const listed = (await git(cwd, ["log", "--format=%H", "--", "."])).toString().split("\n");
-  if (!listed.includes(hash)) return null;
+  // a commit is one the light tier holds, which is kept, so a hash that is none costs no more than reading it
+  if (!(await historyOf(rootArg)).commits.some((c) => c.hash === hash)) return null;
   const changes = (await changesOf(cwd, prefix, [hash])).get(hash)!;
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, JSON.stringify({ form: HISTORY_FORM, changes }));
+  keep(file, { form: HISTORY_FORM, changes });
   return changes;
 }
 
 /** What the cache is written in; a change to how a commit is read changes it, and every kept commit is read again. */
-const HISTORY_FORM = 2;
+const HISTORY_FORM = 3;
 
 /** History's light tier for the root: every commit that touched it, newest first, reading only what the cache does not hold. */
 async function historyOf(rootArg: string): Promise<History> {
@@ -1078,8 +1142,7 @@ async function historyOf(rootArg: string): Promise<History> {
   const fresh = await readCommits(cwd, prefix, listed.filter((h) => !kept[h.hash]));
   if (fresh.length) {
     fresh.forEach((c) => (kept[c.hash] = c));
-    mkdirSync(dirname(cacheFile), { recursive: true });
-    writeFileSync(cacheFile, JSON.stringify({ form: HISTORY_FORM, commits: kept }));
+    keep(cacheFile, { form: HISTORY_FORM, commits: kept });
   }
   return { head: listed[0]?.hash ?? "", commits: listed.map((h) => kept[h.hash]), traced: new Date().toISOString() };
 }
