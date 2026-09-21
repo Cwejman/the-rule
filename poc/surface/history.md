@@ -96,11 +96,11 @@ Locally both are computed on demand and cached by the commit's hash, which never
 
 ### 4.1 The shallow tier is had whole
 
-Every commit as a leaf brief: its hash, parents, author, date and subject, the stamped files it touched, and the briefs within them. It is one file, loaded once when the view opens, and enough to draw the canvas, colour the shape and filter by address.
+Every commit that touched the root: its hash, parents, author, date and subject, the files it changed, and for a stamped file the briefs within it. A brief is named by its path within its file, from the file's own title down, since where a file is placed in the body changes and the commit does not; the page lays that path onto the body when it draws. The commit leaves of the history's reading are made from these records when the history is traced.
 
-It is built by addition, an entry per new commit, and is never computed again for commits it already holds. It is not in the body, and not embedded in the page unless it stays as light as the body is.
+It is one file, `history.json`, loaded once when the view opens, and enough to draw the canvas, colour the shape and filter by address. It is built by addition: a commit is read once, kept by its hash in the repository's git folder, a keeping per root, and never read again. It stands beside the page and never inside it, since it weighs a quarter of the page.
 
-*Measured by the session, 2026-09-21, on this repository's 453 commits: the log with the files each touched is 160 KB, 44 KB gzipped, and took 8.5 seconds cold. The briefs touched are not yet measured.*
+*As built, 2026-09-21. Measured on this repository's 456 commits: 373 KB, 73 KB gzipped, of which the paths of the briefs touched are 130 KB. Read cold in 3.5 seconds, the diffs in one git process and the file versions in another, and served warm in 0.15 to 0.35; lexing every version whole had taken 31, and finding the headings by their lines gave the same briefs for every commit.*
 
 ### 4.2 The deep tier is had a commit at a time
 
@@ -114,7 +114,13 @@ Should a view ever want lines across many commits at once, they are packed in ru
 
 Before anything of this is built, the time `/body` takes and the weight of the built page are measured, and after it they are measured again. Neither may move.
 
-*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17.*
+*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17. Measured, 2026-09-21, around the light tier: `/body` 0.71 to 0.75 seconds and 1,279,090 bytes before and after, and the built page 1,466,094 bytes, 238,119 gzipped, the same to the byte.*
+
+### 4.4 The pipeline clones the whole history
+
+A pipeline's clone holds one commit unless told otherwise, and a history of one commit is no history. So the workflow that builds the page asks for every commit, and a tree without its history writes the one it has.
+
+*As built, 2026-09-21; a clone of one commit was built from to see it.*
 
 ## 5. What a reader sees
 
