@@ -71,7 +71,7 @@ A record's entries may be holons themselves, each with its level beneath it, as 
 
 A record is an event: a ratification, a review's findings, a feedback note each amends the state of the tree. Once its conclusion is in the briefs it amends, the record has done its work and retires from the tree, so the tree stays what stands and not what happened. Git keeps it.
 
-A record whose conclusions are its own briefs has nothing to retire into, and stands: [the history](surface/history.md#24-it-is-a-record-whose-entries-are-holons) is that record, and it is substrate.
+A record whose conclusions are its own briefs has nothing to retire into, and stands as substrate: [the history](surface/history.md#24-it-is-a-record-whose-entries-are-holons) is that record.
 
 *Preferred, the author's; the history's standing is his, 2026-09-21.*
 
@@ -146,6 +146,12 @@ A part is placed wherever it belongs, and that may be more than one place. Each 
 There is no borrowing and no lesser copy: the file is one, and the places that link it are many. What the reading owes is only that a reader who arrives by one route can see which route they took, and that is [a question of the way down](surface/lane.md#75-the-way-down-stands-over-the-lane) rather than of the substrate.
 
 *The author's decision, 2026-09-18. It replaces the trial of 2026-09-15, under which the first place met was the home and every later link a borrow laid folded; the author's reading is that a part simply has several homes, and the route a reader took is the surface's to say.*
+
+### 3.7 A lone link to a commit places it, in the history
+
+In [the history](surface/history.md#22-a-story-places-its-commits), and nowhere else, a lone link may name a commit or a run of commits instead of a file. It places them as a file is placed, whole where the link stands, and they stand as leaves rather than cards, since a commit is not a reading to enter.
+
+*Preferred, the author's, 2026-09-21, as the history was settled; placement taken past files is named here so it has one home.*
 
 ## 4. Headings carry numbers
 
