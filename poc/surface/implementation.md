@@ -150,7 +150,7 @@ Whether the body is served to the page or written into it is the only difference
 
 ### 5.1 Live, the process serves and watches
 
-The process answers six requests: the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, the images the body holds, and history's [light tier](history.md#41-the-light-tier-is-had-whole) and [heavy tier](history.md#42-the-heavy-tier-is-had-a-commit-at-a-time), asked for apart from the body. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
+The process answers six requests: the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, the images the body holds, and history's [light tier](history.md#51-the-light-tier-is-had-whole) and [heavy tier](history.md#52-the-heavy-tier-is-had-a-commit-at-a-time), asked for apart from the body. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
 
 An image is served only when the last trace reached it, so the process hands out nothing else under the path, and its address carries the file's modification time, so a changed image is fetched again rather than kept from before.
 
