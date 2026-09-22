@@ -1173,8 +1173,8 @@ type Index = {
 type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
-/** The panes the middle can hold, in the order they stand: the canvas at the left, the dish, the lane at the right. */
-const PANES = ["canvas", "dish", "lane"] as const;
+/** The panes the middle can hold, in the order they stand: the canvas at the left, the lane between, the dish at the right, so the reading stands between its two maps. */
+const PANES = ["canvas", "lane", "dish"] as const;
 type PaneName = (typeof PANES)[number];
 /** The least width the canvas stands in beside the lane; narrower, it gives way. */
 const CANVAS_MIN = 360;
@@ -2141,8 +2141,8 @@ const WIDGETS: Record<string, Widget> = {
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
-  dish: { kind: "pane", name: "the dish: the plate at full size", icon: "dish" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
+  dish: { kind: "pane", name: "the dish: the plate at full size", icon: "dish" },
 };
 
 const AREAS: { name: AreaName; kind: Widget["kind"] }[] = [
@@ -2598,7 +2598,7 @@ function loadSettings(): void {
   AREAS.forEach(({ name, kind }) => {
     const held = state.settings.areas[name] as unknown;
     const list = Array.isArray(held) ? held : typeof held === "string" && held !== "none" ? [held] : [];
-    state.settings.areas[name] = list.filter((k) => WIDGETS[k]?.kind === kind && k !== "none").slice(0, kind === "adjunct" ? 1 : 2);
+    state.settings.areas[name] = list.filter((k) => WIDGETS[k]?.kind === kind && k !== "none").slice(0, kind === "adjunct" ? 1 : kind === "pane" ? PANES.length : 2);
   });
   state.settings.areas.middle = panesHeld(state.settings.areas.middle);
   if (state.settings.areas.middle.length === 0) state.settings.areas.middle = ["lane"];
@@ -3739,9 +3739,9 @@ function drawLayout(): void {
   // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
   // there is nothing to give way to and a floor would only overflow the page
   if (on.canvas) place(ui.canvas, bleed ? "1fr" : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
-  // the dish takes what is left as the canvas does, and alone it takes the width whole
-  if (on.dish) place(ui.dish, on.lane || on.canvas ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr");
   if (on.lane) place(ui.scroll, `${mid}px`);
+  // the dish stands right of the reading and takes what is left as the canvas does; alone it takes the width whole
+  if (on.dish) place(ui.dish, on.lane || on.canvas ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr");
   if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
   else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
@@ -5488,8 +5488,8 @@ async function start(): Promise<void> {
       <div id="pull" hidden><i></i></div>
       <section class="wing" data-area="wingL"></section>
       <section id="canvas" hidden></section>
-      <section id="dish" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
+      <section id="dish" hidden></section>
       <section class="wing" data-area="wingR"></section>
       <div id="sheet" hidden></div>
       <div id="card" hidden></div>
@@ -5675,7 +5675,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
-#dish { display: flex; justify-content: center; align-items: flex-start; min-width: 0; overflow: hidden; }
+#dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
 #canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
    the viewport, since a map is read by moving it rather than by seeing all of it at once */
