@@ -2781,210 +2781,161 @@ function drawShapeCursor(): void {
 
 // ## 3.10 The plate: the body, as droplets
 //
-// The plate is an agar plate: every brief a droplet, the root at the centre and
-// each level further out. A droplet is as large as its share of its level's
-// prose, and each level is given the room of its own ring, so the prose that
-// gathers deep in a body does not crowd the first levels to dots. The droplets
-// push each other apart and are drawn back to where the rings would lay them,
-// which keeps a branch together and siblings in reading order; where two still
-// press, each is cut at the line between them, so they flatten against each
-// other and never merge. It is solved once per index, still and with nothing
-// random in it, so the same body always lays the same plate.
+// The plate is an agar plate, and the holarchy comes first on it: the root at the
+// centre and every other cell standing on its parent's outer edge, so the way from
+// the root to any cell is a run of cells edge to edge. A cell is given its share
+// of its parent's edge by how many cells stand beneath it, and reaches out to the
+// next ring, or to the rim where nothing stands beneath it, so the plate is filled
+// and a cell stretches rather than shrinks. Each ring is as thick as its cells are
+// wide, so they stand as droplets rather than slivers, and the room between two
+// cells is their kinship's: a hairline within a file, more between files, most
+// between branches. Where a cell per brief would be drawn too thin to see, the
+// plate is drawn a cell per file. It is laid once for each body, still, with
+// nothing random in it.
 
 /**
- * gap: px between droplets; fill: the share of a ring its droplets take; even: how far sizes lean from prose toward
- * the room its branch was given; floor: the least radius, px at the plate's side; most: the largest radius, as a
- * share of a ring's width; ring and angle: how hard a droplet is drawn back into its ring and toward its angle at each
- * step; settle: the last steps, in which droplets only push apart, so none is left inside another
+ * kin, file and apart: px between cells of one file, of two files, and of two branches; hub: the root's radius, as a
+ * share of the plate's; least: how many px across the middling cell must be for the plate to stand a cell per brief;
+ * reach: how many rings past its own a cell with nothing beneath it may stretch; share: how far a ring's area follows
+ * how many cells it holds, from rings of even area at none to an even area per cell at one
  */
-const PLATE = { gap: 1.6, fill: 0.72, even: 0.5, floor: 1.3, most: 0.65, ring: 0.15, angle: 0.04, steps: 260, settle: 60 };
+const PLATE = { kin: 0.8, file: 2.2, apart: 3.5, hub: 0.12, least: 3, reach: 0, share: 1 };
 
 /** The largest extent the plate is drawn at, across or down. */
 const PLATE_SIDE = 260;
 
-/** A droplet, in the plate's own measure: the rim at radius one, the centre at the origin. */
-type Drop = { a: string; x: number; y: number; r: number; d: number; label: string | null };
+/** What a cell of the plate is: a brief, or a file. */
+type Grain = "brief" | "file";
 
-/** Where the rings would lay each brief: the middle of its ring, at the middle of its branch's share of the angle, which is the room it is given. */
-function seedPlate(ix: Index): Map<string, { d: number; angle: number; span: number }> {
-  const seeds = new Map<string, { d: number; angle: number; span: number }>();
-  const lay = (parent: string, a0: number, span: number, d: number): void => {
-    const kids = level(parent);
-    if (kids.length === 0) return;
-    const angles = spread(
-      kids.map((k) => Math.max(1, ix.branch.get(k.address)!)),
-      span,
-      Math.min(span / kids.length, 0.004),
+/**
+ * A cell, in the plate's own measure with the rim at one: an annular sector, and the px kept clear at each of its
+ * sides, before its first angle, after its last, inside toward its parent and outside toward its level.
+ */
+type Cell = { a: string; r0: number; r1: number; a0: number; a1: number; before: number; after: number; inside: number; outside: number; label: string };
+
+/** Whether a brief is a cell at a grain: every brief, or the root and each file's own brief. */
+const isCell = (b: Brief, grain: Grain): boolean => grain === "brief" || b.address === "" || isCard(b);
+
+/** The cells standing directly on a cell: its level, or at the grain of files the nearest files beneath it. */
+const cellsOn = (a: string, grain: Grain): Brief[] => level(a).flatMap((k) => (isCell(k, grain) ? [k] : cellsOn(k.address, grain)));
+
+/** The middle of a row of numbers. */
+const middling = (xs: number[]): number => [...xs].sort((x, y) => x - y)[xs.length >> 1] ?? 0;
+
+/** Lays the body's cells at a grain: each parent's edge shared by how many stand beneath, and each ring's area by how many it holds. */
+function layPlate(grain: Grain): Cell[] {
+  const count = new Map<string, number>();
+  const many = (a: string): number => {
+    if (!count.has(a)) count.set(a, 1 + cellsOn(a, grain).reduce((n, k) => n + many(k.address), 0));
+    return count.get(a)!;
+  };
+  const spans: { b: Brief; d: number; a0: number; a1: number; leaf: boolean; before: number; after: number; inside: number }[] = [];
+  const share = (up: Brief, a0: number, a1: number, d: number, before: number, after: number): void => {
+    const kids = cellsOn(up.address, grain);
+    const total = kids.reduce((n, k) => n + many(k.address), 0);
+    // the room between two cells is their kinship's, and at the ends of a level it is whatever bounds the parent
+    const between = (x: Brief, y: Brief) => (up.address === "" ? PLATE.apart : x.file !== y.file ? PLATE.file : PLATE.kin);
+    const starts = offsets(
+      kids.map((k) => ((a1 - a0) * many(k.address)) / total),
+      0,
     );
-    offsets(angles, 0).forEach((start, i) => {
-      seeds.set(kids[i].address, { d, angle: a0 + start + angles[i] / 2, span: angles[i] });
-      lay(kids[i].address, a0 + start, angles[i], d + 1);
+    kids.forEach((k, i) => {
+      const s0 = a0 + starts[i];
+      const s1 = i === kids.length - 1 ? a1 : a0 + starts[i + 1];
+      const b0 = i > 0 ? between(kids[i - 1], k) : up.address === "" ? PLATE.apart : before;
+      const b1 = i < kids.length - 1 ? between(k, kids[i + 1]) : up.address === "" ? PLATE.apart : after;
+      spans.push({ b: k, d, a0: s0, a1: s1, leaf: cellsOn(k.address, grain).length === 0, before: b0, after: b1, inside: k.file !== up.file ? PLATE.file : PLATE.kin });
+      share(k, s0, s1, d + 1, b0, b1);
     });
   };
-  lay("", -Math.PI / 2, 2 * Math.PI, 1);
-  return seeds;
+  share(brief("")!, -Math.PI / 2, 1.5 * Math.PI, 1, 0, 0);
+  const D = Math.max(1, ...spans.map((s) => s.d));
+  // each ring's area follows how many cells it holds, so a level of many is given the room it needs and a level of few
+  // is not drawn as a band of wide slabs
+  const held = Array.from({ length: D }, (_, i) => spans.filter((s) => s.d === i + 1).length ** PLATE.share);
+  const all = held.reduce((x, y) => x + y, 0);
+  const edges = [PLATE.hub, ...held.map((_, i) => Math.sqrt(PLATE.hub ** 2 + ((1 - PLATE.hub ** 2) * held.slice(0, i + 1).reduce((x, y) => x + y, 0)) / all))];
+  const root: Cell = { a: "", r0: 0, r1: PLATE.hub, a0: 0, a1: 2 * Math.PI, before: 0, after: 0, inside: 0, outside: PLATE.kin, label: state.body!.title };
+  return [
+    root,
+    ...spans.map((s) => ({ a: s.b.address, r0: edges[s.d - 1], r1: edges[s.leaf ? Math.min(D, s.d + PLATE.reach) : s.d], a0: s.a0, a1: s.a1, before: s.before, after: s.after, inside: s.inside, outside: s.leaf && s.d + PLATE.reach >= D ? 0 : PLATE.kin, label: s.b.title })),
+  ];
 }
 
-/** The angle from one to another, the short way round. */
-const turn = (from: number, to: number): number => Math.atan2(Math.sin(to - from), Math.cos(to - from));
-
-/**
- * The droplets of a body, settled. Each starts where the rings would lay it and is sized from its level's room; then,
- * a fixed number of times and always in the same order, overlapping droplets push apart, each is drawn back into its
- * ring and toward its angle, and a droplet's angle follows its parent's as the parent is pushed, so a branch moves as
- * one. The root stands still at the centre.
- */
-function solvePlate(ix: Index): Drop[] {
-  const D = Math.max(1, ix.depth);
-  const t = 1 / (D + 1);
-  const seeds = seedPlate(ix);
-  const briefs = [...seeds.keys()];
-  const floor = PLATE.floor / ((PLATE_SIDE / 2) * 0.97);
-  const byDepth = Map.groupBy(briefs, (a) => seeds.get(a)!.d);
-  const radius = new Map<string, number>();
-  byDepth.forEach((as, d) => {
-    const room = PLATE.fill * Math.PI * (((d + 1) * t) ** 2 - (d * t) ** 2);
-    const total = as.reduce((s, a) => s + Math.max(1, ix.own.get(a)!), 0);
-    as.forEach((a) => {
-      // its prose's share of the level, leaning toward the room its branch was given, so a heavy branch of few briefs leaves no hole
-      const share = (1 - PLATE.even) * (Math.max(1, ix.own.get(a)!) / total) + (PLATE.even * seeds.get(a)!.span) / (2 * Math.PI);
-      radius.set(a, clamp(Math.sqrt((room * share) / Math.PI), floor, t * PLATE.most));
-    });
-  });
-  const root: Drop = { a: "", x: 0, y: 0, r: t * 0.94, d: 0, label: state.body!.title };
-  const drops: Drop[] = briefs.map((a) => {
-    const { d, angle } = seeds.get(a)!;
-    const rm = (d + 0.5) * t;
-    return { a, x: rm * Math.cos(angle), y: rm * Math.sin(angle), r: radius.get(a)!, d, label: brief(a)?.title ?? null };
-  });
-  const at = new Map(drops.map((p) => [p.a, p]));
-  const parent = drops.map((p) => at.get(parentOf(p.a)) ?? null);
-  const all = [root, ...drops];
-  for (let step = 0; step < PLATE.steps; step++) {
-    // overlapping droplets push apart, the lighter giving more; swept along x so only near pairs are met
-    const byX = [...all].sort((p, q) => p.x - p.r - (q.x - q.r) || (p.a < q.a ? -1 : 1));
-    for (let i = 0; i < byX.length; i++) {
-      const p = byX[i];
-      for (let j = i + 1; j < byX.length && byX[j].x - byX[j].r < p.x + p.r; j++) {
-        const q = byX[j];
-        const dx = q.x - p.x;
-        const dy = q.y - p.y;
-        const dist = Math.hypot(dx, dy) || 1e-9;
-        const over = p.r + q.r - dist;
-        if (over <= 0) continue;
-        const wp = p === root ? 0 : q === root ? 1 : (q.r * q.r) / (p.r * p.r + q.r * q.r);
-        p.x -= (dx / dist) * over * wp;
-        p.y -= (dy / dist) * over * wp;
-        q.x += (dx / dist) * over * (1 - wp);
-        q.y += (dy / dist) * over * (1 - wp);
-      }
-    }
-    // each is drawn back: into its ring, and toward its seed's angle as its parent has turned from its own; in the last
-    // steps only the rim holds them
-    const pull = step < PLATE.steps - PLATE.settle ? 1 : 0;
-    drops.forEach((p, i) => {
-      const seed = seeds.get(p.a)!;
-      const up = parent[i];
-      const want = seed.angle + (up ? turn(seeds.get(up.a)!.angle, Math.atan2(up.y, up.x)) : 0);
-      let rr = Math.hypot(p.x, p.y);
-      let angle = Math.atan2(p.y, p.x);
-      const lo = p.d * t + p.r;
-      const hi = Math.min(1 - p.r, (p.d + 1) * t - p.r);
-      rr += (lo <= hi ? (rr < lo ? lo - rr : rr > hi ? hi - rr : 0) : (lo + hi) / 2 - rr) * PLATE.ring * pull;
-      rr = Math.min(rr, 1 - p.r);
-      angle += turn(angle, want) * PLATE.angle * pull;
-      p.x = rr * Math.cos(angle);
-      p.y = rr * Math.sin(angle);
-    });
-  }
-  return all;
-}
-
-/** The droplets of the body in view, solved once for each index. */
-let plateSolved: { index: Index; drops: Drop[] } | null = null;
-const plateDrops = (): Drop[] => {
-  if (plateSolved?.index !== state.index) plateSolved = { index: state.index!, drops: solvePlate(state.index!) };
-  return plateSolved.drops;
+/** The cells of the body in view at each grain, laid once for each index. */
+let plateLaid: { index: Index; cells: Map<Grain, Cell[]> } | null = null;
+const plateCells = (grain: Grain): Cell[] => {
+  if (plateLaid?.index !== state.index) plateLaid = { index: state.index!, cells: new Map() };
+  if (!plateLaid.cells.has(grain)) plateLaid.cells.set(grain, layPlate(grain));
+  return plateLaid.cells.get(grain)!;
 };
 
+/** The measure that turns the plate's own into px on a plate of side `S`. */
+const plateK = (S: number): number => (S / 2) * 0.98;
+
+/** How many px across a cell is at its narrowest, on a plate of side `S`. */
+const across = (c: Cell, S: number): number => plateK(S) * Math.min(c.r1 - c.r0, ((c.a1 - c.a0) * (c.r0 + c.r1)) / 2);
+
+/** The grain a plate of side `S` is drawn at: a cell per brief where the middling one can be seen, a cell per file where not. */
+const grainAt = (S: number): Grain => (middling(plateCells("brief").map((c) => across(c, S))) >= PLATE.least ? "brief" : "file");
+
 /**
- * A droplet as drawn: its circle, cut at the line of equal pull between it and each droplet it meets, and rounded by a
- * stroke of its own colour, so it is drawn a stroke smaller than it is and the stroke gives the size back with round
- * corners. `k` scales the plate's measure to pixels around a centre at `c`.
+ * A cell as drawn: its sector with the room its kinship keeps cut from each side, then drawn a stroke smaller and given
+ * the stroke back in its own colour, so its corners come out round. Where the room would leave nothing, it narrows, so
+ * the least of cells is a sliver and never nothing.
  */
-function dropletPath(p: Drop, near: Drop[], c: number, k: number): { d: string; round: number } {
-  const R = p.r * k;
-  const round = Math.min(2.4, R * 0.3);
-  // the gap narrows for a droplet smaller than it, so the least of them is a sliver and never nothing
-  const gap = Math.min(PLATE.gap, R * 0.5);
-  const cx = c + p.x * k;
-  const cy = c + p.y * k;
-  const n = clamp(Math.round(R * 2.5), 12, 64);
-  let poly = Array.from({ length: n }, (_, i) => [cx + (R - round) * Math.cos((2 * Math.PI * i) / n), cy + (R - round) * Math.sin((2 * Math.PI * i) / n)]);
-  near.forEach((q) => {
-    const dx = (q.x - p.x) * k;
-    const dy = (q.y - p.y) * k;
-    const dist = Math.hypot(dx, dy);
-    if (dist === 0 || dist >= R + q.r * k + gap) return;
-    const ux = dx / dist;
-    const uy = dy / dist;
-    // the power line: where the two circles pull equally, moved back by half the gap and the rounding
-    const s = (dist * dist + R * R - (q.r * k) ** 2) / (2 * dist) - gap / 2 - round;
-    const side = (v: number[]) => (v[0] - cx) * ux + (v[1] - cy) * uy - s;
-    poly = poly.flatMap((v, i) => {
-      const w = poly[(i + 1) % poly.length];
-      const sv = side(v);
-      const sw = side(w);
-      const cut = sv * sw < 0 ? [[v[0] + ((w[0] - v[0]) * sv) / (sv - sw), v[1] + ((w[1] - v[1]) * sv) / (sv - sw)]] : [];
-      return [...(sv <= 0 ? [v] : []), ...cut];
-    });
-  });
-  const d = poly.length < 3 ? "" : `M ${poly.map((v) => `${v[0].toFixed(1)} ${v[1].toFixed(1)}`).join(" L ")} Z`;
-  return { d, round };
-}
-
-/** The measure that turns the plate's own into pixels in a square of side `S`. */
-const plateK = (S: number): number => (S / 2) * 0.97;
-
-/** The extent of the plate's ink in a square of side `S`. A plate is round only where the body is, so the figure is cut to its ink. */
-function plateInk(S: number): { x: number; y: number; w: number; h: number } {
+function cellPath(c: Cell, S: number): { d: string; round: number } {
   const k = plateK(S);
-  const c = S / 2;
-  const drops = plateDrops();
-  const x = Math.min(...drops.map((p) => c + (p.x - p.r) * k));
-  const y = Math.min(...drops.map((p) => c + (p.y - p.r) * k));
-  return { x, y, w: Math.max(...drops.map((p) => c + (p.x + p.r) * k)) - x, h: Math.max(...drops.map((p) => c + (p.y + p.r) * k)) - y };
+  const m = S / 2;
+  const P = (r: number, a: number) => `${(m + r * Math.cos(a)).toFixed(2)} ${(m + r * Math.sin(a)).toFixed(2)}`;
+  if (c.r0 === 0) return { d: `M ${P(c.r1 * k - c.outside / 2 - 1, 0)} A ${c.r1 * k - c.outside / 2 - 1} ${c.r1 * k - c.outside / 2 - 1} 0 1 1 ${P(c.r1 * k - c.outside / 2 - 1, Math.PI)} A ${c.r1 * k - c.outside / 2 - 1} ${c.r1 * k - c.outside / 2 - 1} 0 1 1 ${P(c.r1 * k - c.outside / 2 - 1, 0)} Z`, round: 1 };
+  const R0 = c.r0 * k + c.inside / 2;
+  const R1 = c.r1 * k - c.outside / 2;
+  const mid = (R0 + R1) / 2;
+  const wide = (c.a1 - c.a0) * mid;
+  const fit = Math.min(1, Math.max(0, wide - 0.6) / Math.max(1e-6, (c.before + c.after) / 2));
+  const before = (c.before / 2) * fit;
+  const after = (c.after / 2) * fit;
+  const round = Math.max(0.3, Math.min(2, (R1 - R0) / 2 - 0.2, (wide - before - after) / 2 - 0.2));
+  const ri = R0 + round;
+  const ro = R1 - round;
+  const from = (r: number) => c.a0 + (before + round) / r;
+  const to = (r: number) => Math.max(from(r), c.a1 - (after + round) / r);
+  const large = (r: number) => (to(r) - from(r) > Math.PI ? 1 : 0);
+  return {
+    d: `M ${P(ri, from(ri))} A ${ri.toFixed(2)} ${ri.toFixed(2)} 0 ${large(ri)} 1 ${P(ri, to(ri))} L ${P(ro, to(ro))} A ${ro.toFixed(2)} ${ro.toFixed(2)} 0 ${large(ro)} 0 ${P(ro, from(ro))} Z`,
+    round,
+  };
 }
 
-/** The side of the square a plate is laid in for a room: its ink as large as the room and the plate's side allow. */
-const plateScale = (W: number, H: number): number => {
-  const ink = plateInk(1000);
-  return Math.floor(1000 * Math.min(W / ink.w, H / ink.h, PLATE_SIDE / Math.max(ink.w, ink.h)));
-};
+/** The side of the square a plate is laid in for a room. */
+const plateScale = (W: number, H: number): number => Math.floor(Math.min(W, H, PLATE_SIDE));
 
-/** The width the plate stands in: its ink, drawn at the plate's side. */
-const plateWidth = (): number => (state.index ? Math.ceil(plateInk(plateScale(Infinity, Infinity)).w) : PLATE_SIDE);
+/** The width the plate stands in. */
+const plateWidth = (): number => PLATE_SIDE;
 
 function plateSvg(W: number, H: number): string {
   const S = plateScale(W, H);
   if (S < 80) return "";
-  const drops = plateDrops();
   const k = plateK(S);
-  const c = S / 2;
-  const onPath = new Set(prefixesOf(state.focus));
-  const cls = (p: Drop) => `${p.a === "" ? " centre" : ""}${onPath.has(p.a) ? " on" : ""}${p.a === state.focus ? " here" : ""}${p.a === "" || inLane(p.a) ? "" : " away"}`;
-  const near = (p: Drop) => drops.filter((q) => q !== p && Math.abs(q.x - p.x) < p.r + q.r && Math.abs(q.y - p.y) < p.r + q.r);
-  const cells = drops.map((p) => {
-    const { d, round } = dropletPath(p, near(p), c, k);
-    const R = p.r * k;
-    const label = p.label && R >= 15 ? `<text class="label" x="${(c + p.x * k).toFixed(1)}" y="${(c + p.y * k).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(p.label, Math.floor((2 * R - 8) / 5.6)))}</text>` : "";
-    return d ? `<g class="cell${cls(p)}" data-a="${esc(p.a)}" ${hued(p.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>` : "";
+  const m = S / 2;
+  const cells = plateCells(grainAt(S));
+  const drawn = new Set(cells.map((c) => c.a));
+  const onPath = new Set(prefixesOf(state.focus).filter((a) => drawn.has(a)));
+  const here = prefixesOf(state.focus).findLast((a) => drawn.has(a)) ?? "";
+  const cls = (c: Cell) => `${c.a === "" ? " centre" : ""}${onPath.has(c.a) ? " on" : ""}${c.a === here ? " here" : ""}${c.a === "" || inLane(c.a) ? "" : " away"}`;
+  const shapes = cells.map((c) => {
+    const { d, round } = cellPath(c, S);
+    const mid = ((c.r0 + c.r1) / 2) * k;
+    const angle = (c.a0 + c.a1) / 2;
+    const wide = c.r0 === 0 ? 2 * c.r1 * k : Math.min((c.a1 - c.a0) * mid, 2 * mid);
+    const label = wide >= 40 && (c.r1 - c.r0) * k >= 14 ? `<text class="label" x="${(m + (c.r0 === 0 ? 0 : mid * Math.cos(angle))).toFixed(1)}" y="${(m + (c.r0 === 0 ? 0 : mid * Math.sin(angle))).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(c.label, Math.floor((wide - 8) / 5.6)))}</text>` : "";
+    return `<g class="cell${cls(c)}" data-a="${esc(c.a)}" ${hued(c.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>`;
   });
-  const ink = plateInk(S);
-  return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}</svg>`;
+  return `<svg class="fig plate" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${shapes.join("")}</svg>`;
 }
 
-/** Pointing at a droplet lights the way to it from the root, cell by cell, where the other figures light the one alone. */
+/** Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone. */
 function lightPlate(a: string | null): void {
   const way = new Set(a === null ? [] : prefixesOf(a));
   all<HTMLElement>("svg.plate .cell").forEach((el) => el.classList.toggle("trail", way.has(el.dataset.a!)));
