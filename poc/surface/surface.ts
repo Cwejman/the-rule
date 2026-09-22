@@ -1173,8 +1173,8 @@ type Index = {
 type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
-/** The panes the middle can hold, in the order they stand: the canvas at the left, the lane at the right. */
-const PANES = ["canvas", "lane"] as const;
+/** The panes the middle can hold, in the order they stand: the canvas at the left, the dish, the lane at the right. */
+const PANES = ["canvas", "dish", "lane"] as const;
 type PaneName = (typeof PANES)[number];
 /** The least width the canvas stands in beside the lane; narrower, it gives way. */
 const CANVAS_MIN = 360;
@@ -2106,7 +2106,7 @@ type Adjunct = { kind: "adjunct"; name: string; icon: string; of: (b: Brief, art
  * draws, so nothing beside it moves as it redraws; and whether it grows into the wing's height or takes only what it needs.
  */
 type Figure = { kind: "figure"; name: string; icon: string; draw: (w: number, h: number) => string; width: () => number; grow: boolean; onFocus?: boolean; onPoint?: boolean };
-/** A pane stands in the middle: the lane, or the canvas. It draws itself from the state through its own functions. */
+/** A pane stands in the middle: the lane, the canvas, or the dish. It draws itself from the state through its own functions. */
 type Pane = { kind: "pane"; name: string; icon: string };
 type Widget = Adjunct | Figure | Pane;
 
@@ -2127,6 +2127,7 @@ const ICON: Record<string, string> = {
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
   openRight: `<path d="M3.5 8h6M7 5.5 9.5 8 7 10.5M12.5 3.5v9"/>`,
   closeRight: `<path d="M9.5 8h-6M6 5.5 3.5 8 6 10.5M12.5 3.5v9"/>`,
+  dish: `<circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="1.2"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -2135,11 +2136,12 @@ const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
   tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => 240, grow: true, onFocus: true },
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
-  plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false },
+  plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => plateSvg(w, h), width: () => plateWidth(), grow: false, onFocus: true },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
+  dish: { kind: "pane", name: "the dish: the plate at full size", icon: "dish" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
 };
 
@@ -2908,14 +2910,14 @@ function cellPath(c: Cell, S: number): { d: string; round: number } {
   };
 }
 
-/** The side of the square a plate is laid in for a room. */
-const plateScale = (W: number, H: number): number => Math.floor(Math.min(W, H, PLATE_SIDE));
+/** The side of the square a plate is laid in for a room, no larger than `most`: the wing's side, or in the dish the room itself. */
+const plateScale = (W: number, H: number, most = PLATE_SIDE): number => Math.floor(Math.min(W, H, most));
 
 /** The width the plate stands in. */
 const plateWidth = (): number => PLATE_SIDE;
 
-function plateSvg(W: number, H: number): string {
-  const S = plateScale(W, H);
+function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
+  const S = plateScale(W, H, most);
   if (S < 80) return "";
   const k = plateK(S);
   const m = S / 2;
@@ -2923,7 +2925,9 @@ function plateSvg(W: number, H: number): string {
   const drawn = new Set(cells.map((c) => c.a));
   const onPath = new Set(prefixesOf(state.focus).filter((a) => drawn.has(a)));
   const here = prefixesOf(state.focus).findLast((a) => drawn.has(a)) ?? "";
-  const cls = (c: Cell) => `${c.a === "" ? " centre" : ""}${onPath.has(c.a) ? " on" : ""}${c.a === here ? " here" : ""}${c.a === "" || inLane(c.a) ? "" : " away"}`;
+  // the way to what is pointed at is drawn as well as lit, so a plate drawn again while the pointer rests keeps it
+  const trail = new Set(state.pointed === null ? [] : prefixesOf(state.pointed));
+  const cls = (c: Cell) => `${c.a === "" ? " centre" : ""}${onPath.has(c.a) ? " on" : ""}${c.a === here ? " here" : ""}${trail.has(c.a) ? " trail" : ""}${c.a === "" || inLane(c.a) ? "" : " away"}`;
   const shapes = cells.map((c) => {
     const { d, round } = cellPath(c, S);
     const mid = ((c.r0 + c.r1) / 2) * k;
@@ -2933,6 +2937,18 @@ function plateSvg(W: number, H: number): string {
     return `<g class="cell${cls(c)}" data-a="${esc(c.a)}" ${hued(c.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>`;
   });
   return `<svg class="fig plate" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${shapes.join("")}</svg>`;
+}
+
+/**
+ * The dish: the plate at full size, as a pane of the middle, so a body too large for the wing's plate is seen a cell
+ * per brief. It stands clear of the way down at the top and the strip at the foot.
+ */
+function drawDish(): void {
+  if (ui.dish.hidden || !state.body) return;
+  const top = ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top;
+  ui.dish.style.paddingTop = `${Math.max(12, Math.round(top + 12))}px`;
+  ui.dish.style.paddingBottom = `${footRoom()}px`;
+  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - Math.max(12, top + 12) - footRoom(), Infinity);
 }
 
 /** Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone. */
@@ -3557,7 +3573,7 @@ function recallView(): void {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -3613,17 +3629,21 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * always allowed, since all it shows is its strip.
  */
 /** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & { canvas: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
+type Fit = Record<AreaName, boolean> & { canvas: boolean; dish: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, lane: false, gutter: 0, rail: 0, railSide: "wingL" };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, dish: false, lane: false, gutter: 0, rail: 0, railSide: "wingL" };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
   // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
   const panes = panesHeld(held.middle);
   on.lane = panes.includes("lane");
   on.canvas = panes.includes("canvas");
-  let used = (on.lane ? s.measure + 2 * s.gap : 0) + (on.canvas ? CANVAS_MIN + (on.lane ? s.gap : 2 * s.gap) : 0);
-  if (on.lane && on.canvas && used > ui.areas.clientWidth) (on.canvas = false), (used = s.measure + 2 * s.gap);
+  on.dish = panes.includes("dish");
+  const others = (on.canvas ? 1 : 0) + (on.dish ? 1 : 0);
+  let used = (on.lane ? s.measure + 2 * s.gap : 0) + others * CANVAS_MIN + (others ? (on.lane ? others : others + 1) * s.gap : 0);
+  // the canvas gives way first, then the dish, since the lane is the reading
+  if (on.lane && on.canvas && used > ui.areas.clientWidth) (on.canvas = false), (used -= CANVAS_MIN + s.gap);
+  if (on.lane && on.dish && used > ui.areas.clientWidth) (on.dish = false), (used -= CANVAS_MIN + s.gap);
   for (const wing of ["wingL", "wingR"] as AreaName[]) {
     const need = held[wing].length ? widthIn(held, wing) + s.gap : 0;
     if (used + need > ui.areas.clientWidth) break;
@@ -3704,7 +3724,7 @@ function drawLayout(): void {
   // standing alone on a narrow screen the canvas takes the page whole, edge to edge: there is too little room to spend
   // any of it on a margin, and what falls outside is cut by the viewport as a map is
   const bleed = narrow() && on.canvas && !on.lane;
-  const space = bleed ? "0px" : on.canvas ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
+  const space = bleed ? "0px" : on.canvas || on.dish ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
   // the rail hugs the edge it stands on, so the space at that edge is nothing and the rail takes it
   const railL = on.rail > 0 && on.railSide === "wingL";
   const railR = on.rail > 0 && on.railSide === "wingR";
@@ -3719,6 +3739,8 @@ function drawLayout(): void {
   // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
   // there is nothing to give way to and a floor would only overflow the page
   if (on.canvas) place(ui.canvas, bleed ? "1fr" : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
+  // the dish takes what is left as the canvas does, and alone it takes the width whole
+  if (on.dish) place(ui.dish, on.lane || on.canvas ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr");
   if (on.lane) place(ui.scroll, `${mid}px`);
   if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
   else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
@@ -3727,6 +3749,7 @@ function drawLayout(): void {
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
   ui.content.style.columnGap = `${s.gap}px`;
   ui.canvas.hidden = !on.canvas;
+  ui.dish.hidden = !on.dish;
   ui.canvas.classList.toggle("bleed", bleed);
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
@@ -3916,7 +3939,7 @@ function trimPlace(): void {
 }
 
 /** The panes of the middle that stand on the screen. */
-const panesShown = (): HTMLElement[] => [ui.canvas, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
+const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
 
 /** How far the nodes stand in from the canvas's rim. */
 const CANVAS_INSET = 24;
@@ -4047,7 +4070,8 @@ function drawFocusMarks(): void {
     el.classList.toggle("here", (el.dataset.a === state.focus && onRow) || (el.classList.contains("brief") && el.dataset.a === holder));
   });
   if (canvasOn()) (followFocus(), drawEdges());
-  all<HTMLElement>("svg.fig [data-a]", ui.areas).forEach((el) => {
+  // the plate marks its own, since a cell of it may be a whole file and the focus stand anywhere inside it
+  all<HTMLElement>("svg.fig:not(.plate) [data-a]", ui.areas).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
   });
@@ -4131,6 +4155,7 @@ function drawSlot(area: "wingL" | "wingR", name: string): void {
 }
 
 function drawWings(only?: "focus" | "point"): void {
+  if (only !== "point") drawDish();
   (["wingL", "wingR"] as const).forEach((area) => {
     if (!only) return drawWing(area);
     figureNames(area).forEach((name) => {
@@ -5463,6 +5488,7 @@ async function start(): Promise<void> {
       <div id="pull" hidden><i></i></div>
       <section class="wing" data-area="wingL"></section>
       <section id="canvas" hidden></section>
+      <section id="dish" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section class="wing" data-area="wingR"></section>
       <div id="sheet" hidden></div>
@@ -5478,6 +5504,7 @@ async function start(): Promise<void> {
     tip: $("#tip"),
     areas: $("#areas"),
     canvas: $("#canvas"),
+    dish: $("#dish"),
     scroll: $("#scroll"),
     content: $("#content"),
     lane: $("#lane"),
@@ -5648,6 +5675,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
+#dish { display: flex; justify-content: center; align-items: flex-start; min-width: 0; overflow: hidden; }
 #canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
    the viewport, since a map is read by moving it rather than by seeing all of it at once */
