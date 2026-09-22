@@ -2971,7 +2971,7 @@ function plateSvg(W: number, H: number): string {
   const drops = plateDrops();
   const k = plateK(S);
   const c = S / 2;
-  const onPath = new Set(["", ...prefixesOf(state.focus)]);
+  const onPath = new Set(prefixesOf(state.focus));
   const cls = (p: Drop) => `${p.a === "" ? " centre" : ""}${onPath.has(p.a) ? " on" : ""}${p.a === state.focus ? " here" : ""}${p.a === "" || inLane(p.a) ? "" : " away"}`;
   const near = (p: Drop) => drops.filter((q) => q !== p && Math.abs(q.x - p.x) < p.r + q.r && Math.abs(q.y - p.y) < p.r + q.r);
   const cells = drops.map((p) => {
@@ -2980,11 +2980,14 @@ function plateSvg(W: number, H: number): string {
     const label = p.label && R >= 15 ? `<text class="label" x="${(c + p.x * k).toFixed(1)}" y="${(c + p.y * k).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(p.label, Math.floor((2 * R - 8) / 5.6)))}</text>` : "";
     return d ? `<g class="cell${cls(p)}" data-a="${esc(p.a)}" ${hued(p.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>` : "";
   });
-  // the way from the root to the focus, a thread through the droplets it passes, in the focus's own ink
-  const way = ["", ...prefixesOf(state.focus)].map((a) => drops.find((p) => p.a === a)).filter((p) => p !== undefined);
-  const thread = way.length > 1 ? `<polyline class="thread" ${hued(state.focus)} points="${way.map((p) => `${(c + p.x * k).toFixed(1)},${(c + p.y * k).toFixed(1)}`).join(" ")}"/>` : "";
   const ink = plateInk(S);
-  return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}${thread}</svg>`;
+  return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}</svg>`;
+}
+
+/** Pointing at a droplet lights the way to it from the root, cell by cell, where the other figures light the one alone. */
+function lightPlate(a: string | null): void {
+  const way = new Set(a === null ? [] : prefixesOf(a));
+  all<HTMLElement>("svg.plate .cell").forEach((el) => el.classList.toggle("trail", way.has(el.dataset.a!)));
 }
 
 // ## 3.11 The canvas: the path the reader has opened
@@ -4315,6 +4318,7 @@ function light(): void {
   document.body.classList.toggle("pointing", a !== null);
   all<HTMLElement>(".lit").forEach((el) => el.classList.remove("lit"));
   drawLaser();
+  lightPlate(a);
   if (a === null) return;
   const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`);
   exact.forEach((el) => el.classList.add("lit"));
@@ -6055,15 +6059,14 @@ svg.shape { cursor: grab; }
 svg.plate .cell { --c: var(--rest); }
 svg.plate .cell path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
 svg.plate .cell.centre { --c: var(--hub); }
-svg.plate .cell.on { --c: var(--door); }
-/* what is not in the lane is paled toward grey rather than to it, so every branch still reads by its hue; that wins
-   over the path, but never over where the reader stands */
+/* what is not in the lane is paled toward grey rather than to it, so every branch still reads by its hue */
 svg.plate .cell.away { --c: color-mix(in oklch, var(--rest) 60%, var(--grey)); }
+/* the way to where the reader stands is marked cell by cell, and the way to what they point at lights, over the paling */
+svg.plate .cell.on { --c: var(--door); }
 svg.plate .cell.here { --c: var(--on); }
-svg.plate .cell.lit { --c: var(--lit); }
+svg.plate .cell.trail, svg.plate .cell.lit { --c: var(--lit); }
 /* what the reader stands on and what they point at glow, so a droplet too small to read is still one the eye finds */
 svg.plate .cell.here path, svg.plate .cell.lit path { filter: drop-shadow(0 0 3px var(--c)); }
-svg.plate .thread { fill: none; stroke: var(--on); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; opacity: .55; pointer-events: none; }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
 svg.plate .cell.lit .label, svg.plate .cell.here .label { fill: var(--ground); }
 
