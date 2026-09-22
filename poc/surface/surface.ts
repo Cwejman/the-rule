@@ -2780,109 +2780,186 @@ function drawShapeCursor(): void {
 }
 
 // ## 3.10 The plate: the body, as droplets
+//
+// The plate is an agar plate: every brief a droplet, the root at the centre and
+// each level further out. A droplet is as large as its share of its level's
+// prose, and each level is given the room of its own ring, so the prose that
+// gathers deep in a body does not crowd the first levels to dots. The droplets
+// push each other apart and are drawn back to where the rings would lay them,
+// which keeps a branch together and siblings in reading order; where two still
+// press, each is cut at the line between them, so they flatten against each
+// other and never merge. It is solved once per index, still and with nothing
+// random in it, so the same body always lays the same plate.
 
-const PLATE = { gap: 2.6, floor: 7, round: 9 };
-
-/** The room between siblings at a depth, along the arc: wide between the root's branches, narrowing outward. */
-const sideGap = (d: number): number => [0, 14, 6, 3][d] ?? 2;
-
-type Drop = { a: string; r0: number; r1: number; a0: number; a1: number; more: boolean; label: string | null };
-
-/** Lays the body out radially inside a square of side `S`: sector by branch weight, ring by depth, every level to the rim. */
-function layoutPlate(S: number): { drops: Drop[]; rc: number } {
-  const ix = state.index!;
-  const D = Math.max(1, ix.depth);
-  const R = (S / 2) * 0.97;
-  const t = R / (D + 1);
-  const rc = t;
-  const ring = (d: number) => ({ r0: rc + (d - 1) * t + PLATE.gap / 2, r1: rc + d * t - PLATE.gap / 2 });
-  const full = (span: number) => span >= 2 * Math.PI - 1e-6;
-  // the plate shows the whole topology: no level is left undrawn, so the room between siblings and the floor a cell keeps
-  // both yield when a level is crowded, and cells go to slivers rather than away
-  const lay = (parent: string, a0: number, span: number, d: number): Drop[] => {
-    const kids = level(parent);
-    if (kids.length === 0 || d > D) return [];
-    const { r0, r1 } = ring(d);
-    const n = kids.length;
-    const gap = Math.min(sideGap(d) / r0, span / (3 * n));
-    const usable = span - (full(span) ? n : n - 1) * gap;
-    const floor = Math.min(Math.max(PLATE.floor, (r1 - r0) * 0.2) / r0, usable / n);
-    const angles = spread(
-      kids.map((k) => Math.max(1, ix.branch.get(k.address)!)),
-      usable,
-      floor,
-    );
-    const starts = offsets(angles, gap).map((x) => x + (full(span) ? gap / 2 : 0));
-    return kids.flatMap((k, i) => {
-      const chord = 2 * r0 * Math.sin(Math.min(Math.PI, angles[i]) / 2);
-      const drop: Drop = { a: k.address, r0, r1, a0: a0 + starts[i], a1: a0 + starts[i] + angles[i], more: false, label: chord > 40 && r1 - r0 > 15 ? k.title : null };
-      return [drop, ...lay(k.address, drop.a0, angles[i], d + 1)];
-    });
-  };
-  return { drops: lay("", -Math.PI / 2, 2 * Math.PI, 1), rc };
-}
-
-/** A droplet: an annular sector with rounded corners, or a full ring when the sector is whole. */
-function dropletPath(cx: number, cy: number, r0: number, r1: number, a0: number, a1: number, round: number): string {
-  const P = (r: number, a: number) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
-  const span = a1 - a0;
-  if (span >= 2 * Math.PI - 1e-6) {
-    const o = (r: number) => `M ${P(r, 0)} A ${r} ${r} 0 1 1 ${P(r, Math.PI)} A ${r} ${r} 0 1 1 ${P(r, 0)} Z`;
-    return `${o(r1)} ${o(r0)}`;
-  }
-  const rho = Math.max(0.5, Math.min(round, (r1 - r0) / 2, (r0 * span) / 2));
-  const d0 = rho / r0;
-  const d1 = rho / r1;
-  const large = (s: number) => (s > Math.PI ? 1 : 0);
-  return [
-    `M ${P(r0, a0 + d0)}`,
-    `A ${r0} ${r0} 0 ${large(span - 2 * d0)} 1 ${P(r0, a1 - d0)}`,
-    `Q ${P(r0, a1)} ${P(r0 + rho, a1)}`,
-    `L ${P(r1 - rho, a1)}`,
-    `Q ${P(r1, a1)} ${P(r1, a1 - d1)}`,
-    `A ${r1} ${r1} 0 ${large(span - 2 * d1)} 0 ${P(r1, a0 + d1)}`,
-    `Q ${P(r1, a0)} ${P(r1 - rho, a0)}`,
-    `L ${P(r0 + rho, a0)}`,
-    `Q ${P(r0, a0)} ${P(r0, a0 + d0)}`,
-    "Z",
-  ].join(" ");
-}
+/**
+ * gap: px between droplets; fill: the share of a ring its droplets take; even: how far sizes lean from prose toward
+ * the room its branch was given; floor: the least radius, px at the plate's side; most: the largest radius, as a
+ * share of a ring's width; ring and angle: how hard a droplet is drawn back into its ring and toward its angle at each
+ * step; settle: the last steps, in which droplets only push apart, so none is left inside another
+ */
+const PLATE = { gap: 1.6, fill: 0.72, even: 0.5, floor: 1.3, most: 0.65, ring: 0.15, angle: 0.04, steps: 260, settle: 60 };
 
 /** The largest extent the plate is drawn at, across or down. */
 const PLATE_SIDE = 260;
 
-/**
- * The extent of the plate's ink in a square of side `S`: the centre and every droplet, sampled along its arcs. A plate
- * is round only where the body is; a level that fills one side leaves the other empty, so the figure is cut to its ink.
- */
-function plateInk(S: number): { x: number; y: number; w: number; h: number } {
-  const { drops, rc } = layoutPlate(S);
-  const c = S / 2;
-  const xs = [c - rc, c + rc];
-  const ys = [c - rc, c + rc];
-  drops.forEach((d) => {
-    for (let i = 0; i <= 8; i++) {
-      const a = d.a0 + ((d.a1 - d.a0) * i) / 8;
-      [d.r0, d.r1].forEach((r) => (xs.push(c + r * Math.cos(a)), ys.push(c + r * Math.sin(a))));
-    }
-  });
-  const x = Math.min(...xs);
-  const y = Math.min(...ys);
-  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+/** A droplet, in the plate's own measure: the rim at radius one, the centre at the origin. */
+type Drop = { a: string; x: number; y: number; r: number; d: number; label: string | null };
+
+/** Where the rings would lay each brief: the middle of its ring, at the middle of its branch's share of the angle, which is the room it is given. */
+function seedPlate(ix: Index): Map<string, { d: number; angle: number; span: number }> {
+  const seeds = new Map<string, { d: number; angle: number; span: number }>();
+  const lay = (parent: string, a0: number, span: number, d: number): void => {
+    const kids = level(parent);
+    if (kids.length === 0) return;
+    const angles = spread(
+      kids.map((k) => Math.max(1, ix.branch.get(k.address)!)),
+      span,
+      Math.min(span / kids.length, 0.004),
+    );
+    offsets(angles, 0).forEach((start, i) => {
+      seeds.set(kids[i].address, { d, angle: a0 + start + angles[i] / 2, span: angles[i] });
+      lay(kids[i].address, a0 + start, angles[i], d + 1);
+    });
+  };
+  lay("", -Math.PI / 2, 2 * Math.PI, 1);
+  return seeds;
 }
 
+/** The angle from one to another, the short way round. */
+const turn = (from: number, to: number): number => Math.atan2(Math.sin(to - from), Math.cos(to - from));
+
 /**
- * The side of the square a plate is laid in for a room: its ink as large as the room and the plate's side allow. The
- * gaps between droplets keep their size as the plate scales, so the ink does not scale evenly, and it is settled in a
- * few steps at the size itself.
+ * The droplets of a body, settled. Each starts where the rings would lay it and is sized from its level's room; then,
+ * a fixed number of times and always in the same order, overlapping droplets push apart, each is drawn back into its
+ * ring and toward its angle, and a droplet's angle follows its parent's as the parent is pushed, so a branch moves as
+ * one. The root stands still at the centre.
  */
-const plateScale = (W: number, H: number): number => {
-  let S = 1000;
-  for (let i = 0; i < 5; i++) {
-    const ink = plateInk(S);
-    S *= Math.min(W / ink.w, H / ink.h, PLATE_SIDE / Math.max(ink.w, ink.h));
+function solvePlate(ix: Index): Drop[] {
+  const D = Math.max(1, ix.depth);
+  const t = 1 / (D + 1);
+  const seeds = seedPlate(ix);
+  const briefs = [...seeds.keys()];
+  const floor = PLATE.floor / ((PLATE_SIDE / 2) * 0.97);
+  const byDepth = Map.groupBy(briefs, (a) => seeds.get(a)!.d);
+  const radius = new Map<string, number>();
+  byDepth.forEach((as, d) => {
+    const room = PLATE.fill * Math.PI * (((d + 1) * t) ** 2 - (d * t) ** 2);
+    const total = as.reduce((s, a) => s + Math.max(1, ix.own.get(a)!), 0);
+    as.forEach((a) => {
+      // its prose's share of the level, leaning toward the room its branch was given, so a heavy branch of few briefs leaves no hole
+      const share = (1 - PLATE.even) * (Math.max(1, ix.own.get(a)!) / total) + (PLATE.even * seeds.get(a)!.span) / (2 * Math.PI);
+      radius.set(a, clamp(Math.sqrt((room * share) / Math.PI), floor, t * PLATE.most));
+    });
+  });
+  const root: Drop = { a: "", x: 0, y: 0, r: t * 0.94, d: 0, label: state.body!.title };
+  const drops: Drop[] = briefs.map((a) => {
+    const { d, angle } = seeds.get(a)!;
+    const rm = (d + 0.5) * t;
+    return { a, x: rm * Math.cos(angle), y: rm * Math.sin(angle), r: radius.get(a)!, d, label: brief(a)?.title ?? null };
+  });
+  const at = new Map(drops.map((p) => [p.a, p]));
+  const parent = drops.map((p) => at.get(parentOf(p.a)) ?? null);
+  const all = [root, ...drops];
+  for (let step = 0; step < PLATE.steps; step++) {
+    // overlapping droplets push apart, the lighter giving more; swept along x so only near pairs are met
+    const byX = [...all].sort((p, q) => p.x - p.r - (q.x - q.r) || (p.a < q.a ? -1 : 1));
+    for (let i = 0; i < byX.length; i++) {
+      const p = byX[i];
+      for (let j = i + 1; j < byX.length && byX[j].x - byX[j].r < p.x + p.r; j++) {
+        const q = byX[j];
+        const dx = q.x - p.x;
+        const dy = q.y - p.y;
+        const dist = Math.hypot(dx, dy) || 1e-9;
+        const over = p.r + q.r - dist;
+        if (over <= 0) continue;
+        const wp = p === root ? 0 : q === root ? 1 : (q.r * q.r) / (p.r * p.r + q.r * q.r);
+        p.x -= (dx / dist) * over * wp;
+        p.y -= (dy / dist) * over * wp;
+        q.x += (dx / dist) * over * (1 - wp);
+        q.y += (dy / dist) * over * (1 - wp);
+      }
+    }
+    // each is drawn back: into its ring, and toward its seed's angle as its parent has turned from its own; in the last
+    // steps only the rim holds them
+    const pull = step < PLATE.steps - PLATE.settle ? 1 : 0;
+    drops.forEach((p, i) => {
+      const seed = seeds.get(p.a)!;
+      const up = parent[i];
+      const want = seed.angle + (up ? turn(seeds.get(up.a)!.angle, Math.atan2(up.y, up.x)) : 0);
+      let rr = Math.hypot(p.x, p.y);
+      let angle = Math.atan2(p.y, p.x);
+      const lo = p.d * t + p.r;
+      const hi = Math.min(1 - p.r, (p.d + 1) * t - p.r);
+      rr += (lo <= hi ? (rr < lo ? lo - rr : rr > hi ? hi - rr : 0) : (lo + hi) / 2 - rr) * PLATE.ring * pull;
+      rr = Math.min(rr, 1 - p.r);
+      angle += turn(angle, want) * PLATE.angle * pull;
+      p.x = rr * Math.cos(angle);
+      p.y = rr * Math.sin(angle);
+    });
   }
-  return Math.floor(S);
+  return all;
+}
+
+/** The droplets of the body in view, solved once for each index. */
+let plateSolved: { index: Index; drops: Drop[] } | null = null;
+const plateDrops = (): Drop[] => {
+  if (plateSolved?.index !== state.index) plateSolved = { index: state.index!, drops: solvePlate(state.index!) };
+  return plateSolved.drops;
+};
+
+/**
+ * A droplet as drawn: its circle, cut at the line of equal pull between it and each droplet it meets, and rounded by a
+ * stroke of its own colour, so it is drawn a stroke smaller than it is and the stroke gives the size back with round
+ * corners. `k` scales the plate's measure to pixels around a centre at `c`.
+ */
+function dropletPath(p: Drop, near: Drop[], c: number, k: number): { d: string; round: number } {
+  const R = p.r * k;
+  const round = Math.min(2.4, R * 0.3);
+  // the gap narrows for a droplet smaller than it, so the least of them is a sliver and never nothing
+  const gap = Math.min(PLATE.gap, R * 0.5);
+  const cx = c + p.x * k;
+  const cy = c + p.y * k;
+  const n = clamp(Math.round(R * 2.5), 12, 64);
+  let poly = Array.from({ length: n }, (_, i) => [cx + (R - round) * Math.cos((2 * Math.PI * i) / n), cy + (R - round) * Math.sin((2 * Math.PI * i) / n)]);
+  near.forEach((q) => {
+    const dx = (q.x - p.x) * k;
+    const dy = (q.y - p.y) * k;
+    const dist = Math.hypot(dx, dy);
+    if (dist === 0 || dist >= R + q.r * k + gap) return;
+    const ux = dx / dist;
+    const uy = dy / dist;
+    // the power line: where the two circles pull equally, moved back by half the gap and the rounding
+    const s = (dist * dist + R * R - (q.r * k) ** 2) / (2 * dist) - gap / 2 - round;
+    const side = (v: number[]) => (v[0] - cx) * ux + (v[1] - cy) * uy - s;
+    poly = poly.flatMap((v, i) => {
+      const w = poly[(i + 1) % poly.length];
+      const sv = side(v);
+      const sw = side(w);
+      const cut = sv * sw < 0 ? [[v[0] + ((w[0] - v[0]) * sv) / (sv - sw), v[1] + ((w[1] - v[1]) * sv) / (sv - sw)]] : [];
+      return [...(sv <= 0 ? [v] : []), ...cut];
+    });
+  });
+  const d = poly.length < 3 ? "" : `M ${poly.map((v) => `${v[0].toFixed(1)} ${v[1].toFixed(1)}`).join(" L ")} Z`;
+  return { d, round };
+}
+
+/** The measure that turns the plate's own into pixels in a square of side `S`. */
+const plateK = (S: number): number => (S / 2) * 0.97;
+
+/** The extent of the plate's ink in a square of side `S`. A plate is round only where the body is, so the figure is cut to its ink. */
+function plateInk(S: number): { x: number; y: number; w: number; h: number } {
+  const k = plateK(S);
+  const c = S / 2;
+  const drops = plateDrops();
+  const x = Math.min(...drops.map((p) => c + (p.x - p.r) * k));
+  const y = Math.min(...drops.map((p) => c + (p.y - p.r) * k));
+  return { x, y, w: Math.max(...drops.map((p) => c + (p.x + p.r) * k)) - x, h: Math.max(...drops.map((p) => c + (p.y + p.r) * k)) - y };
+}
+
+/** The side of the square a plate is laid in for a room: its ink as large as the room and the plate's side allow. */
+const plateScale = (W: number, H: number): number => {
+  const ink = plateInk(1000);
+  return Math.floor(1000 * Math.min(W / ink.w, H / ink.h, PLATE_SIDE / Math.max(ink.w, ink.h)));
 };
 
 /** The width the plate stands in: its ink, drawn at the plate's side. */
@@ -2891,22 +2968,23 @@ const plateWidth = (): number => (state.index ? Math.ceil(plateInk(plateScale(In
 function plateSvg(W: number, H: number): string {
   const S = plateScale(W, H);
   if (S < 80) return "";
-  const { drops, rc } = layoutPlate(S);
+  const drops = plateDrops();
+  const k = plateK(S);
   const c = S / 2;
-  const onPath = new Set(prefixesOf(state.focus));
-  const cls = (d: Drop) => `${onPath.has(d.a) ? " on" : ""}${d.a === state.focus ? " here" : ""}${inLane(d.a) ? "" : " away"}`;
-  const cells = drops.map((d) => `<g class="cell${cls(d)}" data-a="${esc(d.a)}" ${hued(d.a)}><path d="${dropletPath(c, c, d.r0, d.r1, d.a0, d.a1, PLATE.round)}"/></g>`);
-  const labels = drops
-    .filter((d) => d.label)
-    .map((d) => {
-      const mid = (d.a0 + d.a1) / 2;
-      const rm = (d.r0 + d.r1) / 2;
-      const chord = 2 * d.r0 * Math.sin(Math.min(Math.PI, d.a1 - d.a0) / 2);
-      return `<text class="label${onPath.has(d.a) ? " on" : ""}${d.a === state.focus ? " here" : ""}" data-a="${esc(d.a)}" x="${(c + rm * Math.cos(mid)).toFixed(1)}" y="${(c + rm * Math.sin(mid)).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(d.label!, Math.floor((chord - 8) / 5.6)))}</text>`;
-    });
-  const centre = `<g class="cell centre${state.focus === "" ? " on" : ""}" data-a=""><circle cx="${c}" cy="${c}" r="${(rc - PLATE.gap / 2).toFixed(1)}"/><text class="label" x="${c}" y="${c}" text-anchor="middle" dominant-baseline="middle">${esc(trim(state.body!.title, Math.floor(rc / 3.4)))}</text></g>`;
+  const onPath = new Set(["", ...prefixesOf(state.focus)]);
+  const cls = (p: Drop) => `${p.a === "" ? " centre" : ""}${onPath.has(p.a) ? " on" : ""}${p.a === state.focus ? " here" : ""}${p.a === "" || inLane(p.a) ? "" : " away"}`;
+  const near = (p: Drop) => drops.filter((q) => q !== p && Math.abs(q.x - p.x) < p.r + q.r && Math.abs(q.y - p.y) < p.r + q.r);
+  const cells = drops.map((p) => {
+    const { d, round } = dropletPath(p, near(p), c, k);
+    const R = p.r * k;
+    const label = p.label && R >= 15 ? `<text class="label" x="${(c + p.x * k).toFixed(1)}" y="${(c + p.y * k).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(p.label, Math.floor((2 * R - 8) / 5.6)))}</text>` : "";
+    return d ? `<g class="cell${cls(p)}" data-a="${esc(p.a)}" ${hued(p.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>` : "";
+  });
+  // the way from the root to the focus, a thread through the droplets it passes, in the focus's own ink
+  const way = ["", ...prefixesOf(state.focus)].map((a) => drops.find((p) => p.a === a)).filter((p) => p !== undefined);
+  const thread = way.length > 1 ? `<polyline class="thread" ${hued(state.focus)} points="${way.map((p) => `${(c + p.x * k).toFixed(1)},${(c + p.y * k).toFixed(1)}`).join(" ")}"/>` : "";
   const ink = plateInk(S);
-  return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}${centre}${labels.join("")}</svg>`;
+  return `<svg class="fig plate" width="${Math.ceil(ink.w)}" height="${Math.ceil(ink.h)}" viewBox="${ink.x.toFixed(1)} ${ink.y.toFixed(1)} ${ink.w.toFixed(1)} ${ink.h.toFixed(1)}">${cells.join("")}${thread}</svg>`;
 }
 
 // ## 3.11 The canvas: the path the reader has opened
@@ -5973,15 +6051,21 @@ body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
 body.scrubbing, body.scrubbing #lane { user-select: none; -webkit-user-select: none; }
 svg.shape { cursor: grab; }
 
-svg.plate .cell path, svg.plate .cell circle { fill: var(--rest); }
-svg.plate .cell.centre circle { fill: var(--hub); }
-svg.plate .cell.on path { fill: var(--door); }
-svg.plate .cell.here path { fill: var(--on); }
-/* grey for anything not in the lane wins over the marks above, at every depth */
-svg.plate .cell.away path { fill: var(--grey); }
-svg.plate .cell.lit path, svg.plate .cell.lit circle { fill: var(--lit); }
+/* a droplet is filled and stroked in one colour, the stroke giving back the size its round corners took */
+svg.plate .cell { --c: var(--rest); }
+svg.plate .cell path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
+svg.plate .cell.centre { --c: var(--hub); }
+svg.plate .cell.on { --c: var(--door); }
+/* what is not in the lane is paled toward grey rather than to it, so every branch still reads by its hue; that wins
+   over the path, but never over where the reader stands */
+svg.plate .cell.away { --c: color-mix(in oklch, var(--rest) 60%, var(--grey)); }
+svg.plate .cell.here { --c: var(--on); }
+svg.plate .cell.lit { --c: var(--lit); }
+/* what the reader stands on and what they point at glow, so a droplet too small to read is still one the eye finds */
+svg.plate .cell.here path, svg.plate .cell.lit path { filter: drop-shadow(0 0 3px var(--c)); }
+svg.plate .thread { fill: none; stroke: var(--on); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; opacity: .55; pointer-events: none; }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
-svg.plate .label.lit, svg.plate .cell.lit .label, svg.plate .label.here { fill: var(--ground); }
+svg.plate .cell.lit .label, svg.plate .cell.here .label { fill: var(--ground); }
 
 .settings { width: 216px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .knobs { display: flex; gap: 12px; justify-content: center; }
