@@ -6034,20 +6034,32 @@ body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
 body.scrubbing, body.scrubbing #lane { user-select: none; -webkit-user-select: none; }
 svg.shape { cursor: grab; }
 
-/* a droplet is filled and stroked in one colour, the stroke giving back the size its round corners took */
-svg.plate .cell { --c: var(--rest); }
+/* a droplet is filled and stroked in one colour, the stroke giving back the size its round corners took. The plate's
+   tones stand close together in the vivid register rather than across the range from grey to vivid, so every branch
+   reads by its hue whatever its state: each tone's chroma sits just under what the weakest branch hue holds at its
+   lightness, which is the blue at the darker tones and the red at the lighter, so no branch shouts over another. Light
+   side, from the paled to the focus: 84% 0.075, 79% 0.1, 70% 0.115, 64% 0.11, 50% 0.085; the dark side mirrors them
+   against its own ground */
+svg.plate .cell {
+  --p-away: light-dark(oklch(84% 0.075 var(--h)), oklch(40% 0.066 var(--h)));
+  --p-rest: light-dark(oklch(79% 0.1 var(--h)), oklch(47% 0.08 var(--h)));
+  --p-on: light-dark(oklch(70% 0.115 var(--h)), oklch(56% 0.095 var(--h)));
+  --p-lit: light-dark(oklch(64% 0.11 var(--h)), oklch(65% 0.105 var(--h)));
+  --p-here: light-dark(oklch(50% 0.085 var(--h)), oklch(82% 0.09 var(--h)));
+  --c: var(--p-rest);
+}
 svg.plate .cell path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
 svg.plate .cell.centre { --c: var(--hub); }
-/* what is not in the lane is paled toward grey rather than to it, so every branch still reads by its hue */
-svg.plate .cell.away { --c: color-mix(in oklch, var(--rest) 60%, var(--grey)); }
+/* what is not in the lane is a step paler, and still its branch's hue */
+svg.plate .cell.away { --c: var(--p-away); }
 /* the way to where the reader stands is marked cell by cell, and the way to what they point at lights, over the paling */
-svg.plate .cell.on { --c: var(--door); }
-svg.plate .cell.here { --c: var(--on); }
-svg.plate .cell.trail, svg.plate .cell.lit { --c: var(--lit); }
+svg.plate .cell.on { --c: var(--p-on); }
+svg.plate .cell.here { --c: var(--p-here); }
+svg.plate .cell.trail, svg.plate .cell.lit { --c: var(--p-lit); }
 /* what the reader stands on and what they point at glow, so a droplet too small to read is still one the eye finds */
 svg.plate .cell.here path, svg.plate .cell.lit path { filter: drop-shadow(0 0 3px var(--c)); }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
-svg.plate .cell.lit .label, svg.plate .cell.here .label { fill: var(--ground); }
+svg.plate .cell.here .label { fill: var(--ground); }
 
 .settings { width: 216px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .knobs { display: flex; gap: 12px; justify-content: center; }
