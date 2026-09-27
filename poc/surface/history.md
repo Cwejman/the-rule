@@ -138,7 +138,7 @@ The filter is as true as the commits are, which is why [a commit is one purpose]
 
 #### 4.1.1 A story stands wherever any of its commits touched
 
-A story tells a stretch of time, not a place, so it holds whatever its run holds. From an address it stands if any of its commits touched there, and the commits of it that did not touch there fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
+A story tells a stretch of time, not a place, so it holds whatever its run holds. From where the reader stands, it stands if any of its commits touched there, and the commits of it that did not touch there fold into a count of how many stand elsewhere, so the run still reads unbroken and the story is seen to reach further than where the reader stands.
 
 *Preferred, the session's proposal taken by the author, 2026-09-21.*
 
@@ -168,7 +168,7 @@ Its data is fetched when the pane first stands and not before, so a reader who n
 
 ## 5. The data, in two tiers
 
-What a reader sees decides what is fetched. The canvas, the colouring and the filter by address span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
+What a reader sees decides what is fetched. The canvas, the colouring and the filter by where the reader stands span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
 
 Locally both are read on demand, each commit once, and kept by its hash, which never goes stale since a commit never changes. Published, the pipeline writes them as files beside the page, since a static host answers no query.
 
