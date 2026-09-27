@@ -8,7 +8,7 @@ status: in force
 
 The surface is one page the browser manages, and one TypeScript file run with Bun makes it, standing beside the entry as [`surface.ts`](surface.ts). Run against a path in a working tree, the file serves the page live and tells it when a file changes. Run once with a flag, it writes the page with the body inside, and that is all the pipeline does on each commit.
 
-Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters).
+Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters). Run with `--history`, it traces [the history](history.md) apart from the body, and prints its stories, their commits and its warnings, which is how a session reads back the story it has told.
 
 Either way the file reads [the stamped](README.md#2-what-it-is-handed) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
 
@@ -150,7 +150,9 @@ Whether the body is served to the page or written into it is the only difference
 
 ### 5.1 Live, the process serves and watches
 
-The process answers six requests: the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, the images the body holds, and history's [light tier](history.md#51-the-light-tier-is-had-whole) and [heavy tier](history.md#52-the-heavy-tier-is-had-a-commit-at-a-time), asked for apart from the body. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
+The process answers for the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, and the images the body holds.
+
+History is asked for apart from the body, in three requests of its own: its [light tier](history.md#51-the-light-tier-is-had-whole), its [heavy tier](history.md#52-the-heavy-tier-is-had-a-commit-at-a-time) and its [traced stories](history.md#26-it-is-handed-over-flat-as-the-body-is). The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
 
 An image is served only when the last trace reached it, so the process hands out nothing else under the path, and its address carries the file's modification time, so a changed image is fetched again rather than kept from before.
 
@@ -174,7 +176,7 @@ The page is written with the body inside it, in a script tag that holds data rat
 
 The browser never runs that tag, so nothing in a brief can become code. Every `<` in the JSON is written as `\u003c`, since a brief containing the closing tag would otherwise end it early. On start the client reads the tag if it is there, and asks the process for the body if it is not.
 
-A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). History is written beside the page and never inside it, [its two tiers](history.md#5-the-data-in-two-tiers) at the paths the live process answers at too. The pipeline clones the whole history for it, since a clone holds one commit unless told otherwise, and a clone of part of its history writes none rather than one that never happened. Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
+A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). History is written beside the page and never inside it, [its two tiers](history.md#5-the-data-in-two-tiers) and its traced stories at the paths the live process answers at too. The pipeline clones the whole history for it, since a clone holds one commit unless told otherwise, and a clone of part of its history writes none rather than one that never happened. Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
 
 The rule's own page is built this way on every commit to its main branch, by a workflow in `.github/workflows/pages.yml`, and served at [its GitHub Pages address](https://cwejman.github.io/the-rule/). The workflow runs the check first, so its warnings stand in the run, and ships the page whatever they say.
 
@@ -264,6 +266,18 @@ With the lane taken out of the middle it is kept laid out of sight rather than h
 
 *In force, 2026-09-18, as built; the pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
 
+#### 6.5.1 The history is the canvas over a world of its own
+
+[The history's pane](history.md#44-it-is-opened-as-a-pane-of-its-own) is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and its pane. While it draws or answers, its world is set in the state's place, and the body's is set back after.
+
+It answers a press, a key, a pointer or a wheel on its pane that way, and whatever the canvas leaves to a later frame re-enters the world that left it.
+
+Nothing of the canvas is written twice, and what the history needs of its own is small: a commit's face and figure, a fold that lays no lane, and the few acts that move on a map. The keys it takes are those, since the rest reach into a lane the history does not have. Its addresses are its own, so nothing the body lights reaches its rows, and nothing it lights reaches the body's.
+
+A map is fitted to its pane when it is first drawn, and again when the pane is given another width, unless the reader has moved it by hand.
+
+*In force, 2026-09-27, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state.*
+
 ### 6.6 What the browser keeps
 
 Three things outlive a draw, and none of them is in the address, so that the address says only where a reader stands. The settings are kept in the browser's storage, once for every body.
@@ -312,7 +326,7 @@ Git could carry the files, and it is not used for that, because the surface want
 
 A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and three things make it the harder road here. It carries commits and not the working tree, so a live reading would lag behind a session's writing until the next commit. A static host serves no smart HTTP, and the client cannot read a `.git` folder served as plain files. And it brings a library, a filesystem in the browser, and a clone of the whole repository where the surface wants only the stamped files under one path.
 
-*Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day. The CLI road taken for history, 2026-09-21.*
+*Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day. The CLI road taken for history, 2026-09-21, and for the runs its stories tell, read by git's own descent, 2026-09-27.*
 
 ## 10. What is not settled yet
 
