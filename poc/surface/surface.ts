@@ -3586,14 +3586,24 @@ function drawCanvas(): void {
     fitCanvas();
     fitted = state.body.root;
     fittedWidth = ui.canvas.clientWidth;
-    // a map fitted again stood at its top, so the reader's place is brought back into view rather than left behind
-    followed = null;
+    // a map fitted again stands at its top, so the reader's place is brought back into view once the width has
+    // settled, rather than left behind, and rather than eased back between every step of a resize or a turned knob
+    refollow();
   }
   applyView(false);
   // the map is wider than the pane, so the reading's own place is brought into view when it moves; a draw that only
   // opened something leaves the view to the opening, which brings its own column in
   followFocus();
   drawEdges();
+}
+
+/** The timers that bring each map's reader back to their place once its width has settled, one per world. */
+const refollowing = new Map<World | null, ReturnType<typeof setTimeout>>();
+function refollow(): void {
+  const w = inside;
+  clearTimeout(refollowing.get(w));
+  const back = () => ((followed = null), followFocus());
+  refollowing.set(w, setTimeout(() => (w ? inWorld(w, back) : back()), 200));
 }
 
 /** The lines: the nesting within each file, and the opening from a row to the head of the reading it named. */
@@ -3960,7 +3970,7 @@ const frame = (fn: () => void): void => {
 
 /** The history's world, empty until the pane first stands; and the light tier its leaves are told from. */
 const pastWorld: World = { body: null, index: null, folds: new Map(), focus: "", scope: "", pointed: null, picked: null, onHead: false, opened: [], view: { x: 24, y: 24, k: 1 }, fitted: null, fittedWidth: 0, followed: null, panned: false, waysLaidFor: null, colOf: new Map(), el: null };
-const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, commits: new Map<string, Commit>() };
+const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, away: true, commits: new Map<string, Commit>() };
 
 /** Whether the map being drawn is the history's. */
 const inPast = (): boolean => inside === pastWorld;
@@ -4001,10 +4011,13 @@ async function loadPast(): Promise<void> {
 
 /** Draws the history's pane: the map of its stories and commits once it has them, and a word while it has not. */
 function drawHistory(): void {
-  if (ui.history.hidden) return;
+  if (ui.history.hidden) return void (past.away = true);
+  // a failure is tried again when the pane is opened again, which on a published page is the only change there is
+  if (past.away && past.status === "failed") past.stale = true;
+  past.away = false;
   // the pane is the world's from the first draw, so a wheel or a drag on it while it loads has somewhere to act
   if (!pastWorld.el) pastWorld.el = ui.history;
-  // read when first asked for, and again after a change or a failure; the map already drawn stays while it is
+  // read when first asked for, and again after a change or a failure met anew; the map already drawn stays while it is
   if (past.status === "none" || (past.stale && past.status !== "loading")) void loadPast();
   if (!pastWorld.body) return void (ui.history.innerHTML = `<p class="none chrome">${past.status === "failed" ? `no history: ${esc(past.said)}` : "reading the history…"}</p>`);
   inWorld(pastWorld, () => {
@@ -5688,7 +5701,7 @@ function wire(): void {
       // the ground of either map is dragged, each moving its own view
       const world = cv === ui.history ? pastWorld : undefined;
       const v = world ? world.view : view;
-      drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: v.x, vy: v.y, moved: false, world };
+      if (!world || world.body) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: v.x, vy: v.y, moved: false, world };
     }
     // the capture is taken on the area rather than on what the press landed on, since a redraw between the press and
     // its release would detach that element and the release would never reach the page
@@ -5823,6 +5836,8 @@ function wire(): void {
       (e) => {
         e.preventDefault();
         hideTip();
+        // a map not yet read has nothing to move, and a move made then would count as the reader's own
+        if (world && !world.body) return;
         const move = () => {
           // moving the map by hand is going looking: from here the reading no longer drags the view back
           panned = true;
@@ -5849,6 +5864,7 @@ function wire(): void {
     el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
     el.addEventListener("gesturechange", (e) => {
       e.preventDefault();
+      if (world && !world.body) return;
       const g = e as Event & { scale: number; clientX: number; clientY: number };
       const zoom = () => zoomAt(g.clientX, g.clientY, g.scale / pinch);
       if (world) inWorld(world, zoom);
