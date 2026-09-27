@@ -6,11 +6,11 @@ status: in force
 
 # Five areas, and what stands in them
 
-The lane is one of five areas in a row: a wing, a gutter, the lane, a gutter, a wing. The gutters hold what stands beside a brief, aligned with it and scrolling with it. The wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own. A reader chooses what each area shows from a light row of icons at its foot, and settings are a figure like any other.
+Five areas stand in a row: a wing, a gutter, the middle, a gutter, a wing. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, aligned with it and scrolling with it. The wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own. One light row of icons at the page's foot chooses what each holds.
 
 That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it could hold more than the lane.*
 
 ## 1. Three kinds of widget
 
@@ -20,13 +20,13 @@ An adjunct stands in a gutter. Given a brief in the lane, read from the shared s
 
 A figure stands in a wing. Given the body and the shared state, it returns a drawing that stands on its own: the tree, the shape beneath the focus, the lane as laid, the body whole. It never touches the prose.
 
-A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), which is the canvas drawing the history instead of the body. Each draws itself from the shared state through its own functions, and all act through the same verbs.
+A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), the stories told over git's commits, drawn by the canvas's code. The three that are not the lane are maps. Each pane draws itself from the shared state through its own functions, and all act through the same verbs.
 
 *Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22 and the history 2026-09-27.*
 
 ## 2. The areas
 
-Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders, the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
+Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim a map keeps](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
 
 ![A row of five areas across the page: a narrow wing on the left holding small bars and blocks with a shaded viewport over them, an empty gutter, a wide lane of grey prose lines with one coloured link in its third line, a gutter holding a short note level with that link, and a narrow wing on the right holding bars and a framed block; a thin rule beneath each area and its name under the rule, lane in bold](.img/areas.svg)\
 The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5-links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4-the-ahead) in the right wing.
@@ -61,7 +61,31 @@ Any area empties by hand, from [the strip](#3-the-strip), where a widget is cycl
 
 *Reasoned, the author's, 2026-09-13; the cycle, 2026-09-16.*
 
-### 2.5 Giving way
+### 2.5 What an area holds
+
+A wing holds up to two figures, one at its top and one at its foot. A figure of fixed size, [the plate](widgets.md#7-the-plate) or [the settings](widgets.md#6-settings), takes only the height it needs; a figure that grows, the shape, [the tree](widgets.md#2-the-tree) or the ahead, takes what is left, shared evenly when both grow. A gutter holds one adjunct. Nothing nests further, splits, or is dragged.
+
+*Reasoned, the author's, 2026-09-13; the second figure the author's ask of 2026-09-14.*
+
+### 2.6 The middle holds one pane or two
+
+With four panes there is room to read two of them side by side and no more, so the middle has two sides: a pane stands at its left or at its right, and a lone pane takes the whole of it. Any two may stand together, so the reading need not be one of them, and the middle is never empty: the last pane cannot be taken away.
+
+Where the lane stands it keeps its measure and a map beside it takes what is left, no narrower than a floor; the canvas and the history take no more than a setting, their greatest width, so a wide screen keeps its space around the row of areas. Two maps share the middle evenly.
+
+The gutters belong to the lane and stand only beside it, wherever in the middle it stands, and the wings do not care what the middle holds.
+
+*The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22.*
+
+### 2.7 The keys belong to one pane, and its rim says which
+
+A key names no place, so where two panes stand the page decides which of them a key acts on, and the reader's hand says it: the keys belong to the pane at the left, and to the pane at the right while the pointer rests on it, back to the left when it leaves. The dish has no act a key could fire, so it never holds them, and they stay with the other.
+
+A map keeps a quiet rim, the one border the page draws, since it is moved by hand and needs an edge to be moved within; the lane keeps none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
+
+*The author's, 2026-09-27; that the dish passes the keys on and that the lane has no rim to ink are the session's. It supersedes the keys belonging to the map whenever it stood, 2026-09-19, which held while only one map could stand.*
+
+### 2.8 Giving way
 
 As the screen narrows the areas give way in one order: the pane beside the lane first, or where no lane stands the pane at the right, then the gutters as a pair, then the right wing, then the left, until one pane stands alone.
 
@@ -73,33 +97,11 @@ The order has one exception at its end, and it is written where it was found: wh
 
 *Reasoned, the author's, 2026-09-13; the canvas first, 2026-09-15, since the lane is the reading, and any pane beside it first, 2026-09-27, when the middle took sides. The exception is a trial, 2026-09-16, and waits on the author's word before it is written in here.*
 
-### 2.6 What an area holds
-
-A wing holds up to two figures, one at its top and one at its foot. A figure of fixed size, [the plate](widgets.md#7-the-plate) or [the settings](widgets.md#6-settings), takes only the height it needs; a figure that grows, the shape, [the tree](widgets.md#2-the-tree) or the ahead, takes what is left, shared evenly when both grow. A gutter holds one adjunct. Nothing nests further, splits, or is dragged.
-
-*Reasoned, the author's, 2026-09-13; the second figure the author's ask of 2026-09-14.*
-
-### 2.7 The middle holds one pane or two
-
-The middle has two sides, and a pane stands on one of them: at most two panes, one at the left and one at the right, and a lone pane takes the whole middle. Any two of the four may stand together, so the reading need not be one of them, and the middle is never empty: the last pane cannot be taken away.
-
-Where the lane stands it keeps its measure and the other pane takes what is left, no narrower than a floor; the canvas and the history take no more than a setting, their greatest width, so a wide screen keeps its space around the row. Two maps share the middle evenly. The gutters belong to the lane and stand only beside it, on whichever side it stands, and the wings do not care what the middle holds.
-
-*The author's, 2026-09-27, when the dish had made three panes and the history was to make four: two sides rather than one order of every pane asked for. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22.*
-
-### 2.8 The keys belong to one pane, and its rim says which
-
-Two panes standing, the keys belong to one of them: the pane at the left, and the pane at the right while the pointer rests on it, back to the left when it leaves. A pane that takes no keys, the dish, never holds them, and they stay with the other.
-
-Which pane holds them is part of [the shared state](#4-one-shared-state-and-four-verbs), and the page shows it, since a key that acts somewhere the reader cannot see is a key that does nothing where they meet it: the pane holding the keys draws its rim in ink, and the other keeps its quiet rim. A lone pane draws no difference, since there is nothing to tell apart.
-
-*The author's, 2026-09-27; that the dish passes the keys on is the session's, since it has no act a key could fire. It supersedes [the keys belonging to the map while it stands](canvas.md#52-the-moves-are-each-panes-own), 2026-09-19, which held while only one map could stand.*
-
 ## 3. The strip
 
 One row of icons stands at the foot of the page, centred, holding every choice once: the panes first, then the adjuncts, then the figures, three groups spaced apart by room alone. A reader's question at the foot is one question, what stands around the reading, so it is asked in one place rather than in five.
 
-An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A side the width cannot hold is stepped over rather than offered, so a press never sends a widget where it would not stand, and what the next press will do is said on pointing. A pane cycles through the middle's sides in the same way, and [gives back what it pushed out](#32-a-pane-gives-back-what-it-pushed-out). A widget in use carries a dot beside its icon, at the side that holds it and level with the middle of it, so the row shows the whole arrangement at a glance; a lone pane carries none, since it has no side.
+An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A side the width cannot hold is stepped over rather than offered, so a press never sends a widget where it would not stand, and what the next press will do is said on pointing. A pane cycles through the middle's sides in the same way, and [gives back what it pushed out](#32-a-pane-gives-back-what-it-pushed-out). A widget in use carries a dot beside its icon, at the side that holds it and level with the middle of it, so the row shows the whole arrangement at a glance; a lone pane takes the whole middle and carries none.
 
 The row stands where the middle stands, which is always, so no choice is ever out of reach at any width.
 
@@ -117,21 +119,25 @@ Every choice is always drawn, so the row never changes length as the screen does
 
 A side of the middle holds one pane, so a pane pressed onto a side pushes out what stood there, and the next press gives it back. The first press stands the pane at the left, and what stood at the left steps out. The second moves it to the right: what stood at the left comes back, and what stood at the right steps out. The third takes it away, and what stood at the right comes back.
 
-So pressing twice puts a pane beside what the reader had rather than in place of it, and nothing a press pushed out is lost to the next one. A lone pane moves to the right only where something it pushed out can come back to the left, and is otherwise the last pane, which cannot be taken away.
+So pressing twice puts a pane beside what the reader had rather than in place of it, and nothing a press pushed out is lost to the next one.
 
-*The author's, 2026-09-27; what a lone pane does, and that a pane whose memory is gone with a reload trades places with the other rather than leaving the left empty, are the session's.*
+A lone pane pressed moves to the right where what it pushed out can come back to the left; where nothing can, it is the last pane, and the press does nothing. What a press pushed out is kept while the page is open, and a pane pressed at the left after a reload has nothing to give back, so it trades places with the pane beside it rather than leave a side empty.
+
+*The author's, 2026-09-27; what a lone pane does and what a reload forgets are the session's.*
 
 ## 4. One shared state, and four verbs
 
 Every widget reads one state and nothing else, and acts through the same four verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, [the pane holding the keys](#28-the-keys-belong-to-one-pane-and-its-rim-says-which), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
 
 Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 
 Everything drawn that names a brief carries that brief's address. That one convention is what keeps the widgets in step: pointing at a brief in any of them lights it in all of them, and pressing it anywhere goes.
 
-*Reasoned, carried from [the first program](README.md#6-the-programs-before-this-one), 2026-09-12.*
+The history is the one second state, and it is held apart on purpose. Its stories and commits are not the body's briefs, so it keeps a state of its own, [a world](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) that stands in this one's place while the history is drawn, and its addresses light only on its own map. What a pane press pushed out is kept beside the state as well, since it is a memory of the strip's and nothing reads it but the next press.
+
+*Reasoned, carried from [the first program](README.md#6-the-programs-before-this-one), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built.*
 
 ### 4.1 Every act is one entry in one table
 

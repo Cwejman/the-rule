@@ -158,7 +158,7 @@ The link itself is underlined in its target's branch hue, so the colour says whe
 
 This is what lets looking be free without [an overlay](refused.md#j-an-overlay-at-all). Everything an overlay told about a link now stands beside the link, and everything it told about a brief stands in the lane or in the wings.
 
-As the width tightens [the gutter narrows](framework.md#25-giving-way) rather than moving anywhere, so what stands beside a link stays beside it, and only the opening words are cut shorter to keep the column a column.
+As the width tightens [the gutter narrows](framework.md#28-giving-way) rather than moving anywhere, so what stands beside a link stays beside it, and only the opening words are cut shorter to keep the column a column.
 
 *Reasoned, the author's, 2026-09-13; the narrowing the author's ask of 2026-09-16, which retired a figure that carried these into the wing as a list for the brief in focus.*
 
@@ -196,7 +196,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
 
-At the middle's size it is [the dish](framework.md#27-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate is seen a cell per brief.
+At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate is seen a cell per brief.
 
 *Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 

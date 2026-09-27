@@ -150,7 +150,7 @@ The history is drawn down the column, as any reading is, so the canvas stays one
 
 ### 4.4 It is opened as a pane of its own
 
-The history is [a pane of the middle](framework.md#27-the-middle-holds-one-pane-or-two), chosen from the strip as the lane, the canvas and the dish are, and it is the canvas drawing the history rather than the body. So it stands beside the lane, or beside the canvas of the body, and the reader moves in it as they move on any map.
+The history is [a pane of the middle](framework.md#26-the-middle-holds-one-pane-or-two), chosen from the strip as the lane, the canvas and the dish are, and it is the canvas drawing the history rather than the body. So it stands beside the lane, or beside the canvas of the body, and the reader moves in it as they move on any map.
 
 Its data is fetched when the pane first stands and not before, so a reader who never opens it never pays for it.
 

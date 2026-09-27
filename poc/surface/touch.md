@@ -18,7 +18,7 @@ Three things a phone takes away, and each one moves a rule rather than only a si
 
 What it does not take away is the reading. The lane stands as it stands, and the rail beside it is what a reader orients by.
 
-The page reads which grain it is in from two facts and nothing else: whether the reader has a finger rather than a pointer, which the browser says and which also means no keyboard, and whether the width has given every area away, which the areas already reckon as they [give way](framework.md#25-giving-way). So a narrow window on a desk keeps its keys and its caps, and a phone loses both.
+The page reads which grain it is in from two facts and nothing else: whether the reader has a finger rather than a pointer, which the browser says and which also means no keyboard, and whether the width has given every area away, which the areas already reckon as they [give way](framework.md#28-giving-way). So a narrow window on a desk keeps its keys and its caps, and a phone loses both.
 
 *The author's, 2026-09-16, in discussion; the two facts the session's, as built the same day.*
 
@@ -130,7 +130,7 @@ The middle holds one pane where the lane stands alone, so pressing a pane sets i
 
 Coming back to the prose settles it at the brief the reader stands on. The lane is laid out of sight while they are away, so its scroll says nothing when it comes back, and without settling it the reader arrived at a place they had not chosen with nothing lit as the brief they had.
 
-*As built, 2026-09-16, from [the middle's rule](framework.md#27-the-middle-holds-one-pane-or-two) read at a width that holds one; the settling on the author's reading, who chose a brief on the canvas and came back to the prose to find it elsewhere and everything dim.*
+*As built, 2026-09-16, from [the middle's rule](framework.md#26-the-middle-holds-one-pane-or-two) read at a width that holds one; the settling on the author's reading, who chose a brief on the canvas and came back to the prose to find it elsewhere and everything dim.*
 
 ### 4.4 The canvas takes the page whole
 
@@ -280,7 +280,7 @@ A badge that cannot be taken is not drawn at all. It keeps its room on a desk so
 
 ## 9. What this asks of the framework
 
-A phone holds the lane and one narrow rail, and [the order of giving way](framework.md#25-giving-way) says the wings go before the lane stands alone. So the order needs an exception: a narrow reading keeps one narrow figure where the reader has asked for one.
+A phone holds the lane and one narrow rail, and [the order of giving way](framework.md#28-giving-way) says the wings go before the lane stands alone. So the order needs an exception: a narrow reading keeps one narrow figure where the reader has asked for one.
 
 It is built as the last step of that order: the wings give way, then the gutters, and then, instead of the lane standing alone, the shape comes back as the rail. It undoes a rule the author set, so it stands here as a trial, and the framework points at it rather than being written again.
 

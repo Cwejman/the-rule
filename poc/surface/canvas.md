@@ -180,7 +180,7 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 ### 5.2 The moves are each pane's own
 
-Which pane the keys belong to is [the framework's to say](framework.md#28-the-keys-belong-to-one-pane-and-its-rim-says-which): the pane at the left, or the one at the right while the pointer rests on it, and its rim says which. Where they belong to the map, these are the moves.
+Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which): the pane at the left, or the one at the right while the pointer rests on it, and its rim says which. Where they belong to the map, these are the moves.
 
 Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so. The keys then belonged to the map whenever it stood, which held while one map could stand; with two sides and four panes, the rim is what tells the reader where the keys are.
 
