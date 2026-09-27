@@ -184,7 +184,7 @@ The rule's own page is built this way on every commit to its main branch, by a w
 
 ## 6. How it is drawn
 
-The page draws from [the shared state](framework.md#4-one-shared-state-and-four-verbs) and nothing else, and every change to one part of it draws again only what depends on that part. So nothing is drawn twice for one change, and nothing drawn can disagree with the state.
+The page draws from [the shared state](framework.md#4-one-shared-state-and-a-few-verbs) and nothing else, and every change to one part of it draws again only what depends on that part. So nothing is drawn twice for one change, and nothing drawn can disagree with the state.
 
 *In force, the author's decision, 2026-09-13.*
 
@@ -256,13 +256,13 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-one-shared-state-and-four-verbs), and both are kept in the browser with the view.
+The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-one-shared-state-and-a-few-verbs), and both are kept in the browser with the view.
 
 Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
 Pan and zoom are one transform on the stage, which the browser composites without laying anything out again, and the type scales with it. The wheel pans, and a pinch, which arrives as a wheel with the control key, zooms about the pointer. A drag on the ground pans, a press on a row selects it, and a press again on what is selected goes there. A view fits the map when it is first drawn, and again when its pane is given another width, unless the reader has moved it by hand, since a map fitted to a pane that has since halved runs off its edge; after that an opening eases the reading it opened into the pane and nothing else moves.
 
-With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from the canvas alone.
+With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from a map alone.
 
 *In force, 2026-09-18, as built; what stands open moved into the shared state 2026-09-19, and the fit at another width, 2026-09-27. The pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
 
