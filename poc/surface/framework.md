@@ -6,9 +6,9 @@ status: in force
 
 # Five areas, and what stands in them
 
-Five areas stand in a row: a wing, a gutter, the middle, a gutter, a wing. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, aligned with it and scrolling with it. The wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own. One light row of icons at the page's foot chooses what each holds.
+Five areas stand in a row: a wing at either edge, the middle between them, and a gutter at either side of the lane, wherever in the middle it stands. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, and the wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own.
 
-That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
+One light row of icons at the page's foot chooses what each holds. That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
 
 *Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it had two sides and the lane need not stand in it.*
 
@@ -26,7 +26,7 @@ A pane stands in the middle, and there are four: the lane, which is the reading;
 
 ## 2. The areas
 
-Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim a map keeps](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
+Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim the canvas and the history keep](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
 
 ![A row of five areas across the page: a narrow wing on the left holding small bars and blocks with a shaded viewport over them, an empty gutter, a wide lane of grey prose lines with one coloured link in its third line, a gutter holding a short note level with that link, and a narrow wing on the right holding bars and a framed block; a thin rule beneath each area and its name under the rule, lane in bold](.img/areas.svg)\
 The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5-links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4-the-ahead) in the right wing.
