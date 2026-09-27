@@ -128,7 +128,7 @@ As built it is [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own) showin
 
 ### 4.1 Only the commits that touch where you stand
 
-Opening the history from an address shows only the commits that touched it, and the stories that hold them. For a reading, that is read from the files each commit touched; for a brief selected within it, from the briefs each commit touched. A commit that touched several readings is among the commits of each.
+Where the reader stands, the history shows only the commits that touched it, and the stories that hold them. For a reading, that is read from the files each commit touched; for a brief selected within it, from the briefs each commit touched. A commit that touched several readings is among the commits of each.
 
 Now that the history is a pane chosen from the strip rather than opened from an address, where it takes that address from is [open](#7-what-this-leaves-open).
 
