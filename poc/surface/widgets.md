@@ -196,17 +196,17 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge, each level a ring around the one inside it. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
 
+Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger).
+
 At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16.*
 
 ### 7.1 A cell's room is how many stand beneath it
 
 A cell's share of its parent's edge is how many cells stand beneath it, and each ring's area follows how many cells it holds, so a crowded level has the room it needs and a level of few is not drawn as a band of wide slabs. The room between two cells is their kinship's: a hairline within a file, more between two files, most between two branches.
 
 It is laid once for each body, still and with nothing random in it, so the same body always lays the same plate.
-
-Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place.
 
 *As built, 2026-09-22. It replaced, the same day, a trial of droplets pushed apart and drawn back to their rings, and with it the plate of 2026-09-12, droplets cut by their neighbours; why the trial gave way was said in talk and is not written, and the session that writes this did not hear it.*
 
