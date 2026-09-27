@@ -20,7 +20,7 @@ An adjunct stands in a gutter. Given a brief in the lane, read from the shared s
 
 A figure stands in a wing. Given the body and the shared state, it returns a drawing that stands on its own: the tree, the shape beneath the focus, the lane as laid, the body whole. It never touches the prose.
 
-A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), the stories told over git's commits, drawn by the canvas's code. The three that are not the lane are maps. Each pane draws itself from the shared state through its own functions, and all act through the same verbs.
+A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), the stories told over git's commits, drawn by the canvas's code. The three that are not the lane are maps. Each pane is drawn from the shared state, the history by the canvas's own functions, and all act through the same verbs.
 
 *Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22 and the history 2026-09-27.*
 
@@ -51,7 +51,7 @@ The gap setting is the least a space is given, and what the width leaves over is
 
 ### 2.3 A wing's figures reach as far as the prose
 
-Vertically a wing's figures reach no further up or down than the prose does. They stand between the middles of the lane's fades at its top and its foot, so they follow [the fade setting](#5-settings-are-data-and-a-figure-edits-them), keeping at least a gap at the top and the strip's room at the foot, with one gap between two figures.
+Vertically a wing's figures reach no further up or down than the prose does. They stand between the middles of the lane's fades at its top and its foot, so they follow [the fade setting](#5-settings-are-data-and-a-figure-edits-them), keeping at least a gap at the top and the room of [the strip](#3-the-strip) at the foot, with one gap between two figures.
 
 *Reasoned, the author's, 2026-09-14.*
 
