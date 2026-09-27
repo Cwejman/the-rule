@@ -13,7 +13,7 @@ It is read as [the surface's history](poc/surface/history.md) says, and never pl
 
 ## History's foundation is laid, data first
 
-On 2026-09-21 the author took up git again, four days after [the first attempt](ideas/history.md) was taken out, and asked that the foundation be laid properly this time. The day designed the history as a reading of its own, built both tiers of its data and measured them, and read the design cold six times until a round changed only words. Nothing of it was drawn.
+On 2026-09-21 the author took up git again, four days after [the first attempt](ideas/history.md) was taken out, and asked that the foundation be laid properly this time. The day designed the history as a reading of its own, built both tiers of its data and measured them, and read the design cold six times. Nothing of it was drawn.
 
 *Reasoned from the commits and the briefs they wrote by a later session, 2026-09-27, and not seen; the session that did the work told no story, since the practice of telling one was written that day.*
 
@@ -27,9 +27,9 @@ With the rounds done, the practice said the history's file is unplaced by design
 
 ### Six rounds of fresh heads
 
-The design was read cold by a session holding only the rule and the draft, and written again from what it found, six times. The rounds settled that the history belongs to the root the surface is handed, that a story's links together are one run, that an untold commit's parent is the history's own brief, and that the history never retires, which was the author's word. The last round changed only words, and wrote what comes next.
+The design was read cold by a session holding only the rule and the draft, and written again from what it found, six times. The rounds settled that the history belongs to the root the surface is handed, that a story's links together are one run, that an untold commit's parent is the history's own brief, and that the history never retires, which was the author's word. The last round wrote what comes next.
 
-The practice and the implementation were brought along with each round: a commit is one purpose rather than one piece, a record may hold holons, a lone link places a commit, and both tiers are taken up by the git CLI.
+The practice and the implementation were brought along with the rounds: a commit is one purpose rather than one piece, a record may hold holons, a lone link places a commit, and both tiers are taken up by the git CLI.
 
 [Six rounds of fresh heads](git:cad337e..e18acf8)
 
