@@ -10,7 +10,7 @@ Five areas stand in a row: a wing, a gutter, the middle, a gutter, a wing. The m
 
 That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
 
-*Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it could hold more than the lane.*
+*Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it had two sides and the lane need not stand in it.*
 
 ## 1. Three kinds of widget
 
@@ -81,7 +81,7 @@ The gutters belong to the lane and stand only beside it, wherever in the middle 
 
 A key names no place, so where two panes stand the page decides which of them a key acts on, and the reader's hand says it: the keys belong to the pane at the left, and to the pane at the right while the pointer rests on it, back to the left when it leaves. The dish has no act a key could fire, so it never holds them, and they stay with the other.
 
-A map keeps a quiet rim, the one border the page draws, since it is moved by hand and needs an edge to be moved within; the lane keeps none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
+A map keeps a quiet rim, the one border the page draws, since it is moved by hand and needs an edge to be moved within; the lane keeps none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see, which is what the keys did until 2026-09-19, acting in the pane the reader had last acted in and moving the prose under a reader who had pressed an arrow on the map. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
 
 *The author's, 2026-09-27; that the dish passes the keys on and that the lane has no rim to ink are the session's. It supersedes the keys belonging to the map whenever it stood, 2026-09-19, which held while only one map could stand.*
 
@@ -151,7 +151,7 @@ An entry also says whether its act can be taken at all, so a badge for an act ou
 
 The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6-settings), which is a wing widget like any other.
 
-The type: the zoom on the prose, the ratio by which each heading register grows over the body, the height of the prose's lines, and the lane's measure. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), and the fade at the edges. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. The middle: the greatest width a map takes. And the widget of each area, which by default is the shape in the left wing, nothing in the left gutter, the links in the right gutter and the ahead in the right wing.
+The type: the zoom on the prose, the ratio by which each heading register grows over the body, the height of the prose's lines, and the lane's measure. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), and the fade at the edges. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. The middle: the greatest width the canvas and the history take. And the widget of each area, which by default is the shape in the left wing, nothing in the left gutter, the links in the right gutter and the ahead in the right wing.
 
 *Reasoned, the author's, 2026-09-13; that headings scale by depth departs from [the design language's register rule](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice), at the author's ask.*
 
