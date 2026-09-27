@@ -1173,9 +1173,11 @@ type Index = {
 type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
-/** The panes the middle can hold, in the order they stand: the canvas at the left, the lane between, the dish at the right, so the reading stands between its two maps. */
-const PANES = ["canvas", "lane", "dish"] as const;
+/** The panes the middle can hold. It has two sides, and a pane stands on one of them: at most two, the first at the left. */
+const PANES = ["lane", "canvas", "dish"] as const;
 type PaneName = (typeof PANES)[number];
+/** A map among the panes, the one that holds no prose: it is what gives way beside the lane, and what the keys move on. */
+const isMap = (p: string): boolean => p !== "lane";
 /** The least width the canvas stands in beside the lane; narrower, it gives way. */
 const CANVAS_MIN = 360;
 type Theme = "light" | "dark" | "system";
@@ -1224,7 +1226,7 @@ type Settings = {
   tree: "spine" | "thread";
   /** whether the face of what is selected on the canvas stands beside it */
   face: "shown" | "hidden";
-  /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle its panes, never none */
+  /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle a pane or two, left then right, never none */
   areas: Record<AreaName, string[]>;
 };
 
@@ -2152,8 +2154,9 @@ const AREAS: { name: AreaName; kind: Widget["kind"] }[] = [
   { name: "gutterR", kind: "adjunct" },
   { name: "wingR", kind: "figure" },
 ];
-/** The panes the middle holds, in their fixed order. */
-const panesHeld = (held: string[] = state.settings.areas.middle): PaneName[] => PANES.filter((p) => held.includes(p));
+/** The panes the middle holds, the left first: any pane at most once, and two at most, since the middle has two sides. */
+const panesHeld = (held: string[] = state.settings.areas.middle): PaneName[] =>
+  held.filter((p, i): p is PaneName => (PANES as readonly string[]).includes(p) && held.indexOf(p) === i).slice(0, 2);
 /** The widgets an area holds, in order. */
 const widgetsOf = (area: AreaName): Widget[] => state.settings.areas[area].map((k) => WIDGETS[k]).filter((w): w is Widget => !!w);
 type WingName = "wingL" | "wingR";
@@ -2164,21 +2167,60 @@ const widgetOf = (area: AreaName): Widget | undefined => widgetsOf(area)[0];
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
 const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => WIDGETS[k].kind === kind);
 
-/** The two sides a widget of each kind can stand on; a pane has none, since the middle holds its panes in one order. */
+/** The two sides a widget of each kind can stand on; a pane's are the middle's own two, which the middle keeps in its order. */
 const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], adjunct: ["gutterL", "gutterR"], pane: [] };
 
 /** The area holding a widget now, or null when it stands nowhere. */
 const standsIn = (k: string): AreaName | null => AREAS.find(({ name }) => state.settings.areas[name].includes(k))?.name ?? null;
 
-/** The panes the middle holds after one is pressed: a toggle, and the last pane cannot be taken away. */
-const panesPressed = (k: string): string[] => {
-  const held = state.settings.areas.middle;
-  return held.includes(k) ? (held.length > 1 ? panesHeld(held.filter((x) => x !== k)) : held) : panesHeld([...held, k]);
+/**
+ * What each pane pushed out of the side it was pressed onto, so the next press gives it back: pressed onto the left, a
+ * pane pushes out what stood there; moved on to the right, the left comes back and what stood at the right is pushed
+ * out; taken away, the right comes back. Kept only while the page is open, since a reload begins a reading afresh.
+ */
+const pushedOut = new Map<string, string | null>();
+
+/** Where a pane stands in the middle: its left, its right, the whole of it alone, or nowhere. */
+const paneSide = (k: string, held: string[] = state.settings.areas.middle): "left" | "right" | "alone" | null => {
+  const panes = panesHeld(held);
+  const i = panes.indexOf(k as PaneName);
+  return i < 0 ? null : panes.length === 1 ? "alone" : i === 0 ? "left" : "right";
 };
 
 /**
- * What every area holds with a widget put at one side, or at none. A pane toggles instead, since the middle holds its
- * panes in one order. A wing holds two, and a third takes the place at its foot; a gutter holds one.
+ * The panes the middle holds after one is pressed, and what the press pushes out. Nowhere, the left, the right, and
+ * nowhere again, as every icon cycles; what differs is that a side holds one pane, so a press pushes out what stood
+ * there and the next press gives it back. A lone pane moves on only where something it pushed out can come back to the
+ * left; with that memory gone, it trades places with the pane beside it rather than leave a side empty.
+ */
+function panePress(k: string): { middle: string[]; pushed: string | null } | null {
+  const panes = panesHeld();
+  const back = (x: string | null | undefined): string | null => (x && x !== k && !panes.includes(x as PaneName) ? x : null);
+  switch (paneSide(k)) {
+    case null:
+      return { middle: [k, ...panes.slice(1)], pushed: panes[0] ?? null };
+    case "alone": {
+      const was = back(pushedOut.get(k));
+      return was ? { middle: [was, k], pushed: null } : null;
+    }
+    case "left": {
+      const was = back(pushedOut.get(k));
+      const right = panes[1];
+      return was ? { middle: [was, k], pushed: right } : { middle: [right, k], pushed: null };
+    }
+    case "right": {
+      const was = back(pushedOut.get(k));
+      return { middle: was ? [panes[0], was] : [panes[0]], pushed: null };
+    }
+  }
+}
+
+/** The panes the middle holds after one is pressed, or as they are where a press would do nothing. */
+const panesPressed = (k: string): string[] => panePress(k)?.middle ?? state.settings.areas.middle;
+
+/**
+ * What every area holds with a widget put at one side, or at none. A pane is pressed onto the middle's sides instead,
+ * giving back what it pushed out. A wing holds two, and a third takes the place at its foot; a gutter holds one.
  */
 function placed(k: string, side: AreaName | null): Held {
   const w = WIDGETS[k];
@@ -2211,7 +2253,11 @@ const cycled = (k: string): Held => placed(k, nextPlace(k) ?? null);
 function offered(k: string): boolean {
   const w = WIDGETS[k];
   const at = standsIn(k);
-  if (w.kind === "pane") return at ? panesHeld().length > 1 : fitsWith({ ...state.settings.areas, middle: panesPressed(k) })[k as PaneName];
+  if (w.kind === "pane") {
+    const next = panePress(k);
+    // a press is offered where it changes the middle, and where the pane it stands would have room to stand
+    return next !== null && (!next.middle.includes(k) || fitsWith({ ...state.settings.areas, middle: next.middle })[k as PaneName]);
+  }
   return nextPlace(k) !== undefined;
 }
 
@@ -2221,7 +2267,13 @@ function pickTip(k: string): string {
   const at = standsIn(k);
   const said = (s: string) => `${w.name} — ${s}`;
   if (!offered(k)) return said(w.kind === "pane" && at ? "the last pane cannot be taken away" : "no room for it at this width");
-  if (w.kind === "pane") return said(at ? "press to take it away" : "press to stand it in the middle");
+  if (w.kind === "pane") {
+    const next = panePress(k)!;
+    const to = paneSide(k, next.middle);
+    const gives = next.pushed ? `, in place of ${WIDGETS[next.pushed].name.split(":")[0]}` : "";
+    const now = { left: "at the left; ", right: "at the right; ", alone: "alone; ", none: "" }[paneSide(k) ?? "none"];
+    return said(`${now}press to ${to === null ? "take it away" : to === "right" ? "stand it at the right" : "stand it at the left"}${gives}`);
+  }
   const [left] = SIDES[w.kind];
   const where = (x: AreaName | null) => (x === null ? "take it away" : x === left ? "stand it at the left" : "stand it at the right");
   // a widget the width denies says so, and still says what a press would do with it
@@ -2998,16 +3050,34 @@ const colOf = new Map<string, number>();
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 
+/** Whether the pointer rests on the pane at the right, which is what hands it the keys. */
+let pointerRight = false;
+
 /**
- * Whether a key acts on the map: it does whenever the map stands. The map is how a body is moved in and the lane is
- * how one reading of it is read, and a reading is moved through by scrolling, which needs no key. So the keys belong
- * to the map while it stands and to the lane when it does not, and there is nothing to be in the wrong half of.
+ * The pane the keys belong to: the pane at the left, and the pane at the right while the pointer rests on it. The dish
+ * has no act a key could fire, so it never holds them and they stay with the pane beside it.
  *
  * It was the pane the reader last acted in until 2026-09-19. That made every key modal on something the page never
  * showed: a reader who opened the canvas and pressed an arrow moved the prose, because their hand had never been put
- * on the map, and nothing on the page could tell them so.
+ * on the map, and nothing on the page could tell them so. Then the keys were the map's whenever it stood, which held
+ * while one map could stand. With two sides, the pane holding them says so by its rim, so the page always shows it.
  */
-const handOnMap = (): boolean => canvasOn();
+function keyPane(): PaneName {
+  const panes = fits().panes;
+  const takes = panes.filter((p) => p !== "dish");
+  if (panes.length < 2 || takes.length < 2) return takes[0] ?? panes[0] ?? "lane";
+  return pointerRight ? panes[1] : panes[0];
+}
+
+/** Whether a key acts on a map: it does when the pane holding the keys is one. */
+const handOnMap = (): boolean => isMap(keyPane());
+
+/** The pane holding the keys draws its rim in ink, where two stand; a lone pane has nothing to be told apart from. */
+function drawKeyRim(): void {
+  const panes = fits().panes;
+  const holder = keyPane();
+  PANES.forEach((p) => paneEl(p).classList.toggle("holds-keys", panes.length === 2 && p === holder));
+}
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
 /**
@@ -3629,21 +3699,21 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
  * always allowed, since all it shows is its strip.
  */
 /** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & { canvas: boolean; dish: boolean; lane: boolean; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
+type Fit = Record<AreaName, boolean> & Record<PaneName, boolean> & { /** the panes that stand, the left first */ panes: PaneName[]; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, canvas: false, dish: false, lane: false, gutter: 0, rail: 0, railSide: "wingL" };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
-  // the middle first: the lane at its measure, the canvas at its least width beside it; too narrow for both, the canvas gives way, since the lane is the reading
-  const panes = panesHeld(held.middle);
-  on.lane = panes.includes("lane");
-  on.canvas = panes.includes("canvas");
-  on.dish = panes.includes("dish");
-  const others = (on.canvas ? 1 : 0) + (on.dish ? 1 : 0);
-  let used = (on.lane ? s.measure + 2 * s.gap : 0) + others * CANVAS_MIN + (others ? (on.lane ? others : others + 1) * s.gap : 0);
-  // the canvas gives way first, then the dish, since the lane is the reading
-  if (on.lane && on.canvas && used > ui.areas.clientWidth) (on.canvas = false), (used -= CANVAS_MIN + s.gap);
-  if (on.lane && on.dish && used > ui.areas.clientWidth) (on.dish = false), (used -= CANVAS_MIN + s.gap);
+  // the middle first: the lane at its measure, a map at its least width. Too narrow for two, one gives way: the map
+  // beside the lane, since the lane is the reading, or with no lane the pane at the right
+  const room = (ps: PaneName[]) => {
+    const maps = ps.filter(isMap).length;
+    return (ps.includes("lane") ? s.measure + 2 * s.gap : 0) + maps * CANVAS_MIN + (maps ? (ps.includes("lane") ? maps : maps + 1) * s.gap : 0);
+  };
+  const asked = panesHeld(held.middle);
+  on.panes = asked.length > 1 && room(asked) > ui.areas.clientWidth ? [asked.includes("lane") ? "lane" : asked[0]] : asked;
+  on.panes.forEach((p) => (on[p] = true));
+  let used = room(on.panes);
   for (const wing of ["wingL", "wingR"] as AreaName[]) {
     const need = held[wing].length ? widthIn(held, wing) + s.gap : 0;
     if (used + need > ui.areas.clientWidth) break;
@@ -3678,6 +3748,9 @@ function fitsWith(held: Held): Fit {
   return on;
 }
 const fits = (): Fit => fitsWith(state.settings.areas);
+
+/** The element each pane stands in. */
+const paneEl = (p: PaneName): HTMLElement => ({ lane: ui.scroll, canvas: ui.canvas, dish: ui.dish })[p];
 
 /** Applies the settings: type registers from zoom and ratio, and the row of areas from measure, gap and what is open. */
 function drawLayout(): void {
@@ -3724,24 +3797,28 @@ function drawLayout(): void {
   // standing alone on a narrow screen the canvas takes the page whole, edge to edge: there is too little room to spend
   // any of it on a margin, and what falls outside is cut by the viewport as a map is
   const bleed = narrow() && on.canvas && !on.lane;
-  const space = bleed ? "0px" : on.canvas || on.dish ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
+  const maps = on.panes.filter(isMap).length;
+  const space = bleed ? "0px" : maps ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
   // the rail hugs the edge it stands on, so the space at that edge is nothing and the rail takes it
   const railL = on.rail > 0 && on.railSide === "wingL";
   const railR = on.rail > 0 && on.railSide === "wingR";
   const tracks = [railL ? "0px" : space];
+  // every area stands in the one row: an element given only its column is placed by the browser after the one before
+  // it in the document, so a pane standing left of one written before it would drop to a row of its own
   const place = (el: HTMLElement, width: string) => {
     tracks.push(width, space);
     el.style.gridColumn = `${tracks.length - 1}`;
+    el.style.gridRow = "1";
   };
   if (railL) place(ui.parts.wingL, `${on.rail}px`);
   else if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
-  // the canvas grows to its greatest width and no further, so the row stays centred with its space around it
-  // the canvas standing beside the lane keeps its least width; standing alone it takes whatever the width is, since
-  // there is nothing to give way to and a floor would only overflow the page
-  if (on.canvas) place(ui.canvas, bleed ? "1fr" : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`);
-  if (on.lane) place(ui.scroll, `${mid}px`);
-  // the dish stands right of the reading and takes what is left as the canvas does; alone it takes the width whole
-  if (on.dish) place(ui.dish, on.lane || on.canvas ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr");
+  // the panes stand in the middle in their order, the left first. The lane keeps its measure; a map beside it keeps its
+  // least width, and the canvas grows to its greatest width and no further, so the row stays centred with its space
+  // around it. Standing alone a map takes whatever the width is, since there is nothing to give way to and a floor would
+  // only overflow the page; and two maps share the middle evenly
+  const mapWidth = (p: PaneName): string =>
+    bleed ? "1fr" : maps === 2 ? `minmax(${CANVAS_MIN}px, 1fr)` : p === "dish" ? (on.lane ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr") : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`;
+  on.panes.forEach((p) => place(paneEl(p), p === "lane" ? `${mid}px` : mapWidth(p)));
   if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
   else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
@@ -3757,6 +3834,7 @@ function drawLayout(): void {
   AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !takesRoom(name))));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
+  drawKeyRim();
 }
 
 /** Draws the lane whole and lays the adjuncts beside it; the header says where the lane is scoped. */
@@ -4269,7 +4347,9 @@ function drawSheet(): void {
 /** One icon: what it is, whether it stands and on which side, and whether it can be taken at all. */
 function pickHtml(k: string): string {
   const at = standsIn(k);
-  const side = at === null || WIDGETS[k].kind === "pane" ? "" : at.endsWith("L") ? " side-l" : " side-r";
+  // a pane's side is its place in the middle, and a lone pane has none, so it carries no dot
+  const pane = WIDGETS[k].kind === "pane" ? paneSide(k) : null;
+  const side = at === null || pane === "alone" ? "" : pane ? (pane === "left" ? " side-l" : " side-r") : at.endsWith("L") ? " side-l" : " side-r";
   // in use but with no room at this width: the choice stands and the width denies it, which is neither in use nor out of reach
   const denied = at !== null && !fits()[at === "middle" ? (k as PaneName) : at] ? " denied" : "";
   const quiet = offered(k) ? "" : at ? " fixed" : " off";
@@ -5050,6 +5130,10 @@ function wire(): void {
     pointer.still = false;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
+    // the keys follow the pointer onto the pane at the right, and back to the left when it leaves
+    const right = fits().panes[1];
+    const onRight = !!right && paneEl(right).contains(e.target as Node);
+    if (onRight !== pointerRight) (pointerRight = onRight), drawKeyRim();
     // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
     const el = named(e);
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
@@ -5059,7 +5143,7 @@ function wire(): void {
     point(el ? el.dataset.a! : null);
     tip(e);
   });
-  document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip()));
+  document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
 
   document.addEventListener("click", (e) => {
     hideTip();
@@ -5111,7 +5195,11 @@ function wire(): void {
       const k = pick.dataset.widget!;
       if (narrow()) return void chooseNarrow(k);
       if (!offered(k)) return;
-      state.settings.areas = cycled(k);
+      // a pane remembers what its press pushed out, so the next press can give it back; the press is reckoned once,
+      // since reckoning it again after the memory is written reads a memory the press has already spent
+      const next = WIDGETS[k].kind === "pane" ? panePress(k) : null;
+      state.settings.areas = next ? { ...state.settings.areas, middle: next.middle } : cycled(k);
+      if (next) pushedOut.set(k, next.pushed);
       saveSettings();
       return void drawAll();
     }
@@ -5683,6 +5771,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #canvas.bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
 #canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
+/* of two panes, the one the keys belong to draws its rim in ink, so a key never acts somewhere the reader cannot see */
+#canvas.holds-keys::after { box-shadow: inset 0 0 0 1px var(--muted); }
 /* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
 #canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
 /* a rim is written at the weight it is drawn at and divided by the view, so every line on the map keeps one weight however far it is zoomed */
