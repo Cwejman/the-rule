@@ -2473,7 +2473,9 @@ function pickTip(k: string): string {
     const next = panePress(k)!;
     const to = paneSide(k, next.middle);
     const gives = next.pushed ? `, in place of ${WIDGETS[next.pushed].name.split(":")[0]}` : "";
-    const now = { left: "at the left; ", right: "at the right; ", alone: "alone; ", none: "" }[paneSide(k) ?? "none"];
+    // a pane the width denies says so, as a widget does, and still says what a press would do with it
+    const denied = at !== null && !fits()[k as PaneName] ? "asked for, but there is no room at this width; " : "";
+    const now = denied || { left: "at the left; ", right: "at the right; ", alone: "alone; ", none: "" }[paneSide(k) ?? "none"];
     return said(`${now}press to ${to === null ? "take it away" : to === "right" ? "stand it at the right" : "stand it at the left"}${gives}`);
   }
   const [left] = SIDES[w.kind];
