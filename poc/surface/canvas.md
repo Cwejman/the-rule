@@ -178,7 +178,7 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 *The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
 
-### 5.2 The moves are each pane's own
+### 5.2 The moves on a map
 
 Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which). Where they belong to a map, these are the moves.
 
