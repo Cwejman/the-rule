@@ -256,7 +256,7 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What it holds of its own is the chain, which card of each column stands open, and what is selected; both are kept in the browser with the view.
+The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-one-shared-state-and-four-verbs), and both are kept in the browser with the view.
 
 Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
@@ -264,7 +264,7 @@ Pan and zoom are one transform on the stage, which the browser composites withou
 
 With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from the canvas alone.
 
-*In force, 2026-09-18, as built; the pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
+*In force, 2026-09-18, as built; what stands open moved into the shared state 2026-09-19, and the fit at another width, 2026-09-27. The pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
 
 #### 6.5.1 The history is the canvas over a world of its own
 
@@ -274,7 +274,7 @@ It answers a press, a key, a pointer or a wheel on its pane that way, and whatev
 
 Nothing of the canvas is written twice, and what the history needs of its own is small: a commit's face and figure, a fold that lays no lane, and the few acts that move on a map. The keys it takes are those, since the rest reach into a lane the history does not have.
 
-Its addresses are its own, so nothing the body lights reaches its rows, and nothing it lights reaches the body's.
+Its addresses are its own, so nothing the body lights reaches its rows, and as yet nothing it lights reaches the body's.
 
 *In force, 2026-09-27, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state.*
 
