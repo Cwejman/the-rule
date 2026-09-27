@@ -1176,13 +1176,15 @@ async function traceHistory(rootArg: string): Promise<Body> {
     return null;
   };
   /**
-   * The commits under the root from one commit to another, both held: what git means by first^..last, the ancestors of
-   * the last that are not ancestors of the first's parents. So a run is read by descent and not by date, and where
-   * branches were merged, what was made on the other branch in the same days is not taken in.
+   * The commits under the root from one commit to another, both held, by descent: the first, and every commit that
+   * descends from it and is an ancestor of the last, which is git's ancestry path. So a run is read by descent and not by
+   * date, and what was made on another branch, forked before the first and merged before the last, is not taken in; a
+   * plain range, first^..last, would take it, since it is an ancestor of the last and not of the first's parents.
    */
   const between = async (first: number, last: number): Promise<number[]> => {
-    const out = await git(cwd, ["log", "--format=%H", commits[last].hash, "--not", ...commits[first].parents, "--", "."]);
-    return out.toString().split("\n").flatMap((h: string) => (at.has(h) ? [at.get(h)!] : [])).sort((x: number, y: number) => x - y);
+    const out = await git(cwd, ["log", "--format=%H", "--ancestry-path", `${commits[first].hash}..${commits[last].hash}`, "--", "."]);
+    const found = out.toString().split("\n").flatMap((h: string) => (at.has(h) ? [at.get(h)!] : []));
+    return [first, ...found].sort((x: number, y: number) => x - y);
   };
   // what each story places, in the order its links stand; the list is newest first, so a run's first is its oldest
   // and stands at the larger index
@@ -1210,7 +1212,8 @@ async function traceHistory(rootArg: string): Promise<Body> {
         [from, to] = [to, from];
       }
       const run = from === to ? [from] : await between(from, to);
-      if (!run.includes(from)) warn(`${said} places ${g.from}..${g.to}, and ${g.from} is not an ancestor of ${g.to}; the run holds what descends from neither`);
+      // a first that is no ancestor of the last has nothing descending from it to the last, and the run is the first alone
+      if (from !== to && !run.includes(to)) warn(`${said} places ${g.from}..${g.to}, and ${g.from} is not an ancestor of ${g.to}; only ${g.from} is placed`);
       // separate links are written newest first, as the record is, so each stands older than the one before it
       if (mine.length && Math.min(...run) <= Math.max(...mine)) warn(`${said} places ${g.from === g.to ? g.from : `${g.from}..${g.to}`} out of time's order; the record stands newest first`);
       run.forEach((i) => {
