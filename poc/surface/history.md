@@ -98,6 +98,14 @@ So the history is told as the work is done, not afterwards, and what [many small
 
 *Preferred, the session's proposal taken by the author, 2026-09-21; that bloat is solved by something else is [his](../../author/ideas-2026-09-21.md#8-bloat-is-valuable-information-and-is-solved-by-something-else).*
 
+### 2.6 It is handed over flat, as the body is
+
+The history's trace is handed to the page as [the body is](implementation.md#3-the-body-traced-and-flat): one flat list in reading order, which for a record is newest first, each brief carrying its address and the page deriving parent and depth from that. Stories and leaves stand in the one list, a leaf being a brief whose address ends in its commit's hash, cut as git cuts one, to seven characters, and lengthened where two would meet.
+
+A leaf carries its hash and no more of the commit, since [the light tier](#51-the-light-tier-is-had-whole) holds the rest and a fact has one home. The trace is read from `history.md` whenever the history is asked for, and handed at `stories.json` beside the light tier, live and published alike.
+
+*Preferred, the author's, 2026-09-27, that the history travels flat as the briefs do; the name and the hash's length the session's.*
+
 ## 3. One code for both
 
 The body and the history are the same structure, so the same code draws both: the canvas, the lane, selection, the keys and folding take a commit as they take a brief. A second code path for history would be a double standard, and every rule of the surface would then have to be kept twice.
@@ -140,6 +148,14 @@ The history is drawn down the column, as any reading is, so the canvas stays one
 
 *Preferred, the author's, 2026-09-21, turning from left to right for coherence in the canvas.*
 
+### 4.4 It is opened as a pane of its own
+
+The history is [a pane of the middle](framework.md#27-the-middle-holds-one-pane-or-two), chosen from the strip as the lane, the canvas and the dish are, and it is the canvas drawing the history rather than the body. So it stands beside the lane, or beside the canvas of the body, and the reader moves in it as they move on any map.
+
+Its data is fetched when the pane first stands and not before, so a reader who never opens it never pays for it.
+
+*The author's, 2026-09-27, that commits as nodes are a pane of their own; it answers how the history is opened, which stood open until then.*
+
 ## 5. The data, in two tiers
 
 What a reader sees decides what is fetched. The canvas, the colouring and the filter by address span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
@@ -168,15 +184,15 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 The data stands, and what is next is laid in the order each step stands on the one before. A session taking this up begins at the first step not done.
 
-1. Trace the history: read `history.md` when it is asked for, resolve its `git:` links against the light tier, make the commit leaves, stand the untold commits among the stories by time, and warn as [the link says](#221-the-link-names-a-commit-or-a-run). Tested alone, as the data was, before anything is drawn.
+1. Trace the history: read `history.md` when it is asked for, resolve its `git:` links against the light tier, make the commit leaves, stand the untold commits among the stories by time, warn as [the link says](#221-the-link-names-a-commit-or-a-run), and hand it over [flat](#26-it-is-handed-over-flat-as-the-body-is). Tested alone, as the data was, before anything is drawn.
 
 2. Write the first stories, over the commits that built the data, as [a session's debrief](#25-a-session-writes-the-story-as-its-debrief), so the trace has a real history to read.
 
-3. Draw it: open the history on the canvas, top-down, with [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), after [how it is opened](#7-what-this-leaves-open) is settled with the author.
+3. Draw it: [the pane](#44-it-is-opened-as-a-pane-of-its-own), the canvas's own code drawing the whole history top-down, with a selected commit's face saying its subject, its author and its date, and its figure the readings it touched.
 
-4. Show what a selection touched, on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
+4. Show what is felt rather than only specified, and so is the author's to see first: [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), and [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
 
-*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; none of the four is begun.*
+*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three are taken up that day; the fourth is where it stops, since what the filter and a change in place feel like is read by looking.*
 
 ## 7. What this leaves open
 
@@ -186,8 +202,6 @@ Whether lines across more commits than a story holds are ever wanted at once; if
 
 How a session tells its story where another session's commits fall between its own, since a run leaves nothing out and stories do not overlap.
 
-How the history is opened: as a pane of its own, from the strip, or as what the canvas draws when asked.
-
 Whether the map opens the way to a touched brief the reader has not opened, or lights only what it holds.
 
-*Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice.*
+*Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice. How the history is opened was answered 2026-09-27, [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own).*
