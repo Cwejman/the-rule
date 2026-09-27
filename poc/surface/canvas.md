@@ -182,8 +182,6 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which). Where they belong to a map, these are the moves.
 
-Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so.
-
 Three of the moves act on the map's structure: right, left and backspace; in the lane, left and backspace have meanings of their own, given with each. The rest mean the same in the lane and on a map, and each acts in the pane the keys belong to.
 
 - Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
