@@ -1368,7 +1368,7 @@ type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
 /** The panes the middle can hold. It has two sides, and a pane stands on one of them: at most two, the first at the left. */
-const PANES = ["lane", "canvas", "dish"] as const;
+const PANES = ["lane", "canvas", "dish", "history"] as const;
 type PaneName = (typeof PANES)[number];
 /** A map among the panes, the one that holds no prose: it is what gives way beside the lane, and what the keys move on. */
 const isMap = (p: string): boolean => p !== "lane";
@@ -1617,13 +1617,16 @@ const acts = (a?: string): string =>
 /** Whether an act falls on the map: a badge in the canvas's own field always does, and a key does while the map stands. */
 const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap());
 
+/** Whether a brief stands whole: in the lane by its fold, and on the history's map wherever it is not folded to its face. */
+const isWhole = (a: string): boolean => (inPast() ? foldOf(a) !== "face" : foldOf(a) === "whole");
+
 const ACTIONS: Record<string, Action> = {
   unfold: {
-    label: (a) => (foldOf(acts(a)) === "whole" ? "fold" : "unfold"),
-    mark: (a) => (foldOf(acts(a)) === "whole" ? ICON.fold : ICON.unfold),
+    label: (a) => (isWhole(acts(a)) ? "fold" : "unfold"),
+    mark: (a) => (isWhole(acts(a)) ? ICON.fold : ICON.unfold),
     keys: [{ key: " " }],
     help: (a) =>
-      foldOf(acts(a)) === "whole"
+      isWhole(acts(a))
         ? "Folds the brief back to its face; the same key unfolds it again."
         : "Unfolds the brief: the paragraphs its face hides, and the level beneath it.",
     also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
@@ -2302,7 +2305,7 @@ type Adjunct = { kind: "adjunct"; name: string; icon: string; of: (b: Brief, art
  * draws, so nothing beside it moves as it redraws; and whether it grows into the wing's height or takes only what it needs.
  */
 type Figure = { kind: "figure"; name: string; icon: string; draw: (w: number, h: number) => string; width: () => number; grow: boolean; onFocus?: boolean; onPoint?: boolean };
-/** A pane stands in the middle: the lane, the canvas, or the dish. It draws itself from the state through its own functions. */
+/** A pane stands in the middle: the lane, the canvas, the dish, or the history. It draws itself from the state through its own functions. */
 type Pane = { kind: "pane"; name: string; icon: string };
 type Widget = Adjunct | Figure | Pane;
 
@@ -2324,6 +2327,7 @@ const ICON: Record<string, string> = {
   openRight: `<path d="M3.5 8h6M7 5.5 9.5 8 7 10.5M12.5 3.5v9"/>`,
   closeRight: `<path d="M9.5 8h-6M6 5.5 3.5 8 6 10.5M12.5 3.5v9"/>`,
   dish: `<circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="1.2"/>`,
+  history: `<path d="M5 2v12"/><circle cx="5" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/><path d="M5 8h3.5a2 2 0 0 0 2-2V4.5"/><circle cx="10.5" cy="3.4" r="1.4"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
@@ -2339,6 +2343,7 @@ const WIDGETS: Record<string, Widget> = {
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
   dish: { kind: "pane", name: "the dish: the plate at full size", icon: "dish" },
+  history: { kind: "pane", name: "the history: stories over the commits, as nodes", icon: "history" },
 };
 
 const AREAS: { name: AreaName; kind: Widget["kind"] }[] = [
@@ -3217,8 +3222,13 @@ function lightPlate(a: string | null): void {
 
 type View = { x: number; y: number; k: number };
 const view: View = { x: 24, y: 24, k: 1 };
-/** The body the canvas was last fitted to, so it fits when it is first drawn and never moves under a fold. */
+/**
+ * The body the canvas was last fitted to, and at what width, so it fits when it is first drawn and never moves under a
+ * fold, and fits again when its pane is given another width, since a map fitted to a pane that has since halved runs
+ * off its edge. A view the reader moved by hand is theirs, and a width does not take it back.
+ */
 let fitted: string | null = null;
+let fittedWidth = 0;
 /** The focus the view was last brought to; null until the first draw, so arriving always brings the reader into view. */
 let followed: string | null = null;
 /** Whether the reader has moved the view by hand. It is half of going astray, the other half being a selection off the reading. */
@@ -3240,7 +3250,7 @@ function attach(): void {
 }
 
 /** Which column each row was drawn in, filled as the canvas is drawn, so an act opens what is selected where it stands. */
-const colOf = new Map<string, number>();
+let colOf = new Map<string, number>();
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 
@@ -3417,6 +3427,15 @@ function closeReading(r: string): void {
  * the level a step stronger than the prose, since they are two kinds of the same thing and not two kinds of thing.
  */
 function marksHtml(b: Brief, hides: boolean): string {
+  // a commit's figure says what it touched, where a folded brief's says what it hides: a bar for every reading it
+  // touched, each in the hue that reading takes in the body, and a quiet one for everything else it changed
+  const c = b.commit ? past.commits.get(b.commit) : undefined;
+  if (c) {
+    const { readings, other } = touchedBy(c);
+    const bars = readings.slice(0, 7).map((r) => `<b class="brief" style="--h:${bodyHue(r.address)};--w:10px"></b>`).join("");
+    const more = readings.length > 7 ? `<b class="more">+${readings.length - 7}</b>` : "";
+    return `<span class="marks">${bars}${more}${other ? `${bars ? `<i class="sep"></i>` : ""}<i class="other"></i>` : ""}</span>`;
+  }
   const rest = blocksOf(b).slice(1);
   const kids = hides ? level(b.address) : [];
   const bars = rest.slice(0, 6).map((t) => (t.type === "image" ? `<i class="image"></i>` : `<i></i>`)).join("");
@@ -3483,6 +3502,10 @@ const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
 const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere", "face"];
+/** The acts the history's field offers: folding a story, and the face. The rest go to the lane, which the history has none of yet. */
+const PAST_ACTS = ["unfold", "face"];
+/** The acts a key takes on the history's map: moving on it, and folding a story. */
+const PAST_KEYS = ["unfold", "next", "previous", "nextLevel", "previousLevel", "above"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
@@ -3495,7 +3518,7 @@ function fieldHtml(): string {
   // and the eye that brings a hidden face back stands only in this field
   if (narrow() || a === null || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
-  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
+  const acts = (inPast() ? PAST_ACTS : FIELD_ACTS).filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
   return acts.length ? `<div id="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
 }
 
@@ -3507,6 +3530,19 @@ function fieldHtml(): string {
 function faceHtml(): string {
   const b = state.picked === null ? undefined : brief(state.picked);
   if (narrow() || !b || state.settings.face === "hidden") return "";
+  // a commit's face says its subject, who made it and when, and the readings it touched, each in its own hue
+  const c = b.commit ? past.commits.get(b.commit) : undefined;
+  if (c) {
+    const { readings, other } = touchedBy(c);
+    const when = new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+    const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
+    const rest = other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "";
+    return (
+      `<div id="face" ${hued(b.address)}>` +
+      `<div class="said">${pathHtml(parentOf(b.address))}<h3>${esc(c.subject)}</h3><span class="stamp chrome">${esc(c.author)} · ${esc(when)} · ${esc(c.hash.slice(0, 7))}</span>${touched || rest ? `<div class="touched">${touched}${rest}</div>` : ""}</div>` +
+      `</div>`
+    );
+  }
   const stamp = stampOf(b);
   return (
     `<div id="face" ${hued(b.address)}>` +
@@ -3538,9 +3574,10 @@ function drawCanvas(): void {
   // neither read nor reach
   const field = ui.canvas.querySelector<HTMLElement>("#field");
   if (field) field.classList.toggle("tight", field.offsetWidth > ui.canvas.clientWidth - 2 * CANVAS_INSET);
-  if (fitted !== state.body.root) {
+  if (fitted !== state.body.root || (!panned && fittedWidth !== ui.canvas.clientWidth)) {
     fitCanvas();
     fitted = state.body.root;
+    fittedWidth = ui.canvas.clientWidth;
   }
   applyView(false);
   // the map is wider than the pane, so the reading's own place is brought into view when it moves; a draw that only
@@ -3646,13 +3683,15 @@ function stepSibling(by: number): void {
 function pickNode(a: string, col: number | null, head = false): void {
   state.picked = a;
   state.onHead = head;
+  // the history has no reading for the map to be on, so what is selected is where the reader stands in it
+  if (inPast()) state.focus = a;
   if (col !== null && !state.opened.includes(a)) state.opened.push(a);
   drawCanvas();
   // an opening brings the reading it opened into the pane, since that is what the press was for
   // the row that was pressed and the reading it opened are brought in together, so the reader keeps the place they
   // pressed from and meets what it led to beside it. It waits a frame, since the browser has not finished laying the
   // column out when the draw returns and a measure taken then is of where the map was, not where it is
-  requestAnimationFrame(() => {
+  frame(() => {
     const pair = col === null ? null : (stage()?.querySelector<HTMLElement>(`.cnode.open > .crow[data-a="${cssEsc(a)}"]`)?.parentElement ?? null);
     if (pair) bringInto(pair, 0.06);
     else bringIntoView(a, head);
@@ -3722,7 +3761,7 @@ function applyView(ease: boolean): void {
       // taller node. Held at two lines, every node grew as the type resisted and the whole map grew with it: the map
       // was laid 7031 tall at the floor against 3004 at life size, so zooming out gave back exactly what it took
       st.style.setProperty("--lines", Number(kz) > 1 ? "1" : "2");
-      requestAnimationFrame(drawEdges);
+      frame(drawEdges);
     }
   }
   rememberView();
@@ -3813,10 +3852,12 @@ function zoomAt(px: number, py: number, factor: number): void {
 const viewKey = (): string => `surface.view:${laneKey()}`;
 let viewTimer: ReturnType<typeof setTimeout> | undefined;
 function rememberView(): void {
+  // the history's view is not kept: it is keyed by the lane, and a reader opens the history afresh
+  if (inside) return;
   clearTimeout(viewTimer);
   viewTimer = setTimeout(() => {
     try {
-      localStorage.setItem(viewKey(), JSON.stringify({ ...view, opened: state.opened }));
+      localStorage.setItem(viewKey(), JSON.stringify({ ...view, opened: state.opened, w: fittedWidth }));
     } catch {}
   }, 150);
 }
@@ -3827,17 +3868,168 @@ function recallView(): void {
     if (kept && typeof kept.k === "number") {
       Object.assign(view, { x: kept.x, y: kept.y, k: kept.k });
       fitted = state.body?.root ?? null;
+      // the view was kept at a width, and a pane given another since is fitted again
+      fittedWidth = typeof kept.w === "number" ? kept.w : 0;
       if (Array.isArray(kept.opened)) state.opened = kept.opened.filter((a: string) => brief(a));
     }
   } catch {}
 }
+
+// ### 3.11.2 The history: the same map, over a second body
+//
+// The history is drawn by the canvas's own code, since a second path would keep
+// every rule of the map twice. That code reads the shared state, so the history
+// holds a state of its own, a world: its body, its folds, what is selected and
+// open, its view, and the pane it stands in. While it is drawn or answers a
+// press, its world is set in the state's place, and the body's is set back
+// after; anything left to a later frame re-enters the world that left it.
+
+type World = {
+  body: Body | null;
+  index: Index | null;
+  folds: Map<string, Fold>;
+  focus: string;
+  scope: string;
+  pointed: string | null;
+  picked: string | null;
+  onHead: boolean;
+  opened: string[];
+  view: View;
+  fitted: string | null;
+  fittedWidth: number;
+  followed: string | null;
+  panned: boolean;
+  waysLaidFor: string | null;
+  colOf: Map<string, number>;
+  el: HTMLElement | null;
+};
+
+/** The world being drawn in, where it is not the body's own; and the body's, held aside while it is. */
+let inside: World | null = null;
+let home: World | null = null;
+
+const takeWorld = (): World => ({
+  body: state.body, index: state.index, folds: state.folds, focus: state.focus, scope: state.scope, pointed: state.pointed,
+  picked: state.picked, onHead: state.onHead, opened: state.opened,
+  view: { ...view }, fitted, fittedWidth, followed, panned, waysLaidFor, colOf, el: ui.canvas,
+});
+
+function putWorld(w: World): void {
+  Object.assign(state, { body: w.body, index: w.index, folds: w.folds, focus: w.focus, scope: w.scope, pointed: w.pointed, picked: w.picked, onHead: w.onHead, opened: w.opened });
+  Object.assign(view, w.view);
+  fitted = w.fitted;
+  fittedWidth = w.fittedWidth;
+  followed = w.followed;
+  panned = w.panned;
+  waysLaidFor = w.waysLaidFor;
+  colOf = w.colOf;
+  ui.canvas = w.el!;
+}
+
+/** Runs something with a world set in the state's place, keeping what it changed there and setting the body's back after. */
+function inWorld<T>(w: World, fn: () => T): T {
+  if (inside === w) return fn();
+  const was = { inside, home };
+  home = takeWorld();
+  putWorld(w);
+  inside = w;
+  try {
+    return fn();
+  } finally {
+    Object.assign(w, takeWorld());
+    putWorld(home);
+    ({ inside, home } = was);
+  }
+}
+
+/** A frame later, in the world that asked for it: the browser lays a pane out after a draw returns, not during it. */
+const frame = (fn: () => void): void => {
+  const w = inside;
+  requestAnimationFrame(() => (w ? inWorld(w, fn) : fn()));
+};
+
+/** The history's world, empty until the pane first stands; and the light tier its leaves are told from. */
+const pastWorld: World = { body: null, index: null, folds: new Map(), focus: "", scope: "", pointed: null, picked: null, onHead: false, opened: [], view: { x: 24, y: 24, k: 1 }, fitted: null, fittedWidth: 0, followed: null, panned: false, waysLaidFor: null, colOf: new Map(), el: null };
+const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, commits: new Map<string, Commit>() };
+
+/** Whether the map being drawn is the history's. */
+const inPast = (): boolean => inside === pastWorld;
+
+/**
+ * Fetches the history when its pane first stands, and not before, so a reader who never opens it never pays for it:
+ * the stories, traced, and the light tier, at the paths the live process answers and the build writes beside the page.
+ * A leaf carries only its hash, so its subject is joined from the light tier here, once.
+ */
+async function loadPast(): Promise<void> {
+  if (past.status === "loading") return;
+  past.status = "loading";
+  past.stale = false;
+  drawHistory();
+  const get = async (path: string) => {
+    const r = await fetch(path, { cache: "no-store" });
+    if (!r.ok) throw new Error((await r.text()) || `${path}: ${r.status}`);
+    return r.json();
+  };
+  try {
+    const [stories, light] = (await Promise.all([get("stories.json"), get("history.json")])) as [Body, History];
+    past.commits = new Map(light.commits.map((c) => [c.hash, c]));
+    stories.briefs.forEach((b) => b.commit && (b.title = past.commits.get(b.commit)?.subject ?? b.commit.slice(0, 7)));
+    stories.warnings.forEach((w) => console.warn(w));
+    const kept = pastWorld.body !== null;
+    pastWorld.body = stories;
+    pastWorld.index = indexBody(stories);
+    // what the reader had folded and selected stays where it still stands
+    if (kept) pastWorld.folds = new Map(Array.from(pastWorld.folds).filter(([a]) => pastWorld.index!.by.has(a)));
+    if (pastWorld.picked !== null && !pastWorld.index.by.has(pastWorld.picked)) pastWorld.picked = null;
+    past.status = "ready";
+  } catch (e) {
+    past.status = "failed";
+    past.said = (e as Error).message;
+  }
+  drawHistory();
+}
+
+/** Draws the history's pane: the map of its stories and commits once it has them, and a word while it has not. */
+function drawHistory(): void {
+  if (ui.history.hidden) return;
+  if (past.status === "none" || (past.stale && past.status === "ready")) return void loadPast();
+  if (past.status !== "ready") return void (ui.history.innerHTML = `<p class="none chrome">${past.status === "loading" ? "reading the history…" : `no history: ${esc(past.said)}`}</p>`);
+  if (!pastWorld.el) pastWorld.el = ui.history;
+  inWorld(pastWorld, () => {
+    placeCanvas();
+    drawCanvas();
+  });
+}
+
+/**
+ * The readings a commit touched, by the body the lane reads: each file it changed that the body places, as that
+ * reading's brief, and a count of what else it changed. Read from the body's own world, whichever map is being drawn.
+ */
+function touchedBy(c: Commit): { readings: Brief[]; other: number } {
+  const w = inside ? home! : takeWorld();
+  const readings: Brief[] = [];
+  let other = 0;
+  c.files.forEach((f) => {
+    const at = w.body?.briefs.find((b) => b.file === f.path && (b.card || b.address === ""));
+    if (at && !readings.includes(at)) readings.push(at);
+    else if (!at) other++;
+  });
+  return { readings, other };
+}
+
+/** The hue a reading takes in the body, by the root-level brief it stands under, whichever map is being drawn. */
+const bodyHue = (a: string): number => {
+  const w = inside ? home! : takeWorld();
+  const i = (w.index?.children.get("") ?? []).findIndex((b) => b.address === a.split("/")[0]);
+  return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
+};
 
 // ## 3.12 Drawing, and drawing again
 //
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; history: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -3896,7 +4088,7 @@ const takesRoom = (area: AreaName): boolean => isOpen(area);
 type Fit = Record<AreaName, boolean> & Record<PaneName, boolean> & { /** the panes that stand, the left first */ panes: PaneName[]; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
 function fitsWith(held: Held): Fit {
   const s = state.settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, history: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
   AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
   // the middle first: the lane at its measure, a map at its least width. Too narrow for two, one gives way: the map
   // beside the lane, since the lane is the reading, or with no lane the pane at the right
@@ -3944,7 +4136,7 @@ function fitsWith(held: Held): Fit {
 const fits = (): Fit => fitsWith(state.settings.areas);
 
 /** The element each pane stands in. */
-const paneEl = (p: PaneName): HTMLElement => ({ lane: ui.scroll, canvas: ui.canvas, dish: ui.dish })[p];
+const paneEl = (p: PaneName): HTMLElement => ({ lane: ui.scroll, canvas: ui.canvas, dish: ui.dish, history: ui.history })[p];
 
 /** Applies the settings: type registers from zoom and ratio, and the row of areas from measure, gap and what is open. */
 function drawLayout(): void {
@@ -4011,7 +4203,7 @@ function drawLayout(): void {
   // around it. Standing alone a map takes whatever the width is, since there is nothing to give way to and a floor would
   // only overflow the page; and two maps share the middle evenly
   const mapWidth = (p: PaneName): string =>
-    bleed ? "1fr" : maps === 2 ? `minmax(${CANVAS_MIN}px, 1fr)` : p === "dish" ? (on.lane ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr") : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`;
+    bleed && p === "canvas" ? "1fr" : maps === 2 ? `minmax(${CANVAS_MIN}px, 1fr)` : p === "dish" ? (on.lane ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr") : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`;
   on.panes.forEach((p) => place(paneEl(p), p === "lane" ? `${mid}px` : mapWidth(p)));
   if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
   else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
@@ -4021,6 +4213,7 @@ function drawLayout(): void {
   ui.content.style.columnGap = `${s.gap}px`;
   ui.canvas.hidden = !on.canvas;
   ui.dish.hidden = !on.dish;
+  ui.history.hidden = !on.history;
   ui.canvas.classList.toggle("bleed", bleed);
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
@@ -4211,7 +4404,7 @@ function trimPlace(): void {
 }
 
 /** The panes of the middle that stand on the screen. */
-const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
+const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.history, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
 
 /** How far the nodes stand in from the canvas's rim. */
 const CANVAS_INSET = 24;
@@ -4264,6 +4457,7 @@ function placeCrumb(): void {
   ui.pull.style.width = `${Math.round(lane.width)}px`;
   ui.pull.style.top = `${ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4}px`;
   placeCanvas();
+  if (!ui.history.hidden && pastWorld.el) inWorld(pastWorld, placeCanvas);
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   // narrow, the fade begins above the way down rather than below it: the prose is never clear behind the line, so the
   // two read as one page and the reading keeps the room the clearance would have taken
@@ -4335,7 +4529,7 @@ function drawFocusMarks(): void {
   const onPath = new Set(prefixesOf(state.focus));
   // a card never dims, and opacity on a brief would take its cards with it, so a brief holding the focus keeps its ink
   const holder = isCard(brief(state.focus)) ? parentOf(state.focus) : null;
-  all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).forEach((el) => {
+  all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).filter((el) => !ui.history.contains(el)).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     // a placed file is drawn twice on the map, so the focus lights the row the reader stands on and not both of them
     const onRow = !el.classList.contains("crow") || (el.dataset.head === "1") === headFor(state.focus);
@@ -4558,6 +4752,7 @@ function drawAll(): void {
   drawWingsAligned();
   drawSheet();
   drawCard();
+  drawHistory();
   light();
 }
 
@@ -4566,11 +4761,13 @@ function drawAll(): void {
 function light(): void {
   const a = state.pointed;
   document.body.classList.toggle("pointing", a !== null);
-  all<HTMLElement>(".lit").forEach((el) => el.classList.remove("lit"));
+  // the history's map names its own addresses, which are not the body's, so nothing lit here reaches it
+  const ours = (el: Element) => !ui.history.contains(el);
+  all<HTMLElement>(".lit").filter(ours).forEach((el) => el.classList.remove("lit"));
   drawLaser();
   lightPlate(a);
   if (a === null) return;
-  const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`);
+  const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`).filter(ours);
   exact.forEach((el) => el.classList.add("lit"));
   const litFigures = new Set(exact.map((el) => el.closest(".fig")));
   all<HTMLElement>(".fig")
@@ -4582,6 +4779,12 @@ function light(): void {
         .sort((x, y) => y.length - x.length)[0];
       if (holding !== undefined) all<HTMLElement>(`[data-a="${cssEsc(holding)}"]`, f).forEach((el) => el.classList.add("lit"));
     });
+}
+
+/** Lights a row of the history's map, and nothing of the body's. */
+function lightPast(a: string | null): void {
+  all<HTMLElement>(".lit", ui.history).forEach((el) => el.classList.remove("lit"));
+  if (a !== null) all<HTMLElement>(`[data-a="${cssEsc(a)}"]`, ui.history).forEach((el) => el.classList.add("lit"));
 }
 
 function point(a: string | null): void {
@@ -4649,7 +4852,7 @@ function tip(e: PointerEvent): void {
   // a port cell under the pointer draws its own line, so the edges follow the element and not only the brief pointed at
 
   if (!el) return;
-  const html = tipHtml(el);
+  const html = ui.history.contains(el) ? inWorld(pastWorld, () => tipHtml(el)) : tipHtml(el);
   if (html) tipTimer = setTimeout(() => showTip(el, html), 260);
 }
 
@@ -4674,7 +4877,7 @@ function showTip(el: Element, html: string): void {
     const f = fig.getBoundingClientRect();
     left = wing.dataset.area === "wingL" ? f.right + 8 : f.left - w - 8;
     top = level();
-  } else if (el.closest("#canvas")) {
+  } else if (el.closest("#canvas, #history")) {
     // past the row itself, on whichever side the pane has room for it
     const right = r.right + 12;
     left = right + w <= innerWidth - 8 ? right : r.left - w - 12;
@@ -5217,6 +5420,12 @@ function refold(change: () => void, anchor: string = state.focus, jump = false):
 function cycle(a: string): void {
   const b = brief(a);
   if (a === "" || !b || !unfolds(b)) return;
+  // the history has no lane, so a fold there is the map's alone: an absent fold means the level stands
+  if (inPast()) {
+    if (foldOf(a) === "face") state.folds.delete(a);
+    else state.folds.set(a, "face");
+    return void drawCanvas();
+  }
   // only a fold that takes away what stood under the reader moves them; unfolding, or folding elsewhere, never scrolls
   const jump = foldOf(a) === "whole" && within(state.focus, a);
   refold(
@@ -5334,7 +5543,10 @@ function wire(): void {
     // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
     // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
     if (el && el.closest("#lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
-    point(el ? el.dataset.a! : null);
+    // an address on the history's map names a story or a commit, not a brief of the body, so it lights there alone
+    const onPast = !!el && ui.history.contains(el);
+    lightPast(onPast ? el!.dataset.a! : null);
+    point(el && !onPast ? el.dataset.a! : null);
     tip(e);
   });
   document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
@@ -5349,14 +5561,22 @@ function wire(): void {
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
     // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
-    if (t.closest("a[href]") || (!t.closest("#canvas") && window.getSelection()?.toString())) return;
+    if (t.closest("a[href]") || (!t.closest("#canvas, #history") && window.getSelection()?.toString())) return;
     // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
     const badge = t.closest<HTMLElement>("[data-act]");
     if (badge) {
       const act = ACTIONS[badge.dataset.act!];
-      if (act && act.can(badge.dataset.a)) act.run(badge.dataset.a);
+      const run = () => void (act && act.can(badge.dataset.a) && act.run(badge.dataset.a));
+      if (badge.closest("#history")) inWorld(pastWorld, run);
+      else run();
       // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
       return void (badge.closest(".strip") && drawChooser());
+    }
+    // on the history's map a press selects, as on the canvas; what a press again would show is not built, so it rests
+    if (t.closest("#history")) {
+      const row = t.closest<HTMLElement>(".crow");
+      if (row && !state.scrubbing) inWorld(pastWorld, () => pickNode(row.dataset.a!, null, row.dataset.head === "1"));
+      return;
     }
     // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
     if (t.closest("#face") && state.picked && brief(state.picked)) return void goTo(state.picked);
@@ -5424,7 +5644,7 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
+  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean; world?: World } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
@@ -5433,7 +5653,7 @@ function wire(): void {
     const el = e.target as HTMLElement;
     // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
     // must neither cancel it nor drag the map out from under the reader
-    const cv = el.closest("#depth") || el.closest(".crow") || el.closest("#field") || el.closest("#face") ? null : el.closest<HTMLElement>("#canvas");
+    const cv = el.closest("#depth") || el.closest(".crow") || el.closest("#field") || el.closest("#face") ? null : el.closest<HTMLElement>("#canvas, #history");
     if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
     else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
@@ -5446,7 +5666,12 @@ function wire(): void {
       document.body.classList.add("scrubbing");
       railScrub(e.clientX, e.clientY);
     } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
-    else if (cv) drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: view.x, vy: view.y, moved: false };
+    else if (cv) {
+      // the ground of either map is dragged, each moving its own view
+      const world = cv === ui.history ? pastWorld : undefined;
+      const v = world ? world.view : view;
+      drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: v.x, vy: v.y, moved: false, world };
+    }
     // the capture is taken on the area rather than on what the press landed on, since a redraw between the press and
     // its release would detach that element and the release would never reach the page
     if (drag)
@@ -5486,10 +5711,15 @@ function wire(): void {
     state.scrubbing = true;
     if (drag.kind === "canvas") {
       // dragging the ground is going looking, as panning by the wheel is
-      panned = true;
-      view.x = drag.vx! + (e.clientX - drag.x);
-      view.y = drag.vy! + (e.clientY - drag.y);
-      applyView(false);
+      const d = drag;
+      const pan = () => {
+        panned = true;
+        view.x = d.vx! + (e.clientX - d.x);
+        view.y = d.vy! + (e.clientY - d.y);
+        applyView(false);
+      };
+      if (d.world) inWorld(d.world, pan);
+      else pan();
     } else if (drag.kind === "knob") {
       drag.el.classList.add("turning");
       const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
@@ -5546,7 +5776,7 @@ function wire(): void {
     (e) => {
       state.holding = null;
       const t = e.target as HTMLElement;
-      if (t.closest("#scroll") || t.closest("[data-knob]") || t.closest("#canvas")) return;
+      if (t.closest("#scroll") || t.closest("[data-knob]") || t.closest("#canvas, #history")) return;
       e.preventDefault();
       ui.scroll.scrollTop += e.deltaY;
       flick(e);
@@ -5567,21 +5797,29 @@ function wire(): void {
     { passive: false },
   );
 
-  // over the canvas the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
-  ui.canvas.addEventListener(
-    "wheel",
-    (e) => {
-      e.preventDefault();
-      hideTip();
-      // moving the map by hand is going looking: from here the reading no longer drags the view back
-      panned = true;
-      if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
-      view.x -= e.deltaX;
-      view.y -= e.deltaY;
-      applyView(false);
-    },
-    { passive: false },
-  );
+  // over either map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about
+  // the pointer; the history's map moves in its own world
+  const wheelOn = (el: HTMLElement, world?: World) =>
+    el.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        hideTip();
+        const move = () => {
+          // moving the map by hand is going looking: from here the reading no longer drags the view back
+          panned = true;
+          if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+          view.x -= e.deltaX;
+          view.y -= e.deltaY;
+          applyView(false);
+        };
+        if (world) inWorld(world, move);
+        else move();
+      },
+      { passive: false },
+    );
+  wheelOn(ui.canvas);
+  wheelOn(ui.history, pastWorld);
   // the depth strip scrubs: with the button held, crossing a cell sets that depth
   ui.crumb.addEventListener("pointerover", (e) => {
     const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
@@ -5589,13 +5827,19 @@ function wire(): void {
   });
   // Safari sends a pinch as a gesture of its own, with the scale so far
   let pinch = 1;
-  ui.canvas.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
-  ui.canvas.addEventListener("gesturechange", (e) => {
-    e.preventDefault();
-    const g = e as Event & { scale: number; clientX: number; clientY: number };
-    zoomAt(g.clientX, g.clientY, g.scale / pinch);
-    pinch = g.scale;
-  });
+  const pinchOn = (el: HTMLElement, world?: World) => {
+    el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
+    el.addEventListener("gesturechange", (e) => {
+      e.preventDefault();
+      const g = e as Event & { scale: number; clientX: number; clientY: number };
+      const zoom = () => zoomAt(g.clientX, g.clientY, g.scale / pinch);
+      if (world) inWorld(world, zoom);
+      else zoom();
+      pinch = g.scale;
+    });
+  };
+  pinchOn(ui.canvas);
+  pinchOn(ui.history, pastWorld);
 
   // the flick: a small reversal of the scroll, down then up then down within a moment, cycles the brief in focus
   const legs: { t: number; d: number }[] = [];
@@ -5624,11 +5868,16 @@ function wire(): void {
   // scrolls never reaches for the pointer, and held a moment it acts on the whole scope instead.
   const take = (c: Chord): boolean => {
     // a chord may be claimed by more than one act, as return reads on the canvas and opens in the lane: the one that
-    // can be taken where the reader stands takes it
-    const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
-    if (!act) return false;
-    act.run();
-    return true;
+    // can be taken where the reader stands takes it. Where the history holds the keys they act on its map, and only the
+    // acts that move and fold there, since the rest would reach into a lane the history does not have
+    const onPast = keyPane() === "history";
+    const run = (): boolean => {
+      const act = Object.entries(ACTIONS).find(([id, x]) => (!onPast || PAST_KEYS.includes(id)) && x.keys.some((k) => same(k, c)) && x.can())?.[1];
+      if (!act) return false;
+      act.run();
+      return true;
+    };
+    return onPast ? inWorld(pastWorld, run) : run();
   };
   let space: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } | null = null;
   const letGo = () => void (space && clearTimeout(space.timer), (space = null));
@@ -5719,6 +5968,7 @@ function wire(): void {
     alignEnds();
     drawAdjuncts();
     drawCanvas();
+    drawHistory();
     drawChooser();
     drawWingsAligned();
   });
@@ -5751,6 +6001,8 @@ function setBody(body: Body): void {
     recallView();
     return kept ? resume(readHash(), kept) : arrive(readHash());
   }
+  // a file changed, and the history may have with it: it is read again the next time it is drawn
+  past.stale = true;
   // the lane is drawn again from the new body, keeping the folds that still resolve and the scroll
   const kept = new Map(Array.from(state.folds).filter(([a]) => state.index!.by.has(a)));
   const top = ui.scroll.scrollTop;
@@ -5772,6 +6024,7 @@ async function start(): Promise<void> {
       <section id="canvas" hidden></section>
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section id="dish" hidden></section>
+      <section id="history" hidden></section>
       <section class="wing" data-area="wingR"></section>
       <div id="sheet" hidden></div>
       <div id="card" hidden></div>
@@ -5787,6 +6040,7 @@ async function start(): Promise<void> {
     areas: $("#areas"),
     canvas: $("#canvas"),
     dish: $("#dish"),
+    history: $("#history"),
     scroll: $("#scroll"),
     content: $("#content"),
     lane: $("#lane"),
@@ -5958,17 +6212,18 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
 #dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
-#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
+#canvas, #history { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
+#history > .none { margin: 48px 24px; font-size: 12px; color: var(--faint); }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
    the viewport, since a map is read by moving it rather than by seeing all of it at once */
 #canvas.bleed { border-radius: 0; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); }
 #canvas.bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
-#canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
+#canvas::after, #history::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
 /* of two panes, the one the keys belong to draws its rim in ink, so a key never acts somewhere the reader cannot see */
-#canvas.holds-keys::after { box-shadow: inset 0 0 0 1px var(--muted); }
+#canvas.holds-keys::after, #history.holds-keys::after { box-shadow: inset 0 0 0 1px var(--muted); }
 /* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
-#canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
+#canvas::before, #history::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
 /* a rim is written at the weight it is drawn at and divided by the view, so every line on the map keeps one weight however far it is zoomed */
 #stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; --hair: calc(1px / var(--k, 1)); --hair-on: calc(1.5px / var(--k, 1)); }
 #stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
@@ -6028,6 +6283,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .crow .marks .brief { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--door); }
 .crow .marks .sep { width: 4px; background: none; }
 .crow .marks .more { flex: none; font-size: .72em; line-height: 1; color: var(--faint); background: none; }
+/* what a commit changed outside the readings the body places: one quiet mark, since what it was is in the face */
+.crow .marks i.other { width: 6px; height: 6px; border-radius: 3px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
+/* a commit's face names the readings it touched, each in the hue it takes in the body */
+#face .touched { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 2px; font-size: 12px; line-height: 1.4; }
+#face .touched .reading { color: var(--on); }
+#face .touched .also { color: var(--faint); }
 /* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
 #field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
 #field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
@@ -6421,7 +6682,7 @@ body.touch #depth { gap: 4px; }
 body.touch #depth .dc { width: 28px; height: 28px; font-size: 12px; }
 /* the rail and the canvas take their gestures whole, so the page does not scroll under a finger that is scrubbing the
    one or panning the other */
-svg.shape, #canvas { touch-action: none; }
+svg.shape, #canvas, #history { touch-action: none; }
 /* the tooltip in a touch grain: the callout beside the thumb, on the side away from the edge the rail stands on */
 #tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
