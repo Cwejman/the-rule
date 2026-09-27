@@ -160,7 +160,7 @@ The history is drawn down the column, as any reading is, so the canvas stays one
 
 ### 4.4 It is opened as a pane of its own
 
-The history is [a pane of the middle](framework.md#26-the-middle-holds-one-pane-or-two), chosen from the strip as the lane, the canvas and the dish are, and it is the canvas drawing the history rather than the body. So it stands beside the lane, or beside the canvas of the body, and the reader moves in it as they move on any map.
+The history is [a pane of the middle](framework.md#26-the-middle-holds-one-pane-or-two), chosen from the strip as the lane, the canvas and the dish are, and it is the canvas drawing the history rather than the body. So it stands beside any other pane, the lane or a map of the body, and the reader moves in it as they move on any map.
 
 Its data is fetched when the pane first stands and not before, so a reader who never opens it never pays for it.
 
@@ -200,7 +200,7 @@ The data, the trace and the pane stand, and what is next is laid in the order ea
 
 3. Draw it: [the pane](#44-it-is-opened-as-a-pane-of-its-own), the canvas's own code drawing the whole history top-down, with a selected commit's face saying its subject, its author and its date, and its figure the readings it touched.
 
-4. Show what is felt rather than only specified, and so is the author's to see first: [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), and [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
+4. Show what is felt rather than only specified, and so is the author's to see first, once [where the pane takes its place from](#7-what-this-leaves-open) is answered: [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), and [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
 
 *In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three were done that day, the stories told afterwards by that session rather than as the debrief of the one that made the commits; the fourth is where it stops, since what the filter and a change in place feel like is read by looking.*
 
