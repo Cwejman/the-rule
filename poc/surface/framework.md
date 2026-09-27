@@ -121,7 +121,7 @@ A side of the middle holds one pane, so a pane pressed onto a side pushes out wh
 
 So pressing twice puts a pane beside what the reader had rather than in place of it, and nothing a press pushed out is lost to the next one.
 
-A lone pane pressed moves to the right where what it pushed out can come back to the left; where nothing can, it is the last pane, and the press does nothing. What a press pushed out is kept while the page is open, and a pane pressed at the left after a reload has nothing to give back, so it trades places with the pane beside it rather than leave a side empty.
+A lone pane pressed moves to the right where what it pushed out can come back to the left; where nothing can, it is the last pane, and the press does nothing. What a press pushed out is kept while the page is open, and a pane standing at the left, pressed after a reload, has nothing to give back, so it trades places with the pane beside it rather than leave a side empty.
 
 *The author's, 2026-09-27; what a lone pane does and what a reload forgets are the session's.*
 
@@ -135,7 +135,7 @@ Where the reader stands lived outside this state until 2026-09-19, in three valu
 
 Everything drawn that names a brief carries that brief's address. That one convention is what keeps the widgets in step: pointing at a brief in any of them lights it in all of them, and pressing it anywhere goes.
 
-The history is the one second state, and it is held apart on purpose. Its stories and commits are not the body's briefs, so it keeps a state of its own, [a world](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) that stands in this one's place while the history is drawn, and its addresses light only on its own map. What a pane press pushed out is kept beside the state as well, since it is a memory of the strip's and nothing reads it but the next press.
+Two things are kept beside the state, and neither is a second answer to anything it holds. The history is a second body and not a second answer about this one, so it keeps [a world](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) that stands in this one's place while it is drawn, and as yet its addresses light only on its own map; what a commit touched lighting the body's figures is [the history's next step](history.md#6-what-comes-next). And what a pane press pushed out is a memory of the strip's that nothing draws from, read only by the next press.
 
 *Reasoned, carried from [the first program](README.md#6-the-programs-before-this-one), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built.*
 
@@ -151,7 +151,7 @@ An entry also says whether its act can be taken at all, so a badge for an act ou
 
 The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6-settings), which is a wing widget like any other.
 
-The type: the zoom on the prose, the ratio by which each heading register grows over the body, the height of the prose's lines, and the lane's measure. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), and the fade at the edges. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the widget of each area, which by default is the shape in the left wing, nothing in the left gutter, the links in the right gutter and the ahead in the right wing.
+The type: the zoom on the prose, the ratio by which each heading register grows over the body, the height of the prose's lines, and the lane's measure. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), and the fade at the edges. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. The middle: the greatest width a map takes. And the widget of each area, which by default is the shape in the left wing, nothing in the left gutter, the links in the right gutter and the ahead in the right wing.
 
 *Reasoned, the author's, 2026-09-13; that headings scale by depth departs from [the design language's register rule](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice), at the author's ask.*
 
