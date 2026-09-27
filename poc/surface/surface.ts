@@ -1634,7 +1634,8 @@ const ACTIONS: Record<string, Action> = {
         : "Unfolds the brief: the paragraphs its face hides, and the level beneath it.",
     also: "The line itself, the chevron in the tree, and the room right of a brief's blocks in the shape.",
     shifted: "Shift folds the brief above instead, which takes you up to it.",
-    can: (a) => !!brief(acts(a)) && unfolds(brief(acts(a))!),
+    // the root never folds, since it is the whole of what is read
+    can: (a) => acts(a) !== "" && !!brief(acts(a)) && unfolds(brief(acts(a))!),
     run: (a) => cycle(acts(a)),
   },
   foldUp: {
@@ -1714,6 +1715,8 @@ const ACTIONS: Record<string, Action> = {
       state.settings.face = state.settings.face === "shown" ? "hidden" : "shown";
       saveSettings();
       drawCanvas();
+      // the setting is one for both maps, so the other is drawn again too, from outside whichever world pressed it
+      requestAnimationFrame(() => (drawCanvas(), drawHistory()));
     },
   },
   scope: {
@@ -2520,7 +2523,7 @@ const narrowChoices = (): string[] => [
 const chooser = { sheet: null as string | null };
 
 /** Whether a choice stands now: a pane in the middle, the shape as the rail beside the prose, any other figure opened whole. */
-const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? panesHeld().includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : chooser.sheet === k);
+const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? fits().panes.includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : chooser.sheet === k);
 
 /** One choice in the pill: what it is, and whether it stands. No side, since the pill has none. */
 function pickNarrowHtml(k: string): string {
@@ -3278,8 +3281,8 @@ function keyPane(): PaneName {
   return pointerRight ? panes[1] : panes[0];
 }
 
-/** Whether a key acts on a map: it does when the pane holding the keys is one. */
-const handOnMap = (): boolean => isMap(keyPane());
+/** Whether a key acts on a map: it does when the pane holding the keys is the canvas or the history; the dish has no act a key could fire. */
+const handOnMap = (): boolean => ["canvas", "history"].includes(keyPane());
 
 /** The pane holding the keys draws its rim in ink, where two stand; a lone pane has nothing to be told apart from. */
 function drawKeyRim(): void {
@@ -3583,6 +3586,8 @@ function drawCanvas(): void {
     fitCanvas();
     fitted = state.body.root;
     fittedWidth = ui.canvas.clientWidth;
+    // a map fitted again stood at its top, so the reader's place is brought back into view rather than left behind
+    followed = null;
   }
   applyView(false);
   // the map is wider than the pane, so the reading's own place is brought into view when it moves; a draw that only
@@ -3969,7 +3974,6 @@ async function loadPast(): Promise<void> {
   if (past.status === "loading") return;
   past.status = "loading";
   past.stale = false;
-  drawHistory();
   const get = async (path: string) => {
     const r = await fetch(path, { cache: "no-store" });
     if (!r.ok) throw new Error((await r.text()) || `${path}: ${r.status}`);
@@ -3990,6 +3994,7 @@ async function loadPast(): Promise<void> {
   } catch (e) {
     past.status = "failed";
     past.said = (e as Error).message;
+    console.warn(`no history: ${past.said}`);
   }
   drawHistory();
 }
@@ -3997,9 +4002,11 @@ async function loadPast(): Promise<void> {
 /** Draws the history's pane: the map of its stories and commits once it has them, and a word while it has not. */
 function drawHistory(): void {
   if (ui.history.hidden) return;
-  if (past.status === "none" || (past.stale && past.status === "ready")) return void loadPast();
-  if (past.status !== "ready") return void (ui.history.innerHTML = `<p class="none chrome">${past.status === "loading" ? "reading the history…" : `no history: ${esc(past.said)}`}</p>`);
+  // the pane is the world's from the first draw, so a wheel or a drag on it while it loads has somewhere to act
   if (!pastWorld.el) pastWorld.el = ui.history;
+  // read when first asked for, and again after a change or a failure; the map already drawn stays while it is
+  if (past.status === "none" || (past.stale && past.status !== "loading")) void loadPast();
+  if (!pastWorld.body) return void (ui.history.innerHTML = `<p class="none chrome">${past.status === "failed" ? `no history: ${esc(past.said)}` : "reading the history…"}</p>`);
   inWorld(pastWorld, () => {
     placeCanvas();
     drawCanvas();
@@ -4010,8 +4017,13 @@ function drawHistory(): void {
  * The readings a commit touched, by the body the lane reads: each file it changed that the body places, as that
  * reading's brief, and a count of what else it changed. Read from the body's own world, whichever map is being drawn.
  */
+const touchedKept = { body: null as Body | null, by: new Map<string, { readings: Brief[]; other: number }>() };
 function touchedBy(c: Commit): { readings: Brief[]; other: number } {
   const w = inside ? home! : takeWorld();
+  // a commit never changes, so what it touched is kept for as long as the body it is read against
+  if (touchedKept.body !== w.body) Object.assign(touchedKept, { body: w.body, by: new Map() });
+  const kept = touchedKept.by.get(c.hash);
+  if (kept) return kept;
   const readings: Brief[] = [];
   let other = 0;
   c.files.forEach((f) => {
@@ -4019,6 +4031,7 @@ function touchedBy(c: Commit): { readings: Brief[]; other: number } {
     if (at && !readings.includes(at)) readings.push(at);
     else if (!at) other++;
   });
+  touchedKept.by.set(c.hash, { readings, other });
   return { readings, other };
 }
 
@@ -4187,7 +4200,7 @@ function drawLayout(): void {
   // with the canvas standing, the spaces are the gap exactly and the canvas takes what is left; without it they share what is left
   // standing alone on a narrow screen the canvas takes the page whole, edge to edge: there is too little room to spend
   // any of it on a margin, and what falls outside is cut by the viewport as a map is
-  const bleed = narrow() && on.canvas && !on.lane;
+  const bleed = narrow() && on.canvas && on.panes.length === 1;
   const maps = on.panes.filter(isMap).length;
   const space = bleed ? "0px" : maps ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
   // the rail hugs the edge it stands on, so the space at that edge is nothing and the rail takes it
@@ -5554,7 +5567,7 @@ function wire(): void {
     point(el && !onPast ? el.dataset.a! : null);
     tip(e);
   });
-  document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
+  document.documentElement.addEventListener("pointerleave", () => (point(null), lightPast(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
 
   document.addEventListener("click", (e) => {
     hideTip();
@@ -5876,6 +5889,7 @@ function wire(): void {
     // can be taken where the reader stands takes it. Where the history holds the keys they act on its map, and only the
     // acts that move and fold there, since the rest would reach into a lane the history does not have
     const onPast = keyPane() === "history";
+    if (onPast && !pastWorld.body) return false;
     const run = (): boolean => {
       const act = Object.entries(ACTIONS).find(([id, x]) => (!onPast || PAST_KEYS.includes(id)) && x.keys.some((k) => same(k, c)) && x.can())?.[1];
       if (!act) return false;
@@ -5968,6 +5982,8 @@ function wire(): void {
     arrive(readHash());
   });
   window.addEventListener("resize", () => {
+    // what stands at the right may have changed under a still pointer, so the keys go back to the left until it moves
+    pointerRight = false;
     drawLayout();
     placeCrumb();
     alignEnds();
