@@ -8,7 +8,7 @@ status: open
 
 History is how the knowledge came to be what it is where a reader stands: which commits touched it, and the stories told over them. Git's history is read as a holarchy of its own, with the stories as its briefs and the commits as the leaves beneath them.
 
-Its data is built, its stories are traced, and it stands on the page as a pane of its own, its stories and commits as nodes; what a selection touched is not yet shown. [What comes next](#6-what-comes-next) says in what order.
+Its data is built, its stories are traced, and it stands on the page as a pane of its own, its stories and commits as nodes; neither the filter by where the reader stands nor what a selection touched is shown yet. [What comes next](#6-what-comes-next) says in what order.
 
 *Preferred, the author's design, settled in discussion with the session 2026-09-21; the data as built the same day, the trace and the pane 2026-09-27, and the rest open.*
 
@@ -68,7 +68,7 @@ The link's target is a commit's hash, or a run's first and last joined by two do
 
 A run holds both of its ends, where git's own two dots leave out the first; read by descent, it is what git calls the ancestry path from the first to the last, with the first itself. The target names no host, so it holds wherever the repository is read, in every project that takes it in as a submodule; on GitHub it reads as a link that goes nowhere, and the text still reads.
 
-The trace resolves a short hash, and warns where one is ambiguous, where a run is not a sequence in the history, and where two stories overlap. It warns as well where a git link stands inside other prose, since that places nothing, and where a lone link names a file, since the history places commits and not files. The rest of what it can say, `--history` prints.
+The trace resolves a short hash, and warns where one is ambiguous, where a run is not a sequence in the history, and where two stories overlap. It warns as well where a git link stands inside other prose, since that places nothing, and where a lone link names a file, since the history places commits and not files. The rest of what it can say, the surface's [`--history` flag](implementation.md#how-it-is-built) prints.
 
 *Preferred, the session's proposal taken by the author, 2026-09-21; a compare address on GitHub was weighed and refused, since it ties the substrate to one host. The two further warnings as built, 2026-09-27, from a cold review of the trace.*
 
@@ -114,7 +114,9 @@ A leaf carries its hash and no more of the commit, since the rest is in the hist
 
 The body and the history are the same structure, so the same code draws both: the canvas, the lane, selection, the keys and folding take a commit as they take a brief. A second code path for history would be a double standard, and every rule of the surface would then have to be kept twice.
 
-*Preferred, the author's, 2026-09-21.*
+As built, the canvas's code draws the history and the lane does not yet: a commit has no prose to lay, and what the lane shows of a commit is its change in place, which is [the next step](#6-what-comes-next).
+
+*Preferred, the author's, 2026-09-21; as built, 2026-09-27.*
 
 ## 4. What a reader sees
 
@@ -127,6 +129,8 @@ As built it is [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own) showin
 ### 4.1 Only the commits that touch where you stand
 
 Opening the history from an address shows only the commits that touched it, and the stories that hold them. For a reading, that is read from the files each commit touched; for a brief selected within it, from the briefs each commit touched. A commit that touched several readings is among the commits of each.
+
+Now that the history is a pane chosen from the strip rather than opened from an address, where it takes that address from is [open](#7-what-this-leaves-open).
 
 The filter is as true as the commits are, which is why [a commit is one purpose](../practice.md#13-a-commit-is-one-purpose).
 
