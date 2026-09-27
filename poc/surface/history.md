@@ -22,9 +22,11 @@ So this time nothing of git enters the body, and the data comes before any view,
 
 ### 1.1 The body is measured before and after
 
-Around anything of this that is built, the time the live process takes to hand the page its body and the weight of the built page are measured before and after. Neither may move.
+Around anything of this that is built, the time the live process takes to hand the page its body and the weight of the built page are measured before and after. Neither may move by anything of history's: nothing of its data enters the body or the page.
 
-*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte.*
+The page's own code grows when the history's pane is drawn by it, and that is measured and said, since a page that grows for its drawing is not a page that carries the history.
+
+*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
 
 ## 2. The history is a holarchy
 
@@ -48,9 +50,11 @@ A story is a brief of that file, a heading and its prose, and a larger story hol
 
 So the author can talk about the last three commits, a session adds a story of those three, and later a story of the last ten holds it, standing beside a story of the ten before.
 
-A story's commits, all its links together, are one run: a sequence in the root's history with nothing left out between its first and its last, read by descent as git reads a range, so that where branches were merged what was made on the other branch in the same days is not taken in. A larger story's run is its own commits and its smaller stories' together, and is one run as well. No two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap. How an overlap would be drawn is not known, and until it is there is none.
+A story's commits, all its links together, are one run: its first commit and every commit under the root that descends from it and leads to its last, with nothing left out between. So a run follows descent and not the calendar, and what was made on another branch in the same days is not in it. A larger story's run is its own commits and its smaller stories' together, and is one run as well.
 
-*Preferred, the author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his.*
+No two stories overlap: a story may hold a smaller story whole, which is nesting, never overlap.
+
+*Preferred, the author's, 2026-09-21, the runs as [he told them](../../author/ideas-2026-09-21.md#12-stories-told-over-runs-of-commits); contiguous on the session's proposal, and no overlap his. Read by descent, the session's, 2026-09-27, after a fresh head found a plain range taking in another branch.*
 
 #### 2.2.1 The link names a commit or a run
 
@@ -62,9 +66,9 @@ The link's target is a commit's hash, or a run's first and last joined by two do
 [The canvas spreads as a tree](git:152713e..b0b54e6)
 ```
 
-A run holds both of its ends, where git's own two dots leave out the first. The target names no host, so it holds wherever the repository is read, in every project that takes it in as a submodule; on GitHub it reads as a link that goes nowhere, and the text still reads.
+A run holds both of its ends, where git's own two dots leave out the first; read by descent, it is what git calls the ancestry path from the first to the last, with the first itself. The target names no host, so it holds wherever the repository is read, in every project that takes it in as a submodule; on GitHub it reads as a link that goes nowhere, and the text still reads.
 
-The trace resolves a short hash, and warns where one is ambiguous, where a run is not a sequence in the history, and where two stories overlap. It warns as well where a git link stands inside other prose, since that places nothing, and where a lone link names a file, since the history places commits and not files.
+The trace resolves a short hash, and warns where one is ambiguous, where a run is not a sequence in the history, and where two stories overlap. It warns as well where a git link stands inside other prose, since that places nothing, and where a lone link names a file, since the history places commits and not files. The rest of what it can say, `--history` prints.
 
 *Preferred, the session's proposal taken by the author, 2026-09-21; a compare address on GitHub was weighed and refused, since it ties the substrate to one host. The two further warnings as built, 2026-09-27, from a cold review of the trace.*
 
@@ -100,11 +104,11 @@ So the history is told as the work is done, not afterwards, and what [many small
 
 ### 2.6 It is handed over flat, as the body is
 
-The history's trace is handed to the page as [the body is](implementation.md#3-the-body-traced-and-flat): one flat list in reading order, which for a record is newest first, each brief carrying its address and the page deriving parent and depth from that. Stories and leaves stand in the one list, a leaf being a brief whose address ends in its commit's hash, cut as git cuts one, to seven characters, and lengthened where two would meet.
+The history's trace is handed to the page as [the body is](implementation.md#3-the-body-traced-and-flat): one flat list in reading order, which for a record is newest first, each brief carrying its address. Stories and leaves stand in the one list, a leaf being a brief whose address ends in its commit's hash, cut as git cuts one, to seven characters, and lengthened where two commits share their first seven.
 
-A leaf carries its hash and no more of the commit, since [the light tier](#51-the-light-tier-is-had-whole) holds the rest and a fact has one home. The trace is read from `history.md` whenever the history is asked for, and handed at `stories.json` beside the light tier, live and published alike.
+A leaf carries its hash and no more of the commit, since the rest is in the history's data, [beneath](#51-the-light-tier-is-had-whole), and a fact has one home. Live, the trace is read from `history.md` whenever the history is asked for; published, the build writes it; either way it stands at `stories.json`, beside the data.
 
-*Preferred, the author's, 2026-09-27, that the history travels flat as the briefs do; the name and the hash's length the session's.*
+*Preferred, the author's, 2026-09-27, that the history travels flat as the briefs do; the name and the hash's length the session's. As built the same day.*
 
 ## 3. One code for both
 
@@ -116,7 +120,9 @@ The body and the history are the same structure, so the same code draws both: th
 
 A reader sees the history from where they stand, what they select shows what it touched, and it is laid as any reading is.
 
-*Preferred, the author's, 2026-09-21.*
+As built it is [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own) showing the whole history, and the first two of these are [what comes next](#6-what-comes-next).
+
+*Preferred, the author's, 2026-09-21; as built, 2026-09-27.*
 
 ### 4.1 Only the commits that touch where you stand
 
@@ -144,7 +150,7 @@ A change in place fetches from [the heavy tier](#52-the-heavy-tier-is-had-a-comm
 
 ### 4.3 History is drawn top-down, as any reading is
 
-The history is drawn down the column, as any reading is, so the canvas stays one coherent picture. The author pictured it at first left to right with the commits along the bottom; a toggle between top-down and left-right belongs to the canvas as a whole, for every reading, and is a step of its own that history does not wait on.
+The history is drawn down the column, as any reading is, so the canvas stays one coherent picture; standing in a pane of its own, it reads as the canvas beside it does. The author pictured it at first left to right with the commits along the bottom; a toggle between top-down and left-right belongs to the canvas as a whole, for every reading, and is a step of its own that history does not wait on.
 
 *Preferred, the author's, 2026-09-21, turning from left to right for coherence in the canvas.*
 
@@ -154,7 +160,7 @@ The history is [a pane of the middle](framework.md#26-the-middle-holds-one-pane-
 
 Its data is fetched when the pane first stands and not before, so a reader who never opens it never pays for it.
 
-*The author's, 2026-09-27, that commits as nodes are a pane of their own; it answers how the history is opened, which stood open until then. As built the same day; [the implementation](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) says how one code draws both.*
+*Preferred, the author's, 2026-09-27, that commits as nodes are a pane of their own; it answers how the history is opened, which stood open until then. As built the same day; [the implementation](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) says how one code draws both.*
 
 ## 5. The data, in two tiers
 
@@ -182,7 +188,7 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 ## 6. What comes next
 
-The data stands, and what is next is laid in the order each step stands on the one before. A session taking this up begins at the first step not done.
+The data, the trace and the pane stand, and what is next is laid in the order each step stands on the one before. A session taking this up begins at the first step not done.
 
 1. Trace the history: read `history.md` when it is asked for, resolve its `git:` links against the light tier, make the commit leaves, stand the untold commits among the stories by time, warn as [the link says](#221-the-link-names-a-commit-or-a-run), and hand it over [flat](#26-it-is-handed-over-flat-as-the-body-is). Tested alone, as the data was, before anything is drawn.
 
@@ -192,7 +198,7 @@ The data stands, and what is next is laid in the order each step stands on the o
 
 4. Show what is felt rather than only specified, and so is the author's to see first: [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), and [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
 
-*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three were done that day; the fourth is where it stops, since what the filter and a change in place feel like is read by looking.*
+*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three were done that day, the stories told afterwards by that session rather than as the debrief of the one that made the commits; the fourth is where it stops, since what the filter and a change in place feel like is read by looking.*
 
 ## 7. What this leaves open
 
@@ -203,5 +209,7 @@ Whether lines across more commits than a story holds are ever wanted at once; if
 How a session tells its story where another session's commits fall between its own, since a run leaves nothing out and stories do not overlap.
 
 Whether the map opens the way to a touched brief the reader has not opened, or lights only what it holds.
+
+Where the history's pane takes the place it is seen from, now that it stands beside the other panes rather than being opened from an address: the focus of the reading beside it, what is selected on the canvas, or a place of its own.
 
 *Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice. How the history is opened was answered 2026-09-27, [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own).*
