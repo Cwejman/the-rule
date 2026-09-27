@@ -182,9 +182,9 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which): the pane at the left, or the one at the right while the pointer rests on it, and its rim says which. Where they belong to the map, these are the moves.
 
-Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so. The keys then belonged to the map whenever it stood, which held while one map could stand; with two sides and four panes, the rim is what tells the reader where the keys are.
+Until 2026-09-19 a key acted in the pane the reader had last acted in, which made every key modal on something the page never showed. A reader who opened the canvas and pressed an arrow moved the prose instead, because their hand had never been put on the map, and nothing on the page could tell them so.
 
-Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in both panes, and each acts in the pane the keys belong to.
+Three of the moves are the map's own, since what they act on is the map's structure: right, left and backspace. The rest mean something in the lane and on a map alike, and each acts in the pane the keys belong to.
 
 - Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
@@ -202,7 +202,7 @@ The last two divide by where the prose stands. While the reader is only looking,
 
 That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.
 
-*The author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
+*Which pane holds the keys, the author's of 2026-09-27. The moves, the author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
 
 ### 5.3 What is selected shows its face
 
