@@ -64,7 +64,13 @@ async function run(): Promise<void> {
   }
   // the history is traced apart from the body, as it is served, so a session writing a story can read what it told
   if (flag("--history") >= 0) {
-    const h = await traceHistory(root);
+    let h: Body;
+    try {
+      h = await traceHistory(root);
+    } catch (e) {
+      // a tree that is not a repository, or a clone without its history, has none to tell
+      return void console.error(`no history: ${(e as Error).message}`);
+    }
     const subject = new Map((await historyOf(root)).commits.map((c) => [c.hash, c.subject]));
     h.briefs.forEach((b) => console.log(`${"  ".repeat(depthOf(b.address))}${b.commit ? `${b.commit.slice(0, 7)} ${subject.get(b.commit)}` : `# ${b.title}  [${b.address || "·"}]`}`));
     h.warnings.forEach((w) => console.log("  " + w));
@@ -1144,12 +1150,17 @@ async function traceHistory(rootArg: string): Promise<Body> {
   const rootDir = dirname(rootFileOf(rootArg));
   const file = join(rootDir, "history.md");
   const past = await historyOf(rootArg);
-  // a link of the git scheme is the history's own, so the trace's word that it is not followed is not a fault here
+  const { cwd } = await repoOf(rootArg);
   const told = existsSync(file) ? await trace(file) : null;
-  const warnings = (told?.warnings ?? []).filter((w) => !w.includes("the scheme git:"));
+  // a link of the git scheme is the history's own, so the trace's word that it is not followed is not a fault here;
+  // and a file that is not under the rule is said once, as the history's, rather than as a placement skipped
+  const warnings = told && told.briefs.length === 0 ? ["history.md is not under the rule, so no story is read"] : (told?.warnings ?? []).filter((w) => !w.includes("the scheme git:"));
   const warn = (w: string) => void warnings.push(`history.md: ${w}`);
   const root: Brief = told?.briefs[0] ?? { address: "", title: "History", number: "", written: "", file: "history.md", kind: "record", body: [], door: false };
-  const stories = told ? told.briefs.slice(1) : [];
+  // the history places commits and not files: a lone link to a file would pull that file's briefs in as stories, so
+  // what the trace reached in other files is left out, and the link says so
+  const stories = told ? told.briefs.slice(1).filter((b) => b.file === root.file) : [];
+  told?.briefs.slice(1).forEach((b) => b.file !== root.file && b.card && warn(`"${told.briefs.find((x) => x.address === parentOf(b.address))?.title ?? root.title}" places ${b.file}; the history places commits, not files, and it is left out`));
   if (told && root.kind !== "record") warn(`stamped as ${root.kind}; the history is a record`);
   const commits = past.commits;
   const at = new Map(commits.map((c, i) => [c.hash, i]));
@@ -1164,6 +1175,15 @@ async function traceHistory(rootArg: string): Promise<Body> {
     warn(`${said} names ${short}, which ${hits.length ? `is ${hits.length} commits under the root; give more of the hash` : "is no commit under the root"}`);
     return null;
   };
+  /**
+   * The commits under the root from one commit to another, both held: what git means by first^..last, the ancestors of
+   * the last that are not ancestors of the first's parents. So a run is read by descent and not by date, and where
+   * branches were merged, what was made on the other branch in the same days is not taken in.
+   */
+  const between = async (first: number, last: number): Promise<number[]> => {
+    const out = await git(cwd, ["log", "--format=%H", commits[last].hash, "--not", ...commits[first].parents, "--", "."]);
+    return out.toString().split("\n").flatMap((h: string) => (at.has(h) ? [at.get(h)!] : [])).sort((x: number, y: number) => x - y);
+  };
   // what each story places, in the order its links stand; the list is newest first, so a run's first is its oldest
   // and stands at the larger index
   const own = new Map<string, number[]>();
@@ -1171,15 +1191,26 @@ async function traceHistory(rootArg: string): Promise<Body> {
   for (const b of [root, ...stories]) {
     const said = `"${b.title}"`;
     const mine: number[] = [];
-    b.body = b.body.filter((t) => {
+    const kept: Tok[] = [];
+    for (const t of b.body) {
       const g = gitPlacement(t);
-      if (!g) return true;
-      if ("fault" in g) return void warn(`${said} places ${g.href}, which is neither a commit's hash of four characters or more nor a run of two`), false;
-      const from = find(g.from, said);
-      const to = g.to === g.from ? from : find(g.to, said);
-      if (from === null || to === null) return false;
-      if (from < to) warn(`${said} places ${g.from}..${g.to}, whose first is newer than its last; a run is written oldest first, and it is read the other way round`);
-      const run = Array.from({ length: Math.abs(from - to) + 1 }, (_, k) => Math.min(from, to) + k);
+      if (!g) {
+        kept.push(t);
+        continue;
+      }
+      if ("fault" in g) {
+        warn(`${said} places ${g.href}, which is neither a commit's hash of four characters or more nor a run of two`);
+        continue;
+      }
+      let from = find(g.from, said);
+      let to = g.to === g.from ? from : find(g.to, said);
+      if (from === null || to === null) continue;
+      if (from < to) {
+        warn(`${said} places ${g.from}..${g.to}, whose first is newer than its last; a run is written oldest first, and it is read the other way round`);
+        [from, to] = [to, from];
+      }
+      const run = from === to ? [from] : await between(from, to);
+      if (!run.includes(from)) warn(`${said} places ${g.from}..${g.to}, and ${g.from} is not an ancestor of ${g.to}; the run holds what descends from neither`);
       // separate links are written newest first, as the record is, so each stands older than the one before it
       if (mine.length && Math.min(...run) <= Math.max(...mine)) warn(`${said} places ${g.from === g.to ? g.from : `${g.from}..${g.to}`} out of time's order; the record stands newest first`);
       run.forEach((i) => {
@@ -1188,11 +1219,15 @@ async function traceHistory(rootArg: string): Promise<Body> {
         placedBy.set(i, b.title);
         mine.push(i);
       });
-      return false;
-    });
+    }
+    b.body = kept;
+    // a git link anywhere else places nothing, and a reader who wrote one meant it to
+    linksIn(kept)
+      .filter((l) => /^git:/i.test(l.href ?? ""))
+      .forEach((l) => warn(`${said} links ${l.href} inside other prose, which places nothing; a commit is placed by a paragraph that is its link alone`));
     own.set(b.address, mine);
   }
-  if (root.address === "" && own.get("")!.length) warn(`the history's own brief places commits; a commit is placed by the story that tells it`);
+  if (own.get("")!.length) warn(`the history's own brief places commits; a commit is placed by the story that tells it`);
   // a story's run is its own commits and every smaller story's beneath it, and it leaves nothing out between its ends
   const kids = (a: string) => stories.filter((b) => parentOf(b.address) === a && b.address !== a);
   const runOf = new Map<string, number[]>();
@@ -1202,46 +1237,60 @@ async function traceHistory(rootArg: string): Promise<Body> {
     return all;
   };
   gather("");
+  // what each story's run spans, by descent from its oldest commit to its newest
+  const span = new Map<string, number[]>();
   for (const b of stories) {
     const run = runOf.get(b.address)!;
-    if (!run.length) warn(`"${b.title}" tells no commit, so it has no place in time and stands first`);
-    else if (run[run.length - 1] - run[0] + 1 !== run.length) warn(`"${b.title}" leaves out ${run[run.length - 1] - run[0] + 1 - run.length === 1 ? "a commit" : `${run[run.length - 1] - run[0] + 1 - run.length} commits`} between its first and its last; a story's commits are one run`);
+    if (!run.length) {
+      warn(`"${b.title}" tells no commit, so it has no place in time and stands first`);
+      continue;
+    }
+    const whole = run.length === 1 ? run : await between(run[run.length - 1], run[0]);
+    span.set(b.address, whole);
+    const left = whole.filter((i) => !run.includes(i)).length;
+    if (left) warn(`"${b.title}" leaves out ${left === 1 ? "a commit" : `${left} commits`} between its first and its last; a story's commits are one run`);
   }
-  // no two stories beside each other overlap; a story may hold a smaller one whole, which is nesting
+  // no two stories beside each other overlap: neither tells a commit the other's run spans. A story may hold a smaller
+  // one whole, which is nesting
   for (const a of ["", ...stories.map((b) => b.address)]) {
-    const level = kids(a).filter((k) => runOf.get(k.address)!.length);
+    const level = kids(a).filter((k) => span.has(k.address));
     level.forEach((x, i) =>
       level.slice(i + 1).forEach((y) => {
-        const [p, q] = [runOf.get(x.address)!, runOf.get(y.address)!];
-        if (p[0] <= q[q.length - 1] && q[0] <= p[p.length - 1]) warn(`"${x.title}" and "${y.title}" overlap; a story holds a smaller one whole or stands apart from it`);
+        const crosses = (p: string, q: string) => runOf.get(p)!.some((c) => span.get(q)!.includes(c));
+        if (crosses(x.address, y.address) || crosses(y.address, x.address)) warn(`"${x.title}" and "${y.title}" overlap; a story holds a smaller one whole or stands apart from it`);
       }),
     );
   }
   // the flat list: each level in time's order, newest first, a story standing where its newest commit would
+  const taken = new Set(stories.map((b) => b.address));
   const leaf = (i: number, parent: string): Brief => {
     const c = commits[i];
-    const short = c.hash.slice(0, cut);
+    const at = (h: string) => (parent ? `${parent}/${h}` : h);
+    // a story titled as a hash would share the leaf's address, and then the leaf takes the whole hash
+    const address = taken.has(at(c.hash.slice(0, cut))) ? at(c.hash) : at(c.hash.slice(0, cut));
     // the subject stands in the light tier, which the page joins by the hash, so it is not carried twice
-    return { address: parent ? `${parent}/${short}` : short, title: "", number: "", written: "", file: "history.md", kind: "commit", body: [], door: false, commit: c.hash };
+    return { address, title: "", number: "", written: "", file: "history.md", kind: "commit", body: [], door: false, commit: c.hash };
   };
   const untold = commits.map((_, i) => i).filter((i) => !placedBy.has(i));
   const when = (a: string) => runOf.get(a)?.[0] ?? -1;
   const briefs: Brief[] = [root];
-  const lay = (a: string, placed: number[]): void => {
+  const titleOf = (a: string) => (a === "" ? root.title : (stories.find((b) => b.address === a)?.title ?? a));
+  const lay = (holder: Brief, placed: number[]): void => {
+    const a = holder.address;
     const items = [...kids(a).map((b) => ({ t: when(b.address), b, story: true })), ...placed.map((i) => ({ t: i, b: leaf(i, a), story: false }))].sort((x, y) => x.t - y.t);
-    // the stories are written newest first, and read in time's order whatever order they were written in
-    const written = kids(a).map((b) => b.address);
-    const timed = items.filter((x) => x.story).map((x) => x.b.address);
-    if (written.join("|") !== timed.join("|")) warn(`the stories under "${a === "" ? root.title : brief(a)?.title ?? a}" are not written newest first; they are read in time's order`);
+    // the stories are written newest first, and read in time's order whatever order they were written in; one that
+    // tells no commit has no time, and is said once already
+    const dated = (b: Brief) => runOf.get(b.address)!.length > 0;
+    const written = kids(a).filter(dated).map((b) => b.address);
+    const timed = items.filter((x) => x.story && dated(x.b)).map((x) => x.b.address);
+    if (written.join("|") !== timed.join("|")) warn(`the stories under "${titleOf(a)}" are not written newest first; they are read in time's order`);
+    holder.door = items.length > 0;
     items.forEach((x) => {
       briefs.push(x.b);
-      if (x.story) lay(x.b.address, own.get(x.b.address) ?? []);
+      if (x.story) lay(x.b, own.get(x.b.address) ?? []);
     });
-    const holder = a === "" ? root : briefs.find((b) => b.address === a);
-    if (holder) holder.door = items.length > 0;
   };
-  const brief = (a: string) => stories.find((b) => b.address === a);
-  lay("", [...untold, ...(own.get("") ?? [])].sort((x, y) => x - y));
+  lay(root, [...untold, ...own.get("")!].sort((x, y) => x - y));
   return { title: root.title, root: "history.md", briefs, warnings, traced: new Date().toISOString() };
 }
 
