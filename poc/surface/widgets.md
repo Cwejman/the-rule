@@ -194,9 +194,9 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 ## 7. The plate
 
-The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
+The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge, each level a ring around the one inside it. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
 
-At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate is seen a cell per brief.
+At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
 *Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
@@ -210,7 +210,7 @@ It is laid once for each body, still and with nothing random in it, so the same 
 
 ### 7.2 A plate too small for a cell per brief stands a cell per file
 
-Where the middling cell would stand less than three pixels across, the plate stands a cell per file instead: the root and each placed file's own brief, each file sharing its parent's edge by how many files stand beneath it. A wing's plate is mostly this; the dish, at the middle's size, is a cell per brief.
+Where the median cell would stand less than three pixels across, the plate stands a cell per file instead: the root and each placed file's own brief, each file sharing its parent's edge by how many files stand beneath it. A wing's plate of a large body is mostly this.
 
 So nothing is drawn too thin to see, which is [the floor every figure keeps](#11-nothing-is-drawn-too-small-to-read), met by showing less rather than by shrinking through it.
 
@@ -220,9 +220,13 @@ So nothing is drawn too thin to see, which is [the floor every figure keeps](#11
 
 A cell may be a whole file, so the plate marks its own focus: the deepest cell drawn on the way to the focus is the one that holds it, wherever in the file the reader stands, and the cells on the way to it are marked too. Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone.
 
-Every branch reads by its hue in every state: the plate's tones stand close together, each just under what the weakest branch hue holds at its lightness, so no branch goes dull where another stays vivid.
-
 *As built, 2026-09-22.*
+
+### 7.4 Every branch reads by its hue in every state
+
+The plate is mostly colour, so its tones stand close together, each just under what the weakest branch hue holds at its lightness: no branch goes dull where another stays vivid, whether a cell is marked, pale or lit.
+
+*As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register.*
 
 ## 8. The keys
 
