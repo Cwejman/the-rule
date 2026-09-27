@@ -15,7 +15,7 @@ It is read as [the surface's history](poc/surface/history.md) says, and never pl
 
 On 2026-09-21 the author took up git again, four days after [the first attempt](ideas/history.md) was taken out, and asked that the foundation be laid properly this time. The day designed the history as a reading of its own, built both tiers of its data and measured them, and read the design cold six times. Nothing of it was drawn.
 
-*Reasoned from the commits and the briefs they wrote by a later session, 2026-09-27, and not seen; the session that did the work told no story, since the practice of telling one was written that day.*
+*Reasoned from the commits and the briefs they wrote by a later session, 2026-09-27, and not seen; the session that did the work told no story, and nothing yet read one.*
 
 ### The day is placed
 
@@ -33,7 +33,7 @@ The practice and the implementation were brought along with the rounds: a commit
 
 [Six rounds of fresh heads](git:cad337e..e18acf8)
 
-*Reasoned from the commits by a later session, 2026-09-27; that the last round changed only words is the working session's own account, kept outside the repository; its commit says only that it holds the sixth round's last words.*
+*Reasoned from the commits by a later session, 2026-09-27.*
 
 ### A cold review of the data
 
