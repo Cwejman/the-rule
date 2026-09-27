@@ -200,11 +200,13 @@ At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-
 
 *Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
-### 7.1 The holarchy comes first
+### 7.1 A cell's room is how many stand beneath it
 
 A cell's share of its parent's edge is how many cells stand beneath it, and each ring's area follows how many cells it holds, so a crowded level has the room it needs and a level of few is not drawn as a band of wide slabs. The room between two cells is their kinship's: a hairline within a file, more between two files, most between two branches.
 
-It is laid once for each body, still and with nothing random in it, so the same body always lays the same plate. Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place.
+It is laid once for each body, still and with nothing random in it, so the same body always lays the same plate.
+
+Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place.
 
 *As built, 2026-09-22. It replaced, the same day, a trial of droplets pushed apart and drawn back to their rings, and with it the plate of 2026-09-12, droplets cut by their neighbours; why the trial gave way was said in talk and is not written, and the session that writes this did not hear it.*
 
