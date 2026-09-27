@@ -182,7 +182,7 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which). Where they belong to a map, these are the moves.
 
-Three of the moves act on the map's structure: right, left and backspace; in the lane, left and backspace have meanings of their own, given with each. The rest mean the same in the lane and on a map, and each acts in the pane the keys belong to.
+Three of the moves act on the map's structure: right, left and backspace; in the lane, left and backspace have meanings of their own, given with each. The rest have a meaning in the lane as well, given with each, and each acts in the pane the keys belong to.
 
 - Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
@@ -196,11 +196,11 @@ Three of the moves act on the map's structure: right, left and backspace; in the
 
 - The full stop takes the reader back to where they are: the selection returns to the reading line, the way to it is opened where the map had closed it, and anything folded over it is unfolded. With shift it leaves only that way, folding and closing everything else. A map that spreads needs both, since what the reader opened stays open until they say otherwise.
 
-Backspace and shift with return divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have gone in, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
+Backspace and shift with return divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have taken the prose there with return, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace goes quiet there rather than doing nothing.
 
 That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.
 
-*Which pane holds the keys, the author's of 2026-09-27. The moves, the author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
+*The moves, the author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
 
 ### 5.3 What is selected shows its face
 
