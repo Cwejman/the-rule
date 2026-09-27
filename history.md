@@ -11,6 +11,76 @@ It is read as [the surface's history](poc/surface/history.md) says, and never pl
 
 *Begun 2026-09-27; each story says who told it.*
 
+## The middle takes two sides, and history is drawn
+
+On 2026-09-27 the author asked for the history to be carried on until a step that is not trivial, and for the middle to hold two panes with sides, since with the dish there were three. The session wrote the design first, gave the panes their sides and the keys a holder, traced the stories, told the first of them, and drew the history as a pane by the canvas's own code. It stopped before a selection shows what it touched, which is the author's to see first.
+
+*Told by the session that made these commits, 2026-09-27, as its debrief; this story's own commit stands untold above it.*
+
+### Six rounds of fresh heads, and two cold reviews
+
+The briefs were read cold six times until a round changed only words, and the pane's code was reviewed cold twice. What they mended in the code: a story's run is read by git's ancestry path, so a branch forked before it and merged within it is not taken in; the history's pane no longer throws or blanks while it is read, retries a failure, and brings the reader's place back once a width settles. In the briefs, older faults the rounds met on the way were mended with the new.
+
+[Six rounds of fresh heads, and two cold reviews](git:0fea5f2..c78ab68)
+
+*Told by the session that made them, 2026-09-27.*
+
+### The briefs say what is built
+
+The implementation, the surface's entry and the history's brief were brought up to the trace and the pane as built, and the body's measure was taken again: it stood at 0.75 seconds, and nothing of history's data is in the page.
+
+[The briefs say what is built](git:c3aef0b..8a6672c)
+
+*Told by the session that made them, 2026-09-27.*
+
+### The history is drawn as a pane
+
+The history is drawn by the canvas's own code over a world of its own, set in the state's place while it draws and answers: its stories and commits as nodes, a commit's face telling who, when and the readings it touched, fetched only when the pane first stands.
+
+[The history is drawn as a pane](git:fa93520)
+
+*Told by the session that made it, 2026-09-27.*
+
+### The trace is reviewed cold
+
+A cold review of the trace, run against repositories made for it, found six faults, and all were mended: a run read by date took in another branch's commits, a lone link to a file pulled that file in as stories, and four smaller.
+
+[The trace is reviewed cold](git:667aa0e)
+
+*Told by the session that made it, 2026-09-27.*
+
+### The first stories are told
+
+The day history's foundation was laid, 2026-09-21, is told in six stretches over its thirty-two commits, so the trace has a real history to read.
+
+[The first stories are told](git:d0496b6)
+
+*Told by the session that made it, 2026-09-27.*
+
+### The stories are traced
+
+`history.md` is traced when it is asked for: its `git:` links resolved against the light tier, the commits placed as leaves beneath their stories, the untold among them by time, handed flat as the body is, and every fault a run or a story can have warned of.
+
+[The stories are traced](git:2aa1869)
+
+*Told by the session that made it, 2026-09-27.*
+
+### The middle takes two sides
+
+A pane is pressed onto the left, then the right, then away, giving back what each press pushed out, and the pane holding the keys draws its rim in ink.
+
+[The middle takes two sides](git:62cd1ac)
+
+*Told by the session that made it, 2026-09-27.*
+
+### The design is written first
+
+The framework, the canvas's keys, the plate as it had been laid again on 2026-09-22, and the history were written before anything was built.
+
+[The design is written first](git:75d3db0..658a447)
+
+*Told by the session that made it, 2026-09-27.*
+
 ## History's foundation is laid, data first
 
 On 2026-09-21 the author took up git again, four days after [the first attempt](ideas/history.md) was taken out, and asked that the foundation be laid properly this time. The day designed the history as a reading of its own, built both tiers of its data and measured them, and read the design cold six times. Nothing of it was drawn.
