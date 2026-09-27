@@ -15,7 +15,7 @@ It is read as [the surface's history](poc/surface/history.md) says, and never pl
 
 On 2026-09-21 the author took up git again, four days after [the first attempt](ideas/history.md) was taken out, and asked that the foundation be laid properly this time. The day designed the history as a reading of its own, built both tiers of its data and measured them, and read the design cold six times. Nothing of it was drawn.
 
-*Reasoned from the commits and the briefs they wrote by a later session, 2026-09-27, and not seen; the session that did the work told no story, and no trace or page yet read one.*
+*Reasoned from the commits and the briefs they wrote by a later session, 2026-09-27, and not seen; the session that did the work told no story, and on that day no trace or page yet read one.*
 
 ### The day is placed
 
