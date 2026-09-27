@@ -144,7 +144,7 @@ A story tells a stretch of time, not a place, so it holds whatever its run holds
 
 ### 4.2 A selection shows what it touched
 
-Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the map lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there.
+Selecting a commit, or a story that holds ten, shows what it touched in three places: [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the canvas lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there.
 
 In place, the blocks that changed are marked and the rest is left as it is, and what was removed is shown only when asked; a finer marking may come later. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 
@@ -200,9 +200,11 @@ The data, the trace and the pane stand, and what is next is laid in the order ea
 
 3. Draw it: [the pane](#44-it-is-opened-as-a-pane-of-its-own), the canvas's own code drawing the whole history top-down, with a selected commit's face saying its subject, its author and its date, and its figure the readings it touched.
 
-4. Show what is felt rather than only specified, and so is the author's to see first, once [where the pane takes its place from](#7-what-this-leaves-open) is answered: [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), and [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the map and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks.
+4. Show [what a selection touched](#42-a-selection-shows-what-it-touched) on the shape, the canvas and in place in the lane, fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks. It is felt rather than only specified, and so is the author's to see first.
 
-*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three were done that day, the stories told afterwards by that session rather than as the debrief of the one that made the commits; the fourth is where it stops, since what the filter and a change in place feel like is read by looking.*
+5. Show [only the commits that touch where the reader stands](#41-only-the-commits-that-touch-where-you-stand), once [where the pane takes its place from](#7-what-this-leaves-open) is answered.
+
+*In force as the order, the session's, 2026-09-21, when the author paused the work after the data; laid again 2026-09-27, when the author asked that the work go on until a step that is not trivial, and the pane was his. The first three were done that day, the stories told afterwards by that session rather than as the debrief of the one that made the commits; the fourth is where it stops, since what a change in place feels like is read by looking, and the fifth waits on a question.*
 
 ## 7. What this leaves open
 
@@ -212,8 +214,8 @@ Whether lines across more commits than a story holds are ever wanted at once; if
 
 How a session tells its story where another session's commits fall between its own, since a run leaves nothing out and stories do not overlap.
 
-Whether the map opens the way to a touched brief the reader has not opened, or lights only what it holds.
+Whether the canvas opens the way to a touched brief the reader has not opened, or lights only what it holds.
 
 Where the history's pane takes the place it is seen from, now that it stands beside the other panes rather than being opened from an address: the focus of the reading beside it, what is selected on the canvas, or a place of its own.
 
-*Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice. How the history is opened was answered 2026-09-27, [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own).*
+*Open, 2026-09-21; the rest raised that day was answered the same day, and [the granularity of a commit](../practice.md#13-a-commit-is-one-purpose) went to the practice. How the history is opened was answered 2026-09-27, [a pane of its own](#44-it-is-opened-as-a-pane-of-its-own), and where that pane takes its place from was raised the same day.*
