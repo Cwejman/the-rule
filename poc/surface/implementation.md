@@ -260,7 +260,7 @@ The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reade
 
 Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
-Pan and zoom are one transform on the stage, which the browser composites without laying anything out again, and the type scales with it. The wheel pans, and a pinch, which arrives as a wheel with the control key, zooms about the pointer. A drag on the ground pans, a press on a row selects it and opens what it names, and a press again on what is selected goes there. A view fits the map once, when it is first drawn; after that an opening eases the reading it opened into the pane and nothing else moves.
+Pan and zoom are one transform on the stage, which the browser composites without laying anything out again, and the type scales with it. The wheel pans, and a pinch, which arrives as a wheel with the control key, zooms about the pointer. A drag on the ground pans, a press on a row selects it and opens what it names, and a press again on what is selected goes there. A view fits the map when it is first drawn, and again when its pane is given another width, unless the reader has moved it by hand, since a map fitted to a pane that has since halved runs off its edge; after that an opening eases the reading it opened into the pane and nothing else moves.
 
 With the lane taken out of the middle it is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from the canvas alone.
 
@@ -268,13 +268,13 @@ With the lane taken out of the middle it is kept laid out of sight rather than h
 
 #### 6.5.1 The history is the canvas over a world of its own
 
-[The history's pane](history.md#44-it-is-opened-as-a-pane-of-its-own) is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and its pane. While it draws or answers, its world is set in the state's place, and the body's is set back after.
+[The history's pane](history.md#44-it-is-opened-as-a-pane-of-its-own) is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and the element it is drawn into. While it draws or answers, its world is set in the state's place, and the body's is set back after.
 
 It answers a press, a key, a pointer or a wheel on its pane that way, and whatever the canvas leaves to a later frame re-enters the world that left it.
 
-Nothing of the canvas is written twice, and what the history needs of its own is small: a commit's face and figure, a fold that lays no lane, and the few acts that move on a map. The keys it takes are those, since the rest reach into a lane the history does not have. Its addresses are its own, so nothing the body lights reaches its rows, and nothing it lights reaches the body's.
+Nothing of the canvas is written twice, and what the history needs of its own is small: a commit's face and figure, a fold that lays no lane, and the few acts that move on a map. The keys it takes are those, since the rest reach into a lane the history does not have.
 
-A map is fitted to its pane when it is first drawn, and again when the pane is given another width, unless the reader has moved it by hand.
+Its addresses are its own, so nothing the body lights reaches its rows, and nothing it lights reaches the body's.
 
 *In force, 2026-09-27, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state.*
 
