@@ -194,27 +194,35 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 ## 7. The plate
 
-The plate is a wing widget: the body whole in one square, drawn as droplets on a round plate. The root sits at the centre, its briefs are droplets around it, and each carries its own smaller droplets further out, level by level to the rim. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is grey at every depth.
+The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one). It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
+At the middle's size it is [the dish](framework.md#27-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate is seen a cell per brief.
 
-### 7.1 Droplets meet without merging
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
-Each droplet is cut by its neighbours where they meet, so the plate is shared by what each brief [weighs](#62-the-switches), and a droplet stays compact however small it gets, where [a rectangle's cells degenerate](refused.md#f-a-rectangle-dividing-into-rectangles). Pressing a droplet goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place, since a droplet has no room beside it for a second press.
+### 7.1 The holarchy comes first
 
-*Reasoned, the author's, 2026-09-12.*
+A cell's share of its parent's edge is how many cells stand beneath it, and each ring's area follows how many cells it holds, so a crowded level has the room it needs and a level of few is not drawn as a band of wide slabs. The room between two cells is their kinship's: a hairline within a file, more between two files, most between two branches.
 
-### 7.2 Every level draws to the rim
+It is laid once for each body, still and with nothing random in it, so the same body always lays the same plate. Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place.
 
-Every level draws to the rim, however small its droplets, since the plate is for the whole topology and a level left undrawn defeats it. This is the one figure that goes beneath [the floor](#11-nothing-is-drawn-too-small-to-read): a crowded level goes to slivers rather than away.
+*As built, 2026-09-22. It replaced, the same day, a trial of droplets pushed apart and drawn back to their rings, and with it the plate of 2026-09-12, droplets cut by their neighbours; why the trial gave way was said in talk and is not written, and the session that writes this did not hear it.*
 
-*Reasoned, the author's ask of 2026-09-13, after a plate that stopped two rings out.*
+### 7.2 A plate too small for a cell per brief stands a cell per file
 
-### 7.3 The figure is cut to what it draws
+Where the middling cell would stand less than three pixels across, the plate stands a cell per file instead: the root and each placed file's own brief, each file sharing its parent's edge by how many files stand beneath it. A wing's plate is mostly this; the dish, at the middle's size, is a cell per brief.
 
-A body whose levels fill one side of the plate leaves the other empty, and that room is not kept, so the plate stands as wide and as tall as it draws.
+So nothing is drawn too thin to see, which is [the floor every figure keeps](#11-nothing-is-drawn-too-small-to-read), met by showing less rather than by shrinking through it.
 
-*Reasoned, the author's, 2026-09-13.*
+*As built, 2026-09-22; it supersedes the plate of 2026-09-13 that drew every level to the rim as slivers.*
+
+### 7.3 A cell marks the focus it holds
+
+A cell may be a whole file, so the plate marks its own focus: the deepest cell drawn on the way to the focus is the one that holds it, wherever in the file the reader stands, and the cells on the way to it are marked too. Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone.
+
+Every branch reads by its hue in every state: the plate's tones stand close together, each just under what the weakest branch hue holds at its lightness, so no branch goes dull where another stays vivid.
+
+*As built, 2026-09-22.*
 
 ## 8. The keys
 
