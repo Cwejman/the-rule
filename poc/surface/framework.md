@@ -37,13 +37,13 @@ The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in 
 
 The lane keeps its measure, the width of its line of text, which is a setting. The gutters are wider than an editor's gutter, since what stands there is read, and they take the room the wings have left them rather than a width of their own: as wide as an adjunct reads best in where there is room, narrower where there is not, and out as a pair below the least it still reads in.
 
-A wing is as wide as the widest figure it holds, and every figure declares a width that never changes with what it draws, so nothing beside it moves as it redraws. A wing's [strip](#3-the-strip) is free to reach a little past it into the space beside.
+A wing is as wide as the widest figure it holds, and every figure declares a width that never changes with what it draws, so nothing beside it moves as it redraws.
 
 *Reasoned, the author's asks of 2026-09-14.*
 
 ### 2.2 The spaces between are one
 
-No area carries room it does not use, so the spacing is the spaces between them, and those are one: the space at either edge of the viewport is the space between a wing and the lane.
+No area carries room it does not use, so the spacing is the spaces between them, and those are one: the space at either edge of the viewport is the space between a wing and the middle.
 
 The gap setting is the least a space is given, and what the width leaves over is shared among the spaces evenly. The gutters are the exception to the sharing, standing exactly a gap from the lane, since what stands in them is aligned to its lines.
 
@@ -81,7 +81,7 @@ The gutters belong to the lane and stand only beside it, wherever in the middle 
 
 A key names no place, so where two panes stand the page decides which of them a key acts on, and the reader's hand says it: the keys belong to the pane at the left, and to the pane at the right while the pointer rests on it, back to the left when it leaves. The dish has no act a key could fire, so it never holds them, and they stay with the other.
 
-A map keeps a quiet rim, the one border the page draws, since it is moved by hand and needs an edge to be moved within; the lane keeps none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see, which is what the keys did until 2026-09-19, acting in the pane the reader had last acted in and moving the prose under a reader who had pressed an arrow on the map. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
+The canvas and the history keep a quiet rim, the one border the page draws, since they are moved by hand and need an edge to be moved within; the lane and the dish, which are not moved so, keep none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see, which is what the keys did until 2026-09-19, acting in the pane the reader had last acted in and moving the prose under a reader who had pressed an arrow on the map. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
 
 *The author's, 2026-09-27; that the dish passes the keys on and that the lane has no rim to ink are the session's. It supersedes the keys belonging to the map whenever it stood, 2026-09-19, which held while only one map could stand.*
 
@@ -125,9 +125,9 @@ A lone pane pressed moves to the right where what it pushed out can come back to
 
 *The author's, 2026-09-27; what a lone pane does and what a reload forgets are the session's.*
 
-## 4. One shared state, and four verbs
+## 4. One shared state, and a few verbs
 
-Every widget reads one state and nothing else, and acts through the same four verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
+Every widget reads one state and nothing else, and acts through the same few verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
 The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
 
@@ -135,7 +135,7 @@ Where the reader stands lived outside this state until 2026-09-19, in three valu
 
 Everything drawn that names a brief carries that brief's address. That one convention is what keeps the widgets in step: pointing at a brief in any of them lights it in all of them, and pressing it anywhere goes.
 
-Two things are kept beside the state, and neither is a second answer to anything it holds. The history is a second body and not a second answer about this one, so it keeps [a world](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) that stands in this one's place while it is drawn, and as yet its addresses light only on its own map; what a commit touched lighting the body's figures is [the history's next step](history.md#6-what-comes-next). And what a pane press pushed out is a memory of the strip's that nothing draws from, read only by the next press.
+Two things are kept beside the state, and neither is a second answer to anything it holds. The history is a second body and not a second answer about this one, so it keeps [a world](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own) that stands in this one's place while it is drawn, and its addresses are its own, lighting only on its own map [as yet](implementation.md#651-the-history-is-the-canvas-over-a-world-of-its-own). And what a pane press pushed out is a memory of the strip's that nothing draws from, read only by the next press.
 
 *Reasoned, carried from [the first program](README.md#6-the-programs-before-this-one), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built.*
 
@@ -143,7 +143,7 @@ Two things are kept beside the state, and neither is a second answer to anything
 
 A key has to be named where it is drawn as well as where it is pressed, so the acts a reader can take are a table as the widgets are: each entry gives the chords that fire it, what it is called, the sentence that helps, the other ways to the same thing, and the doing. The keys are wired from it, [the badges](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) are drawn from it, and adding an act is adding an entry.
 
-An entry also says whether its act can be taken at all, so a badge for an act out of reach goes quiet rather than vanishing, and a key that would do nothing does nothing. And an act works on an address: the one a badge beside a brief passes, or, from a key, the focus, which is the brief the reading line stands on.
+An entry also says whether its act can be taken at all, so a badge for an act out of reach goes quiet rather than vanishing, and a key that would do nothing does nothing. And an act works on an address: the one a badge beside a brief passes, or, from a key, where the reader stands in the pane holding the keys: the focus in the lane, which is the brief the reading line stands on, and the selection on a map.
 
 *Reasoned, the author's ask of 2026-09-16, when the keys were named nowhere but in the branch of code that fired them.*
 
