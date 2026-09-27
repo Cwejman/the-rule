@@ -33,7 +33,7 @@ The practice and the implementation were brought along with each round: a commit
 
 [Six rounds of fresh heads](git:cad337e..e18acf8)
 
-*Reasoned from the commits by a later session, 2026-09-27; that the last round changed only words is the sixth commit's own word.*
+*Reasoned from the commits by a later session, 2026-09-27; that the last round changed only words is the working session's own account, kept outside the repository; its commit says only that it holds the sixth round's last words.*
 
 ### A cold review of the data
 
