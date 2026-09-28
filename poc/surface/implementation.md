@@ -152,7 +152,7 @@ Whether the body is served to the page or written into it is the only difference
 
 The process answers for the page itself, the body as JSON, a stream that says when a file under the path has changed, so the client asks for the body again and draws it, and the images the body holds. The stream says as well when git's head has moved, since a commit changes no file the body holds, and the page reads the history again when it next reads it.
 
-History is asked for apart from the body, in three requests of its own: its [light tier](history.md#51-the-light-tier-is-had-whole), its [heavy tier](history.md#52-the-heavy-tier-is-had-a-commit-at-a-time) and its [traced stories](history.md#26-it-is-handed-over-flat-as-the-body-is). The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
+History is asked for apart from the body, in three requests of its own: its [light tier](history.md#51-the-light-tier-is-had-whole), its [heavy tier](history.md#52-the-heavy-tier-is-had-a-commit-at-a-time) and its [traced stories](history.md#26-it-is-handed-over-flat-as-the-body-is). The process reads the light tier and the stories ahead, once it has handed the page its body, and keeps them in memory by where git's head stands and by the stories' own text, so [turning to the history](history.md#411-turning-to-it-never-waits-for-what-was-read-before) seldom waits. The body is assembled again whole on any change to its markdown or to an image, which a body this size allows.
 
 An image is served only when the last trace reached it, so the process hands out nothing else under the path, and its address carries the file's modification time, so a changed image is fetched again rather than kept from before.
 
