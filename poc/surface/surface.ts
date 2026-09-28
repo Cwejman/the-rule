@@ -192,21 +192,29 @@ async function serve(rootArg: string, port: number): Promise<void> {
   const memo = { head: "", told: "", past: null as Promise<History> | null, stories: null as Promise<Body> | null };
   const headNow = async () => (await git(rootDir, ["rev-parse", "HEAD"])).toString().trim();
   const toldNow = () => (existsSync(join(rootDir, "history.md")) ? readFileSync(join(rootDir, "history.md"), "utf8") : "");
-  const kept = <T,>(p: Promise<T>, drop: () => void): Promise<T> => (p.catch(drop), p);
+  // a read that has not answered in two minutes is given up, since one that hangs would hang every read after it
+  const bounded = <T,>(p: Promise<T>): Promise<T> =>
+    Promise.race([p, new Promise<T>((_, no) => setTimeout(() => no(new Error("the history took too long to read")), 120_000))]);
   const pastNow = async (): Promise<History> => {
     const head = await headNow();
     if (memo.head !== head) Object.assign(memo, { head, past: null, stories: null });
-    return (memo.past ??= kept(historyOf(rootArg), () => (memo.past = null)));
+    if (memo.past) return memo.past;
+    // a read that failed is dropped, and only if it is still the one kept, so it never takes a newer read with it
+    const p: Promise<History> = bounded(historyOf(rootArg));
+    memo.past = p;
+    p.catch(() => memo.past === p && (memo.past = null));
+    return p;
   };
   const storiesNow = async (): Promise<Body> => {
-    await pastNow();
+    const read = await pastNow();
     const told = toldNow();
     if (memo.told !== told) Object.assign(memo, { told, stories: null });
+    if (memo.stories) return memo.stories;
     // what the trace had to say is printed as the body's warnings are, once for each telling
-    return (memo.stories ??= kept(
-      traceHistory(rootArg).then((h) => (h.warnings.forEach((w) => console.warn("  " + w)), h)),
-      () => (memo.stories = null),
-    ));
+    const p: Promise<Body> = bounded(traceHistory(rootArg, read).then((h) => (h.warnings.forEach((w) => console.warn("  " + w)), h)));
+    memo.stories = p;
+    p.catch(() => memo.stories === p && (memo.stories = null));
+    return p;
   };
   const past = () => pastNow().then((h) => Response.json(h, { headers: fresh }), none);
   const stories = () => storiesNow().then((h) => Response.json(h, { headers: fresh }), none);
@@ -282,14 +290,14 @@ async function build(rootArg: string, out: string): Promise<void> {
   // answers too; a tree that is not a repository, or a clone without its history, has none to write
   // the history is written whole or not at all: what an earlier build left is taken away first, and nothing is written
   // until every part of it has been read, so a page never reads a history out of step with itself
-  ["history.json", "stories.json"].forEach((f) => existsSync(join(outDir, f)) && rmSync(join(outDir, f)));
+  ["history.json", "stories.json", "commits"].forEach((f) => existsSync(join(outDir, f)) && rmSync(join(outDir, f), { recursive: true }));
   try {
     const past = await historyOf(rootArg);
     // the heavy tier is a file per commit, read in one pass, at the path the live process answers too
     const { cwd, prefix } = await repoOf(rootArg);
     const heavy = await changesOf(cwd, prefix, past.commits.map((c) => c.hash));
     // the stories stand beside them, traced as the page is built
-    const stories = await traceHistory(rootArg);
+    const stories = await traceHistory(rootArg, past);
     stories.warnings.forEach((w) => console.warn("  " + w));
     mkdirSync(join(outDir, "commits"), { recursive: true });
     heavy.forEach((c, hash) => writeFileSync(join(outDir, "commits", `${hash}.json`), JSON.stringify(c)));
@@ -1189,10 +1197,12 @@ function gitPlacement(tok: Tok): { href: string; from: string; to: string } | { 
  * the commit's hash beneath it, cut as git cuts one and lengthened where two commits would meet; the leaf carries the
  * full hash, and the light tier holds the rest of the commit.
  */
-async function traceHistory(rootArg: string): Promise<Body> {
+async function traceHistory(rootArg: string, read?: History): Promise<Body> {
   const rootDir = dirname(rootFileOf(rootArg));
   const file = join(rootDir, "history.md");
-  const past = await historyOf(rootArg);
+  // told from the history the caller has already read, where it has, so a commit landing between the two reads never
+  // leaves a story naming a commit the light tier does not hold
+  const past = read ?? (await historyOf(rootArg));
   const { cwd } = await repoOf(rootArg);
   const told = existsSync(file) ? await trace(file) : null;
   // a link of the git scheme is the history's own, so the trace's word that it is not followed is not a fault here;
@@ -4085,7 +4095,10 @@ async function readPast(): Promise<void> {
   const get = async (path: string) => {
     const r = await fetch(path, { cache: "no-store" });
     // the live process says in a word why there is none; a static host answers with a page of its own, which says nothing
-    if (!r.ok) throw new Error(r.headers.get("content-type")?.startsWith("text/plain") ? await r.text() : "no history was published with this page");
+    const said = r.headers.get("content-type") ?? "";
+    if (!r.ok) throw new Error(said.startsWith("text/plain") ? await r.text() : "no history was published with this page");
+    // a host that answers every path with a page of its own answers this one too, and that is no history
+    if (!said.includes("json")) throw new Error("no history was published with this page");
     return r.json();
   };
   try {
@@ -4198,7 +4211,7 @@ function switchHtml(): string {
         ? `the history — none: ${past.said}`
         : "the history — press to read it";
   const waiting = past.asked ? `<span class="waiting chrome">reading the history…</span>` : "";
-  return `<button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button>${waiting}`;
+  return `<span class="switch"><button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button>${waiting}</span>`;
 }
 
 /**
@@ -5762,7 +5775,7 @@ function wire(): void {
     if (inPast()) lightPlate(onPlate ? el!.dataset.a! : null);
     tip(e);
   });
-  document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
+  document.documentElement.addEventListener("pointerleave", () => (point(null), inPast() && lightPlate(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
 
   document.addEventListener("click", (e) => {
     hideTip();
@@ -6153,6 +6166,8 @@ function wire(): void {
     // the address is the body's, so the browser's back and forward take the reader back to the body first, leaving the
     // address where the browser moved it
     if (reading === "history") toBody(true);
+    // and a turn still waiting is let go, since the reader has gone somewhere of their own
+    if (past.asked) (past.asked = false), drawChooser();
     record();
     state.scope = brief(readScope()) ? readScope() : "";
     arrive(readHash());
@@ -6553,9 +6568,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* the switch has no side and carries no dot; while the history is read it stands darkest, and while it is read in it breathes */
 .strip .pick.mode.busy { animation: busy 1s ease-in-out infinite alternate; }
 /* the word stands clear of the row at the switch's left, so nothing in the row moves while the reader waits; it comes in only once the waiting is felt */
-.strip .group:first-child { position: relative; }
+.strip .switch { position: relative; display: inline-flex; }
 .strip .waiting { position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 10px; font-size: 12px; color: var(--faint); white-space: nowrap; pointer-events: none; animation: arrive .3s ease-out both .25s; }
 @keyframes arrive { from { opacity: 0; } to { opacity: 1; } }
+/* at the foot of a phone the row is centred on the page, so the word stands above the switch rather than beside it, where it would run off the edge */
+.strip.foot .waiting { right: auto; top: auto; left: 50%; bottom: 100%; transform: translateX(-50%); margin: 0 0 12px; }
 @keyframes busy { from { opacity: .2; } to { opacity: .6; } }
 /* a widget in use says which side holds it, as a dot beside its icon, level with the middle of it so it balances the
    round forms the icons are made of. It is the icon's own ink, three pixels across and three clear of the glyph */
