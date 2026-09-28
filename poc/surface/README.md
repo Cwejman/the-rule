@@ -56,7 +56,7 @@ Past the reading stand two readings of their own. The canvas is the second pane,
 
 [A touch reading](touch.md)
 
-Git's history is a reading of its own as well, stories told over runs of commits, opened apart from the body rather than placed in it. It stands as a pane of its own, its stories and commits drawn as nodes; what a selection touched is not yet shown.
+Git's history is a reading of its own as well, stories told over runs of commits, opened apart from the body rather than placed in it. It stands as a pane of its own, its stories and commits drawn as nodes, and is to become [a mode](history.md#41-it-is-a-mode-not-a-pane) the lane and the canvas are turned to; what a selection touched is not yet shown.
 
 [History](history.md)
 
