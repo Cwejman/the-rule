@@ -32,6 +32,8 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 The surface is going to have a few modes, chosen perhaps from a centred menu at its foot. The first is the current lane of prose with its wings. The second is the canvas, and there the exploring begins: a few variants are made and held here, and as they are learned from they are removed or refined.
 
+These became the panes of the middle; a mode now names only what the history turns them to, [the history's](history.md#41-it-is-a-mode-not-a-pane).
+
 *The author's, 2026-09-15.*
 
 ## 3. The path the reader has opened, and not the whole body
@@ -46,7 +48,7 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 ## 4. Down is the reading, across is each opening
 
-The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross, except where the root's level is laid across, [beneath](#410-the-roots-level-runs-down-or-across).
+The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's own reading runs across.
 
 Going in at a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Go in again inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened. Going in is [an act of its own](#5-one-press-selects-two-presses-go) and never a press.
 
@@ -156,11 +158,13 @@ It is the way down said on the map. What the run of names gives as text, the lin
 
 The root's level may be laid across instead of down: its rows side by side left to right, and each one's level hanging down beneath it, as a trunk with branches in one direction. It is a setting each canvas holds: the body's runs down unless it is turned, and [the history's](history.md#45-its-root-runs-left-to-right-a-trunk) runs across, since it is a trunk more than a tree.
 
-Only the root's level turns. Everything beneath it goes down as a file's levels do, and [the moves](#52-the-moves-on-a-map) keep their meanings across as down: down and up walk the reading, shift with them jumps level to level, and backspace folds.
+Only the root's level turns. Everything beneath it goes down as a file's levels do, and [the moves](#52-the-moves-on-a-map) that fold, backspace and shift with the space bar, fold across as they fold down.
 
-Laid across, the root's rows stand where [an opening](#4-down-is-the-reading-across-is-each-opening) would stand, since across is also the step into another reading. The history opens nothing, so there the two do not meet; in the body, where an opened reading stands when the root runs across is open.
+Laid across, the root's rows stand where [an opening](#4-down-is-the-reading-across-is-each-opening) would stand, since across is also the step into another reading. While the history is one file it opens nothing, so there the two do not meet; once it is a folder, and in the body, where an opened reading stands when the root runs across is open.
 
-*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history. That only the root's level turns and the moves keep their meanings, which is his ask that folding with shift and the arrows work there too, is the session's reading; where an opening stands across is the session's question, and open.*
+So is which way the arrows go on the trunk. Kept to their meanings, down walks the trunk rightward and right goes in, which on a trunk with nothing to open does nothing; following the screen instead, right and left walk the trunk and the step in needs another key. Which reads right is felt, and the author settles it by looking.
+
+*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history. That only the root's level turns, and the moves read as his ask that folding with shift and the arrows work there too, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
 ## 5. One press selects, two presses go
 
@@ -194,7 +198,7 @@ Which pane the keys belong to is [the framework's to say](framework.md#27-the-ke
 
 Three of the moves act on the map's structure: right, left and backspace; in the lane, left and backspace have meanings of their own, given with each. The rest have a meaning in the lane as well, given with each where it differs, and each acts in the pane the keys belong to.
 
-- Down and up move where the reader is: the next brief of the lane, the next row down the column of the map, which within a file is that file's reading order. Shift with them jumps level to level instead, passing over whatever hangs beneath.
+- Down and up move where the reader is: the next brief of the lane, the next row of the map in its reading order, which within a file is that file's. Shift with them jumps level to level instead, passing over whatever hangs beneath.
 
 - Right goes in: it stands the reader at the head of the reading [the card](#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) leads to, opening it first where it is not open yet. Going in is the same move either way, since what was asked for is to be at the head and whether the reading had to be opened is the map's business. It goes nowhere else, since [a level of a file waits](#44-a-level-of-a-file-opened-to-the-right-waits).
 
@@ -208,7 +212,7 @@ Three of the moves act on the map's structure: right, left and backspace; in the
 
 Backspace and shift with return divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have taken the prose there with return, [the map holds the reading the lane holds](#6-one-state-and-the-lane-in-step-with-it), so closing it has to take the prose out first, which is what shift with return does; backspace does not close there, and waits for shift with return.
 
-That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the top of the root's column, where nothing stands above and nothing open stands to be closed, it is quiet.
+That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the head of the root's reading, where nothing stands above and nothing open stands to be closed, it is quiet.
 
 *The moves, the author's, 2026-09-19, given as right opens, left steps back without closing, backspace closes, return goes and shift with return goes to the parent while closing; that down and up walk a file's reading rather than its level is his as well, from finding the arrows moving on topology where the scroll moves on the reading. As built the same day. It supersedes the four moves of 2026-09-18, which took one shape in both panes and left no way to stand at a reading's head. Two faults were his report of the same day, that the two rows were not separately reachable after all: right did nothing where the reading already stood open, so the head could be left and never returned to, and a step onto a card brought the head into view instead of the card, so the reader moved to a row standing off the frame.*
 
