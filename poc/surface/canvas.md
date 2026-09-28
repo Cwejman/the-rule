@@ -32,9 +32,9 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 The surface is going to have a few modes, chosen perhaps from a centred menu at its foot. The first is the current lane of prose with its wings. The second is the canvas, and there the exploring begins: a few variants are made and held here, and as they are learned from they are removed or refined.
 
-These became the panes of the middle; a mode now names only what the history turns them to, [the history's](history.md#41-it-is-a-mode-not-a-pane).
+These became the panes of the middle; a mode now names only what the history turns them to: [the history](history.md#41-it-is-a-mode-not-a-pane).
 
-*The author's, 2026-09-15.*
+*The author's, 2026-09-15; the last sentence the session's, 2026-09-28.*
 
 ## 3. The path the reader has opened, and not the whole body
 
@@ -48,7 +48,7 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 ## 4. Down is the reading, across is each opening
 
-The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's own reading runs across.
+The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's level runs across.
 
 Going in at a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Go in again inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened. Going in is [an act of its own](#5-one-press-selects-two-presses-go) and never a press.
 
@@ -156,15 +156,15 @@ It is the way down said on the map. What the run of names gives as text, the lin
 
 ### 4.10 The root's level runs down or across
 
-The root's level may be laid across instead of down: its rows side by side left to right, and each one's level hanging down beneath it, as a trunk with branches in one direction. It is a setting each canvas holds: the body's runs down unless it is turned, and [the history's](history.md#45-its-root-runs-left-to-right-a-trunk) runs across, since it is a trunk more than a tree.
+The root's level may be laid across instead of down: its rows side by side left to right, and each one's level hanging down beneath it, as a trunk with branches in one direction. It may be a setting of every canvas, the body's running down unless it is turned; and [the history's](history.md#45-its-roots-level-runs-left-to-right-a-trunk) runs across, since it is a trunk more than a tree.
 
-Only the root's level turns. Everything beneath it goes down as a file's levels do, and [the moves](#52-the-moves-on-a-map) that fold, backspace and shift with the space bar, fold across as they fold down.
+Only the root's level turns. Everything beneath it goes down as a file's levels do, and [the moves](#52-the-moves-on-a-map) keep their meanings: shift with the arrows jumps along the trunk as it jumps from level to level, and backspace and shift with the space bar fold. What backspace folds on a row of the trunk, which has nothing above it but the root, is open.
 
 Laid across, the root's rows stand where [an opening](#4-down-is-the-reading-across-is-each-opening) would stand, since across is also the step into another reading. While the history is one file it opens nothing, so there the two do not meet; once it is a folder, and in the body, where an opened reading stands when the root runs across is open.
 
 So is which way the arrows go on the trunk. Kept to their meanings, down walks the trunk rightward and right goes in, which on a trunk with nothing to open does nothing; following the screen instead, right and left walk the trunk and the step in needs another key. Which reads right is felt, and the author settles it by looking.
 
-*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history. That only the root's level turns, and the moves read as his ask that folding with shift and the arrows work there too, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
+*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
 ## 5. One press selects, two presses go
 
@@ -330,4 +330,6 @@ The look. The canvas is nodes on a flat ground today, and what the author asked 
 
 A touch reading of the canvas beyond a drag that pans it, and [the pull past the top](lane.md#74-pull-past-the-top), which is built in the lane and not here.
 
-*Open, 2026-09-18.*
+Where an opened reading stands when the root's level runs across, and which way the arrows go and what backspace folds on the trunk, which [a root laid across](#410-the-roots-level-runs-down-or-across) raises.
+
+*Open, 2026-09-18; the last raised 2026-09-28.*
