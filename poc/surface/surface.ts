@@ -145,8 +145,17 @@ async function serve(rootArg: string, port: number): Promise<void> {
   const version = `version ${Bun.hash(script + CSS).toString(36)}`;
   const listeners = new Set<(s: string) => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let moved: ReturnType<typeof setTimeout> | undefined;
+  // a commit changes no file the body holds, so git's own log of where its head moved is what says the history grew;
+  // it is told apart from a change to the body, which the history's reading does not need
+  const headLog = /^\.git[\\/]logs[\\/]HEAD$/;
   // a change to the markdown or to an image the body may hold is a change to the body
   watch(rootDir, { recursive: true }, (_event, name) => {
+    if (name && headLog.test(String(name))) {
+      clearTimeout(moved);
+      moved = setTimeout(() => listeners.forEach((send) => send("history")), 120);
+      return;
+    }
     if (name && !/\.md$/i.test(String(name)) && !imageType(String(name))) return;
     clearTimeout(timer);
     timer = setTimeout(() => listeners.forEach((send) => send("change")), 120);
@@ -3878,12 +3887,15 @@ function zoomAt(px: number, py: number, factor: number): void {
 const viewKey = (): string => `surface.view:${laneKey()}`;
 let viewTimer: ReturnType<typeof setTimeout> | undefined;
 function rememberView(): void {
-  // the history's view is not kept: it is keyed by the lane, and a reader opens the history afresh
-  if (inside) return;
+  // a view is kept only for the body's canvas, since the history is opened afresh on a reload; and what is kept is
+  // reckoned now, since by the time the write comes the state may hold the other world
+  if (inside || reading === "history") return;
+  const key = viewKey();
+  const kept = JSON.stringify({ ...view, opened: state.opened, w: fittedWidth });
   clearTimeout(viewTimer);
   viewTimer = setTimeout(() => {
     try {
-      localStorage.setItem(viewKey(), JSON.stringify({ ...view, opened: state.opened, w: fittedWidth }));
+      localStorage.setItem(key, kept);
     } catch {}
   }, 150);
 }
@@ -3993,6 +4005,22 @@ const onBody = <T,>(fn: () => T): T => (inPast() ? inWorld(bodyWorld!, fn) : fn(
 /** The body's world, whichever the state holds: what a commit's touched readings and their hues are read against. */
 const bodyNow = (): World => (inPast() ? bodyWorld! : takeWorld());
 
+/**
+ * Settles the world the state now holds against its body, which may have changed while it was held aside: what no
+ * longer stands is let go, what stands whole shows its level, new briefs among them, and the focus falls back to the
+ * nearest brief still in the lane.
+ */
+function settleWorld(): void {
+  state.folds = new Map(Array.from(state.folds).filter(([a]) => brief(a)));
+  if (!brief(state.scope)) state.scope = "";
+  if (!state.folds.has(state.scope)) state.folds.set(state.scope, "whole");
+  closeLay();
+  if (!inLane(state.focus)) state.focus = nearestInLane(state.focus);
+  if (state.picked !== null && !brief(state.picked)) state.picked = null;
+  state.opened = state.opened.filter((a) => brief(a));
+  state.pointed = null;
+}
+
 /** What each world keeps of the lane beyond its world: the trail, the scroll, and what escape can undo and redo. */
 type LaneKept = { trail: Hop[]; scroll: number; undos: Snapshot[]; redos: Snapshot[] };
 const laneKept: Record<"body" | "history", LaneKept | null> = { body: null, history: null };
@@ -4047,6 +4075,8 @@ async function loadPast(): Promise<void> {
   } finally {
     drawChooser();
   }
+  // a change that came while this reading was under way is read again, since the fetch may have begun before it
+  if (past.stale && past.status === "ready" && inPast()) void loadPast();
 }
 
 /**
@@ -4061,8 +4091,11 @@ async function toPast(): Promise<void> {
   laneKept.body = keepLane();
   bodyWorld = takeWorld();
   pastWorld.el = ui.canvas;
+  // what the body pointed at goes with it, or the plate would keep lighting it while the history is read
+  bodyWorld.pointed = null;
   putWorld(pastWorld);
   reading = "history";
+  if (laneKept.history !== null) settleWorld();
   takeLane(laneKept.history);
   chooser.sheet = null;
   card.a = null;
@@ -4072,21 +4105,25 @@ async function toPast(): Promise<void> {
   quiet();
 }
 
-/** Turns the lane and the canvas back to the body, as the reader left it. */
-function toBody(): void {
+/**
+ * Turns the lane and the canvas back to the body, as the reader left it. Where the browser has already moved to an
+ * address, by its back or forward, the address is left as it moved, for the reader to arrive at.
+ */
+function toBody(moved = false): void {
   if (reading === "body") return;
   laneKept.history = keepLane();
   Object.assign(pastWorld, takeWorld());
   putWorld(bodyWorld!);
   bodyWorld = null;
   reading = "body";
+  settleWorld();
   takeLane(laneKept.body);
   chooser.sheet = null;
   card.a = null;
   drawAll();
   ui.scroll.scrollTop = laneKept.body?.scroll ?? 0;
   quiet();
-  followHistory(hashFor(state.focus));
+  if (!moved) followHistory(hashFor(state.focus));
 }
 
 /** The switch in the strip: a mode has no side, so it is a switch and not a cycle, and it says which the lane reads. */
@@ -4876,13 +4913,15 @@ function light(): void {
   document.body.classList.toggle("pointing", a !== null);
   all<HTMLElement>(".lit").forEach((el) => el.classList.remove("lit"));
   drawLaser();
-  lightPlate(a);
+  // while the history is read the plate is the body's, and a history's address lights nothing on it
+  const ours = (el: Element) => !inPast() || !el.closest("svg.plate, #dish");
+  if (!inPast()) lightPlate(a);
   if (a === null) return;
-  const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`);
+  const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`).filter(ours);
   exact.forEach((el) => el.classList.add("lit"));
   const litFigures = new Set(exact.map((el) => el.closest(".fig")));
   all<HTMLElement>(".fig")
-    .filter((f) => !litFigures.has(f))
+    .filter((f) => !litFigures.has(f) && ours(f))
     .forEach((f) => {
       const holding = all<HTMLElement>("[data-a]", f)
         .map((cell) => cell.dataset.a!)
@@ -5183,10 +5222,15 @@ let laneTimer: ReturnType<typeof setTimeout> | undefined;
 
 /** Keeps the lane as laid, its scope and every fold, with the address the reader stands at; written a moment after it settles. */
 function rememberLane(): void {
+  // the lane kept is the body's, which a reload lays again; and it is reckoned now, since by the time the write comes
+  // the state may hold the history
+  if (reading === "history") return;
+  const key = laneKey();
+  const kept = JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail });
   clearTimeout(laneTimer);
   laneTimer = setTimeout(() => {
     try {
-      localStorage.setItem(laneKey(), JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail }));
+      localStorage.setItem(key, kept);
     } catch {}
   }, 150);
 }
@@ -5656,7 +5700,8 @@ function wire(): void {
     const t = e.target as HTMLElement;
     // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
     const inner = t.closest<HTMLAnchorElement>('a[href^="#/"]');
-    if (inner && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+    // in the history an address is the history's, which the browser cannot open, so it is followed here whatever is held
+    if (inner && (inPast() || !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey))) {
       e.preventDefault();
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
@@ -5717,7 +5762,11 @@ function wire(): void {
       const key = set.dataset.set as keyof Settings;
       (state.settings as unknown as Record<string, unknown>)[key] = typeof DEFAULTS[key] === "number" ? Number(v) : v;
       // what a brief weighs is in the index, so a change of weight indexes the body again
-      if (key === "weight" && state.body) state.index = indexBody(state.body);
+      if (key === "weight") {
+        if (state.body) state.index = indexBody(state.body);
+        const held = reading === "history" ? bodyWorld : pastWorld;
+        if (held?.body) held.index = indexBody(held.body);
+      }
       saveSettings();
       return void drawAll();
     }
@@ -5740,7 +5789,7 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean; world?: World } | null = null;
+  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
@@ -5804,15 +5853,10 @@ function wire(): void {
     state.scrubbing = true;
     if (drag.kind === "canvas") {
       // dragging the ground is going looking, as panning by the wheel is
-      const d = drag;
-      const pan = () => {
-        panned = true;
-        view.x = d.vx! + (e.clientX - d.x);
-        view.y = d.vy! + (e.clientY - d.y);
-        applyView(false);
-      };
-      if (d.world) inWorld(d.world, pan);
-      else pan();
+      panned = true;
+      view.x = drag.vx! + (e.clientX - drag.x);
+      view.y = drag.vy! + (e.clientY - drag.y);
+      applyView(false);
     } else if (drag.kind === "knob") {
       drag.el.classList.add("turning");
       const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
@@ -5890,26 +5934,19 @@ function wire(): void {
     { passive: false },
   );
 
-  // over either map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about
-  // the pointer; the history's map moves in its own world
-  const wheelOn = (el: HTMLElement, world?: World) =>
+  // over the map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
+  const wheelOn = (el: HTMLElement) =>
     el.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
         hideTip();
-        // a map not yet read has nothing to move, and a move made then would count as the reader's own
-        if (world && !world.body) return;
-        const move = () => {
-          // moving the map by hand is going looking: from here the reading no longer drags the view back
-          panned = true;
-          if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
-          view.x -= e.deltaX;
-          view.y -= e.deltaY;
-          applyView(false);
-        };
-        if (world) inWorld(world, move);
-        else move();
+        // moving the map by hand is going looking: from here the reading no longer drags the view back
+        panned = true;
+        if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+        view.x -= e.deltaX;
+        view.y -= e.deltaY;
+        applyView(false);
       },
       { passive: false },
     );
@@ -5921,15 +5958,12 @@ function wire(): void {
   });
   // Safari sends a pinch as a gesture of its own, with the scale so far
   let pinch = 1;
-  const pinchOn = (el: HTMLElement, world?: World) => {
+  const pinchOn = (el: HTMLElement) => {
     el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
     el.addEventListener("gesturechange", (e) => {
       e.preventDefault();
-      if (world && !world.body) return;
       const g = e as Event & { scale: number; clientX: number; clientY: number };
-      const zoom = () => zoomAt(g.clientX, g.clientY, g.scale / pinch);
-      if (world) inWorld(world, zoom);
-      else zoom();
+      zoomAt(g.clientX, g.clientY, g.scale / pinch);
       pinch = g.scale;
     });
   };
@@ -6047,8 +6081,9 @@ function wire(): void {
   ui.scroll.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
   // the browser's back and forward, or an address typed, arrive as a change the reader made
   window.addEventListener("hashchange", () => {
-    // the address is the body's, so the browser's back and forward take the reader back to the body first
-    if (reading === "history") toBody();
+    // the address is the body's, so the browser's back and forward take the reader back to the body first, leaving the
+    // address where the browser moved it
+    if (reading === "history") toBody(true);
     record();
     state.scope = brief(readScope()) ? readScope() : "";
     arrive(readHash());
@@ -6076,23 +6111,29 @@ const inlined: string | null = typeof document === "undefined" ? null : (documen
 
 const load = async (): Promise<Body> => (inlined !== null ? JSON.parse(inlined) : (await fetch("/body")).json());
 
+/** What the page says of the body at its head, its title and its warnings, whichever substrate the lane reads. */
+function sayBody(body: Body): void {
+  document.title = body.title || "The surface";
+  const w = ui.header.querySelector<HTMLElement>(".warnings")!;
+  w.textContent = body.warnings.length ? `${body.warnings.length} warning${body.warnings.length > 1 ? "s" : ""}` : "";
+  w.dataset.tip = body.warnings.join("\n");
+  body.warnings.forEach((x) => console.warn(x));
+}
+
 function setBody(body: Body): void {
-  // while the history is read the body's world is held aside, so a change goes there, and the history is read again
+  // while the history is read the body's world is held aside, so a change goes there, settled when it is turned back
+  // to, and the history is read again
   if (reading === "history" && bodyWorld) {
     bodyWorld.body = body;
     bodyWorld.index = indexBody(body);
-    bodyWorld.folds = new Map(Array.from(bodyWorld.folds).filter(([a]) => bodyWorld!.index!.by.has(a)));
+    sayBody(body);
     past.stale = true;
     return void loadPast();
   }
   const first = state.body === null;
   state.body = body;
   state.index = indexBody(body);
-  document.title = body.title || "The surface";
-  const w = ui.header.querySelector<HTMLElement>(".warnings")!;
-  w.textContent = body.warnings.length ? `${body.warnings.length} warning${body.warnings.length > 1 ? "s" : ""}` : "";
-  w.dataset.tip = body.warnings.join("\n");
-  body.warnings.forEach((x) => console.warn(x));
+  sayBody(body);
   if (first) {
     // read before the address is written back, since writing it keeps the lane as it stands, which is not yet laid
     const kept = recalledLane();
@@ -6163,6 +6204,8 @@ async function start(): Promise<void> {
     // one, and the lane is laid again as it was left, so a page left open never runs code older than its body
     let version: string | null = null;
     new EventSource("/changes").onmessage = async (e) => {
+      // git's head moved: the history is read again, at once if it is being read and otherwise when it is next turned to
+      if (e.data === "history") return void ((past.stale = true), inPast() && loadPast());
       if (!String(e.data).startsWith("version ")) return setBody(await load());
       if (version !== null && version !== e.data) location.reload();
       version = e.data;
