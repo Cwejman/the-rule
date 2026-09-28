@@ -208,7 +208,7 @@ A faint rim is drawn just inside its edge so a light image keeps an edge on a li
 
 The focus is the article under [the reading line](lane.md#41-where-the-reading-line-stands), or the nearest above it. A move to a brief finds the scroll that brings the brief to the line by halving the interval, since the line moves with the scroll.
 
-When the line eases to the ends, the room above and below the lane is set each time the lane is laid, so the opening's heading and the last block stand level with the shape's first and last rows. The shape's scale depends on that room, so the two are settled together, [beneath](#62-wings-are-drawn-whole-as-html-or-svg). When the focus changes, the page's address is replaced without entering the history, and the widgets that depend on the focus draw again.
+When the line eases to the ends, the room above and below the lane is set each time the lane is laid, so the opening's heading and the last block stand level with the shape's first and last rows. The shape's scale depends on that room, so the two are settled together, [beneath](#62-wings-are-drawn-whole-as-html-or-svg). When the focus changes, the page's address is replaced without entering the browser's history, and the widgets that depend on the focus draw again.
 
 *In force, the author's decision, 2026-09-13; the easing, 2026-09-14.*
 
