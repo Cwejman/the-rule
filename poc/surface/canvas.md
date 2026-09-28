@@ -164,7 +164,9 @@ Laid across, the root's rows stand where [an opening](#4-down-is-the-reading-acr
 
 So is which way the arrows go on the trunk. Kept to their meanings, down walks the trunk rightward and right goes in, which on a trunk with nothing to open does nothing; following the screen instead, right and left walk the trunk and the step in needs another key. Which reads right is felt, and the author settles it by looking.
 
-*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
+As built, one line runs along beneath the root's row and drops into the head of each row of the trunk, and an act in [the field](#51-the-field-the-acts-stand-in) turns the canvas the reader is on, each canvas keeping its own.
+
+*The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history; as built the same day. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
 ## 5. One press selects, two presses go
 
