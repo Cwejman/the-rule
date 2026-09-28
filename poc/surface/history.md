@@ -212,17 +212,13 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 ## 6. What comes next
 
-Done: the data, 2026-09-21; the trace, the first stories and a pane drawn by the canvas's code, 2026-09-27. What is next is laid in the order each step stands on the one before, and a session taking this up begins at the first step not done.
+Done: the data, 2026-09-21; the trace, the first stories and a pane drawn by the canvas's code, 2026-09-27; [the mode](#41-it-is-a-mode-not-a-pane) with the lane drawing the history, and [its root running across](#45-its-roots-level-runs-left-to-right-a-trunk), 2026-09-28. What is next is laid in the order each step stands on the one before, and a session taking this up begins at the first step not done.
 
-1. Make it [a mode](#41-it-is-a-mode-not-a-pane), with the lane drawing it: the switch in the strip, the lane, the canvas and the widgets that follow the lane turned to the history, the plate and the dish kept on the body, and the history's pane taken out. In the lane a story is prose and a commit is [its face](#23-a-commit-is-a-brief-of-its-own-kind), folding as any brief does.
+1. Show [only the commits that touch where the reader stands](#42-only-the-commits-that-touch-where-you-stand), the body's scope, and say the filter in the way down.
 
-2. Show [only the commits that touch where the reader stands](#42-only-the-commits-that-touch-where-you-stand), the body's scope, and say the filter in the way down.
+2. Show [what a selection touched](#43-a-selection-shows-what-it-touched) in the body, on the plate while the history is read and on the shape, the canvas and in place in the lane once it is left, with [what is selected beside the switch](#44-what-is-selected-stands-beside-the-switch), fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks. It is felt rather than only specified, and so is the author's to see first.
 
-3. [The root's level runs down or across](canvas.md#410-the-roots-level-runs-down-or-across): the history's across, and the body's turnable as the author's perhaps, with the moves on the map working across as they work down.
-
-4. Show [what a selection touched](#43-a-selection-shows-what-it-touched) in the body, on the plate while the history is read and on the shape, the canvas and in place in the lane once it is left, with [what is selected beside the switch](#44-what-is-selected-stands-beside-the-switch), fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks. It is felt rather than only specified, and so is the author's to see first.
-
-*In force as the order, the session's, 2026-09-21; laid again 2026-09-27, and again 2026-09-28, when the author made the history a mode and answered where it stands from. Each step is looked at on the page before the next.*
+*In force as the order, the session's, 2026-09-21; laid again 2026-09-27, and again 2026-09-28, when the author made the history a mode and answered where it stands from. The trunk was laid third that day and built second, on the author's word that the history running left to right had been clear; the order had put a step of his first requirement after one he had not asked for first. Each step is looked at on the page before the next.*
 
 ## 7. What this leaves open
 
@@ -234,7 +230,7 @@ How a session tells its story where another session's commits fall between its o
 
 Whether the canvas opens the way to a touched brief the reader has not opened, or lights only what it holds.
 
-Which way time runs along [the trunk](#45-its-roots-level-runs-left-to-right-a-trunk): the oldest at the left, as a timeline reads, or the newest, as the record is written.
+Which way time runs along [the trunk](#45-its-roots-level-runs-left-to-right-a-trunk). As built the newest stands at the left, as the record is written and [so that now is what a reader meets](#24-it-is-a-record-whose-entries-are-holons), and the arrows walk it as it is drawn; the oldest at the left, as a timeline reads, is the author's to choose by looking.
 
 Whether a reader scoped in the body can widen the filter to the whole history without leaving their scope, and whether a reader may scope within the history's own lane, and what that scope would then mean.
 
