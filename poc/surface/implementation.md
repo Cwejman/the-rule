@@ -268,7 +268,7 @@ With the lane taken out of the middle, the lane is kept laid out of sight rather
 
 #### 6.5.1 The history is the canvas over a world of its own
 
-[The history's pane](history.md#44-it-is-opened-as-a-pane-of-its-own) is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and the element it is drawn into. While it draws or answers, its world is set in the state's place, and the body's is set back after.
+The history's pane, which is to become [a mode](history.md#44-it-is-a-mode-not-a-pane), is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and the element it is drawn into. While it draws or answers, its world is set in the state's place, and the body's is set back after.
 
 It answers a press, a key, a pointer or a wheel on its pane that way, and whatever the canvas leaves to a later frame re-enters the world that left it.
 
