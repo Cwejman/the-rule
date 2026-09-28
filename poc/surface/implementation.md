@@ -268,7 +268,9 @@ With the lane taken out of the middle, the lane is kept laid out of sight rather
 
 #### 6.5.1 The history is the lane and the canvas over a world of its own
 
-[The history](history.md#41-it-is-a-mode-not-a-pane) is drawn by the lane's and the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, its focus and scope, what is selected and open on the map, and its view. Turning to the history sets its world in the state's place and holds the body's aside; turning back sets the body's back. Each keeps its own trail, its scroll, and what escape can undo and redo, so an undo never lays one substrate's lane over the other.
+[The history](history.md#41-it-is-a-mode-not-a-pane) is drawn by the lane's and the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, its focus and scope, what is selected and open on the map, and its view. Turning to the history sets its world in the state's place and holds the body's aside; turning back sets the body's back.
+
+Each keeps its own trail, its scroll, and what escape can undo and redo, so an undo never lays one substrate's lane over the other.
 
 The plate and the dish stay the body, so while the history is read they draw inside the body's world, and a press on a cell of the plate turns back to the body before it goes there. The page's address and the browser's history are the body's alone: nothing of the history is written to either, and the browser's back and forward turn back to the body first. A change to the body while the history is read reaches the body's world, and the history is read again.
 
