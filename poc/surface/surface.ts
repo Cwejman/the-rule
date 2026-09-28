@@ -1476,6 +1476,8 @@ type Settings = {
   tree: "spine" | "thread";
   /** whether the face of what is selected on the canvas stands beside it */
   face: "shown" | "hidden";
+  /** which way each canvas lays its root's level: down, as a file's levels go, or across as a trunk; the body's runs down and the history's across unless turned */
+  trunk: { body: "down" | "across"; history: "down" | "across" };
   /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle a pane or two, left then right, never none */
   areas: Record<AreaName, string[]>;
 };
@@ -1498,6 +1500,7 @@ const DEFAULTS: Settings = {
   prose: "serif",
   tree: "spine",
   face: "shown",
+  trunk: { body: "down", history: "across" },
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
 };
 
@@ -1757,6 +1760,23 @@ const ACTIONS: Record<string, Action> = {
     // showing is a going, though its address is the very one the reading line carries
     can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && !!brief(acts(a)) && (scopeFor(acts(a)) !== state.scope || acts(a) !== state.focus),
     run: (a) => readOn(acts(a)),
+  },
+  trunk: {
+    label: () => (rootRuns() === "across" ? "root down" : "root across"),
+    mark: () => (rootRuns() === "across" ? ICON.unfold : ICON.openRight),
+    keys: [],
+    help: () => (rootRuns() === "across" ? "Lays the root's level down the column, as a file's levels go." : "Lays the root's level across, as a trunk, each of its rows with its own level hanging down beneath it."),
+    also: "Each canvas keeps its own: the body's runs down and the history's across unless turned.",
+    can: () => canvasOn(),
+    run: () => {
+      const which = inPast() ? "history" : "body";
+      state.settings.trunk = { ...state.settings.trunk, [which]: rootRuns() === "across" ? "down" : "across" };
+      saveSettings();
+      // the map is laid anew, so it is fitted anew, and the reader's place brought back into it
+      fitted = null;
+      followed = null;
+      drawCanvas();
+    },
   },
   history: {
     label: () => (reading === "history" ? "the body" : "the history"),
@@ -2930,6 +2950,9 @@ function loadSettings(): void {
   if (state.settings.line !== "middle" && state.settings.line !== "ends") state.settings.line = DEFAULTS.line;
   if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
   if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
+  const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
+  const trunk = (state.settings.trunk ?? {}) as Partial<Settings["trunk"]>;
+  state.settings.trunk = { body: runs(trunk.body, DEFAULTS.trunk.body), history: runs(trunk.history, DEFAULTS.trunk.history) };
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -3321,6 +3344,9 @@ function attach(): void {
   panned = false;
 }
 
+/** Which way the root's level runs on the canvas being drawn: the history's and the body's are each their own. */
+const rootRuns = (): "down" | "across" => state.settings.trunk[inPast() ? "history" : "body"];
+
 /** Which column each row was drawn in, filled as the canvas is drawn, so an act opens what is selected where it stands. */
 let colOf = new Map<string, number>();
 
@@ -3549,7 +3575,9 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
   const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
-  const beneath = kids.length ? `<div class="ckids">${kids.map((k) => nodeHtml(k, root, col)).join("")}</div>` : "";
+  // the root's level may run across as a trunk, each of its rows with its own level hanging down beneath it
+  const across = head && a === "" && rootRuns() === "across" ? " across" : "";
+  const beneath = kids.length ? `<div class="ckids${across}">${kids.map((k) => nodeHtml(k, root, col)).join("")}</div>` : "";
   return `<div class="cnode">${row}${beneath}</div>`;
 }
 
@@ -3574,7 +3602,7 @@ const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { inde
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
-const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere", "face"];
+const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere", "face", "trunk"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
@@ -3685,8 +3713,27 @@ function drawEdges(): void {
   // can follow back is what says where they are, where a map of one grey weight leaves them to work it out
   const way = new Set(prefixesOf(state.focus));
   const lit: string[] = [];
+  // a trunk: one line along beneath the root's row, from the root's own drop to the last of its rows, and a short drop
+  // from it into the head of each; the way to where the reader stands is lit along it and down into the one row on it
+  all<HTMLElement>(".ckids.across", st).forEach((kids) => {
+    const row = kids.previousElementSibling as HTMLElement | null;
+    const rows = Array.from(kids.children).flatMap((n) => {
+      const r = n.querySelector<HTMLElement>(":scope > .crow");
+      return r ? [r] : [];
+    });
+    if (!row || !rows.length) return;
+    const p = at(row);
+    const x0 = p.left + form.x;
+    const y = (p.bottom + at(rows[0]).top) / 2;
+    const xOf = (r: HTMLElement) => at(r).left + form.x;
+    paths.push(`<path class="nest" d="M${x0.toFixed(1)} ${p.bottom.toFixed(1)}L${x0.toFixed(1)} ${y.toFixed(1)}L${xOf(rows[rows.length - 1]).toFixed(1)} ${y.toFixed(1)}"/>`);
+    rows.forEach((r) => paths.push(`<path class="nest" d="M${xOf(r).toFixed(1)} ${y.toFixed(1)}L${xOf(r).toFixed(1)} ${at(r).top.toFixed(1)}"/>`));
+    const on = rows.find((r) => way.has(r.dataset.a ?? "\u0000"));
+    if (on && way.has(row.dataset.a ?? "\u0000"))
+      lit.push(`<path class="nest on" ${hued(on.dataset.a ?? "")} d="M${x0.toFixed(1)} ${p.bottom.toFixed(1)}L${x0.toFixed(1)} ${y.toFixed(1)}L${xOf(on).toFixed(1)} ${y.toFixed(1)}L${xOf(on).toFixed(1)} ${at(on).top.toFixed(1)}"/>`);
+  });
   // the nesting of a file: one line dropping from the brief that holds them, as a file tree draws it
-  all<HTMLElement>(".ckids", st).forEach((kids) => {
+  all<HTMLElement>(".ckids:not(.across)", st).forEach((kids) => {
     const row = kids.previousElementSibling;
     const rows = Array.from(kids.children).flatMap((n) => {
       const r = n.querySelector<HTMLElement>(":scope > .crow");
@@ -6461,6 +6508,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* an opening holds its row and the reading it opened side by side, the reading beginning level with the row */
 .cnode.open { flex-direction: row; align-items: flex-start; gap: var(--across); }
 .ckids { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ngap); margin: var(--ngap) 0 0 var(--indent); }
+/* a trunk: the root's rows stand side by side beneath it, each with its level hanging down, and the line along them drawn in the gap above */
+.ckids.across { flex-direction: row; gap: calc(2 * var(--ngap)); margin: calc(2 * var(--ngap)) 0 0 0; }
 .cbeside { display: flex; flex-direction: column; align-items: flex-start; }
 /* a row is a thing to look at and to press, so it keeps its own edge. Its name stands on one line and its figure on
    the next, so the name is never squeezed by the figure and both begin at the row's own edge */
