@@ -130,9 +130,19 @@ The history needs both readings a body has, the prose and the map, and a pane of
 
 What stands where does not change, and the history is not a pane. The widgets that follow the lane follow it into the mode: the shape, the tree and the ahead draw the history's lane, and the links tell of the links in its prose. The plate and the dish do not, and stay the body.
 
-A pane's icon cycles it through the middle's sides; a mode has no side, so its icon is a switch. The history's data is fetched when the mode is first turned to and not before, so a reader who never reads the history never pays for it.
+A pane's icon cycles it through the middle's sides; a mode has no side, so its icon is a switch. The page fetches the history's data when the reader reaches for the switch and not before, so a reader who never reads the history never pays for it.
 
-*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch on first turning are the session's. Its key, and whether the mode enters the page's address, are open.*
+*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch as the reader reaches for it are the session's. Its key, and whether the mode enters the page's address, are open.*
+
+#### 4.1.1 Turning to it never waits for what was read before
+
+A history already read is turned to at once, and read again behind it where it has changed, so a reader never waits for what they have seen.
+
+Only the first turn can wait, and it says so: the switch takes the weight it will have once the history stands and breathes, a quiet word beside it says the history is being read, and a second press lets the waiting go. Nothing in the row moves while it waits.
+
+The live process reads the history ahead of the reader, once the page has its body, and keeps it by where git's head stands, so even the first turn seldom waits. A published page has its history beside it as files, and says plainly where none was published.
+
+*The author's ask of 2026-09-28, that the loading be a quality experience; the form is the session's. Measured the same day: a cold read of 565 commits took 9.4 seconds and a warm one 0.4, a repeat from memory 0.03, and the body stood at 0.85 to 0.97 seconds while the history was read ahead.*
 
 ### 4.2 Only the commits that touch where you stand
 
