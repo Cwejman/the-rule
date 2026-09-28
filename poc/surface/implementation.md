@@ -266,17 +266,17 @@ With the lane taken out of the middle, the lane is kept laid out of sight rather
 
 *In force, 2026-09-18, as built, and the lane kept out of sight when a map stands without it the same day; what stands open moved into the shared state 2026-09-19, and the fit at another width, 2026-09-27. The pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
 
-#### 6.5.1 The history is the canvas over a world of its own
+#### 6.5.1 The history is the lane and the canvas over a world of its own
 
-The history's pane, which is to become [a mode](history.md#41-it-is-a-mode-not-a-pane), is drawn by the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, what is selected and open, its view, and the element it is drawn into. While it draws or answers, its world is set in the state's place, and the body's is set back after.
+[The history](history.md#41-it-is-a-mode-not-a-pane) is drawn by the lane's and the canvas's own functions, which read the shared state, so the history holds a state of its own, a world: its body, its folds, its focus and scope, what is selected and open on the map, and its view. Turning to the history sets its world in the state's place and holds the body's aside; turning back sets the body's back. Each keeps its own trail, its scroll, and what escape can undo and redo, so an undo never lays one substrate's lane over the other.
 
-It answers a press, a key, a pointer or a wheel on its pane that way, and whatever the canvas leaves to a later frame re-enters the world that left it.
+The plate and the dish stay the body, so while the history is read they draw inside the body's world, and a press on a cell of the plate turns back to the body before it goes there. The page's address and the browser's history are the body's alone: nothing of the history is written to either, and the browser's back and forward turn back to the body first. A change to the body while the history is read reaches the body's world, and the history is read again.
 
-Nothing of the canvas is written twice, and what the history needs of its own is small: a commit's face and figure, a fold that lays no lane, and the few acts that move on a map. The keys it takes are those, since the rest reach into a lane the history does not have.
+Nothing of the lane or the canvas is written twice. What the history needs of its own is small: a commit's entry in the lane and its face and figure on the map, each told from the light tier; a commit's readings and their hues read from the body's world; and a commit neither carrying a number nor counting in its story's.
 
-Its addresses are its own, so nothing the body lights reaches its rows, and as yet nothing it lights reaches the body's.
+Its addresses are its own, so nothing the body lights reaches its briefs, and as yet nothing it lights reaches the body's.
 
-*In force, 2026-09-27, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state.*
+*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world.*
 
 ### 6.6 What the browser keeps
 
