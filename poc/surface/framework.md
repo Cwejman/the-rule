@@ -20,7 +20,7 @@ An adjunct stands in a gutter. Given a brief in the lane, read from the shared s
 
 A figure stands in a wing. Given the body and the shared state, it returns a drawing that stands on its own: the tree, the shape beneath the focus, the lane as laid, the body whole. It never touches the prose.
 
-A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), the stories told over git's commits, drawn by the canvas's code. The three that are not the lane are maps. Each pane is drawn from the shared state, the history by the canvas's own functions, and all act through the same verbs.
+A pane stands in the middle, and there are four: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size; and [the history](history.md), the stories told over git's commits, drawn by the canvas's code, which is to become [a mode](history.md#41-it-is-a-mode-not-a-pane) the lane and the canvas are turned to rather than a pane. The three that are not the lane are maps. Each pane is drawn from the shared state, the history by the canvas's own functions, and all act through the same verbs.
 
 *Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22 and the history 2026-09-27.*
 
@@ -99,7 +99,7 @@ The order has one exception at its end, and it is written where it was found: wh
 
 ## 3. The strip
 
-One row of icons stands at the foot of the page, centred, holding every choice once: the panes first, then the adjuncts, then the figures, three groups spaced apart by room alone. A reader's question at the foot is one question, what stands around the reading, so it is asked in one place rather than in five.
+One row of icons stands at the foot of the page, centred, holding every choice once: the panes first, then the adjuncts, then the figures, three groups spaced apart by room alone. A reader's question at the foot is one question, what stands around the reading, so it is asked in one place rather than in five. The history's switch is to stand first, [a group of its own](history.md#41-it-is-a-mode-not-a-pane), once the history is a mode.
 
 An icon cycles when it is pressed: nowhere, the left, the right, nowhere again, so one icon carries both whether a widget stands and which side holds it. A side the width cannot hold is stepped over rather than offered, so a press never sends a widget where it would not stand, and what the next press will do is said on pointing. A pane cycles through the middle's sides in the same way, and [gives back what it pushed out](#32-a-pane-gives-back-what-it-pushed-out). A widget in use carries a dot beside its icon, at the side that holds it and level with the middle of it, so the row shows the whole arrangement at a glance; a lone pane takes the whole middle and carries none.
 
