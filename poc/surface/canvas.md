@@ -152,6 +152,16 @@ It is the way down said on the map. What the run of names gives as text, the lin
 
 *The author's ask of 2026-09-20, that the lines from the root to where you are be explicit; as built the same day.*
 
+### 4.10 The root's level runs down or across
+
+The root's level may be laid across instead of down: its rows side by side left to right, and each one's level hanging down beneath it, as a trunk with branches in one direction. It is a setting of the canvas for every reading, and [the history](history.md#43-its-root-runs-left-to-right-a-trunk) takes it across by default, since it is a trunk more than a tree.
+
+Only the root's level turns. Everything beneath it goes down as a file's levels do, and the moves keep their meanings, so down and up still walk the reading and shift with them still jumps level to level; folding by levels with shift and the arrows works across as it works down.
+
+Laid across, the root's rows stand where [an opening](#4-down-is-the-reading-across-is-each-opening) would stand, since across is also the step into another reading. The history opens nothing, so there the two do not meet; in the body, where an opened reading stands when the root runs across is open.
+
+*The author's, 2026-09-28: [the root's direction for every canvas](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), across by default in the history. That only the root's level turns and the moves keep their meanings is the session's reading; where an opening stands across is the session's question, and open.*
+
 ## 5. One press selects, two presses go
 
 Three things a reader wants of a node, and they are not one act. To know what it is. To go there and read it. To see what it holds without leaving where they are.
