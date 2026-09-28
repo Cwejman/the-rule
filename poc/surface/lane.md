@@ -116,7 +116,7 @@ The fade at the top comes in with the reading line, since nothing stands above t
 
 Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-a-reading-is-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
 
-Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the history, and the history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7-scoping-the-lane). The browser's back and forward walk them.
+Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the browser's history, and that history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7-scoping-the-lane). The browser's back and forward walk them.
 
 *Reasoned, the author's, 2026-09-13.*
 
