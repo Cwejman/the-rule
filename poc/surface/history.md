@@ -38,7 +38,7 @@ So the history is drawn as any reading is, and only its leaves are a kind of the
 
 ### 2.1 It stands at the root, and is never placed in the body
 
-The stories live beside the entry of the root the surface is handed, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places the file in the body, and the surface knows it by where it stands: it is traced only when the history is first read. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
+The stories live beside the entry of the root the surface is handed, as `history.md` first, and as a folder `history/` once one reading no longer holds them, as any file becomes one. Nothing places the file in the body, and the surface knows it by where it stands: it is traced when the history is asked for, and never for the body. The file is stamped as a record, [beneath](#24-it-is-a-record-whose-entries-are-holons).
 
 The history there is the root's own: the commits that touched what lies under the root, which for this repository is the whole of it.
 
@@ -128,11 +128,11 @@ The history is a mode the middle is turned to, read from where the reader stands
 
 The history needs both readings a body has, the prose and the map, and a pane of its own gave it only the map. So it is a mode: a switch in [the strip](framework.md#3-the-strip), standing first and apart from the panes, turns the lane and the canvas, wherever they stand, to the history, the lane to its stories and commits as prose and the canvas to them as a map, and turns them back.
 
-What stands where does not change, and the history is not a pane. The widgets that follow the lane follow it into the mode: the shape, the tree and the ahead draw the history's lane, and the links stand beside it. The plate and the dish do not, and stay the body.
+What stands where does not change, and the history is not a pane. The widgets that follow the lane follow it into the mode: the shape, the tree and the ahead draw the history's lane, and the links tell of the links in its prose. The plate and the dish do not, and stay the body.
 
-The switch is a switch and not a cycle, since a mode has no side: dark while the history is read, light while it is not, and it says which on pointing. The history's data is fetched when the mode is first turned to and not before, so a reader who never reads the history never pays for it.
+A pane's icon cycles it through the middle's sides; a mode has no side, so its icon is a switch. The history's data is fetched when the mode is first turned to and not before, so a reader who never reads the history never pays for it.
 
-*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch's weights, its place first in the strip and the fetch on first turning are the session's. Its key, and whether the mode enters the page's address, are open.*
+*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch on first turning are the session's. Its key, and whether the mode enters the page's address, are open.*
 
 ### 4.2 Only the commits that touch where you stand
 
@@ -156,15 +156,13 @@ A story tells a stretch of time, not a place, so it holds whatever its run holds
 
 Selecting a commit, or a story that holds ten, in the history shows what it touched in the body.
 
-It stays selected when the mode is left, beside whatever the reader selects in the body, and there [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the canvas lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there.
-
-[The plate](widgets.md#7-the-plate) stays the body in the mode as well, so it shows what was touched while the history is read, beside the selection.
+It stays selected when the mode is left, beside whatever the reader selects in the body, and there [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the canvas lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there. While the history is read, [the plate](widgets.md#7-the-plate), which stays the body, shows it beside the selection.
 
 In place, the blocks that changed are marked and the rest is left as it is, and what was removed is shown only when asked; a finer marking may come later. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 
 A change in place fetches from [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) exactly the commits it shows, one for a commit and ten for a story of ten, so what it asks is bounded by the story and never by the history.
 
-*Preferred, the author's, 2026-09-21: [how a change affected the field](../../author/ideas-2026-09-21.md#9-how-a-change-affected-the-field) and [a selection shows the pieces affected](../../author/ideas-2026-09-21.md#15-a-selection-shows-the-pieces-affected); the selection kept past the mode, the session's, and the plate staying the body, the author's, 2026-09-28, until the panes are managed some other way, and that it then shows what was touched, the session's. The first cut of the change in place and giving up a hue per commit are the session's proposals, taken; that a story's change in place fetches its commits one by one is the session's, from a fresh head finding it unsaid.*
+*Preferred, the author's, 2026-09-21: [how a change affected the field](../../author/ideas-2026-09-21.md#9-how-a-change-affected-the-field) and [a selection shows the pieces affected](../../author/ideas-2026-09-21.md#15-a-selection-shows-the-pieces-affected); the plate staying the body, the author's, 2026-09-28, until the panes are managed some other way. The selection kept past the mode, and the plate showing what it touched, are the session's. The first cut of the change in place and giving up a hue per commit are the session's proposals, taken; that a story's change in place fetches its commits one by one is the session's, from a fresh head finding it unsaid.*
 
 ### 4.4 What is selected stands beside the switch
 
@@ -172,9 +170,9 @@ What is selected in the history reaches everything, since the body lights what i
 
 *Preferred, the author's, 2026-09-28: [a status by the git glyph](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), for it affects everything, given by him as a perhaps; that pressing it lets go is the session's.*
 
-### 4.5 Its root runs left to right, a trunk
+### 4.5 Its root's level runs left to right, a trunk
 
-On the canvas the history's root level runs across, left to right, and each story's level hangs down beneath it, since the history is not a tree so much as a trunk with branches in one direction. Which way the root's level runs is [each canvas's own setting](canvas.md#410-the-roots-level-runs-down-or-across), and the history's is across by default.
+On the canvas the history's root level runs across, left to right, and each story's level hangs down beneath it, since the history is not a tree so much as a trunk with branches in one direction. Which way the root's level runs [may be a setting of every canvas](canvas.md#410-the-roots-level-runs-down-or-across), and the history's is across by default.
 
 *Preferred, the author's, 2026-09-28: [a trunk and not a tree](../../author/ideas-2026-09-28.md#4-the-canvas-runs-left-to-right-a-trunk-and-not-a-tree), and the direction perhaps every canvas's [the same day](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas). It supersedes the history drawn down the column for coherence, 2026-09-21, which left a toggle between the two directions for later. Which way time runs along the trunk is open.*
 
@@ -210,7 +208,7 @@ Done: the data, 2026-09-21; the trace, the first stories and a pane drawn by the
 
 2. Show [only the commits that touch where the reader stands](#42-only-the-commits-that-touch-where-you-stand), the body's scope, and say the filter in the way down.
 
-3. [The root's level runs down or across](canvas.md#410-the-roots-level-runs-down-or-across), a setting of each canvas, the history's across, with the moves on the map working across as they work down.
+3. [The root's level runs down or across](canvas.md#410-the-roots-level-runs-down-or-across): the history's across, and the body's turnable as the author's perhaps, with the moves on the map working across as they work down.
 
 4. Show [what a selection touched](#43-a-selection-shows-what-it-touched) in the body, on the plate while the history is read and on the shape, the canvas and in place in the lane once it is left, with [what is selected beside the switch](#44-what-is-selected-stands-beside-the-switch), fetching [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time) as a change in place asks. It is felt rather than only specified, and so is the author's to see first.
 
@@ -226,7 +224,7 @@ How a session tells its story where another session's commits fall between its o
 
 Whether the canvas opens the way to a touched brief the reader has not opened, or lights only what it holds.
 
-Which way time runs along [the trunk](#45-its-root-runs-left-to-right-a-trunk): the oldest at the left, as a timeline reads, or the newest, as the record is written.
+Which way time runs along [the trunk](#45-its-roots-level-runs-left-to-right-a-trunk): the oldest at the left, as a timeline reads, or the newest, as the record is written.
 
 Whether a reader scoped in the body can widen the filter to the whole history without leaving their scope, and whether a reader may scope within the history's own lane, and what that scope would then mean.
 
