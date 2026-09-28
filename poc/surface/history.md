@@ -138,7 +138,7 @@ A pane's icon cycles it through the middle's sides; a mode has no side, so its i
 
 A history already read is turned to at once, and read again behind it where it has changed, so a reader never waits for what they have seen.
 
-Only the first turn can wait, and it says so: the switch takes the weight it will have once the history stands and breathes, a quiet word beside it says the history is being read, and a second press lets the waiting go. Nothing in the row moves while it waits.
+Only the first turn can wait, and it says so: the switch takes the weight it will have once the history stands and breathes, a quiet word beside it, or above it at the foot of a phone, says the history is being read, and a second press lets the waiting go. Nothing in the row moves while it waits.
 
 The live process reads the history ahead of the reader, once the page has its body, and keeps it by where git's head stands, so even the first turn seldom waits. A published page has its history beside it as files, and says plainly where none was published.
 
