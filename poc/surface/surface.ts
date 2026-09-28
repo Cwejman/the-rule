@@ -27,7 +27,7 @@
 // coherent, declarative over imperative, data over logic, pure functions with
 // their side effects kept apart, flat data with one source of truth.
 
-import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync, mkdirSync, copyFileSync, renameSync } from "node:fs";
+import { readFileSync, existsSync, statSync, writeFileSync, watch, openSync, readSync, closeSync, mkdirSync, copyFileSync, renameSync, rmSync } from "node:fs";
 import { resolve, dirname, relative, join, sep, basename } from "node:path";
 import { marked } from "marked";
 
@@ -145,17 +145,8 @@ async function serve(rootArg: string, port: number): Promise<void> {
   const version = `version ${Bun.hash(script + CSS).toString(36)}`;
   const listeners = new Set<(s: string) => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
-  let moved: ReturnType<typeof setTimeout> | undefined;
-  // a commit changes no file the body holds, so git's own log of where its head moved is what says the history grew;
-  // it is told apart from a change to the body, which the history's reading does not need
-  const headLog = /^\.git[\\/]logs[\\/]HEAD$/;
   // a change to the markdown or to an image the body may hold is a change to the body
   watch(rootDir, { recursive: true }, (_event, name) => {
-    if (name && headLog.test(String(name))) {
-      clearTimeout(moved);
-      moved = setTimeout(() => listeners.forEach((send) => send("history")), 120);
-      return;
-    }
     if (name && !/\.md$/i.test(String(name)) && !imageType(String(name))) return;
     clearTimeout(timer);
     timer = setTimeout(() => listeners.forEach((send) => send("change")), 120);
@@ -188,18 +179,59 @@ async function serve(rootArg: string, port: number): Promise<void> {
   // nothing the live process serves may be kept by the browser: the page carries the whole of the drawing, so a reader
   // who reloads after a change must be handed the page as it is now and never the one they had
   const fresh = { "cache-control": "no-store, must-revalidate" };
-  const body = async () => Response.json(await retrace(), { headers: fresh });
+  const body = async () => {
+    const r = Response.json(await retrace(), { headers: fresh });
+    warm();
+    return r;
+  };
   // history is asked for apart from the body, and only when a view wants it, at the one path it has published as well
   const none = (e: unknown) => new Response((e as Error).message, { status: 404, headers: fresh });
-  const past = () => historyOf(rootArg).then((h) => Response.json(h, { headers: fresh }), none);
-  // the stories are traced whenever they are asked for, since they are prose a session may be writing, and what the
-  // trace had to say is printed as the body's warnings are
-  const stories = () =>
-    traceHistory(rootArg).then((h) => (h.warnings.forEach((w) => console.warn("  " + w)), Response.json(h, { headers: fresh })), none);
+  // what is read of the history is kept in memory by where git's head stands, and the stories by the text they are
+  // told in as well, since a session may be writing them; so a reader turning to the history again waits for nothing
+  // that has not changed. A reading that failed is not kept, and is tried again when next asked for
+  const memo = { head: "", told: "", past: null as Promise<History> | null, stories: null as Promise<Body> | null };
+  const headNow = async () => (await git(rootDir, ["rev-parse", "HEAD"])).toString().trim();
+  const toldNow = () => (existsSync(join(rootDir, "history.md")) ? readFileSync(join(rootDir, "history.md"), "utf8") : "");
+  const kept = <T,>(p: Promise<T>, drop: () => void): Promise<T> => (p.catch(drop), p);
+  const pastNow = async (): Promise<History> => {
+    const head = await headNow();
+    if (memo.head !== head) Object.assign(memo, { head, past: null, stories: null });
+    return (memo.past ??= kept(historyOf(rootArg), () => (memo.past = null)));
+  };
+  const storiesNow = async (): Promise<Body> => {
+    await pastNow();
+    const told = toldNow();
+    if (memo.told !== told) Object.assign(memo, { told, stories: null });
+    // what the trace had to say is printed as the body's warnings are, once for each telling
+    return (memo.stories ??= kept(
+      traceHistory(rootArg).then((h) => (h.warnings.forEach((w) => console.warn("  " + w)), h)),
+      () => (memo.stories = null),
+    ));
+  };
+  const past = () => pastNow().then((h) => Response.json(h, { headers: fresh }), none);
+  const stories = () => storiesNow().then((h) => Response.json(h, { headers: fresh }), none);
+  // the history is read ahead of the reader, once the page has had its body, so the first turn to it finds it read: a
+  // cold read of every commit takes seconds, and the body must never wait behind it
+  let warmed = false;
+  const warm = () => void (!warmed && ((warmed = true), setTimeout(() => void storiesNow().catch(() => {}), 400)));
   const asset = (path: string) => {
     const file = decodeURIComponent(path.slice("/asset/".length));
     return held.has(file) ? new Response(Bun.file(join(rootDir, file)), { headers: { "cache-control": "no-cache" } }) : new Response("not an image the body holds", { status: 404 });
   };
+
+  // a commit changes no file the body holds, so git's own log of where its head moved is what says the history grew. It
+  // is watched where git keeps it, which for a root inside a repository or a worktree is not beneath the root; a tree
+  // that is not a repository has no history to tell of
+  let moved: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const log = resolve(rootDir, (await git(rootDir, ["rev-parse", "--git-path", "logs/HEAD"])).toString().trim());
+    mkdirSync(dirname(log), { recursive: true });
+    watch(dirname(log), (_event, name) => {
+      if (String(name) !== basename(log)) return;
+      clearTimeout(moved);
+      moved = setTimeout(() => listeners.forEach((send) => send("history")), 120);
+    });
+  } catch {}
 
   await retrace();
   const routes: Record<string, () => Response | Promise<Response>> = { "/body": body, "/changes": changes, "/history.json": past, "/stories.json": stories };
@@ -248,20 +280,22 @@ async function build(rootArg: string, out: string): Promise<void> {
   console.log(`${body.briefs.length} briefs from ${body.root} → ${out}${written.size ? `, ${written.size} image${written.size === 1 ? "" : "s"} written beside it` : ""}`);
   // history's light tier stands beside the page as a file of its own, never inside it, at the path the live process
   // answers too; a tree that is not a repository, or a clone without its history, has none to write
+  // the history is written whole or not at all: what an earlier build left is taken away first, and nothing is written
+  // until every part of it has been read, so a page never reads a history out of step with itself
+  ["history.json", "stories.json"].forEach((f) => existsSync(join(outDir, f)) && rmSync(join(outDir, f)));
   try {
     const past = await historyOf(rootArg);
-    writeFileSync(join(outDir, "history.json"), JSON.stringify(past));
     // the heavy tier is a file per commit, read in one pass, at the path the live process answers too
     const { cwd, prefix } = await repoOf(rootArg);
     const heavy = await changesOf(cwd, prefix, past.commits.map((c) => c.hash));
-    mkdirSync(join(outDir, "commits"), { recursive: true });
-    heavy.forEach((c, hash) => writeFileSync(join(outDir, "commits", `${hash}.json`), JSON.stringify(c)));
-    console.log(`${past.commits.length} commits → ${join(outDir, "history.json")}, and what each changed → ${join(outDir, "commits")}`);
     // the stories stand beside them, traced as the page is built
     const stories = await traceHistory(rootArg);
     stories.warnings.forEach((w) => console.warn("  " + w));
+    mkdirSync(join(outDir, "commits"), { recursive: true });
+    heavy.forEach((c, hash) => writeFileSync(join(outDir, "commits", `${hash}.json`), JSON.stringify(c)));
+    writeFileSync(join(outDir, "history.json"), JSON.stringify(past));
     writeFileSync(join(outDir, "stories.json"), JSON.stringify(stories));
-    console.log(`${stories.briefs.length - 1} stories and commits → ${join(outDir, "stories.json")}`);
+    console.log(`${past.commits.length} commits → ${join(outDir, "history.json")}, what each changed → ${join(outDir, "commits")}, and ${stories.briefs.length - 1} stories and commits → ${join(outDir, "stories.json")}`);
   } catch (e) {
     console.warn(`  no history written: ${(e as Error).message}`);
   }
@@ -3994,7 +4028,7 @@ const pastWorld: World = { body: null, index: null, folds: new Map(), focus: "",
 let bodyWorld: World | null = null;
 
 /** The light tier the history's leaves are told from, and how far it has been read. */
-const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, commits: new Map<string, Commit>() };
+const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, asked: false, pending: null as Promise<void> | null, commits: new Map<string, Commit>() };
 
 /** Whether the state holds the history: the mode stands, and nothing is being drawn in the body's world. */
 const inPast = (): boolean => reading === "history" && inside === null;
@@ -4036,14 +4070,22 @@ function takeLane(k: LaneKept | null): void {
  * writes beside the page. A leaf carries only its hash, so its subject is joined from the light tier here, once. What
  * the reader had folded and selected stays where it still stands, in whichever place the history's world is kept.
  */
-async function loadPast(): Promise<void> {
-  if (past.status === "loading") return;
+function loadPast(): Promise<void> {
+  return (past.pending ??= readPast().finally(() => {
+    past.pending = null;
+    // a change that came while this reading was under way is read again, since the fetch may have begun before it
+    if (past.stale && past.status === "ready" && inPast()) void loadPast();
+  }));
+}
+
+async function readPast(): Promise<void> {
   past.status = "loading";
   past.stale = false;
   drawChooser();
   const get = async (path: string) => {
     const r = await fetch(path, { cache: "no-store" });
-    if (!r.ok) throw new Error((await r.text()) || `${path}: ${r.status}`);
+    // the live process says in a word why there is none; a static host answers with a page of its own, which says nothing
+    if (!r.ok) throw new Error(r.headers.get("content-type")?.startsWith("text/plain") ? await r.text() : "no history was published with this page");
     return r.json();
   };
   try {
@@ -4052,20 +4094,17 @@ async function loadPast(): Promise<void> {
     stories.briefs.forEach((b) => b.commit && (b.title = past.commits.get(b.commit)?.subject ?? b.commit.slice(0, 7)));
     stories.warnings.forEach((w) => console.warn(w));
     const index = indexBody(stories);
-    const keep = (w: { folds: Map<string, Fold>; picked: string | null }) => {
-      w.folds = new Map(Array.from(w.folds).filter(([a]) => index.by.has(a)));
-      if (w.picked !== null && !index.by.has(w.picked)) w.picked = null;
-    };
     past.status = "ready";
-    if (!inPast()) return void Object.assign(pastWorld, { body: stories, index }, (keep(pastWorld), {}));
+    if (!inPast()) {
+      // held aside, it is settled when it is next turned to
+      Object.assign(pastWorld, { body: stories, index });
+      return;
+    }
     // read again while the history stands: the lane is drawn again from it, as the body's is on a change
     const top = ui.scroll.scrollTop;
     state.body = stories;
     state.index = index;
-    keep(state);
-    closeLay();
-    if (!brief(state.scope)) state.scope = "";
-    if (!inLane(state.focus)) state.focus = nearestInLane(state.focus);
+    settleWorld();
     drawAll();
     ui.scroll.scrollTop = top;
   } catch (e) {
@@ -4075,19 +4114,28 @@ async function loadPast(): Promise<void> {
   } finally {
     drawChooser();
   }
-  // a change that came while this reading was under way is read again, since the fetch may have begun before it
-  if (past.stale && past.status === "ready" && inPast()) void loadPast();
 }
 
 /**
- * Turns the lane and the canvas to the history. Its data is read when the mode is first turned to, and again after a
- * change; the first time, the history is laid whole from its root, and after that it stands as the reader left it.
+ * Turns the lane and the canvas to the history. A history already read is turned to at once, and read again behind it
+ * where it has changed since, so the reader never waits for what they have seen before. Only the first turn waits, and
+ * it says so: the switch takes its weight at once and breathes, a word beside it says the history is being read, and a
+ * second press lets the waiting go. The first time, the history is laid whole from its root; after that it stands as
+ * the reader left it.
  */
 async function toPast(): Promise<void> {
   if (reading === "history") return;
-  if (past.status !== "ready" || past.stale) await loadPast();
-  // the reader may have turned to the history again while it was being read
-  if (past.status !== "ready" || !pastWorld.body || (reading as string) === "history") return void (past.status === "failed" && notice(`No history: ${past.said}`));
+  if (!pastWorld.body) {
+    if (past.asked) return void ((past.asked = false), drawChooser());
+    past.asked = true;
+    drawChooser();
+    await loadPast();
+    // the waiting may have been let go by a second press, or the reader may have turned to the history some other way
+    const asked = past.asked;
+    past.asked = false;
+    drawChooser();
+    if (!asked || !pastWorld.body || (reading as string) === "history") return void (past.status === "failed" && asked && notice(`No history: ${past.said}`));
+  }
   laneKept.body = keepLane();
   bodyWorld = takeWorld();
   pastWorld.el = ui.canvas;
@@ -4099,11 +4147,18 @@ async function toPast(): Promise<void> {
   takeLane(laneKept.history);
   chooser.sheet = null;
   card.a = null;
-  if (laneKept.history === null) return arrive("");
-  drawAll();
-  ui.scroll.scrollTop = laneKept.history.scroll;
-  quiet();
+  if (laneKept.history === null) arrive("");
+  else {
+    drawAll();
+    ui.scroll.scrollTop = laneKept.history.scroll;
+    quiet();
+  }
+  // what changed since it was last read is read behind it, and drawn in when it arrives
+  if (past.stale) void loadPast();
 }
+
+/** Reads the history ahead of a turn to it, as the reader reaches for the switch, so the turn finds it read. */
+const readAhead = (): void => void ((past.status === "none" || (past.stale && past.status !== "loading")) && loadPast());
 
 /**
  * Turns the lane and the canvas back to the body, as the reader left it. Where the browser has already moved to an
@@ -4126,12 +4181,24 @@ function toBody(moved = false): void {
   if (!moved) followHistory(hashFor(state.focus));
 }
 
-/** The switch in the strip: a mode has no side, so it is a switch and not a cycle, and it says which the lane reads. */
+/**
+ * The switch in the strip: a mode has no side, so it is a switch and not a cycle, and it says which the lane reads.
+ * Asked for and not yet read, it stands as it will once the history stands and breathes, with a word beside it; read
+ * again behind a history already standing, it breathes alone, since what the reader has is there to read.
+ */
 function switchHtml(): string {
-  const on = reading === "history";
-  const busy = past.status === "loading" ? " busy" : "";
-  const tip = on ? "the history — reading it; press to read the body" : past.status === "failed" ? `the history — none: ${past.said}` : "the history — press to read it";
-  return `<button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button>`;
+  const on = reading === "history" || past.asked;
+  // a read ahead the reader did not ask for is not shown: the switch breathes only for a waiting or a history standing
+  const busy = past.status === "loading" && on ? " busy" : "";
+  const tip = past.asked
+    ? "the history — being read; press to let it go"
+    : reading === "history"
+      ? "the history — reading it; press to read the body"
+      : past.status === "failed"
+        ? `the history — none: ${past.said}`
+        : "the history — press to read it";
+  const waiting = past.asked ? `<span class="waiting chrome">reading the history…</span>` : "";
+  return `<button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button>${waiting}`;
 }
 
 /**
@@ -4915,7 +4982,7 @@ function light(): void {
   drawLaser();
   // while the history is read the plate is the body's, and a history's address lights nothing on it
   const ours = (el: Element) => !inPast() || !el.closest("svg.plate, #dish");
-  if (!inPast()) lightPlate(a);
+  lightPlate(inPast() ? null : a);
   if (a === null) return;
   const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`).filter(ours);
   exact.forEach((el) => el.classList.add("lit"));
@@ -5687,10 +5754,12 @@ function wire(): void {
     // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
     // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
     if (el && el.closest("#lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
+    // reaching for the switch reads the history ahead of the press
+    if (el === null && (e.target as HTMLElement | null)?.closest?.("[data-mode]")) readAhead();
     // the plate stays the body while the history is read, so a cell of it lights the way on the plate alone
     const onPlate = inPast() && !!el?.closest("svg.plate, #dish");
     point(el && !onPlate ? el.dataset.a! : null);
-    if (onPlate) lightPlate(el!.dataset.a!);
+    if (inPast()) lightPlate(onPlate ? el!.dataset.a! : null);
     tip(e);
   });
   document.documentElement.addEventListener("pointerleave", () => (point(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
@@ -6145,11 +6214,8 @@ function setBody(body: Body): void {
   // a file changed, and the history may have with it: it is read again the next time it is drawn
   past.stale = true;
   // the lane is drawn again from the new body, keeping the folds that still resolve and the scroll
-  const kept = new Map(Array.from(state.folds).filter(([a]) => state.index!.by.has(a)));
   const top = ui.scroll.scrollTop;
-  state.folds = kept;
-  closeLay();
-  if (!inLane(state.focus)) state.focus = nearestInLane(state.focus);
+  settleWorld();
   drawAll();
   ui.scroll.scrollTop = top;
 }
@@ -6486,6 +6552,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .strip .pick.fixed { cursor: default; }
 /* the switch has no side and carries no dot; while the history is read it stands darkest, and while it is read in it breathes */
 .strip .pick.mode.busy { animation: busy 1s ease-in-out infinite alternate; }
+/* the word stands clear of the row at the switch's left, so nothing in the row moves while the reader waits; it comes in only once the waiting is felt */
+.strip .group:first-child { position: relative; }
+.strip .waiting { position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 10px; font-size: 12px; color: var(--faint); white-space: nowrap; pointer-events: none; animation: arrive .3s ease-out both .25s; }
+@keyframes arrive { from { opacity: 0; } to { opacity: 1; } }
 @keyframes busy { from { opacity: .2; } to { opacity: .6; } }
 /* a widget in use says which side holds it, as a dot beside its icon, level with the middle of it so it balances the
    round forms the icons are made of. It is the icon's own ink, three pixels across and three clear of the glyph */
