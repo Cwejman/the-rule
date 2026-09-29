@@ -17,7 +17,15 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-09-28 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-09-29 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+
+### The whole history is told
+
+On 2026-09-29 the author asked that this file be cared for before the history is taken further, so that the whole of the repository stands in it under the law. The session read every commit, told them all in four periods and the days, sittings and labs within them, and read the telling five times with a fresh head and against the commits, until a round changed only words.
+
+[The whole history is told](git:5e60ae9..98d473d)
+
+*Told by the session that made these commits, as its debrief, 2026-09-29; the commit that tells it stands untold above it.*
 
 ### History becomes a mode
 
