@@ -9,11 +9,11 @@ How this repository came to be what it is, told over its commits. It is told in 
 
 The stories name a few things often. The law is [the rule](rule.md), called the code until 2026-09-17. The arc is the knowledge written under the law, begun inside OpenLight, the author's larger project, and cut out as this repository on 2026-09-14. The study is the ten labs that found the law, each running under an edition, a version of the law, and the sweep is the research of August they read. The practice says how the law is kept in markdown and git, and the skill what a session does with it.
 
-Knowledge under the law is made of briefs, each a heading with its prose, whose face is the heading and the first paragraph. A file is one reading, and a paragraph that is nothing but a link, a lone link, places another file there as a part of it, shown as a card; crossing into it crosses a boundary. The body is everything the root file reaches that way, and a scope is the part of it a reader has narrowed to.
+Knowledge under the law is made of briefs, each a heading with its prose, whose face is the heading and the first paragraph. Written knowledge under the law is called the substrate. A file is one reading, and a paragraph that is nothing but a link, a lone link, places another file there as a part of it, shown as a card; crossing into it crosses a boundary. The body is everything the root file reaches that way, and a scope is the part of it a reader has narrowed to.
 
-The surface is the page the body is read on. Its lane holds the prose; beside it the canvas draws the same as a map of nodes, the plate draws the body whole as one round figure, and the dish is the plate grown to a pane. The middle is where the panes stand, and an act is anything a reader can do there, by a key or a press. [The surface's own brief](poc/surface/README.md) has the rest, and [its brief on history](poc/surface/history.md) how it reads this file. A fresh head is a session that reads a draft cold, and a cold review does the same to code.
+The surface is the page the body is read on; a monitor, a first surface and a reader were built and retired before it, on 2026-09-11 and 12. Its lane holds the prose, and the brief under its reading line, a line across the lane, is where the reader stands; the shape is a small drawing of the lane beside it; beside it the canvas draws the same as a map of nodes, the plate draws the body whole as one round figure, and the dish is the plate grown to a pane. The middle is where the panes stand, and an act is anything a reader can do there, by a key or a press. [The surface's own brief](poc/surface/README.md) has the rest, and [its brief on history](poc/surface/history.md) how it reads this file. A fresh head is a session that reads a draft cold, and a cold review does the same to code.
 
-*Begun 2026-09-27. A story's confidence holds for everything beneath it unless one says otherwise, and where none says, a story was reasoned on 2026-09-29 by a later session from the commits and the briefs they wrote, the messages carried as written and not checked against the files. Two days say otherwise: 2026-09-27 was told by the session that did the work, and 2026-09-21 by a later session on 2026-09-27.*
+*Begun 2026-09-27. A story's confidence holds for everything beneath it unless one says otherwise, and where none says, a story was reasoned on 2026-09-29 by a later session from the commits and the briefs they wrote, the messages carried as written and not checked against the files. Two days say otherwise at their heads, 2026-09-27, told by the session that did the work, and 2026-09-21, told by a later session on 2026-09-27; a few stories carry a note of their own.*
 
 ## History is laid, and the middle makes room for it
 
@@ -22,8 +22,6 @@ From 2026-09-21 to 2026-09-28 the surface took git up again, four days after [th
 ### History becomes a mode
 
 On 2026-09-28 the author read the history's pane and asked for it to be read as prose as well as on the map, filtered by where the reader stands. The day designed it as a mode the lane and the canvas are turned to and built it, reviewed it cold, made turning to it never wait while two more cold reviews followed, and laid the canvas's root across as a trunk.
-
-*The session that made these commits told no story, so the opening's grade holds.*
 
 #### The root's level runs across
 
@@ -45,7 +43,7 @@ The first cold review found where the mode let the page fall out of step with wh
 
 #### The mode is built
 
-A switch, standing first in the strip of icons at the page's foot, and the key g turn the lane and the canvas to the history and back. Each keeps its own lane, trail and undo, while the plate, the dish and the page's address stay the body's. The briefs were brought to it as built.
+A switch, standing first in the strip of icons at the page's foot, and the key g turn the lane and the canvas to the history and back. Each keeps its own place in the lane, its trail and its undo, while the plate, the dish and the page's address stay the body's. The briefs were brought to it as built.
 
 [The mode is built](git:55a5ddd..28759d0)
 
@@ -65,7 +63,7 @@ The author's dictation was held as said, and his answer to the session's plan wa
 
 On 2026-09-27 the author asked for the history to be carried on until a step that is not trivial, and for the middle to hold two panes with sides, since with the dish there were three. The session wrote the design first, gave the panes their sides and the keys a holder, traced the stories into what the page draws, told the first of them, and drew the history as a pane by the canvas's own drawing. It stopped before a selection shows what it touched, which is the author's to see first.
 
-*Seen by the session that made these commits, which told them as its debrief, 2026-09-27. Its stories are kept as it told them, but for three changes made on 2026-09-29: "The stories are traced, told and reviewed" joins three it told apart, "A run is read by descent" takes two commits out of the rounds they came before, and "The session tells its day" places the commit that told them.*
+*Seen by the session that made these commits, which told them as its debrief, 2026-09-27. Its stories are kept as it told them, but for three changes made on 2026-09-29: "The stories are traced, told and reviewed" joins three it told apart, "A run is read by ancestry" takes two commits out of the rounds they came before, "The session tells its day" places the commit that told them, and the body's measure moved from "The briefs say what is built" into the rounds, whose commit took it.*
 
 #### The session tells its day
 
@@ -75,19 +73,19 @@ The session told the stories of its own commits before it ended.
 
 #### Six rounds of fresh heads, and two cold reviews
 
-The briefs were read cold six times until a round changed only words, and the pane's code was reviewed cold twice. What the reviews mended in the pane: it no longer throws or blanks while it is read, retries a failure, and brings the reader's place back once a width settles. In the briefs, older faults the rounds met on the way were mended with the new.
+The briefs were read cold six times until a round changed only words, and the pane's code was reviewed cold twice. What the reviews mended in the pane: it no longer throws or blanks while it is read, retries a failure, and brings the reader's place back once a width settles. The body's measure was taken again: the server still handed the page its body in 0.75 seconds, and nothing of history's data is in the page, which is what had sunk the first attempt. In the briefs, older faults the rounds met on the way were mended with the new.
 
 [Six rounds of fresh heads, and two cold reviews](git:81b63aa..c78ab68)
 
-#### A run is read by descent
+#### A run is read by ancestry
 
-A story's run came to be read by git's ancestry path, so a branch forked before it and merged within it is not taken in. Apart from it, a pane with no room at the width came to say so when pointed at.
+A story's run, already read by descent, came to be read by git's ancestry path, so a branch forked before it and merged within it is not taken in. Apart from it, a pane with no room at the width came to say so when pointed at.
 
-[A run is read by descent](git:0fea5f2..4a338f6)
+[A run is read by ancestry](git:0fea5f2..4a338f6)
 
 #### The briefs say what is built
 
-The implementation, the surface's entry and the history's brief were brought up to the trace and the pane as built, and the body's measure was taken again: the server still handed the page its body in 0.75 seconds, and nothing of history's data is in the page, which is what had sunk the first attempt.
+The implementation, the surface's entry and the history's brief were brought up to the trace and the pane as built.
 
 [The briefs say what is built](git:c3aef0b..8a6672c)
 
@@ -195,7 +193,7 @@ On the morning of 2026-09-20 the map came to say where the reader stands rather 
 
 #### The card and the reading line
 
-On the evening of 2026-09-19 a card stopped taking the reading line, so the map would stop jumping to each card the prose passes. The next morning gave the line back to the card as the last thing it reached, in the story above.
+On the evening of 2026-09-19 a card was taken off the reading line, so the map would stop jumping to each card the prose passes. The author found that scrolling then moved nothing, and nine minutes later the card took the line again while the map came to follow the reading rather than each step of the line.
 
 [The card and the reading line](git:7520ab7..ac36089)
 
@@ -217,7 +215,7 @@ On 2026-09-18 the author read the body on the surface and found the root could b
 
 #### The map is pressed and read
 
-Into the night a press on the map was made a press again rather than the start of a drag, since half of what the author pressed did nothing. A node was sized to its name, the live page was no longer kept by the browser, one press came to select and two to go, and the keys came to act in the pane the reader's hand was in.
+Into the night a press on the map was made a press again rather than the start of a drag, since half of what a reader pressed did nothing. A node was sized to its name, the live page was no longer kept by the browser, one press came to select and two to go, and the keys came to act in the pane the reader's hand was in.
 
 [The map is pressed and read](git:f814a55..93d3563)
 
@@ -229,7 +227,7 @@ In the evening the canvas was laid again as the path a reader opens, since a who
 
 #### The canvas takes its second dimension
 
-Toward eleven the canvas became one map of the body, down for the reading of one file and across for each boundary crossed.
+From before ten to near eleven the canvas became one map of the body, down for the reading of one file and across for each boundary crossed.
 
 [The canvas takes its second dimension](git:f993a06..bbce8dd)
 
@@ -241,7 +239,7 @@ Around nine the card came to take the reading line and the ink a brief takes, to
 
 #### The boundary is written through the body
 
-In the early morning the file became one reading in the practice, the skill and the surface's design; every entry's briefs moved into the files they placed, the four ratified files took theirs with the author, and a lone link came to place a part anywhere in a brief.
+From the early morning the file became one reading in the practice, the skill and the surface's design; every entry's briefs moved into the files they placed, the four ratified files took theirs with the author, and a lone link came to place a part anywhere in a brief.
 
 [The boundary is written through the body](git:e979359..2af3ac5)
 
@@ -361,7 +359,7 @@ The arc was readied to leave, the sweep moving inside its study, and here it was
 
 #### The law ratified, and the arc polished
 
-The law was ratified whole, so a ratified file is edited only in review with its ratifier. A brief's face, its heading and first paragraph, was held short with the check listing the long ones, and the arc was polished so each level is laid in the order it stands on itself.
+The law was ratified whole, so a ratified file is edited only in review with its ratifier. A brief's face, its heading and first paragraph, was held short with the check listing the long ones, and the arc was polished so each level is laid in the order its briefs stand on each other.
 
 [The law ratified, and the arc polished](git:19a73e4..1d1f3c5)
 
@@ -377,15 +375,15 @@ On 2026-09-13 the surface was built against its specification, used, and its rea
 
 #### The lane's keys, and its undo
 
-Past midnight the space bar came to act on release and unfold the whole scope when held, and a reload came to lay the lane again as it was left. Holding the space bar could not be taken back by the browser's back, so escape came to undo the last change. The way down to the scope came to stand over the lane.
+Past midnight the space bar came to act on release and unfold the whole scope when held, and a reload came to lay the lane again as it was left. Escape was first made to walk back through the page's history, and when that did not return a reader from holding the space bar, it came to undo the last change instead. The way down to the scope came to stand over the lane.
 
 [The lane's keys, and its undo](git:44f53ca..89d78a8)
 
-#### The shape's presses land
+#### A press in a wing lands again
 
-The minimap of the lane took its presses on the room right of a brief's blocks, previewing what a fold there would hide, and a pointer between two rows came to light one brief.
+Resting on the room right of a folded brief in the shape came to preview what unfolding it gives, presses in a wing that had been read as presses on the strip came to land again, and a pointer between two rows of the shape came to light one brief.
 
-[The shape's presses land](git:1d77c3f..ed573b5)
+[A press in a wing lands again](git:1d77c3f..ed573b5)
 
 #### The areas give way
 
@@ -395,7 +393,7 @@ The palette took a dark side and the prose a choice of faces, and the areas came
 
 #### One lane, and the sides orient
 
-In the evening the surface was built again to read in one lane, since only one pane was ever read, with the sides orienting: folding by the face, the minimap as the ground, the keys moving the focus, and scoping.
+In the evening the surface was built again to read in one lane, since only one pane was ever read, with the sides orienting: folding by the face, the shape standing where a minimap would, the keys moving the focus, and scoping.
 
 [One lane, and the sides orient](git:d48f710..c3db6ec)
 
@@ -533,7 +531,7 @@ The principles were written, the practice got its first home as markdown, the la
 
 #### The author writes the code
 
-The ontology was set aside into a sub-study, and the author wrote lab 08's edition with the session under two laws, with the brief holding the holarchy and the link; lab 10 later dropped the laws.
+The ontology was set aside into a sub-study, and the author wrote lab 08's edition with the session under two laws framing what knowledge is made of, with the brief holding the holarchy and the link; lab 10 later dropped the laws.
 
 [The author writes the code](git:b4b3527..98bf395)
 
