@@ -7396,7 +7396,7 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 #heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .phead { position: absolute; height: ${HEADROOM}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
 .phead > .grip, .phead > .own { opacity: 0; transition: opacity .3s ease .45s; }
-.phead.near { pointer-events: auto; }
+.phead.near > .grip, .phead.near > .own { pointer-events: auto; }
 .phead.near > .grip, .phead.near > .own { opacity: 1; transition: opacity .12s ease 0s; }
 /* a program of git's keeps its grip standing, so git's mark always stands at its top edge */
 .phead.git > .grip { opacity: .75; pointer-events: auto; }
