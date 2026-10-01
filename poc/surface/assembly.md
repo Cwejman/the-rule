@@ -8,13 +8,15 @@ status: open
 
 The surface's code has grown from 1,223 lines to 7,945 in eighteen days. Most of the growth is not new function but the same function reached twice: two worlds made by copying one state in and out, two layouts kept side by side, one thing drawn by three renderers, and what to draw again written out by hand wherever something changes.
 
-Assembled again on the lore of building programs, the page's script keeps every behaviour in roughly a sixth fewer lines of code and up to half its comments. The larger gain is not the lines: each part does one thing that can be named, and the four ways the code went wrong cannot recur.
+Assembled again on the lore of building programs, the page's script keeps every behaviour in roughly a sixth fewer lines of code and up to half its comments. The larger gain is not the lines: each part does one thing that can be named, and the copying, the second layout, the second renderer and the redraw by hand have no place left to grow from.
 
-*Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there as the sister project's principles hold it, "of course not changing behaviour", and "there must be immense simplification possible under that wisdom". Read cold twice, once as a brief and once against the code, before anything is built.*
+*Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there as the sister project's principles hold it, "of course not changing behaviour", and "there must be immense simplification possible under that wisdom". Read cold three times, as a brief and against the code, until a round changed only words; each move says beneath it when it is built.*
 
 ## 1. What the program is for
 
 A reader takes in a body of knowledge laid by the gradient, at the depth they need, and always sees where they stand in it. Beside it they can read how it came to be, git's history, laid the same way. Everything the page does serves that, and it comes to four parts, with a shell around them.
+
+Where the page is too narrow for anything beside the prose, which may be a phone or a narrow window, the lane stands alone: that is what the code calls narrow, a width below the measure, three gaps and the least gutter, and this brief calls it so.
 
 1. **The reading: where the reader stands.** One reading of one body: its scope, the fold of every brief, the focus, what the pointer rests on, what is selected and open on the map, and how the reader came here. Two readings stand at once, the body's and the history's, and the reader's settings stand beside them.
 2. **The views: what they see.** The prose, the canvas and the figures. Each is a projection of one reading, drawn from it and from what the shell has measured of the page.
@@ -40,15 +42,15 @@ The pilot's script was 915 lines of code in all.
 The type checker finds two unused names, so the weight is not dead code. It is the same thing done more than once:
 
 - **A world is copied, not held.** The history's reading is made by copying twenty-one fields of one global state, and the elements it is drawn in, out to a record and the other world's in, and back when done. A copy held across a nested call goes stale, and a helper was added for each case found. Of the cold reviews' faults in the two worlds, at least three were stale copies or a shared global left behind.
-- **Two layouts.** Wide, the page is the row laid by hand. On a phone it is still the five areas the row superseded, with their own grid, wing drawing, slots and fitting. The wide row is translated back into the areas' terms so the rest can ask the old questions, which it does through `fits()` 32 times and `narrow()` 45. The settings keep both arrangements.
+- **Two layouts.** Wide, the page is the row laid by hand. Where the lane stands alone it is still the five areas the row superseded, with their own grid, wing drawing, slots and fitting. The wide row is translated back into the areas' terms so the rest can ask the old questions, which it does through `fits()` 32 times and `narrow()` 45. The settings keep both arrangements.
 - **One thing, several renderers.** A commit's line is drawn three times, and so is the line of acts beneath a brief. A figure's slot is drawn by the stacks and again by the wings. The programs are described by five overlapping tables.
 - **What to draw again, by hand.** About eighteen places each draw again a hand-picked part of the page. Some drawing also changes the reading: drawing the map decides what is selected and open.
 - **The gestures in one function.** One function of 594 lines wires 25 listeners. A press is a chain of some thirty cases, and the acts it reaches are spread through it.
-- **Dead paths.** Some code can never run: the gutters on a phone, which the width forbids; an act nothing calls; knobs that no longer exist; and style for markup no longer drawn.
+- **Dead paths.** Some code can never run: the gutters where the lane stands alone, which the width forbids; an act nothing calls; knobs that no longer exist; and style for markup no longer drawn.
 
 The comments carry the dated story of many decisions, which [the briefs](implementation.md) and [the repository's record of its commits](../../history.md) already hold.
 
-*Measured, the session's, 2026-10-01, at commit 25ee761, by reading and by count; the faults by the reviews of 977f285, 1a54efb and f927248.*
+*Measured, the session's, 2026-10-01, of the code as it stood at commit 25ee761, by reading and by count; the faults by the reviews of 977f285, 1a54efb and f927248.*
 
 ## 3. The lore it stands on
 
@@ -79,7 +81,9 @@ A page like this one has a known shape:
 
 The program's four parts are that shape, with the layout as a view of the settings. Taken whole, as a framework, it would bring a compile step and a runtime the surface refused when it [chose plain functions](implementation.md#8-plain-functions-before-a-framework). Taken as a shape, it costs nothing and tells each function where it belongs.
 
-*Reasoned, carried from the Elm architecture as Czaplicki described it, 2012 onward; not checked.*
+One part of the shape is not taken: the update here changes the reading in place rather than giving a new one. A reading is one object that a few hundred functions read, the undo already keeps the reading as it stood before each change, and a new reading at every scroll would be a copy made to be thrown away.
+
+*Reasoned, carried from the Elm architecture as Czaplicki described it, 2012 onward; not checked. Not taking the new model at each update is the session's.*
 
 ### 3.4 The sister project's principles
 
@@ -93,21 +97,21 @@ The author holds these, and every move is weighed against them:
 
 From the project's rules, three more apply here: code documents itself where it can, a single line tells the story behind a solution where it would otherwise be overrun, and nothing fails silently.
 
-*The author's, carried from the sister project: the first five from its principles, the last three from its rules.*
+*Preferred, the author's, carried from the sister project, the first five from its principles and the last three from its rules; not checked here.*
 
 ## 4. How it is assembled
 
-Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 650 to 780 lines of the page's code, and 300 to 600 of its comments.
+Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 670 to 780 lines of the page's code, and 300 to 600 of its comments.
 
 *Reasoned, the session's, 2026-10-01; the estimates are a cold reader's, made against the code at 25ee761 and not yet measured. None of the moves is answered by the author.*
 
 ### 4.1 What can never run goes
 
-The gutters on a phone can never stand, since a width narrow enough to be a phone is too narrow for them. The act that turned a phone to the history is drawn nowhere, since the switch acts directly. The formatting kept for two knobs that are already gone still stands. The style still holds rules for markup the page no longer draws.
+The gutters can never stand where the lane stands alone, since that width is too narrow for them. The act that turned the lone pane to the history is drawn nowhere, since the switch acts directly. The formatting kept for two knobs that are already gone still stands. The style still holds rules for markup the page no longer draws.
 
-All of it goes, and nothing a reader can reach changes, since none of it can be reached. About 60 lines.
+All of it goes, and nothing a reader can reach changes, since none of it can be reached. With it went two unused names, two aliases, a class that only ever landed on what was hidden, and the band a figure opened over the reading kept for a wide page that never opens one.
 
-*Simplicity. Reasoned from the code; that each is unreachable is checked by the harness before it goes.*
+*Simplicity. Fulfilled, 2026-10-01, in 3c3aeca: 65 lines, the harness equal and a cold review finding no change.*
 
 ### 4.2 One thing, one renderer
 
@@ -134,9 +138,9 @@ A reading is one object, a world. It holds:
 
 The page holds two worlds. "The world now" points at one of them, and acting in the other sets the pointer and sets it back. Since both are the live objects, nothing is copied and no copy can go stale. A timer or a frame that waits captures the world it began in, not a copy of it.
 
-The copying, the list of fields to copy, the helpers that patched stale copies, and the four wrappers with their different nesting rules all go. Each world's elements carry its name, so which world an element belongs to is read off the element, not reckoned. About 100 to 130 lines.
+The copying, the list of fields to copy, the helpers that patched stale copies, and the four wrappers with their different nesting rules all go. Each world's elements carry its name, so which world an element belongs to is read off the element, not reckoned; what belongs to neither, the figures, the foot and the card above it, takes the world the keys are in, as it does now. About 100 to 130 lines.
 
-The pointer is chosen over handing each function its world as an argument. The world is read some 340 times, across most of the page's functions, and threading one more argument through all of them is the clever form of what one variable says plainly. The views are kept pure all the same: they read the world now and change nothing in it. What is under way across both worlds, a drag, a key held and the pointer's last world, stays the shell's and outside any world, as it is outside the copying today.
+The pointer is chosen over handing each function its world as an argument. The world is read some 340 times, across most of the page's functions, and threading one more argument through all of them is the clever form of what one variable says plainly. The views still change nothing: they read only the world now and the shell. What is under way across both worlds, a drag, a key held and the pointer's last world, stays the shell's and outside any world, as it is outside the copying today.
 
 The move is mechanical but wide: every reading of the view, the ends or a world's elements becomes a reading of the world now, so the change touches hundreds of lines while it removes a hundred.
 
@@ -162,11 +166,11 @@ About 30 lines.
 
 Where each program stands is computed by one pure function of four things: the settings, the screen's width and height, and whether the reader has a finger. It returns where each program stands, how wide, and which gave way. One function then places the elements, and every other part asks the layout, not the areas.
 
-A phone's arrangement is not the wide row, and it stays what it is. What it needs of the settings are the pane it shows, the side its rail stands on, and the figures it has room for beside a map. Those are read from the areas as they are kept now, so a reader's saved arrangement still lays their phone. The areas' grid, wing drawing and slots then go, and a phone's figures are drawn by the same stack code as the wide page's. About 250 to 300 lines.
+Where the lane stands alone the arrangement is not the wide row, and it stays what it is. What it needs of the settings are the pane it shows, the side its rail stands on, and the figures it has room for beside a map. Those are read from the areas as they are kept now, so a reader's saved arrangement still lays it. The areas' grid, wing drawing and slots then go, and the figures there are drawn by the same stack code as the wide page's. About 250 to 300 lines.
 
-This is the move most likely to move a pixel. Today the grid lays the phone and the browser rounds, and the one function will place in whole pixels. Two fixed figures in one wing stand at its top and its foot, where a stack sets them one under the other. And the wings give way in their own order. Each such case is matched, not let go, and [the harness](#6-how-the-behaviour-is-kept) finds any that is missed.
+This is the move most likely to move a pixel. Today the grid lays the lone pane and the browser rounds, and the one function will place in whole pixels. Two fixed figures in one wing stand at its top and its foot, where a stack sets them one under the other. And the wings give way in their own order. Each such case is matched, not let go, and [the harness](#6-how-the-behaviour-is-kept) finds any that is missed.
 
-*One pattern for one kind of thing, and pure functions. Reasoned, the session's; a phone exactly as it is today. It leaves [the framework's five areas](framework.md#2-the-areas) standing only as what a phone keeps, and says so there.*
+*One pattern for one kind of thing, and pure functions. Reasoned, the session's; the lane alone exactly as it is today. It leaves [the framework's five areas](framework.md#2-the-areas) standing only as what the lane alone keeps, and says so there.*
 
 ### 4.7 One draw, at a few levels
 
@@ -178,7 +182,7 @@ An act changes a reading or the settings, and never draws. When it is done, the 
 
 A discrete act draws at all where that is fast enough, and the cost is measured first. All draws a world's prose again only where that world's reading changed, since laying a prose anew loses what a reader holds in it: a selection of its text, the focus of an element, an image already decoded, and where the browser anchored the scroll. A continuous gesture keeps its own narrow redraw, named, since a scroll, a drag or a turned knob must not lay the whole page again under the hand. The two places where one measure settles another stay explicit: the prose's ends with the shape's slot, and the gutters with the room they hang below the lane.
 
-There is no tracking of what depends on what, which would be a small framework. About 40 to 60 lines.
+An act that changes a reading marks that world, and that mark is all the draw asks; there is no tracking of what depends on what, which would be a small framework. About 40 to 60 lines.
 
 *Describe over instruct, unidirectional flow, and dumb is smart. Reasoned, the session's. It departs from [the implementation](implementation.md#6-how-it-is-drawn), in force since 2026-09-13, that every change draws again only what depends on it: a discrete act may now draw more than it needs, where that costs the reader nothing.*
 
@@ -220,7 +224,7 @@ The page's script is cut out of the file by its comment headings and transpiled.
 
 Keeping behaviour keeps some that exists only because of how the code grew. Each would simplify further, and each is the author's to let go or keep:
 
-- **A phone kept by the areas.** A phone could be laid from the row as a narrow screen, instead of from the five areas the row superseded. That would make the areas go as data too, but it changes a phone.
+- **The lane alone kept by the areas.** Where the lane stands alone the page could be laid from the row as a narrow screen, instead of from the five areas the row superseded. That would make the areas go as data too, but it changes the page there, a phone first among it.
 - **The figures beside a map on a screen just too narrow for the prose's gutters.** They stand there today only because the areas fit them there.
 - **Settings kept from before 2026-09-17.** The repairs for a fade, an area that held one name, and the areas before the row change nothing for a reader who has opened the page since.
 - **The heavy tier of git's history, what each commit changed line by line.** It is served and written, but no part of the page reads it yet. [The surface's brief on git's history](history.md) plans it, so it is not dead, only waiting.
@@ -235,7 +239,7 @@ A harness drives the page in a browser through scenarios. It runs at several wid
 - arriving, scrolling, folding, scoping, following links and undoing;
 - the map and git's history;
 - dragging programs, pulling gaps, the dock, the knobs and the switches;
-- a phone's foot, its card and its rail;
+- a phone's foot, its card and its rail, and a narrow window with a pointer;
 - a reload that resumes, and the browser's back.
 
 After every step it takes the screen as a picture, and the facts a reader could observe: the address, the settings kept, each scroll, the visible text, where each brief stands on the screen, the markup, the selected text and the focused element. It also records how much of each prose survived the step unrebuilt, so a draw that lays a prose anew where it did not before shows, though the picture is the same.
@@ -252,7 +256,7 @@ The harness sits outside the surface and ships nothing. The scenarios cover what
 
 Each move is one commit, after the harness, the type checker and a cold review are each clean. The removals come first, then what makes one thing one, then the world, which every later move stands on. Then the layout, the draw, the acts and the gestures.
 
-1. What can never run goes.
+1. What can never run goes. *Built, 3c3aeca.*
 2. One thing, one renderer, and one table of programs.
 3. The settings as a table.
 4. A world as a value, and drawing that changes nothing.
