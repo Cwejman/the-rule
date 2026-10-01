@@ -2934,11 +2934,11 @@ function pressProgram(k: string): void {
   } else {
     const kept = leftAt.get(k);
     // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
-    // stands alone comes in beside the body's prose where it stands on the page, so the columns further out give way
-    // before it and a press is seldom answered only by the dock
+    // stands alone comes in beside the body's prose where it stands on the page, at its left, the side that gives way
+    // last, so the columns further out give way before it and a press is seldom answered only by the dock
     const shown = laid().cols;
     const end = shown.length ? shown[shown.length - 1].c + 1 : L.length;
-    const fresh: Zone = isAlone(k) && laidAt("prose") ? { kind: "beside", target: "prose", after: true } : { kind: "col", at: end };
+    const fresh: Zone = isAlone(k) && laidAt("prose") ? { kind: "beside", target: "prose", after: false } : { kind: "col", at: end };
     const zone: Zone = kept && standing(kept.near) ? kept.zone : fresh;
     let next = dropped(L, k, zone);
     if (next === L) next = dropped(L, k, { kind: "col", at: L.length });
@@ -4516,7 +4516,8 @@ async function readPast(): Promise<void> {
       }
     });
   } catch (e) {
-    past.status = "failed";
+    // a history read before and failing only when read again still stands as it was read
+    past.status = gitWorld?.body ? "ready" : "failed";
     past.said = (e as Error).message;
     console.warn(`no history: ${past.said}`);
     // a phone that turned its pane to the history is told why it still shows the body; a history read before and
@@ -5008,8 +5009,12 @@ function drawSeams(): void {
 /** The program whose head the pointer is near, so it shows. */
 let nearHead: string | null = null;
 
-/** Where a program's head stands: along the top of a program alone in its column, in the room above a figure. */
-const headTop = (k: string, b: { y: number }): number => (isAlone(k) ? 0 : Math.max(0, b.y - HEADROOM));
+/**
+ * Where a program's head stands: along the top of a program alone in its column, in the room above a figure, or just
+ * inside a figure's top where a gap of its stack lies above, so the gap stays to be pulled and the grip to be reached.
+ */
+const headTop = (k: string, b: { y: number }): number =>
+  isAlone(k) ? 0 : stackGaps.some((g) => layoutNow()[g.c]?.items[g.i + 1]?.k === k) ? b.y : Math.max(0, b.y - HEADROOM);
 
 /**
  * The heads: a thin row along each program's top edge, its grip at the left and the program's own settings after it.
@@ -6247,7 +6252,7 @@ function drawPull(ease: boolean): void {
   g.classList.toggle("easing", ease);
   g.style.setProperty("--pull", share.toFixed(3));
   if (share > 0) g.hidden = false;
-  else if (ease) setTimeout(() => pulled === 0 && (g.hidden = true), 260);
+  else if (ease) setTimeout(() => Number(g.style.getPropertyValue("--pull")) === 0 && (g.hidden = true), 260);
   else g.hidden = true;
 }
 
