@@ -132,7 +132,7 @@ What stands where does not change, and the history is not a pane. The widgets th
 
 A pane's icon cycles it through the middle's sides; a mode has no side, so its icon is a switch. The page fetches the history's data when the reader reaches for the switch and not before, so a reader who never reads the history never pays for it.
 
-*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch as the reader reaches for it are the session's. Its key, and whether the mode enters the page's address, are open.*
+*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch as the reader reaches for it are the session's. Its key, and whether the mode enters the page's address, are open. Superseded wide on 2026-10-01 by [git's prose and canvas as programs](layout.md#6-the-body-and-git-two-worlds) beside the body's; where the lane stands alone the mode stands as it was, its switch at the foot.*
 
 #### 4.1.1 Turning to it never waits for what was read before
 
@@ -142,7 +142,7 @@ Only the first turn can wait, and it says so: the switch takes the weight it wil
 
 The live process reads the history ahead of the reader, once the page has its body, and keeps it by where git's head stands, so even the first turn seldom waits. A published page has its history beside it as files, and says plainly where none was published.
 
-*The author's ask of 2026-09-28, that the loading be a quality experience; the form is the session's. Measured the same day: a cold read of 565 commits took 9.4 seconds and a warm one 0.4, a repeat from memory 0.03, and the body stood at 0.85 to 0.97 seconds while the history was read ahead.*
+*The author's ask of 2026-09-28, that the loading be a quality experience; the form is the session's. Measured the same day: a cold read of 565 commits took 9.4 seconds and a warm one 0.4, a repeat from memory 0.03, and the body stood at 0.85 to 0.97 seconds while the history was read ahead. Wide, from 2026-10-01, the history is read once anything of it stands, and while it is read git's prose says so and git's status tells how far it has got.*
 
 ### 4.2 Only the commits that touch where you stand
 
@@ -178,7 +178,7 @@ A change in place fetches from [the heavy tier](#52-the-heavy-tier-is-had-a-comm
 
 What is selected in the history reaches everything, since the body lights what it touched once the mode is left. So beside the switch stands what is selected there, a commit or a run, in a word or two, and pressing it lets that selection go, and the body goes back to its own colours.
 
-*Preferred, the author's, 2026-09-28: [a status by the git glyph](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), for it affects everything, given by him as a perhaps; that pressing it lets go is the session's.*
+*Preferred, the author's, 2026-09-28: [a status by the git glyph](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), for it affects everything, given by him as a perhaps; that pressing it lets go is the session's. Superseded on 2026-10-01 by [git's status](layout.md#71-gits-status-is-a-program), the author's word, where what is selected stands; letting it go there waits, as the selection reaching the body does.*
 
 ### 4.5 Its root's level runs left to right, a trunk
 
