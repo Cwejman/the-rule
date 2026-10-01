@@ -1719,6 +1719,8 @@ type Action = {
   /** whether it can be taken at all; a badge that cannot is not drawn */
   can: (a?: string) => boolean;
   run: (a?: string) => void;
+  /** what it is and does instead where it falls on the map, in the parts that differ there */
+  map?: Partial<Pick<Action, "label" | "mark" | "help" | "can" | "run">>;
 };
 
 /** The address an action acts on: the one a badge passes, or the focus, which is what a key acts on. */
@@ -1732,7 +1734,7 @@ const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap
 /** Whether a brief stands whole, by its fold in the lane. */
 const isWhole = (a: string): boolean => foldOf(a) === "whole";
 
-const ACTIONS: Record<string, Action> = {
+const ACTS: Record<string, Action> = {
   unfold: {
     label: (a) => (isWhole(acts(a)) ? "fold" : "unfold"),
     mark: (a) => (isWhole(acts(a)) ? ICON.fold : ICON.unfold),
@@ -1748,27 +1750,33 @@ const ACTIONS: Record<string, Action> = {
     run: (a) => cycle(acts(a)),
   },
   foldUp: {
-    label: (a) => (onMap(a) && !foldsUp() ? "close" : "fold above"),
-    mark: (a) => (onMap(a) && !foldsUp() ? ICON.closeRight : ICON.fold),
+    label: () => "fold above",
+    mark: () => ICON.fold,
     keys: [{ key: "Backspace" }, { key: " ", shift: true }],
-    help: (a) =>
-      onMap(a) && !foldsUp()
-        ? "Closes the reading you are in, so the map ends at the card again and you stand on it."
-        : "Folds the brief above the one you are on, its parent, which takes you up to it.",
+    help: () => "Folds the brief above the one you are on, its parent, which takes you up to it.",
     also: "Shift with the space bar does the same. The left arrow steps up without folding, and shift with return closes a reading the prose stands in.",
-    can: (a) => (onMap(a) ? foldsUp() !== null || shuts() !== "" : acts(a) !== state.scope && !!brief(parentOf(acts(a)))),
-    run: (a) => {
-      if (!onMap(a)) return cycle(parentOf(acts(a)));
-      // within a file the brief above folds; at the top of a reading there is none, and the reading itself closes. One
-      // act, and the boundary is what decides which of the two the reader gets
-      const up = foldsUp();
-      if (up) {
-        // it folds and never unfolds, since the reader asked for less
-        if (foldOf(up.a) !== "face") cycle(up.a);
-        return pickNode(up.a, null, up.head);
-      }
-      const r = shuts();
-      if (r) closeReading(r);
+    can: (a) => acts(a) !== state.scope && !!brief(parentOf(acts(a))),
+    run: (a) => cycle(parentOf(acts(a))),
+    map: {
+      label: () => (foldsUp() ? "fold above" : "close"),
+      mark: () => (foldsUp() ? ICON.fold : ICON.closeRight),
+      help: () =>
+        foldsUp()
+          ? "Folds the brief above the one you are on, its parent, which takes you up to it."
+          : "Closes the reading you are in, so the map ends at the card again and you stand on it.",
+      can: () => foldsUp() !== null || shuts() !== "",
+      run: () => {
+        // within a file the brief above folds; at the top of a reading there is none, and the reading itself closes. One
+        // act, and the boundary is what decides which of the two the reader gets
+        const up = foldsUp();
+        if (up) {
+          // it folds and never unfolds, since the reader asked for less
+          if (foldOf(up.a) !== "face") cycle(up.a);
+          return pickNode(up.a, null, up.head);
+        }
+        const r = shuts();
+        if (r) closeReading(r);
+      },
     },
   },
   unfoldAll: {
@@ -1796,7 +1804,7 @@ const ACTIONS: Record<string, Action> = {
     can: (a) => {
       const x = acts(a);
       const b = brief(x);
-      return (a !== undefined ? canvasOn() : handOnMap()) && !!b && isCard(b) && level(x).length > 0 && state.colOf.has(x) && !state.opened.includes(x);
+      return onMap(a) && !!b && isCard(b) && level(x).length > 0 && state.colOf.has(x) && !state.opened.includes(x);
     },
     run: (a) => {
       const x = acts(a);
@@ -1811,7 +1819,7 @@ const ACTIONS: Record<string, Action> = {
     also: "A press again on what is already selected.",
     // somewhere to go is somewhere the going would take the reader: standing on a card whose reading the prose is not
     // showing is a going, though its address is the very one the reading line carries
-    can: (a) => (a !== undefined ? canvasOn() : handOnMap()) && !!brief(acts(a)) && (scopeFor(acts(a)) !== state.scope || acts(a) !== state.focus),
+    can: (a) => onMap(a) && !!brief(acts(a)) && (scopeFor(acts(a)) !== state.scope || acts(a) !== state.focus),
     run: (a) => readOn(acts(a)),
   },
   trunk: {
@@ -1857,21 +1865,22 @@ const ACTIONS: Record<string, Action> = {
   out: {
     label: () => "out",
     keys: [{ key: "Enter", shift: true }],
-    help: () =>
-      handOnMap()
-        ? "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes."
-        : "Goes out of this reading to the brief that placed it, so what stood around it comes back.",
+    help: () => "Goes out of this reading to the brief that placed it, so what stood around it comes back.",
     also: "The names in the way down, the grey ticks in the shape, and pulling past the top of the lane.",
-    can: () => (handOnMap() ? closable() !== "" : state.scope !== ""),
-    run: () => {
-      if (!handOnMap()) return popUp();
-      const r = closable();
-      if (!r) return;
-      // the prose is taken out first: the map holds the reading the lane holds, so a close made before the going
-      // would be laid again by the very next draw
-      const holder = parentOf(r);
-      if (brief(holder)) readOn(holder);
-      closeReading(r);
+    can: () => state.scope !== "",
+    run: () => popUp(),
+    map: {
+      help: () => "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes.",
+      can: () => closable() !== "",
+      run: () => {
+        const r = closable();
+        if (!r) return;
+        // the prose is taken out first: the map holds the reading the lane holds, so a close made before the going
+        // would be laid again by the very next draw
+        const holder = parentOf(r);
+        if (brief(holder)) readOn(holder);
+        closeReading(r);
+      },
     },
   },
   deeper: {
@@ -1893,63 +1902,63 @@ const ACTIONS: Record<string, Action> = {
   next: {
     label: () => "next",
     keys: [{ key: "ArrowDown" }],
-    help: () => (handOnMap() ? "Moves to the next node down this column of the map, which within a file is its reading order." : "Moves the reading on to the next brief in the lane, folding nothing."),
+    help: () => "Moves the reading on to the next brief in the lane, folding nothing.",
     can: () => true,
-    run: () => (handOnMap() ? stepPick(1) : step(1)),
+    run: () => step(1),
+    map: { help: () => "Moves to the next node down this column of the map, which within a file is its reading order.", run: () => stepPick(1) },
   },
   previous: {
     label: () => "previous",
     keys: [{ key: "ArrowUp" }],
-    help: () => (handOnMap() ? "Moves back to the node before this one up this column of the map." : "Moves the reading back to the brief before this one in the lane, folding nothing."),
+    help: () => "Moves the reading back to the brief before this one in the lane, folding nothing.",
     can: () => true,
-    run: () => (handOnMap() ? stepPick(-1) : step(-1)),
+    run: () => step(-1),
+    map: { help: () => "Moves back to the node before this one up this column of the map.", run: () => stepPick(-1) },
   },
   nextLevel: {
     label: () => "next of this level",
     keys: [{ key: "ArrowDown", shift: true }],
-    help: () =>
-      handOnMap()
-        ? "Moves to the next node at this level of the map, passing over whatever hangs beneath it."
-        : "Moves the reading to the next brief at this level, passing over whatever stands beneath it.",
+    help: () => "Moves the reading to the next brief at this level, passing over whatever stands beneath it.",
     can: () => true,
-    run: () => (handOnMap() ? stepLevel(1) : stepSibling(1)),
+    run: () => stepSibling(1),
+    map: { help: () => "Moves to the next node at this level of the map, passing over whatever hangs beneath it.", run: () => stepLevel(1) },
   },
   previousLevel: {
     label: () => "previous of this level",
     keys: [{ key: "ArrowUp", shift: true }],
-    help: () =>
-      handOnMap()
-        ? "Moves back to the node before this one at this level of the map, passing over whatever hangs beneath it."
-        : "Moves the reading back to the brief before this one at this level, passing over whatever stands beneath it.",
+    help: () => "Moves the reading back to the brief before this one at this level, passing over whatever stands beneath it.",
     can: () => true,
-    run: () => (handOnMap() ? stepLevel(-1) : stepSibling(-1)),
+    run: () => stepSibling(-1),
+    map: { help: () => "Moves back to the node before this one at this level of the map, passing over whatever hangs beneath it.", run: () => stepLevel(-1) },
   },
   above: {
     label: () => "out",
     keys: [{ key: "ArrowLeft" }],
-    help: () =>
-      handOnMap()
-        ? "Steps back out without closing anything: from the head of a reading onto the card that opened it, and from a row onto the one it hangs beneath."
-        : "Moves the reading up to the brief this one stands beneath, folding nothing.",
-    can: () => (handOnMap() ? state.picked !== null && outOf(state.picked, state.onHead) !== null : state.focus !== state.scope),
-    run: () => {
-      if (!handOnMap()) return up();
-      const out = state.picked === null ? null : outOf(state.picked, state.onHead);
-      if (out) pickNode(out.a, null, out.head);
+    help: () => "Moves the reading up to the brief this one stands beneath, folding nothing.",
+    can: () => state.focus !== state.scope,
+    run: () => up(),
+    map: {
+      help: () => "Steps back out without closing anything: from the head of a reading onto the card that opened it, and from a row onto the one it hangs beneath.",
+      can: () => state.picked !== null && outOf(state.picked, state.onHead) !== null,
+      run: () => {
+        const out = state.picked === null ? null : outOf(state.picked, state.onHead);
+        if (out) pickNode(out.a, null, out.head);
+      },
     },
   },
   beneath: {
     label: () => "in",
     keys: [{ key: "ArrowRight" }],
-    help: () =>
-      handOnMap()
-        ? "Goes in: stands you at the head of the reading this card leads to, opening it first where it is not open yet."
-        : "Moves the reading into the first brief beneath this one, when it stands in the lane.",
-    can: () => (handOnMap() ? stepsIn() !== null : level(state.focus).length > 0),
-    run: () => {
-      if (!handOnMap()) return down();
-      const step = stepsIn();
-      if (step) pickNode(step.a, step.col, true);
+    help: () => "Moves the reading into the first brief beneath this one, when it stands in the lane.",
+    can: () => level(state.focus).length > 0,
+    run: () => down(),
+    map: {
+      help: () => "Goes in: stands you at the head of the reading this card leads to, opening it first where it is not open yet.",
+      can: () => stepsIn() !== null,
+      run: () => {
+        const step = stepsIn();
+        if (step) pickNode(step.a, step.col, true);
+      },
     },
   },
   wayHere: {
@@ -2003,6 +2012,19 @@ const ACTIONS: Record<string, Action> = {
     run: () => redo(),
   },
 };
+
+/**
+ * Every act as it is taken: where an act does something else on the map, each part that differs is asked of the map's
+ * form wherever the act falls on the map, and of its own everywhere else.
+ */
+const ACTIONS: Record<string, Action> = Object.fromEntries(
+  Object.entries(ACTS).map(([id, act]) => {
+    if (!act.map) return [id, act];
+    const as = (a?: string): Action => (onMap(a) ? { ...act, ...act.map } : act);
+    const mark = act.mark ?? act.map.mark;
+    return [id, { ...act, label: (a) => as(a).label(a), mark: mark && ((a) => as(a).mark!(a)), help: (a) => as(a).help(a), can: (a) => as(a).can(a), run: (a) => as(a).run(a) }];
+  }),
+);
 
 const same = (x: Chord, y: Chord): boolean => x.key === y.key && !!x.shift === !!y.shift && !!x.hold === !!y.hold;
 
