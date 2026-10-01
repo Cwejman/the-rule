@@ -4387,8 +4387,12 @@ const gitReady = (): boolean => !!(inPast() ? state.body : gitWorld?.body);
 /** Runs something in the body's world, which while something is done in the history is held aside: what the plate draws. */
 const onBody = <T,>(fn: () => T): T => (inPast() ? inWorld(home!, fn) : fn());
 
-/** Runs something in the history's world, where it has been read; otherwise nothing is run. */
-const inGit = <T,>(fn: () => T): T | undefined => (inPast() ? fn() : gitWorld?.body ? inWorld(gitWorld, fn) : undefined);
+/**
+ * Runs something in the history's world, where it has been read; otherwise nothing is run. Asked from inside the body
+ * while the history is itself held aside one step out, its state as it stands is that step's, not the world's as it was
+ * when the history was last left, so that is the one set in place.
+ */
+const inGit = <T,>(fn: () => T): T | undefined => (inPast() ? fn() : home?.name === "history" ? inWorld(home, fn) : gitWorld?.body ? inWorld(gitWorld, fn) : undefined);
 
 /** Runs something in a world by its name. */
 const inNamed = <T,>(w: WorldName, fn: () => T): T | undefined => (w === "body" ? onBody(fn) : inGit(fn));
@@ -5596,7 +5600,9 @@ function drawChooser(): void {
     // standing but given way at this width: the choice holds and only the room is missing
     const denied = at && laid().gone.has(at.c) ? " denied" : "";
     const fixed = at && layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1 ? " fixed" : "";
-    return `<button class="pick${at ? " on" : ""}${denied}${fixed}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
+    // a program of git's that stands while the history is first read breathes, as the switch did
+    const busy = at && PROGRAMS[k].world === "history" && past.status === "loading" && !gitReady() ? " busy" : "";
+    return `<button class="pick${at ? " on" : ""}${denied}${fixed}${busy}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
   };
   const groups = DOCK.map((g) => `<span class="group">${g.map(pick).join("")}</span>`).join("");
   ui.strips.innerHTML = `<div class="strip dock ${state.settings.dock}">${groups}</div>`;
@@ -7529,6 +7535,7 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .strip.dock.left .group { flex-direction: column; }
 .strip.dock.left .group + .group { margin: 20px 0 0; }
 .strip.dock .pick { touch-action: none; }
+.strip.dock .pick.busy { animation: busy 1s ease-in-out infinite alternate; }
 .strip.dock.taking .pick { opacity: .5; }
 
 .opening { margin-bottom: 40px; }
