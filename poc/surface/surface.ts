@@ -2933,10 +2933,13 @@ function pressProgram(k: string): void {
     state.settings.layout = without(L, k);
   } else {
     const kept = leftAt.get(k);
-    // a program that never stood comes in after the last column on the page, before any that gave way
+    // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
+    // stands alone comes in beside the body's prose where it stands on the page, so it is the last to give way and a
+    // press is never answered by nothing
     const shown = laid().cols;
     const end = shown.length ? shown[shown.length - 1].c + 1 : L.length;
-    const zone: Zone = kept && standing(kept.near) ? kept.zone : { kind: "col", at: end };
+    const fresh: Zone = isAlone(k) && laidAt("prose") ? { kind: "beside", target: "prose", after: true } : { kind: "col", at: end };
+    const zone: Zone = kept && standing(kept.near) ? kept.zone : fresh;
     let next = dropped(L, k, zone);
     if (next === L) next = dropped(L, k, { kind: "col", at: L.length });
     const at = whereIs(k, next);
@@ -3915,14 +3918,14 @@ function faceHtml(): string {
     const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
     const rest = other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "";
     return (
-      `<div class="face" ${hued(b.address)}>` +
+      `<div class="pickface" ${hued(b.address)}>` +
       `<div class="said">${pathHtml(parentOf(b.address))}<h3>${esc(c.subject)}</h3><span class="stamp chrome">${esc(c.author)} · ${esc(when)} · ${esc(c.hash.slice(0, 7))}</span>${touched || rest ? `<div class="touched">${touched}${rest}</div>` : ""}</div>` +
       `</div>`
     );
   }
   const stamp = stampOf(b);
   return (
-    `<div class="face" ${hued(b.address)}>` +
+    `<div class="pickface" ${hued(b.address)}>` +
     `<div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${blocks(blocksOf(b).slice(0, 1))}</div>` +
     `</div>`
   );
@@ -3969,7 +3972,7 @@ function drawCanvas(): void {
 /** The timers that bring each map's reader back to their place once its width has settled, one per world. */
 const refollowing = new Map<World | null, ReturnType<typeof setTimeout>>();
 function refollow(): void {
-  const w = inside;
+  const w = live(inside);
   clearTimeout(refollowing.get(w));
   const back = () => ((followed = null), followFocus());
   refollowing.set(w, setTimeout(() => (w ? inWorld(w, back) : back()), 200));
@@ -4232,7 +4235,7 @@ function bringInto(el: HTMLElement, leftAt: number): void {
   const w = (r.width / kx) * view.k;
   const h = (r.height / ky) * view.k;
   // the face and the acts stand over the map, so what is brought in is brought into what is left clear of them
-  const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".face")?.offsetWidth ?? 0);
+  const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".pickface")?.offsetWidth ?? 0);
   const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".field") ? 44 : 0);
   const top = canvasTop();
   const x = view.x + lx * view.k;
@@ -4378,9 +4381,15 @@ function inWorld<T>(w: World, fn: () => T): T {
 
 /** A frame later, in the world that asked for it: the browser lays a pane out after a draw returns, not during it. */
 const frame = (fn: () => void): void => {
-  const w = inside;
+  const w = live(inside);
   requestAnimationFrame(() => (w ? inWorld(w, fn) : fn()));
 };
+
+/**
+ * The world itself that a world the state holds stands for: one held aside one step out is a copy, which is gone by
+ * the time anything later runs, so a later act runs in the history's world or, at the top, in the body's.
+ */
+const live = (w: World | null): World | null => (w?.name === "history" ? gitWorld : null);
 
 /** The history's world, made with the elements it is drawn in once the page stands; its body is read only once something of it is asked for. */
 let gitWorld: World;
@@ -4510,8 +4519,9 @@ async function readPast(): Promise<void> {
     past.status = "failed";
     past.said = (e as Error).message;
     console.warn(`no history: ${past.said}`);
-    // a phone that turned its pane to the history is told why it still shows the body
-    if (narrow() && narrowWorld === "history") (notice(`No history: ${past.said}`), (narrowWorld = "body"));
+    // a phone that turned its pane to the history is told why it still shows the body; a history read before and
+    // failing only when read again stays as it was read
+    if (narrow() && narrowWorld === "history" && !gitWorld?.body) (notice(`No history: ${past.said}`), (narrowWorld = "body"));
     drawGitWaiting();
   } finally {
     drawChooser();
@@ -5039,7 +5049,7 @@ function headNear(x: number, y: number): string | null {
   const px = x - r.left;
   const py = y - r.top;
   // a gap between two figures of a stack is pulled there, so no head shows over it
-  if (stackGaps.some((g) => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + g.h)) return null;
+  if (stackGaps.some((g) => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + Math.max(8, g.h))) return null;
   for (const [k, b] of boxes) {
     const top = headTop(k, b);
     if (px >= b.x && px <= b.x + b.w && py >= top - 4 && py <= top + HEADROOM + 14) return k;
@@ -6154,6 +6164,8 @@ const PULL = 300;
 const PULL_DEAD = 0.08;
 let pulled = 0;
 let pullTimer: ReturnType<typeof setTimeout> | undefined;
+/** The world whose gauge the pull fills, since the pull is one and each prose has a gauge of its own. */
+let pullIn: WorldName = "body";
 /** When the last wheel event came, and whether a push has been felt: momentum is an unbroken stream, a new swipe begins after a gap. */
 let lastWheelAt = 0;
 let pushing = false;
@@ -6175,6 +6187,8 @@ const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.del
  */
 function pull(e: WheelEvent): void {
   clearTimeout(pullTimer);
+  // a wheel in the other world lets go of the pull in the one whose gauge it was filling
+  if (pullIn !== worldNow()) (inNamed(pullIn, restPull), (pullIn = worldNow()));
   const now = performance.now();
   const gap = now - lastWheelAt;
   lastWheelAt = now;
@@ -6588,7 +6602,7 @@ function wire(): void {
     // the switch turns the lane and the canvas to the history, and back
     if (t.closest("[data-mode]")) return void turnNarrow();
     // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
-    if (t.closest(".face") && state.picked && brief(state.picked)) return void goTo(state.picked);
+    if (t.closest(".pickface") && state.picked && brief(state.picked)) return void goTo(state.picked);
     // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) {
@@ -6715,7 +6729,7 @@ function wire(): void {
     const el = e.target as HTMLElement;
     // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
     // must neither cancel it nor drag the map out from under the reader
-    const cv = el.closest(".depth") || el.closest(".crow") || el.closest(".field") || el.closest(".face") ? null : el.closest<HTMLElement>(".canvas");
+    const cv = el.closest(".depth") || el.closest(".crow") || el.closest(".field") || el.closest(".pickface") ? null : el.closest<HTMLElement>(".canvas");
     if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
     else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
@@ -7486,9 +7500,9 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* what a commit changed outside the readings the body places: one quiet mark, since what it was is in the face */
 .crow .marks i.other { width: 6px; height: 6px; border-radius: 3px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 /* a commit's face names the readings it touched, each in the hue it takes in the body */
-.face .touched { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 2px; font-size: 12px; line-height: 1.4; }
-.face .touched .reading { color: var(--on); }
-.face .touched .also { color: var(--faint); }
+.pickface .touched { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 2px; font-size: 12px; line-height: 1.4; }
+.pickface .touched .reading { color: var(--on); }
+.pickface .touched .also { color: var(--faint); }
 /* a commit in the history's lane is an entry of the record, not a heading of a reading: its subject at the prose's size, who and when beneath it, and the readings it touched */
 .brief.commit .head { font-size: var(--body); font-weight: 500; line-height: 1.35; margin: 0; }
 .brief.commit .said { margin: 2px 0 0; font-size: 12px; color: var(--faint); }
@@ -7507,13 +7521,13 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .field.tight .badge { gap: 3px; padding: 4px 6px; }
 /* the face of what is selected: one fixed place at the top right of the canvas, a thing standing over the map, so it
    keeps its own edge; pressing it reads what it shows */
-.face { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
-.face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
-.face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-.face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
-.face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
-.face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
-.face::after { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 26px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
+.pickface { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
+.pickface .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
+.pickface .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+.pickface h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
+.pickface .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
+.pickface p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
+.pickface::after { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 26px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
