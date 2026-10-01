@@ -8,7 +8,7 @@ status: open
 
 The surface's code has grown from 1,223 lines to 7,945 in eighteen days. Most of the growth is not new function but the same function reached twice: two worlds made by copying one state in and out, two layouts kept side by side, one thing drawn by three renderers, and what to draw again written out by hand wherever something changes.
 
-Assembled again on the lore of building programs, the page's script keeps every behaviour in roughly a sixth fewer lines of code and up to half its comments. The larger gain is not the lines: each part does one thing that can be named, and the copying, the second layout, the second renderer and the redraw by hand have no place left to grow from.
+Assembled again on the lore of building programs, the page's script would keep every behaviour in roughly a sixth fewer lines of code; the larger part of that waits on three choices that are the author's. The larger gain is not the lines: each part does one thing that can be named, and the copying, the second layout, the second renderer and the redraw by hand have no place left to grow from.
 
 *Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there as the sister project's principles hold it, "of course not changing behaviour", and "there must be immense simplification possible under that wisdom". Read cold three times, as a brief and against the code, until a round changed only words; each move says beneath it when it is built.*
 
@@ -101,7 +101,7 @@ From the project's rules, three more apply here: code documents itself where it 
 
 ## 4. How it is assembled
 
-Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 670 to 780 lines of the page's code, and 300 to 600 of its comments.
+Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 670 to 780 lines of the page's code, and 60 to 100 of its comments.
 
 *Reasoned, the session's, 2026-10-01; the estimates are a cold reader's, made against the code at 25ee761 and not yet measured. None of the moves is answered by the author.*
 
@@ -125,7 +125,7 @@ These are each written once and used where each is wanted:
 
 The five tables that describe the programs become one: each program says how it draws, how wide it stands, whether it grows, what it answers and which world it is of. A program's height is then said once, where it is now said in two tables that can disagree. About 90 lines.
 
-*One pattern for one kind of thing, and a single source of truth. Reasoned; each renderer's output stays character for character what it was.*
+*One pattern for one kind of thing, and a single source of truth. Reasoned; each renderer's output stays character for character what it was. Fulfilled, 2026-10-02, in 83f7a96, but for the one table of programs: the renderers each once, and whether a program stands alone said once. The rest of the tables are the areas' other half, and wait with [the one layout](#46-one-layout-as-a-function-of-the-settings-and-the-screen).*
 
 ### 4.3 A world is a value the page points at
 
@@ -144,7 +144,7 @@ The pointer is chosen over handing each function its world as an argument. The w
 
 The move is mechanical but wide: every reading of the view, the ends or a world's elements becomes a reading of the world now, so the change touches hundreds of lines while it removes a hundred.
 
-*A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken. It supersedes the world set in the state's place of [the implementation](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) and of [the framework's shared state](framework.md#4-one-shared-state-and-a-few-verbs), where they say so.*
+*A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken. It supersedes the world set in the state's place of [the implementation](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) and of [the framework's shared state](framework.md#4-one-shared-state-and-a-few-verbs), where they say so. Fulfilled, 2026-10-02, in c1becf3: the harness equal, and a cold review found no path where writing live differs from copying back.*
 
 ### 4.4 What the map decides before it draws
 
@@ -162,7 +162,7 @@ The settings are the page's, apart from both worlds. Today they are checked by h
 
 About 30 lines.
 
-*Data over logic. Reasoned. A setting that is not checked today, such as the nesting line or the flick, is checked once it is in the table, which changes nothing for a value the page itself wrote.*
+*Data over logic. Reasoned. A setting that is not checked today, such as the nesting line or the flick, is checked once it is in the table, which changes nothing for a value the page itself wrote. Fulfilled, 2026-10-02, in 9ce04e4; the nesting line, the face and the flick were only ever written with the values their switches offer.*
 
 ### 4.6 One layout, as a function of the settings and the screen
 
@@ -172,21 +172,19 @@ Where the lane stands alone the arrangement is not the wide row, and it stays wh
 
 This is the move most likely to move a pixel. Today the grid lays the lone pane and the browser rounds, and the one function will place in whole pixels. Two fixed figures in one wing stand at its top and its foot, where a stack sets them one under the other. And the wings give way in their own order. Each such case is matched, not let go, and [the harness](#6-how-the-behaviour-is-kept) finds any that is missed.
 
-*One pattern for one kind of thing, and pure functions. Reasoned, the session's; the lane alone exactly as it is today. It leaves [the framework's five areas](framework.md#2-the-areas) standing only as what the lane alone keeps, and says so there.*
+Building it to keep the lane alone exactly as it is means writing in the page's own code what the browser's grid does for the areas today, its rounding included, to the pixel. Some of what that keeps exists only because the areas fit it: a narrow figure beside the prose where the body is shallow, two maps side by side just below the width where the lane stands alone, and a wing beside a lone map. That is much risk for what it removes, so the move waits on [the author's word](#5-what-only-the-author-can-let-go) on whether the lane alone may be laid from the row.
+
+*One pattern for one kind of thing, and pure functions. Reasoned, the session's; the lane alone exactly as it is today. Not built, 2026-10-02: it waits on the author. It leaves [the framework's five areas](framework.md#2-the-areas) standing only as what the lane alone keeps, and says so there.*
 
 ### 4.7 One draw, at a few levels
 
-An act changes a reading or the settings, and never draws. When it is done, the shell draws the page at one of a few named levels:
-- **all**: the layout, both proses, the map and the figures;
-- **the lanes**: both proses and the map;
-- **the figures**;
-- **the light**: what is lit.
+An act changes a reading or the settings, and the page is drawn again from them. It was proposed that one function draw the page at a few named levels, so that what each act draws again is no longer a list written at the act.
 
-A discrete act draws at all where that is fast enough, and the cost is measured first. All draws a world's prose again only where that world's reading changed, since laying a prose anew loses what a reader holds in it: a selection of its text, the focus of an element, an image already decoded, and where the browser anchored the scroll. A continuous gesture keeps its own narrow redraw, named, since a scroll, a drag or a turned knob must not lay the whole page again under the hand. The two places where one measure settles another stay explicit: the prose's ends with the shape's slot, and the gutters with the room they hang below the lane.
+Building toward it showed the lists are already few and short. Drawing everything is one function, and each part a function of its own. Laying the row again with what each world measures against it is one function, and drawing what changed with the pointer or the focus is one as well. What an act draws beyond those is particular to it: which world, which part, and what must keep its place, such as the scroll it anchors on. Drawing at a coarser level would lay a prose anew where today it is left alone, and so lose what a reader holds in it: a selection of its text, the focus of an element, an image already decoded.
 
-An act that changes a reading marks that world, and that mark is all the draw asks; there is no tracking of what depends on what, which would be a small framework. About 40 to 60 lines.
+So it is not built. [The implementation's rule](implementation.md#6-how-it-is-drawn), that a change draws again only what depends on it, stands.
 
-*Describe over instruct, unidirectional flow, and dumb is smart. Reasoned, the session's. It departs from [the implementation](implementation.md#6-how-it-is-drawn), in force since 2026-09-13, that every change draws again only what depends on it: a discrete act may now draw more than it needs, where that costs the reader nothing.*
+*Describe over instruct, and dumb is smart, weighed against keeping behaviour. Reasoned, the session's, 2026-10-02, from the call sites read through: the move as first proposed would have added a layer of levels to save some forty lines, at the cost of what a reader holds.*
 
 ### 4.8 An act, and its other hand
 
@@ -196,21 +194,21 @@ Each such entry gains one override for the map: a label, a help, a test and a do
 
 About 20 to 30 lines.
 
-*Data over logic, and an action named in one place. Reasoned; a cold reader showed that two tables would copy the twelve entries that do not care.*
+*Data over logic, and an action named in one place. Reasoned; a cold reader showed that two tables would copy the twelve entries that do not care. Fulfilled, 2026-10-02, in d6dff6d.*
 
-### 4.9 The gestures, as data
+### 4.9 The gestures, each a function of its own
 
-A press is a table of what it can land on, the first match taking it: a badge, a row of the map, a fold line, a program in the dock, a gutter, a setting, a cell of the trail, a name in the way down, a cell of a figure. Each case says what it acts on.
+Every gesture was wired inside one function of 594 lines, with what each keeps between events beside it.
 
-A drag is a table of its kinds: a gap, a stack's gap, a program, a knob, the shape, the rail, the map's ground and a phone's card. Each kind says how it starts, follows the hand and lets go. The wheel, the keys and the pointer are each one small function. The acts they reach stand in the section of acts, not inside the wiring.
+Now each is a small function at the level of the page: what the pointer does, a press, a drag, the wheel, the keys, a resize and the browser's back. The wiring only says which of them listens to what, in the order it always did. The acts the gestures reach, folding, moving, scoping and pulling out, are back with the moves they are, where they had come to stand under the rail.
 
-About 80 lines go. The rest becomes several readable parts instead of one function nobody reads whole.
+A press and a drag were also to become tables. A press already reads as one list of cases, the first that matches taking it, so a table would only move the same list. A drag's kinds each start, follow the hand and let go differently, and each waits for a different distance before it counts, so a table of them saves little. Neither is built.
 
-*Data over logic, and one thing well. Reasoned, the session's; the order in which a press tries its cases is behaviour and stays as it is.*
+*One thing well, and dumb is smart. Reasoned, the session's; built 2026-10-02 as far as it serves, the harness equal and a cold review read; the order in which a press tries its cases and every listener's order stay as they were.*
 
 ### 4.10 The comments say why
 
-A comment says what is not plain from the code: in a line, why it is so and what it guards against, which is the story the sister project's rules ask for where code would otherwise be overrun. The longer story of how a decision was reached, with its dates, stands in the briefs and in the record of the repository's commits, which already hold it, and it leaves the code. About 300 to 600 lines.
+A comment says what is not plain from the code: in a line, why it is so and what it guards against, which is the story the sister project's rules ask for where code would otherwise be overrun. The longer story of how a decision was reached, with its dates, stands in the briefs and in the record of the repository's commits, which already hold it, and it leaves the code. Counted, it is smaller than first thought: four lines carry a date and some sixty tell what once was, and the rest of the comments are reasons, which the sister project's rules ask to keep. About 60 to 100 lines.
 
 *Self-documenting code, and its context in a line. Reasoned. The comments are written in the author's voice, so which go is his to see in the diff before it is committed.*
 
@@ -259,17 +257,17 @@ The harness sits outside the surface and ships nothing. The scenarios cover what
 Each move is one commit, after the harness, the type checker and a cold review are each clean. The removals come first, then what makes one thing one, then the world, which every later move stands on. Then the layout, the draw, the acts and the gestures.
 
 1. What can never run goes. *Built, 3c3aeca.*
-2. One thing, one renderer, and one table of programs.
-3. The settings as a table.
-4. A world as a value, and drawing that changes nothing.
-5. One layout.
-6. One draw, at a few levels.
-7. An act and its other hand.
-8. The gestures as data.
-9. The comments, shown to the author before they are committed.
-10. Files, if the author wants them.
+2. One thing, one renderer, and one table of programs. *Built but for the one table, 83f7a96.*
+3. The settings as a table. *Built, 9ce04e4.*
+4. A world as a value, and what the map decides named. *Built, c1becf3.*
+5. One layout. *Waits on the author.*
+6. One draw, at a few levels. *Not built: it would cost what a reader holds.*
+7. An act and its other hand. *Built, d6dff6d.*
+8. The gestures, each a function of its own. *Built.*
+9. The comments, shown to the author before they are committed. *Waits on the author.*
+10. Files, if the author wants them. *Waits on the author.*
 
-*Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves.*
+*Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves. Measured, 2026-10-02, after the eighth: the page's script went from 4,069 lines of code to 3,956, every record of the harness equal throughout. The three largest moves are the author's, so the larger part of the estimate waits with them.*
 
 ## 8. What this leaves open
 
