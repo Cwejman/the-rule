@@ -27,9 +27,9 @@ On 2026-10-01 the author let go of the ink the canvas's rim took while the canva
 
 #### The page laid by hand is written, and read ten times
 
-The page is to be a row of columns, each a stack of programs, moved by a grip or the alt key and sized by dragging the gaps between them, with git's prose and canvas standing as programs beside the body's rather than as a mode, a dock at the left or the foot, and a head on every program holding its own settings. Ten fresh heads read it until one changed only words; most of what they found was the session's to settle. The author then answered the keys, the wheel, the figures, git's selection and the plate, and what is still the author's stands in the brief as not yet answered.
+The page is to be a row of columns, each a stack of programs, moved by a grip or the alt key and sized by dragging the gaps between them, with git's prose and canvas standing as programs beside the body's rather than as a mode, a dock at the left or the foot, and a head on every program holding its own settings. Ten fresh heads read it until one changed only words; most of what they found was the session's to settle. The author then answered the keys, the wheel, the figures, git's selection and the plate, and corrected the wheel once more, and what is still the author's stands in the brief as not yet answered.
 
-[The page laid by hand is written, and read ten times](git:89729bb..fb8713c)
+[The page laid by hand is written, and read ten times](git:89729bb..5ebe4f3)
 
 #### The rim stays quiet whichever pane holds the keys
 
