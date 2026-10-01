@@ -84,7 +84,7 @@ Easing to the ends, which is where a reader starts, it stands on the opening at 
 
 The wheel scrolls the lane wherever the pointer rests, over a wing or a gutter as over the text, so the reader never has to aim at the prose to read on. Only [a meter](widgets.md#61-the-meters) takes the wheel for itself.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13. Wide, from 2026-10-01, it is the body's prose the wheel scrolls from anywhere; git's prose takes it while the pointer rests on it, and from anywhere where it is the [only prose standing](layout.md#61-the-keys).*
 
 ### 4.3 Pointing overrides the focus
 
@@ -256,7 +256,7 @@ Where the line is too narrow to read them all, the run is cut at its root until 
 
 How the reader came here is the trail, against the lane's right edge on the same line, so its cells keep their place as moves are added at the right: a cell per move, oldest first. A going is a small block, a scoping a chevron down or up, [a link followed](#9-following-a-link-moves-you) the link glyph, each in the hue of where it went, and pointing at one says what it was. Folds and scrolls are not moves, and two moves that bring the lane back where it stood before the first, a scoping in and out again, are no journey, so both leave. Pressing a cell lays the lane back as it stood before that move and cuts the trail back to there; where the trail grows too long it is cut at its root, the oldest first. It stands only once a move has been made. Past it stands [the key that undoes the last change](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), which is where a reader looks to be back where they were, and it is quiet while there is nothing to take back.
 
-*Reasoned, the author's, 2026-09-14; the growing past the lane his ask of 2026-09-18, and the three parts told by the type his direction of the same day, after a first cut drew them as chips and he refused it; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day; the run reaching down to the focus rather than to the scope, his ask of 2026-09-16, from reading on a phone and finding he wanted the address of where he had scrolled to.*
+*Reasoned, the author's, 2026-09-14; the growing past the lane his ask of 2026-09-18, and the three parts told by the type his direction of the same day, after a first cut drew them as chips and he refused it; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day; the run reaching down to the focus rather than to the scope, his ask of 2026-09-16, from reading on a phone and finding he wanted the address of where he had scrolled to. Wide, from 2026-10-01, each world's way down stands over [its own prose](layout.md#6-the-body-and-git-two-worlds), or over its canvas where its prose does not stand, a head's room below the top edge.*
 
 ## 8. A record is ordered by time
 
