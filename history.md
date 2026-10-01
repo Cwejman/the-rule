@@ -19,11 +19,17 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 From 2026-09-21 to 2026-10-01 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-### The canvas's rim goes quiet
+### The page is laid by hand, and the canvas's rim goes quiet
 
-On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart.
+On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart. Then the author asked for more freedom in how the page is laid than the strip's presses give, and the session wrote the design they settled in discussion as an open brief.
 
-*Told by the session that made the commit, 2026-10-01.*
+*Told by the session that made these commits, as its debrief, 2026-10-01; the commit that tells it stands untold above it.*
+
+#### The page laid by hand is written, and read ten times
+
+The page is to be a row of columns, each a stack of programs, moved by a grip or the alt key and sized by dragging the gaps between them, with git's prose and canvas standing as programs beside the body's rather than as a mode, a dock at the left or the foot, and a head on every program holding its own settings. Ten fresh heads read it until one changed only words; most of what they found was the session's to settle, and what is the author's stands in the brief as not yet answered.
+
+[The page laid by hand is written, and read ten times](git:89729bb..6ff9999)
 
 #### The rim stays quiet whichever pane holds the keys
 
