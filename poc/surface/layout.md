@@ -8,9 +8,9 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-Nothing of it is built, and [what it will supersede](#11-what-it-supersedes) once built stands beneath its reason.
+It is built, wide, as laid here, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#8-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
 
-*Preferred, the author's, 2026-10-01, in discussion with the session. What the session proposed says so where it stands, and whether the author let it stand or has not answered it.*
+*Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
 ## 1. Why it is laid again
 
@@ -74,13 +74,13 @@ Every gap beside something that can be pulled can be dragged. The gap between tw
 
 The gap setting stays what it is, the least room between two programs. A width pulled is kept as a length and not as a share, so a column keeps its width as the screen changes until the page narrows past it, and no column is pulled narrower than its program's least width, though the screen may narrow it further [as it gives way](#32-giving-way). So the knobs that set a width go: the prose's measure and the canvas's width are pulled at their gaps.
 
-A figure keeps the width it declares, as [it does today](framework.md#21-widths), so a column of figures is as wide as its widest figure and is not pulled; a gap beside it sizes only the column on its other side. A program standing alone has a least width and a width of its own, and no greatest: the prose a least of 440, its measure alone, and its default measure with both gutters as its own, as the measure's least and default are today; the canvas 360 and 720, as its floor and greatest width are today; and the plate the figure's size, and as its own as wide as the page's height allows.
+A figure keeps the width it declares, as [it does today](framework.md#21-widths), so a column of figures is as wide as its widest figure and is not pulled; a gap beside it sizes only the column on its other side. A program standing alone has a least width and a width of its own, and no greatest: the prose a least of 440, its measure alone, and its default measure with both gutters as its own, as the measure's least and default are today; the canvas 360 and 720, as its floor and greatest width are today; and the plate 160, and the plate figure's 260 as its own, so it comes in as the plate and is pulled wider to be the dish.
 
 The prose's column holds the prose and its gutters. A gutter takes the width an adjunct reads best in, and the measure takes what the gutters leave. As the column is pulled narrower the gutters narrow first, then go as a pair, before the measure narrows, as [they give way](framework.md#28-giving-way) today.
 
-A gap double-pressed gives its programs back their own widths: the prose its default measure with its gutters, the canvas 720, and the plate as wide as the page's height allows.
+A gap double-pressed gives its programs back their own widths: the prose its default measure with its gutters, the canvas 720, and the plate 260.
 
-*Preferred, the author's, 2026-10-01, that dragging between programs, across and down, replaces the knobs, and that the gap setting stays, as the least room between programs. That a gap trades between its two neighbours, widths kept as lengths, a column of figures kept to its widest, the widths of the canvas and the plate, the gutters inside the prose's column and the double press are the session's, not yet answered.*
+*Preferred, the author's, 2026-10-01, that dragging between programs, across and down, replaces the knobs, and that the gap setting stays, as the least room between programs. That a gap trades between its two neighbours, widths kept as lengths, a column of figures kept to its widest, the widths of the canvas and the plate, the gutters inside the prose's column and the double press are the session's, not yet answered. The plate standing at 260 of its own departs from the page's height laid here before it was built, since a plate that came in at the page's height took a column as wide as the prose.*
 
 ### 3.1 Centred, or the room spread between
 
@@ -144,13 +144,15 @@ The page's address stays the body's. Today the history's world is set in place o
 
 ### 6.1 The keys
 
-Few programs contend for the keys: only git's against the body's. So the keys are the body's, and git's prose and canvas catch them while the pointer rests on them, giving them back when it leaves. Within the body they go as [they do today](framework.md#27-the-keys-belong-to-one-pane), to the canvas while it is pointed at and to the prose otherwise.
+Few programs contend for the keys: only git's against the body's. So the keys are the body's, and git's prose and canvas catch them while the pointer rests on them, giving them back once it rests on the body's prose, canvas or plate.
+
+Resting on a figure, a gap or the dock moves them nowhere, so the figures do not change under a pointer on its way to them. Within the body they go as [they do today](framework.md#27-the-keys-belong-to-one-pane), to the canvas while it is pointed at and to the prose otherwise.
 
 The wheel scrolls the body's prose from anywhere, [as it does today](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere), so the reader never has to move to the prose to read on. Over git's prose it scrolls git's prose instead, over a map it pans that map, and over a meter it turns the meter. Where git's prose is the only prose standing, the wheel scrolls it from anywhere.
 
 The figures, the shape, the tree and the ahead, draw the world holding the keys, so they tell of what the reader is deliberately looking at rather than staying the body's. The plate stays the body's.
 
-*Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that the wheel drives the body's prose from anywhere and git's only over it or where it stands alone, and that the figures follow what the reader is deliberately looking at. Within the body as today, and the figures reading that as the world holding the keys, are the session's.*
+*Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that the wheel drives the body's prose from anywhere and git's only over it or where it stands alone, and that the figures follow what the reader is deliberately looking at. Within the body as today, the figures reading that as the world holding the keys, and the keys kept where they were while the pointer rests on a figure, are the session's, the last found as it was built.*
 
 ### 6.2 A program of git's is told apart by its grip
 
@@ -172,9 +174,19 @@ A press on a program's icon takes it away, and a second press puts it back where
 
 Git's status is a program of git's world, telling of the diff the reader works in. What is selected in git, a commit or a story, stands in it, and is let go there, as it stood [beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). What else it shows is open, and so is its kind: a figure of a declared width, or a program standing alone.
 
-*Preferred, the author's, 2026-10-01: the selection in git's status; the rest left open by the author.*
+As built it is a figure of fixed size. It tells how far the history is read, how many stories and commits it holds, and what is selected in git: the node selected on git's canvas where it stands, or else the brief git's prose stands on, a press on which goes there. Letting the selection go waits on the selection reaching the body, which is not built.
 
-## 8. What this leaves open
+*Preferred, the author's, 2026-10-01: the selection in git's status; the rest left open by the author. What it shows as built, and what counts as selected, are the session's.*
+
+## 8. What is built, and what is not
+
+Everything above is built wide, on 2026-10-01, but the meeting of the two worlds. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
+
+Where the lane stands alone a phone keeps its reading as it was: one pane, the rail, and a switch at the foot that turns the pane to the history and back, which is the mode kept for a phone. The way down stands a head's room lower wide, so the heads have the top edge to themselves.
+
+*Seen, as built and looked at on the page, 2026-10-01, the session's.*
+
+## 9. What this leaves open
 
 Whether anything should say which world holds the keys, now that nothing does. Layouts kept by number and called by a key wait, the author's word of 2026-10-01. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
 
