@@ -21,15 +21,23 @@ From 2026-09-21 to 2026-10-01 the surface took git up again, four days after [th
 
 ### The page is laid by hand, and the canvas's rim goes quiet
 
-On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart. Then the author asked for more freedom in how the page is laid than the strip's presses give, and the session wrote the design they settled in discussion as an open brief.
+On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart. Then the author asked for more freedom in how the page is laid than the strip's presses give, and the session wrote the design they settled in discussion as an open brief, then built it in two stages, the page laid by hand and then the two worlds standing at once, and reviewed it cold until a round found nothing more.
 
 *Told by the session that made these commits, as its debrief, 2026-10-01; the commit that tells it stands untold above it.*
+
+#### The page is laid by hand, and the two worlds stand at once
+
+The surface was built as the brief says, but for the meeting of the two worlds. Wide, the page is a row of stacks laid by grips, the alt key and the dock, with gaps pulled across and down, a head on each program, and the dock at the foot or down the left. Then git's prose, canvas and status became programs beside the body's, each world drawn in elements of its own, and the mode was kept only as a phone's switch. Each brief the build superseded says so in a commit of its own.
+
+Two cold reviews, one of the layout and one of the two worlds, found nine faults, and the rounds that read only the mending found two, then four, then nothing but one head too wide to press through. All were mended. The pass on a cold page found that a card folded to its face was taken for the canvas's face and pinned over the prose, and that a press bringing git's prose in was answered by nothing, since it came in where it gave way first. Now it comes in at the left of the body's prose, the side that gives way last.
+
+[The page is laid by hand, and the two worlds stand at once](git:abf7713..84b2b4d)
 
 #### The page laid by hand is written, and read ten times
 
 The page is to be a row of columns, each a stack of programs, moved by a grip or the alt key and sized by dragging the gaps between them, with git's prose and canvas standing as programs beside the body's rather than as a mode, a dock at the left or the foot, and a head on every program holding its own settings. Ten fresh heads read it until one changed only words; most of what they found was the session's to settle. The author then answered the keys, the wheel, the figures, git's selection and the plate, and corrected the wheel once more, and what is still the author's stands in the brief as not yet answered.
 
-[The page laid by hand is written, and read ten times](git:89729bb..5ebe4f3)
+[The page laid by hand is written, and read ten times](git:89729bb..607750a)
 
 #### The rim stays quiet whichever pane holds the keys
 
