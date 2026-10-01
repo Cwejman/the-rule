@@ -308,6 +308,10 @@ The drawing holds the lane, then the areas and their strip, then one section per
 
 *In force, the author's decision, 2026-09-12; the widget table 2026-09-13.*
 
+At 7,945 lines the file was read through again on 2026-10-01, for what it is for and how it may be assembled on the lore of building programs, without changing what a reader sees or does.
+
+[The surface, assembled again](assembly.md)
+
 ### 7.1 Taste in the rule itself
 
 The author's guidelines from the sister project are guidance for taste, not rules the check reads, and are not brought in here: [Hjulverkstan's principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-). They hold simplicity and coherence, data over logic, pure functions with their side effects kept apart, and flat data with a single source of truth.
