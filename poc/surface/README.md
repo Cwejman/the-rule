@@ -56,15 +56,15 @@ Past the reading stand two readings of their own. The canvas is the second pane,
 
 [A touch reading](touch.md)
 
-Git's history is a reading of its own as well, stories told over runs of commits, opened apart from the body rather than placed in it. It is [a mode](history.md#41-it-is-a-mode-not-a-pane) the lane and the canvas are turned to, from a switch first in the strip, its stories read as prose and drawn as nodes; what a selection touched is not yet shown.
+Git's history is a reading of its own as well, stories told over runs of commits, opened apart from the body rather than placed in it. Its stories are read in a prose and drawn on a canvas of their own, programs that stand beside the body's, and a phone turns its one pane to them by a switch at its foot; what a selection touched is not yet shown.
 
 [History](history.md)
 
-How the page is laid is to be the reader's by hand: a row of columns, each a stack of programs, moved and sized by dragging, with git's prose and canvas standing as programs beside the body's rather than as a mode.
+How the page is laid is the reader's by hand: a row of columns, each a stack of programs, moved and sized by dragging, with git's prose and canvas standing as programs beside the body's rather than as a mode.
 
 [The page laid by hand](layout.md)
 
-*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open; built as a pane 2026-09-27, and as a mode 2026-09-28. The page laid by hand, 2026-10-01, is open and not built.*
+*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open; built as a pane 2026-09-27, and as a mode 2026-09-28. The page laid by hand, 2026-10-01, is open, and built the same day but for the meeting of the two worlds.*
 
 ## 5. What this does not answer
 
