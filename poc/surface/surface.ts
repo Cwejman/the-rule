@@ -6081,155 +6081,6 @@ function scrollToFocus(smooth: boolean): void {
   quiet();
 }
 
-// ### 3.14.1 Pull past the top
-//
-// At the top of a scope, scrolling up beyond where the lane can go fills a
-// gauge, and when it is full the reader is taken up a level, as some
-// applications refresh when pulled past their top. A pull that stops drains.
-
-/** How far a pull must go before it takes the reader up. */
-const PULL = 300;
-/** How much of a pull passes unseen, so the tail of a scroll that only just reached the top does not flash the gauge. */
-const PULL_DEAD = 0.08;
-let pulled = 0;
-let pullTimer: ReturnType<typeof setTimeout> | undefined;
-/** The world whose gauge the pull fills, since the pull is one and each prose has a gauge of its own. */
-let pullIn: WorldName = "body";
-/** When the last wheel event came, and whether a push has been felt: momentum is an unbroken stream, a new swipe begins after a gap. */
-let lastWheelAt = 0;
-let pushing = false;
-/** The gap in the stream that means a gesture has begun: momentum never pauses this long, and a finger touching the pad stops it dead. */
-const PULL_GAP = 50;
-/** Whether a pull has already taken the reader out and the hand has not yet let go: one movement of the hand is one act. */
-let spent = false;
-
-/**
- * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
- * whole notches of a hundred or more, or in lines, where a trackpad arrives as small fractional deltas.
- */
-const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.deltaY) >= 100 && Number.isInteger(e.deltaY));
-
-/**
- * Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything
- * else lets it drain. A pull that stops springs back after a second of quiet, long enough for a second swipe to continue
- * the first; a mouse wheel's notches come slower still, so its pull is kept longer between them.
- */
-function pull(e: WheelEvent): void {
-  clearTimeout(pullTimer);
-  // a wheel in the other world lets go of the pull in the one whose gauge it was filling
-  if (pullIn !== worldNow()) (inNamed(pullIn, restPull), (pullIn = worldNow()));
-  const now = performance.now();
-  const gap = now - lastWheelAt;
-  lastWheelAt = now;
-  const rest = notched(e) ? 1500 : 1000;
-  // One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands
-  // in is scrolled to the card it left, so the events after it met a lane no longer at its top, drained the pull and
-  // armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for
-  // the hand to let go, which is a push the other way or the quiet the gauge already springs back after — and neither
-  // is the lane merely standing somewhere else, so it is asked before anything about where the lane stands.
-  if (spent) {
-    if (e.deltaY > 0) spent = false;
-    else pullTimer = setTimeout(restIn(worldNow()), rest);
-    return drainPull();
-  }
-  if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
-  // the momentum of a scroll that reaches the top must never count. Momentum is an unbroken stream of events, and a
-  // finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top
-  // that comes after a gap in the stream, or on a wheel's notch
-  if (gap > PULL_GAP || notched(e)) pushing = true;
-  if (!pushing) return;
-  pulled = Math.min(PULL, pulled + -e.deltaY);
-  drawPull(false);
-  if (pulled >= PULL) {
-    pulled = 0;
-    spent = true;
-    pushing = false;
-    drawPull(true);
-    pullTimer = setTimeout(restIn(worldNow()), rest);
-    return popUp();
-  }
-  // a swipe with its momentum seldom reaches the whole pull, so the pull is held long enough for the next swipe to continue it
-  pullTimer = setTimeout(restIn(worldNow()), rest);
-}
-
-/** The gauge springs back. */
-function drainPull(): void {
-  pushing = false;
-  if (pulled === 0) return;
-  pulled = 0;
-  drawPull(true);
-}
-
-/** The pull let go of in the world whose gauge it filled, since a timer runs wherever the state happens to stand. */
-const restIn = (w: WorldName) => (): void => void inNamed(w, restPull);
-
-/** The hand has let go: the gauge springs back and a spent pull can be made again. */
-function restPull(): void {
-  spent = false;
-  drainPull();
-}
-
-/** The gauge: a line over the top of the lane that fills from its middle out past the dead zone, and eases back when it drains. */
-function drawPull(ease: boolean): void {
-  const g = ui.pull;
-  const share = Math.max(0, (pulled / PULL - PULL_DEAD) / (1 - PULL_DEAD));
-  g.classList.toggle("easing", ease);
-  g.style.setProperty("--pull", share.toFixed(3));
-  if (share > 0) g.hidden = false;
-  else if (ease) setTimeout(() => Number(g.style.getPropertyValue("--pull")) === 0 && (g.hidden = true), 260);
-  else g.hidden = true;
-}
-
-// ### 3.14.2 The rail answers a finger
-//
-// A finger is only a fatter pointer, so the rail answers it as the shape
-// answers a pointer, in a touch grain. The finger comes down and the lane is
-// laid where it stands, live, so a reader sees what they are scrubbing past
-// rather than a preview of it, and the callout says beside the thumb what
-// stands there, on the side away from the edge, so the hand never covers the
-// answer. Sliding away from the rail's own edge past a threshold arms a reset:
-// the callout says so, and letting go there lays the lane back where it stood.
-// Coming back onto the rail takes up the scrub again, so nothing is committed
-// until the finger lifts. The reset is the undo the lane already keeps with a
-// direction given to it: touching down records the lane, as every change does.
-
-/** How far past the rail the thumb slides before letting go lays the lane back. */
-const RESET = 60;
-/** Whether the thumb has slid off the rail far enough that letting go would lay the lane back. */
-let armed = false;
-
-/**
- * Lays the lane at the point of the rail the finger is on, since that point is the place the reader is asking to see.
- * It is a preview while the finger is down: the lane follows it, the callout names what is there, and letting go
- * leaves it. Sliding off past the threshold arms the reset instead, and the lane is left where it is until the finger
- * lifts, which then lays it back.
- */
-function railScrub(x: number, y: number): void {
-  const svg = ui.parts[fits().railSide].querySelector<SVGSVGElement>("svg.shape");
-  if (!svg) return;
-  const r = svg.getBoundingClientRect();
-  // away from the rail's own edge: right of a rail at the left, left of one at the right
-  const right = fits().railSide === "wingL";
-  armed = right ? x > r.right + RESET : x < r.left - RESET;
-  if (!armed) {
-    const k = Number(svg.dataset.k);
-    ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
-  }
-  railCallout(y, right ? r.right : r.left);
-}
-
-/** The callout: what the finger is over, drawn as the tooltip draws a brief, or what letting go will do once the reset is armed. */
-function railCallout(y: number, edge: number): void {
-  const t = ui.tip;
-  const b = brief(focusUnderLine());
-  t.classList.add("callout");
-  t.innerHTML = armed ? `<span class="name plain">let go to lay the lane back</span>` : b ? `${pathHtml(b.address)}<span class="name">${esc(b.title || state.body!.title)}</span>` : "";
-  t.hidden = false;
-  // beside the thumb on the side away from the edge the rail stands on, so the hand never covers the answer
-  t.style.left = `${Math.round(fits().railSide === "wingL" ? edge + 14 : edge - 14 - t.offsetWidth)}px`;
-  t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
-}
-
 /** How far a reader scrolls down in one run before the mark gets out of the way, and how far back up before it returns. */
 const AWAY = { down: 140, up: 40 };
 /** Where the lane stood at the last scroll, and how far the scrolling has run in one direction. */
@@ -6445,567 +6296,766 @@ function step(delta: number): void {
   moveTo(i < 0 ? order[0]?.address ?? "" : order[j].address);
 }
 
-/** Wires the gestures: pointing lights, pressing goes, a fold line folds, dragging scrubs, and keys do the same. */
-function wire(): void {
-  const named = (e: Event) => (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-a]") ?? null;
-  /** Runs something in a world, the history's only once it has been read. */
-  const runIn = (w: WorldName, fn: () => void): void => void (w === "history" && gitReady() ? inGit(fn) : onBody(fn));
-  /** Lays the row again and what each world measures against it, without drawing either prose again. */
-  const relayRow = (): void => {
-    onBody(() => (drawLayout(), drawCrumb(), alignEnds(), drawAdjuncts()));
-    inGit(() => gitShown() && (drawCrumb(), alignEnds(), drawAdjuncts()));
-    drawWings();
-  };
+// ### 3.14.1 Pull past the top
+//
+// At the top of a scope, scrolling up beyond where the lane can go fills a
+// gauge, and when it is full the reader is taken up a level, as some
+// applications refresh when pulled past their top. A pull that stops drains.
 
-  document.addEventListener("pointermove", (e) => {
-    // after a scroll, a pointer lights a brief only once it has travelled a little: a scroll that comes to rest under a
-    // still pointer makes the browser send a move of its own, which would light whatever the scroll left beneath it.
-    // Otherwise every move counts, so the highlight never lags behind the region the pointer is in
-    if (pointer.still && Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) < 4) return;
-    pointer.still = false;
-    pointer.x = e.clientX;
-    pointer.y = e.clientY;
-    // the canvas takes the keys while the pointer rests on it, and they go back to the prose when it leaves
-    const target = e.target as HTMLElement;
-    pointerOn = target.closest?.(".canvas") ? "canvas" : target.closest?.(".scroll") ? "lane" : target.closest?.("#dish") ? "dish" : null;
-    // and the history's prose and canvas take them while the pointer rests there, and the body's take them back; the
-    // figures follow, so they tell of what the reader is looking at, and pointing at a figure moves neither
-    if (pointerOn !== null) {
-      const was = keysWorld();
-      pointerWorld = worldOfEl(target);
-      if (keysWorld() !== was) drawWings();
-    }
-    // a program's head shows while the pointer is near its top edge, and not while a program is being moved
-    if (!narrow() && !drag) {
-      const near = headNear(e.clientX, e.clientY);
-      if (near !== nearHead) {
-        ui.heads.querySelector(".near")?.classList.remove("near");
-        nearHead = near;
-        if (near !== null) ui.heads.querySelector(`[data-head="${cssEsc(near)}"]`)?.classList.add("near");
-      }
-    }
-    // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
-    const el = named(e);
-    all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
-    // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
-    // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
-    if (el && el.closest(".lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
-    // reaching for the switch, or for one of git's programs in the dock, reads the history ahead of the press
-    if (el === null && target.closest?.('[data-mode], .dock [data-program^="git"]')) readAhead();
-    // pointing lights in the world the element belongs to, and lets go of what the other world had lit
-    const w = el ? worldOfEl(el) : null;
-    onBody(() => point(w === "body" ? el!.dataset.a! : null));
-    inGit(() => point(w === "history" ? el!.dataset.a! : null));
-    tip(e);
-  });
-  document.documentElement.addEventListener("pointerleave", () => {
-    onBody(() => point(null));
-    inGit(() => point(null));
-    hideTip();
-    pointerOn = null;
-    nearHead = null;
-    ui.heads.querySelector(".near")?.classList.remove("near");
-  });
+/** How far a pull must go before it takes the reader up. */
+const PULL = 300;
+/** How much of a pull passes unseen, so the tail of a scroll that only just reached the top does not flash the gauge. */
+const PULL_DEAD = 0.08;
+let pulled = 0;
+let pullTimer: ReturnType<typeof setTimeout> | undefined;
+/** The world whose gauge the pull fills, since the pull is one and each prose has a gauge of its own. */
+let pullIn: WorldName = "body";
+/** When the last wheel event came, and whether a push has been felt: momentum is an unbroken stream, a new swipe begins after a gap. */
+let lastWheelAt = 0;
+let pushing = false;
+/** The gap in the stream that means a gesture has begun: momentum never pauses this long, and a finger touching the pad stops it dead. */
+const PULL_GAP = 50;
+/** Whether a pull has already taken the reader out and the hand has not yet let go: one movement of the hand is one act. */
+let spent = false;
 
-  // a press acts in the world of what it lands on
-  const onClick = (e: MouseEvent): void => {
-    hideTip();
-    const t = e.target as HTMLElement;
-    // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
-    const inner = t.closest<HTMLAnchorElement>('a[href^="#/"]');
-    // in the history an address is the history's, which the browser cannot open, so it is followed here whatever is held
-    if (inner && (inPast() || !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey))) {
-      e.preventDefault();
-      return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
-    }
-    // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
-    if (t.closest("a[href]") || (!t.closest(".canvas") && window.getSelection()?.toString())) return;
-    // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
-    const badge = t.closest<HTMLElement>("[data-act]");
-    if (badge) {
-      const act = ACTIONS[badge.dataset.act!];
-      void (act && act.can(badge.dataset.a) && act.run(badge.dataset.a));
-      // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
-      return void (badge.closest(".strip") && drawChooser());
-    }
-    // the switch turns the lane and the canvas to the history, and back
-    if (t.closest("[data-mode]")) return void turnNarrow();
-    // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
-    if (t.closest(".pickface") && state.picked && brief(state.picked)) return void goTo(state.picked);
-    // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
-    const crow = t.closest<HTMLElement>(".crow");
-    if (crow) {
-      if (scrubbing) return;
-      const a = crow.dataset.a!;
-      const head = crow.dataset.head === "1";
-      if (narrow() && !fits().lane) card.a = a;
-      // one press selects, two presses go. Opening a reading is an act of its own and never rides on a press, since a
-      // reader who presses to look at a node has not asked for the map to grow
-      if (state.picked === a && state.onHead === head) readOn(a);
-      else pickNode(a, null, head);
-      drawCard();
-      return void drawChooser();
-    }
-    // a press on the canvas that is not a row lets the card go, as pressing away from a thing lets it go anywhere
-    if (t.closest(".canvas") && !t.closest("#card") && card.a !== null && !scrubbing) dropCard();
-    const dc = t.closest<HTMLElement>("[data-depth]");
-    if (dc) return void unfoldTo(Number(dc.dataset.depth));
-    if (t.closest(".canvas") && scrubbing) return;
-    const fold = t.closest<HTMLElement>("[data-fold]");
-    if (fold) return void cycle(fold.dataset.fold!);
-    // a card is the part itself, standing here: pressing it goes there, as pressing a figure's cell does
-    const opened = t.closest<HTMLElement>(".lane .card[data-card]");
-    if (opened) return void goTo(opened.dataset.card!);
-    const pick = t.closest<HTMLElement>(".strip [data-widget]");
-    if (pick) return void (narrow() && chooseNarrow(pick.dataset.widget!));
-    // a program's icon in the dock takes it away, and a second press puts it back where it stood; a drag is not a press
-    const program = t.closest<HTMLElement>(".dock [data-program]");
-    if (program) return void (scrubbing || pressProgram(program.dataset.program!));
-    // a gutter is a setting of the prose it stands beside, set in its head
-    const gutter = t.closest<HTMLElement>("[data-gutter]");
-    if (gutter) {
-      const [w, i] = gutter.dataset.gutter!.split(":") as ["body" | "history", string];
-      const g = settings.gutters[w].slice() as [string | null, string | null];
-      g[Number(i)] = g[Number(i)] ? null : "links";
-      settings.gutters = { ...settings.gutters, [w]: g };
-      saveSettings();
-      return void drawAll();
-    }
-    const set = t.closest<HTMLElement>("[data-set]");
-    if (set) {
-      const v = set.dataset.value!;
-      const key = set.dataset.set as keyof Settings;
-      (settings as unknown as Record<string, unknown>)[key] = typeof DEFAULTS[key] === "number" ? Number(v) : v;
-      // what a brief weighs is in the index, so a change of weight indexes the body again
-      if (key === "weight") {
-        onBody(() => (state.index = indexBody(state.body!)));
-        inGit(() => (state.index = indexBody(state.body!)));
-      }
-      saveSettings();
-      return void drawAll();
-    }
-    // a hop of the trail lays the lane back as it stood there
-    const hop = t.closest<HTMLElement>("[data-hop]");
-    if (hop) return void backTo(Number(hop.dataset.hop));
-    // a level above, in the shape or the crumb, scopes out to itself
-    const scope = t.closest<HTMLElement>("[data-scope]");
-    if (scope) return void scopeTo(scope.dataset.scope!);
-    const go = t.closest<HTMLElement>("[data-go]");
-    if (go) return void goTo(go.dataset.go!);
-    const cell = t.closest<HTMLElement>("svg.fig [data-a]");
-    if (!cell || scrubbing) return;
-    // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
-    const press = t.closest<HTMLElement>("[data-press]")?.dataset.press;
-    const folds = press ? press === "fold" : e.metaKey || e.ctrlKey;
-    return void (folds ? cycle(cell.dataset.a!) : goTo(cell.dataset.a!));
-  };
-  document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
+/**
+ * Whether a wheel event came from a notched mouse wheel rather than a trackpad. No browser says; a wheel arrives as
+ * whole notches of a hundred or more, or in lines, where a trackpad arrives as small fractional deltas.
+ */
+const notched = (e: WheelEvent): boolean => e.deltaMode !== 0 || (Math.abs(e.deltaY) >= 100 && Number.isInteger(e.deltaY));
 
-  // dragging: a knob turns, the shape scrubs
-  let drag: {
-    kind: "knob" | "shape" | "rail" | "canvas" | "card" | "move" | "seam" | "vseam";
-    el: HTMLElement;
-    x: number;
-    y: number;
-    start: number;
-    vx?: number;
-    vy?: number;
-    moved: boolean;
-    /** a program being moved, and the zone it would land in */
-    k?: string;
-    zone?: Zone | null;
-    /** a gap being pulled: the columns either side, or the stack and the figure above it, and what they stood at */
-    sides?: [number | null, number | null];
-    widths?: Map<number, number>;
-    heights?: number[];
-    /** the world the drag began in, which a pan or a scrub goes on acting in */
-    world?: WorldName;
-  } | null = null;
-  // a drag acts in the world it began in, to its end
-  document.addEventListener("pointerdown", (e) => {
-    const w = worldOfEl(e.target as Element);
-    runIn(w, () => down(e));
-    if (drag) drag.world = w;
-  });
-  const down = (e: PointerEvent): void => {
-    if (e.button !== 0) return;
-    // wide, a gap is pulled, and a program is taken by its grip, by its icon in the dock, or anywhere with alt held
-    if (!narrow()) {
-      const t = e.target as HTMLElement;
-      const seam = t.closest<HTMLElement>("[data-seam]");
-      const vseam = t.closest<HTMLElement>("[data-vseam]");
-      const grip = t.closest<HTMLElement>("[data-grip]") ?? t.closest<HTMLElement>(".dock [data-program]");
-      const held = e.altKey && !grip ? programAt(e.clientX, e.clientY) : null;
-      const at = { el: ui.areas, x: e.clientX, y: e.clientY, start: 0, moved: false };
-      if (seam) {
-        const sp = laid().spaces[Number(seam.dataset.seam)];
-        drag = { ...at, kind: "seam", sides: [sp.left, sp.right], widths: new Map(laid().cols.map((c) => [c.c, c.w])) };
-      } else if (vseam) {
-        const [c, i] = vseam.dataset.vseam!.split(":").map(Number);
-        const heights = layoutNow()[c].items.filter((it) => (WIDGETS[it.k] as Figure)?.grow).map((it) => slots.get(`fig:${it.k}`)?.height ?? FIGURE_FLOOR);
-        drag = { ...at, kind: "vseam", sides: [c, i], heights };
-      } else if (grip || held) drag = { ...at, kind: "move", k: grip?.dataset.grip ?? grip?.dataset.program ?? held!, zone: null };
-      if (drag) {
-        // a press on an icon of the dock is still a press: only the text a drag would select is spared, and the pointer
-        // is held only once it moves, since holding it at the press would hand the press itself to the page
-        if (!grip?.dataset.program) e.preventDefault();
-        return;
-      }
+/**
+ * Takes a wheel at the lane: up at the top of a scope, in the same movement that reached it, fills the gauge; anything
+ * else lets it drain. A pull that stops springs back after a second of quiet, long enough for a second swipe to continue
+ * the first; a mouse wheel's notches come slower still, so its pull is kept longer between them.
+ */
+function pull(e: WheelEvent): void {
+  clearTimeout(pullTimer);
+  // a wheel in the other world lets go of the pull in the one whose gauge it was filling
+  if (pullIn !== worldNow()) (inNamed(pullIn, restPull), (pullIn = worldNow()));
+  const now = performance.now();
+  const gap = now - lastWheelAt;
+  lastWheelAt = now;
+  const rest = notched(e) ? 1500 : 1000;
+  // One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands
+  // in is scrolled to the card it left, so the events after it met a lane no longer at its top, drained the pull and
+  // armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for
+  // the hand to let go, which is a push the other way or the quiet the gauge already springs back after — and neither
+  // is the lane merely standing somewhere else, so it is asked before anything about where the lane stands.
+  if (spent) {
+    if (e.deltaY > 0) spent = false;
+    else pullTimer = setTimeout(restIn(worldNow()), rest);
+    return drainPull();
+  }
+  if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
+  // the momentum of a scroll that reaches the top must never count. Momentum is an unbroken stream of events, and a
+  // finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top
+  // that comes after a gap in the stream, or on a wheel's notch
+  if (gap > PULL_GAP || notched(e)) pushing = true;
+  if (!pushing) return;
+  pulled = Math.min(PULL, pulled + -e.deltaY);
+  drawPull(false);
+  if (pulled >= PULL) {
+    pulled = 0;
+    spent = true;
+    pushing = false;
+    drawPull(true);
+    pullTimer = setTimeout(restIn(worldNow()), rest);
+    return popUp();
+  }
+  // a swipe with its momentum seldom reaches the whole pull, so the pull is held long enough for the next swipe to continue it
+  pullTimer = setTimeout(restIn(worldNow()), rest);
+}
+
+/** The gauge springs back. */
+function drainPull(): void {
+  pushing = false;
+  if (pulled === 0) return;
+  pulled = 0;
+  drawPull(true);
+}
+
+/** The pull let go of in the world whose gauge it filled, since a timer runs wherever the state happens to stand. */
+const restIn = (w: WorldName) => (): void => void inNamed(w, restPull);
+
+/** The hand has let go: the gauge springs back and a spent pull can be made again. */
+function restPull(): void {
+  spent = false;
+  drainPull();
+}
+
+/** The gauge: a line over the top of the lane that fills from its middle out past the dead zone, and eases back when it drains. */
+function drawPull(ease: boolean): void {
+  const g = ui.pull;
+  const share = Math.max(0, (pulled / PULL - PULL_DEAD) / (1 - PULL_DEAD));
+  g.classList.toggle("easing", ease);
+  g.style.setProperty("--pull", share.toFixed(3));
+  if (share > 0) g.hidden = false;
+  else if (ease) setTimeout(() => Number(g.style.getPropertyValue("--pull")) === 0 && (g.hidden = true), 260);
+  else g.hidden = true;
+}
+
+// ### 3.14.2 The rail answers a finger
+//
+// A finger is only a fatter pointer, so the rail answers it as the shape
+// answers a pointer, in a touch grain. The finger comes down and the lane is
+// laid where it stands, live, so a reader sees what they are scrubbing past
+// rather than a preview of it, and the callout says beside the thumb what
+// stands there, on the side away from the edge, so the hand never covers the
+// answer. Sliding away from the rail's own edge past a threshold arms a reset:
+// the callout says so, and letting go there lays the lane back where it stood.
+// Coming back onto the rail takes up the scrub again, so nothing is committed
+// until the finger lifts. The reset is the undo the lane already keeps with a
+// direction given to it: touching down records the lane, as every change does.
+
+/** How far past the rail the thumb slides before letting go lays the lane back. */
+const RESET = 60;
+/** Whether the thumb has slid off the rail far enough that letting go would lay the lane back. */
+let armed = false;
+
+/**
+ * Lays the lane at the point of the rail the finger is on, since that point is the place the reader is asking to see.
+ * It is a preview while the finger is down: the lane follows it, the callout names what is there, and letting go
+ * leaves it. Sliding off past the threshold arms the reset instead, and the lane is left where it is until the finger
+ * lifts, which then lays it back.
+ */
+function railScrub(x: number, y: number): void {
+  const svg = ui.parts[fits().railSide].querySelector<SVGSVGElement>("svg.shape");
+  if (!svg) return;
+  const r = svg.getBoundingClientRect();
+  // away from the rail's own edge: right of a rail at the left, left of one at the right
+  const right = fits().railSide === "wingL";
+  armed = right ? x > r.right + RESET : x < r.left - RESET;
+  if (!armed) {
+    const k = Number(svg.dataset.k);
+    ui.scroll.scrollTop = (y - r.top - 4) / k - ui.scroll.clientHeight / 2;
+  }
+  railCallout(y, right ? r.right : r.left);
+}
+
+/** The callout: what the finger is over, drawn as the tooltip draws a brief, or what letting go will do once the reset is armed. */
+function railCallout(y: number, edge: number): void {
+  const t = ui.tip;
+  const b = brief(focusUnderLine());
+  t.classList.add("callout");
+  t.innerHTML = armed ? `<span class="name plain">let go to lay the lane back</span>` : b ? `${pathHtml(b.address)}<span class="name">${esc(b.title || state.body!.title)}</span>` : "";
+  t.hidden = false;
+  // beside the thumb on the side away from the edge the rail stands on, so the hand never covers the answer
+  t.style.left = `${Math.round(fits().railSide === "wingL" ? edge + 14 : edge - 14 - t.offsetWidth)}px`;
+  t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
+}
+
+// ### 3.14.3 The gestures
+//
+// Each gesture is a small function of its own: what the pointer does, a press, a
+// drag, the wheel and the keys, each with what it keeps between events beside it.
+// The wiring beneath says only which of them listens to what.
+
+const named = (e: Event) => (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-a]") ?? null;
+
+/** Runs something in a world, the history's only once it has been read. */
+const runIn = (w: WorldName, fn: () => void): void => void (w === "history" && gitReady() ? inGit(fn) : onBody(fn));
+
+/** Lays the row again and what each world measures against it, without drawing either prose again. */
+const relayRow = (): void => {
+  onBody(() => (drawLayout(), drawCrumb(), alignEnds(), drawAdjuncts()));
+  inGit(() => gitShown() && (drawCrumb(), alignEnds(), drawAdjuncts()));
+  drawWings();
+};
+
+function onPointerMove(e: PointerEvent): void {
+  // after a scroll, a pointer lights a brief only once it has travelled a little: a scroll that comes to rest under a
+  // still pointer makes the browser send a move of its own, which would light whatever the scroll left beneath it.
+  // Otherwise every move counts, so the highlight never lags behind the region the pointer is in
+  if (pointer.still && Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) < 4) return;
+  pointer.still = false;
+  pointer.x = e.clientX;
+  pointer.y = e.clientY;
+  // the canvas takes the keys while the pointer rests on it, and they go back to the prose when it leaves
+  const target = e.target as HTMLElement;
+  pointerOn = target.closest?.(".canvas") ? "canvas" : target.closest?.(".scroll") ? "lane" : target.closest?.("#dish") ? "dish" : null;
+  // and the history's prose and canvas take them while the pointer rests there, and the body's take them back; the
+  // figures follow, so they tell of what the reader is looking at, and pointing at a figure moves neither
+  if (pointerOn !== null) {
+    const was = keysWorld();
+    pointerWorld = worldOfEl(target);
+    if (keysWorld() !== was) drawWings();
+  }
+  // a program's head shows while the pointer is near its top edge, and not while a program is being moved
+  if (!narrow() && !drag) {
+    const near = headNear(e.clientX, e.clientY);
+    if (near !== nearHead) {
+      ui.heads.querySelector(".near")?.classList.remove("near");
+      nearHead = near;
+      if (near !== null) ui.heads.querySelector(`[data-head="${cssEsc(near)}"]`)?.classList.add("near");
     }
-    const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
-    const held = (e.target as HTMLElement).closest<HTMLElement>("#card");
-    const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
-    const el = e.target as HTMLElement;
-    // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
-    // must neither cancel it nor drag the map out from under the reader
-    const cv = el.closest(".depth") || el.closest(".crow") || el.closest(".field") || el.closest(".pickface") ? null : el.closest<HTMLElement>(".canvas");
-    if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
-    else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: settings[knob.dataset.knob as Knob["key"]], moved: false };
-    // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
-    // and the callout, beside the thumb, names it; the lane as it stood is recorded so the reset can lay it back
-    else if (map && onRail() && touch) {
-      e.preventDefault();
-      record();
-      drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: true };
-      scrubbing = true;
-      document.body.classList.add("scrubbing");
-      railScrub(e.clientX, e.clientY);
-    } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
-    else if (cv) {
-      drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: state.view.x, vy: state.view.y, moved: false };
+  }
+  // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
+  const el = named(e);
+  all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
+  // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
+  // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
+  if (el && el.closest(".lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
+  // reaching for the switch, or for one of git's programs in the dock, reads the history ahead of the press
+  if (el === null && target.closest?.('[data-mode], .dock [data-program^="git"]')) readAhead();
+  // pointing lights in the world the element belongs to, and lets go of what the other world had lit
+  const w = el ? worldOfEl(el) : null;
+  onBody(() => point(w === "body" ? el!.dataset.a! : null));
+  inGit(() => point(w === "history" ? el!.dataset.a! : null));
+  tip(e);
+}
+
+function onPointerLeave(): void {
+  onBody(() => point(null));
+  inGit(() => point(null));
+  hideTip();
+  pointerOn = null;
+  nearHead = null;
+  ui.heads.querySelector(".near")?.classList.remove("near");
+}
+
+// a press acts in the world of what it lands on
+const onClick = (e: MouseEvent): void => {
+  hideTip();
+  const t = e.target as HTMLElement;
+  // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
+  const inner = t.closest<HTMLAnchorElement>('a[href^="#/"]');
+  // in the history an address is the history's, which the browser cannot open, so it is followed here whatever is held
+  if (inner && (inPast() || !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey))) {
+    e.preventDefault();
+    return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
+  }
+  // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
+  if (t.closest("a[href]") || (!t.closest(".canvas") && window.getSelection()?.toString())) return;
+  // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
+  const badge = t.closest<HTMLElement>("[data-act]");
+  if (badge) {
+    const act = ACTIONS[badge.dataset.act!];
+    void (act && act.can(badge.dataset.a) && act.run(badge.dataset.a));
+    // an act taken from the foot changes what the foot has left to offer, and nothing else would draw it again
+    return void (badge.closest(".strip") && drawChooser());
+  }
+  // the switch turns the lane and the canvas to the history, and back
+  if (t.closest("[data-mode]")) return void turnNarrow();
+  // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
+  if (t.closest(".pickface") && state.picked && brief(state.picked)) return void goTo(state.picked);
+  // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
+  const crow = t.closest<HTMLElement>(".crow");
+  if (crow) {
+    if (scrubbing) return;
+    const a = crow.dataset.a!;
+    const head = crow.dataset.head === "1";
+    if (narrow() && !fits().lane) card.a = a;
+    // one press selects, two presses go. Opening a reading is an act of its own and never rides on a press, since a
+    // reader who presses to look at a node has not asked for the map to grow
+    if (state.picked === a && state.onHead === head) readOn(a);
+    else pickNode(a, null, head);
+    drawCard();
+    return void drawChooser();
+  }
+  // a press on the canvas that is not a row lets the card go, as pressing away from a thing lets it go anywhere
+  if (t.closest(".canvas") && !t.closest("#card") && card.a !== null && !scrubbing) dropCard();
+  const dc = t.closest<HTMLElement>("[data-depth]");
+  if (dc) return void unfoldTo(Number(dc.dataset.depth));
+  if (t.closest(".canvas") && scrubbing) return;
+  const fold = t.closest<HTMLElement>("[data-fold]");
+  if (fold) return void cycle(fold.dataset.fold!);
+  // a card is the part itself, standing here: pressing it goes there, as pressing a figure's cell does
+  const opened = t.closest<HTMLElement>(".lane .card[data-card]");
+  if (opened) return void goTo(opened.dataset.card!);
+  const pick = t.closest<HTMLElement>(".strip [data-widget]");
+  if (pick) return void (narrow() && chooseNarrow(pick.dataset.widget!));
+  // a program's icon in the dock takes it away, and a second press puts it back where it stood; a drag is not a press
+  const program = t.closest<HTMLElement>(".dock [data-program]");
+  if (program) return void (scrubbing || pressProgram(program.dataset.program!));
+  // a gutter is a setting of the prose it stands beside, set in its head
+  const gutter = t.closest<HTMLElement>("[data-gutter]");
+  if (gutter) {
+    const [w, i] = gutter.dataset.gutter!.split(":") as ["body" | "history", string];
+    const g = settings.gutters[w].slice() as [string | null, string | null];
+    g[Number(i)] = g[Number(i)] ? null : "links";
+    settings.gutters = { ...settings.gutters, [w]: g };
+    saveSettings();
+    return void drawAll();
+  }
+  const set = t.closest<HTMLElement>("[data-set]");
+  if (set) {
+    const v = set.dataset.value!;
+    const key = set.dataset.set as keyof Settings;
+    (settings as unknown as Record<string, unknown>)[key] = typeof DEFAULTS[key] === "number" ? Number(v) : v;
+    // what a brief weighs is in the index, so a change of weight indexes the body again
+    if (key === "weight") {
+      onBody(() => (state.index = indexBody(state.body!)));
+      inGit(() => (state.index = indexBody(state.body!)));
     }
-    // the capture is taken on the area rather than on what the press landed on, since a redraw between the press and
-    // its release would detach that element and the release would never reach the page
-    if (drag)
-      try {
-        drag.el.setPointerCapture?.(e.pointerId);
-      } catch {}
-  };
-  document.addEventListener("pointermove", (e) => drag && runIn(drag.world ?? "body", () => dragged(e)));
-  const dragged = (e: PointerEvent): void => {
-    if (!drag) return;
-    if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
-    if (drag.kind === "move" || drag.kind === "seam" || drag.kind === "vseam") {
-      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
-      if (!drag.moved) {
-        drag.moved = true;
-        scrubbing = true;
-        try {
-          ui.areas.setPointerCapture(e.pointerId);
-        } catch {}
-        hideTip();
-        nearHead = null;
-        ui.heads.querySelector(".near")?.classList.remove("near");
-        document.body.classList.add(drag.kind === "move" ? "moving" : drag.kind === "seam" ? "pulling" : "pulling-v");
-      }
-      if (drag.kind === "move") {
-        drag.zone = zoneAt(e.clientX, e.clientY, drag.k!);
-        return void drawZone(drag.zone);
-      }
-      if (drag.kind === "seam") pullSeam(drag.sides![0], drag.sides![1], e.clientX - drag.x, drag.widths!);
-      else pullStack(drag.sides![0]!, drag.sides![1]!, e.clientY - drag.y, drag.heights!);
-      // the row is laid again under the hand; the maps are fitted to their new widths once the hand lets go
-      return void relayRow();
-    }
-    // the card takes the whole of the movement: it grows until it is as tall as it may stand, and what is left over
-    // scrolls its prose; going the other way the prose comes back first and then the card comes down
-    if (drag.kind === "card") {
-      const hold = ui.card.querySelector<HTMLElement>(".hold");
-      const up = drag.y - e.clientY;
-      drag.y = e.clientY;
-      if (Math.abs(up) > 1) drag.moved = true;
-      if (up > 0) {
-        const grow = Math.min(up, Math.max(0, cardMost() - card.h));
-        card.h += grow;
-        if (hold) hold.scrollTop += up - grow;
-      } else {
-        const back = Math.min(-up, hold?.scrollTop ?? 0);
-        if (hold) hold.scrollTop -= back;
-        card.h = Math.max(0, card.h - (-up - back));
-      }
-      ui.card.style.height = `${Math.round(card.h)}px`;
-      return;
-    }
-    // up or right turns a meter up; the shape scrubs by height alone
-    const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
-    // what counts as a movement is distance travelled, not height: the canvas pans in both directions, and a press
-    // with a shake in it was being taken for a drag and swallowed
-    const gone = drag.kind === "canvas" ? Math.hypot(e.clientX - drag.x, e.clientY - drag.y) : Math.abs(dy);
-    if (!drag.moved && gone < 4) return;
-    drag.moved = true;
-    scrubbing = true;
-    if (drag.kind === "canvas") {
-      // dragging the ground is going looking, as panning by the wheel is
-      state.panned = true;
-      state.view.x = drag.vx! + (e.clientX - drag.x);
-      state.view.y = drag.vy! + (e.clientY - drag.y);
-      applyView(false);
-    } else if (drag.kind === "knob") {
-      drag.el.classList.add("turning");
-      const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
-      const v = clamp(drag.start - (dy / 150) * (k.max - k.min), k.min, k.max);
-      settings[k.key] = Math.round(v / k.step) * k.step;
-      drawLayout();
-      drawAdjuncts();
-      drawMeter(drag.el);
-    } else {
-      const k = Number(drag.el.dataset.k);
-      ui.scroll.scrollTop = drag.start + dy / k;
-    }
-  };
-  const release = () => runIn(drag?.world ?? "body", letGoOf);
-  const letGoOf = () => {
-    if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
-      document.body.classList.remove("moving", "pulling", "pulling-v");
-      ui.zone.hidden = true;
-      ui.strips.querySelector(".dock")?.classList.remove("taking");
-      const { kind, k, zone, moved } = drag;
-      drag = null;
-      setTimeout(() => (scrubbing = false), 0);
-      if (!moved) return;
-      if (kind === "move") return void (zone && dropProgram(k!, zone));
-      saveSettings();
-      return void drawAll();
-    }
-    // let down past the least it is held at, the card goes, with what was chosen; anywhere else it stays where the
-    // finger left it, since the reader put it there
-    if (drag?.kind === "card") {
-      if (card.h < CARD.least) dropCard();
-      else drawCard();
-    }
-    if (drag?.kind === "knob") drag.el.classList.remove("turning");
-    if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
-    if (drag?.kind === "rail") {
-      document.body.classList.remove("scrubbing");
-      ui.tip.classList.remove("callout");
-      hideTip();
-      if (armed) undo();
-      // a scrub drags the pointer across the prose, and the browser takes that for a selection
-      getSelection?.()?.removeAllRanges();
-      armed = false;
-    }
-    drag = null;
-    setTimeout(() => (scrubbing = false), 0);
-  };
-  document.addEventListener("pointerup", release);
-  document.addEventListener("pointercancel", release);
-  // a gap pressed twice gives the programs either side their own widths back, and a stack its even shares
-  document.addEventListener("dblclick", (e) => {
+    saveSettings();
+    return void drawAll();
+  }
+  // a hop of the trail lays the lane back as it stood there
+  const hop = t.closest<HTMLElement>("[data-hop]");
+  if (hop) return void backTo(Number(hop.dataset.hop));
+  // a level above, in the shape or the crumb, scopes out to itself
+  const scope = t.closest<HTMLElement>("[data-scope]");
+  if (scope) return void scopeTo(scope.dataset.scope!);
+  const go = t.closest<HTMLElement>("[data-go]");
+  if (go) return void goTo(go.dataset.go!);
+  const cell = t.closest<HTMLElement>("svg.fig [data-a]");
+  if (!cell || scrubbing) return;
+  // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
+  const press = t.closest<HTMLElement>("[data-press]")?.dataset.press;
+  const folds = press ? press === "fold" : e.metaKey || e.ctrlKey;
+  return void (folds ? cycle(cell.dataset.a!) : goTo(cell.dataset.a!));
+};
+
+// dragging: a knob turns, the shape scrubs
+let drag: {
+  kind: "knob" | "shape" | "rail" | "canvas" | "card" | "move" | "seam" | "vseam";
+  el: HTMLElement;
+  x: number;
+  y: number;
+  start: number;
+  vx?: number;
+  vy?: number;
+  moved: boolean;
+  /** a program being moved, and the zone it would land in */
+  k?: string;
+  zone?: Zone | null;
+  /** a gap being pulled: the columns either side, or the stack and the figure above it, and what they stood at */
+  sides?: [number | null, number | null];
+  widths?: Map<number, number>;
+  heights?: number[];
+  /** the world the drag began in, which a pan or a scrub goes on acting in */
+  world?: WorldName;
+} | null = null;
+
+const pointerDown = (e: PointerEvent): void => {
+  if (e.button !== 0) return;
+  // wide, a gap is pulled, and a program is taken by its grip, by its icon in the dock, or anywhere with alt held
+  if (!narrow()) {
     const t = e.target as HTMLElement;
     const seam = t.closest<HTMLElement>("[data-seam]");
     const vseam = t.closest<HTMLElement>("[data-vseam]");
-    if (!seam && !vseam) return;
-    const L = layoutNow().map((c) => ({ ...c, items: c.items.map((it) => ({ ...it })) }));
+    const grip = t.closest<HTMLElement>("[data-grip]") ?? t.closest<HTMLElement>(".dock [data-program]");
+    const held = e.altKey && !grip ? programAt(e.clientX, e.clientY) : null;
+    const at = { el: ui.areas, x: e.clientX, y: e.clientY, start: 0, moved: false };
     if (seam) {
       const sp = laid().spaces[Number(seam.dataset.seam)];
-      [sp.left, sp.right].forEach((c) => c !== null && L[c] && delete L[c].w);
-    } else L[Number(vseam!.dataset.vseam!.split(":")[0])]?.items.forEach((it) => delete it.h);
-    settings.layout = L;
+      drag = { ...at, kind: "seam", sides: [sp.left, sp.right], widths: new Map(laid().cols.map((c) => [c.c, c.w])) };
+    } else if (vseam) {
+      const [c, i] = vseam.dataset.vseam!.split(":").map(Number);
+      const heights = layoutNow()[c].items.filter((it) => (WIDGETS[it.k] as Figure)?.grow).map((it) => slots.get(`fig:${it.k}`)?.height ?? FIGURE_FLOOR);
+      drag = { ...at, kind: "vseam", sides: [c, i], heights };
+    } else if (grip || held) drag = { ...at, kind: "move", k: grip?.dataset.grip ?? grip?.dataset.program ?? held!, zone: null };
+    if (drag) {
+      // a press on an icon of the dock is still a press: only the text a drag would select is spared, and the pointer
+      // is held only once it moves, since holding it at the press would hand the press itself to the page
+      if (!grip?.dataset.program) e.preventDefault();
+      return;
+    }
+  }
+  const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
+  const held = (e.target as HTMLElement).closest<HTMLElement>("#card");
+  const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
+  const el = e.target as HTMLElement;
+  // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
+  // must neither cancel it nor drag the map out from under the reader
+  const cv = el.closest(".depth") || el.closest(".crow") || el.closest(".field") || el.closest(".pickface") ? null : el.closest<HTMLElement>(".canvas");
+  if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
+  else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: settings[knob.dataset.knob as Knob["key"]], moved: false };
+  // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
+  // and the callout, beside the thumb, names it; the lane as it stood is recorded so the reset can lay it back
+  else if (map && onRail() && touch) {
+    e.preventDefault();
+    record();
+    drag = { kind: "rail", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: true };
+    scrubbing = true;
+    document.body.classList.add("scrubbing");
+    railScrub(e.clientX, e.clientY);
+  } else if (map) drag = { kind: "shape", el: map, x: e.clientX, y: e.clientY, start: ui.scroll.scrollTop, moved: false };
+  else if (cv) {
+    drag = { kind: "canvas", el: cv, x: e.clientX, y: e.clientY, start: 0, vx: state.view.x, vy: state.view.y, moved: false };
+  }
+  // the capture is taken on the area rather than on what the press landed on, since a redraw between the press and
+  // its release would detach that element and the release would never reach the page
+  if (drag)
+    try {
+      drag.el.setPointerCapture?.(e.pointerId);
+    } catch {}
+};
+
+const dragged = (e: PointerEvent): void => {
+  if (!drag) return;
+  if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
+  if (drag.kind === "move" || drag.kind === "seam" || drag.kind === "vseam") {
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      scrubbing = true;
+      try {
+        ui.areas.setPointerCapture(e.pointerId);
+      } catch {}
+      hideTip();
+      nearHead = null;
+      ui.heads.querySelector(".near")?.classList.remove("near");
+      document.body.classList.add(drag.kind === "move" ? "moving" : drag.kind === "seam" ? "pulling" : "pulling-v");
+    }
+    if (drag.kind === "move") {
+      drag.zone = zoneAt(e.clientX, e.clientY, drag.k!);
+      return void drawZone(drag.zone);
+    }
+    if (drag.kind === "seam") pullSeam(drag.sides![0], drag.sides![1], e.clientX - drag.x, drag.widths!);
+    else pullStack(drag.sides![0]!, drag.sides![1]!, e.clientY - drag.y, drag.heights!);
+    // the row is laid again under the hand; the maps are fitted to their new widths once the hand lets go
+    return void relayRow();
+  }
+  // the card takes the whole of the movement: it grows until it is as tall as it may stand, and what is left over
+  // scrolls its prose; going the other way the prose comes back first and then the card comes down
+  if (drag.kind === "card") {
+    const hold = ui.card.querySelector<HTMLElement>(".hold");
+    const up = drag.y - e.clientY;
+    drag.y = e.clientY;
+    if (Math.abs(up) > 1) drag.moved = true;
+    if (up > 0) {
+      const grow = Math.min(up, Math.max(0, cardMost() - card.h));
+      card.h += grow;
+      if (hold) hold.scrollTop += up - grow;
+    } else {
+      const back = Math.min(-up, hold?.scrollTop ?? 0);
+      if (hold) hold.scrollTop -= back;
+      card.h = Math.max(0, card.h - (-up - back));
+    }
+    ui.card.style.height = `${Math.round(card.h)}px`;
+    return;
+  }
+  // up or right turns a meter up; the shape scrubs by height alone
+  const dy = drag.kind === "knob" ? e.clientY - drag.y - (e.clientX - drag.x) : e.clientY - drag.y;
+  // what counts as a movement is distance travelled, not height: the canvas pans in both directions, and a press
+  // with a shake in it was being taken for a drag and swallowed
+  const gone = drag.kind === "canvas" ? Math.hypot(e.clientX - drag.x, e.clientY - drag.y) : Math.abs(dy);
+  if (!drag.moved && gone < 4) return;
+  drag.moved = true;
+  scrubbing = true;
+  if (drag.kind === "canvas") {
+    // dragging the ground is going looking, as panning by the wheel is
+    state.panned = true;
+    state.view.x = drag.vx! + (e.clientX - drag.x);
+    state.view.y = drag.vy! + (e.clientY - drag.y);
+    applyView(false);
+  } else if (drag.kind === "knob") {
+    drag.el.classList.add("turning");
+    const k = KNOBS.find((k) => k.key === drag!.el.dataset.knob)!;
+    const v = clamp(drag.start - (dy / 150) * (k.max - k.min), k.min, k.max);
+    settings[k.key] = Math.round(v / k.step) * k.step;
+    drawLayout();
+    drawAdjuncts();
+    drawMeter(drag.el);
+  } else {
+    const k = Number(drag.el.dataset.k);
+    ui.scroll.scrollTop = drag.start + dy / k;
+  }
+};
+
+const release = () => runIn(drag?.world ?? "body", letGoOf);
+
+const letGoOf = () => {
+  if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
+    document.body.classList.remove("moving", "pulling", "pulling-v");
+    ui.zone.hidden = true;
+    ui.strips.querySelector(".dock")?.classList.remove("taking");
+    const { kind, k, zone, moved } = drag;
+    drag = null;
+    setTimeout(() => (scrubbing = false), 0);
+    if (!moved) return;
+    if (kind === "move") return void (zone && dropProgram(k!, zone));
     saveSettings();
-    drawAll();
-  });
-  document.addEventListener(
+    return void drawAll();
+  }
+  // let down past the least it is held at, the card goes, with what was chosen; anywhere else it stays where the
+  // finger left it, since the reader put it there
+  if (drag?.kind === "card") {
+    if (card.h < CARD.least) dropCard();
+    else drawCard();
+  }
+  if (drag?.kind === "knob") drag.el.classList.remove("turning");
+  if (drag?.kind === "knob" && drag.moved) (saveSettings(), drawChooser(), drawWingsAligned());
+  if (drag?.kind === "rail") {
+    document.body.classList.remove("scrubbing");
+    ui.tip.classList.remove("callout");
+    hideTip();
+    if (armed) undo();
+    // a scrub drags the pointer across the prose, and the browser takes that for a selection
+    getSelection?.()?.removeAllRanges();
+    armed = false;
+  }
+  drag = null;
+  setTimeout(() => (scrubbing = false), 0);
+};
+
+// a gap pressed twice gives the programs either side their own widths back, and a stack its even shares
+function onDoubleClick(e: MouseEvent): void {
+  const t = e.target as HTMLElement;
+  const seam = t.closest<HTMLElement>("[data-seam]");
+  const vseam = t.closest<HTMLElement>("[data-vseam]");
+  if (!seam && !vseam) return;
+  const L = layoutNow().map((c) => ({ ...c, items: c.items.map((it) => ({ ...it })) }));
+  if (seam) {
+    const sp = laid().spaces[Number(seam.dataset.seam)];
+    [sp.left, sp.right].forEach((c) => c !== null && L[c] && delete L[c].w);
+  } else L[Number(vseam!.dataset.vseam!.split(":")[0])]?.items.forEach((it) => delete it.h);
+  settings.layout = L;
+  saveSettings();
+  drawAll();
+}
+
+// over the lane the browser scrolls it, and the pull only watches — except once a pull has been spent, where the rest
+// of the same movement would scroll the reading it just landed in away from the card it put the reader on
+const pullOn = (el: HTMLElement, w: WorldName) =>
+  el.addEventListener(
     "wheel",
-    (e) => {
-      const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
-      if (!knob) return;
-      e.preventDefault();
-      const k = KNOBS.find((k) => k.key === knob.dataset.knob)!;
-      settings[k.key] = clamp(Math.round((settings[k.key] - Math.sign(e.deltaY) * k.step) / k.step) * k.step, k.min, k.max);
-      saveSettings();
-      drawAll();
-    },
+    (e) =>
+      runIn(w, () => {
+        pull(e);
+        // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
+        // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
+        if (spent && e.deltaY < 0) e.preventDefault();
+      }),
     { passive: false },
   );
 
-  // the wheel scrolls the lane wherever the pointer rests, except over a meter, which turns instead
-  document.addEventListener(
+// over the map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
+const wheelOn = (el: HTMLElement, w: WorldName) =>
+  el.addEventListener(
     "wheel",
     (e) => {
-      holding = null;
-      const t = e.target as HTMLElement;
-      if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas")) return;
-      // from anywhere else the wheel scrolls the body's prose, so the reader never has to reach for it, or the
-      // history's where it is the only prose standing
-      const into: WorldName | null = narrow() ? narrowShown() : laidAt("prose") ? "body" : laidAt("gitProse") && gitReady() ? "history" : null;
-      if (into === null) return;
       e.preventDefault();
-      runIn(into, () => {
-        ui.scroll.scrollTop += e.deltaY;
-        flick(e);
-        pull(e);
+      hideTip();
+      runIn(w, () => {
+        // moving the map by hand is going looking: from here the reading no longer drags the view back
+        state.panned = true;
+        if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+        state.view.x -= e.deltaX;
+        state.view.y -= e.deltaY;
+        applyView(false);
       });
     },
     { passive: false },
   );
-  // over the lane the browser scrolls it, and the pull only watches — except once a pull has been spent, where the rest
-  // of the same movement would scroll the reading it just landed in away from the card it put the reader on
-  const pullOn = (el: HTMLElement, w: WorldName) =>
-    el.addEventListener(
-      "wheel",
-      (e) =>
-        runIn(w, () => {
-          pull(e);
-          // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
-          // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
-          if (spent && e.deltaY < 0) e.preventDefault();
-        }),
-      { passive: false },
-    );
 
-  // over the map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
-  const wheelOn = (el: HTMLElement, w: WorldName) =>
-    el.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        hideTip();
-        runIn(w, () => {
-          // moving the map by hand is going looking: from here the reading no longer drags the view back
-          state.panned = true;
-          if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
-          state.view.x -= e.deltaX;
-          state.view.y -= e.deltaY;
-          applyView(false);
-        });
-      },
-      { passive: false },
-    );
-  // the depth strip scrubs: with the button held, crossing a cell sets that depth
-  const scrubOn = (el: HTMLElement, w: WorldName) =>
-    el.addEventListener("pointerover", (e) => {
-      const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
-      if (dc && e.buttons & 1) runIn(w, () => unfoldTo(Number(dc.dataset.depth)));
-    });
-  // Safari sends a pinch as a gesture of its own, with the scale so far
-  let pinch = 1;
-  const pinchOn = (el: HTMLElement, w: WorldName) => {
-    el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
-    el.addEventListener("gesturechange", (e) => {
-      e.preventDefault();
-      const g = e as Event & { scale: number; clientX: number; clientY: number };
-      runIn(w, () => zoomAt(g.clientX, g.clientY, g.scale / pinch));
-      pinch = g.scale;
-    });
-  };
+// the depth strip scrubs: with the button held, crossing a cell sets that depth
+const scrubOn = (el: HTMLElement, w: WorldName) =>
+  el.addEventListener("pointerover", (e) => {
+    const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
+    if (dc && e.buttons & 1) runIn(w, () => unfoldTo(Number(dc.dataset.depth)));
+  });
 
-  // the flick: a small reversal of the scroll, down then up then down within a moment, cycles the brief in focus
-  const legs: { t: number; d: number }[] = [];
-  let flicked = 0;
-  const flick = (e: WheelEvent): void => {
-      if (!settings.flick || Math.abs(e.deltaY) < 2) return;
-      const now = performance.now();
-      const last = legs.at(-1);
-      if (last && Math.sign(last.d) === Math.sign(e.deltaY)) last.d += e.deltaY;
-      else legs.push({ t: now, d: e.deltaY });
-      while (legs.length && now - legs[0].t > 260) legs.shift();
-      const atEnd = ui.scroll.scrollTop <= 0 || ui.scroll.scrollTop >= ui.scroll.scrollHeight - ui.scroll.clientHeight - 1;
-      if (legs.length >= 3 && now - flicked > 600 && !atEnd) {
-        const [a, b, c] = legs.slice(-3);
-        if (Math.abs(a.d) > 6 && Math.abs(b.d) > 6 && Math.abs(c.d) > 6 && Math.abs(a.d + b.d + c.d) < 80) {
-          flicked = now;
-          legs.length = 0;
-          cycle(state.focus);
-        }
-      }
-  };
-  const flickOn = (el: HTMLElement, w: WorldName) => el.addEventListener("wheel", (e) => runIn(w, () => flick(e)), { passive: true });
+// Safari sends a pinch as a gesture of its own, with the scale so far
+let pinch = 1;
 
-  // Every key fires an action from the table, and nothing is named here: a chord is looked up, and taken only where the
-  // action says it can be. The space bar keeps its own discipline, since it acts when it is let go, so a reader who only
-  // scrolls never reaches for the pointer, and held a moment it acts on the whole scope instead.
-  const take = (c: Chord): boolean => {
-    // a chord may be claimed by more than one act, as return reads on the canvas and opens in the lane: the one that
-    // can be taken where the reader stands takes it
-    // a key acts in the world the keys belong to: the history's while the pointer rests on its prose or canvas
-    let taken = false;
-    runIn(keysWorld(), () => {
-      const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
-      if (!act) return;
-      act.run();
-      taken = true;
-    });
-    return taken;
-  };
-  let space: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } | null = null;
-  const letGo = () => void (space && clearTimeout(space.timer), (space = null));
-  window.addEventListener("blur", letGo);
-  document.addEventListener("keyup", (e) => {
-    if (e.key !== " " || !space) return;
+const pinchOn = (el: HTMLElement, w: WorldName) => {
+  el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
+  el.addEventListener("gesturechange", (e) => {
     e.preventDefault();
-    const { shift, held } = space;
-    letGo();
-    if (!held) take({ key: " ", shift });
+    const g = e as Event & { scale: number; clientX: number; clientY: number };
+    runIn(w, () => zoomAt(g.clientX, g.clientY, g.scale / pinch));
+    pinch = g.scale;
   });
+};
 
-  document.addEventListener("keydown", (e) => {
-    if ((e.target as HTMLElement).closest("input, textarea")) return;
-    if (e.key === " ") {
-      e.preventDefault();
-      if (space) return;
-      const shift = e.shiftKey;
-      const hold: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } = { shift, held: false, timer: setTimeout(() => ((hold.held = true), take({ key: " ", shift, hold: true })), HOLD) };
-      space = hold;
-      return;
+// the flick: a small reversal of the scroll, down then up then down within a moment, cycles the brief in focus
+const legs: { t: number; d: number }[] = [];
+
+let flicked = 0;
+
+const flick = (e: WheelEvent): void => {
+    if (!settings.flick || Math.abs(e.deltaY) < 2) return;
+    const now = performance.now();
+    const last = legs.at(-1);
+    if (last && Math.sign(last.d) === Math.sign(e.deltaY)) last.d += e.deltaY;
+    else legs.push({ t: now, d: e.deltaY });
+    while (legs.length && now - legs[0].t > 260) legs.shift();
+    const atEnd = ui.scroll.scrollTop <= 0 || ui.scroll.scrollTop >= ui.scroll.scrollHeight - ui.scroll.clientHeight - 1;
+    if (legs.length >= 3 && now - flicked > 600 && !atEnd) {
+      const [a, b, c] = legs.slice(-3);
+      if (Math.abs(a.d) > 6 && Math.abs(b.d) > 6 && Math.abs(c.d) > 6 && Math.abs(a.d + b.d + c.d) < 80) {
+        flicked = now;
+        legs.length = 0;
+        cycle(state.focus);
+      }
     }
-    // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
-    const said: Chord = { key: e.key, shift: e.shiftKey };
-    const chord = actionFor(said) ? said : { key: pressed(e), shift: e.shiftKey };
-    if (!actionFor(chord)) return;
-    if (e.key !== "Escape") e.preventDefault();
-    take(chord);
+};
+
+const flickOn = (el: HTMLElement, w: WorldName) => el.addEventListener("wheel", (e) => runIn(w, () => flick(e)), { passive: true });
+
+// Every key fires an action from the table, and nothing is named here: a chord is looked up, and taken only where the
+// action says it can be. The space bar keeps its own discipline, since it acts when it is let go, so a reader who only
+// scrolls never reaches for the pointer, and held a moment it acts on the whole scope instead.
+const take = (c: Chord): boolean => {
+  // a chord may be claimed by more than one act, as return reads on the canvas and opens in the lane: the one that
+  // can be taken where the reader stands takes it
+  // a key acts in the world the keys belong to: the history's while the pointer rests on its prose or canvas
+  let taken = false;
+  runIn(keysWorld(), () => {
+    const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
+    if (!act) return;
+    act.run();
+    taken = true;
   });
+  return taken;
+};
 
-  // an image whose size the trace could not read, or a remote one whose shape changed since, takes its own size once it
-  // has loaded, and what stands beside the lane is laid again; one that fails to load leaves its alt text. Only the
-  // shape is compared, since a vector sized by its view box loads at a size the browser picks for it
-  let relaying = 0;
-  const relay = (w: WorldName) => {
-    cancelAnimationFrame(relaying);
-    relaying = requestAnimationFrame(() => runIn(w, () => (alignEnds(), drawAdjuncts(), drawWings())));
-  };
-  const imagesOn = (el: HTMLElement, w: WorldName) => {
-    el.addEventListener(
-      "load",
-      (e) =>
-        runIn(w, () => {
-          const img = e.target as HTMLImageElement;
-          if (img.tagName !== "IMG" || !state.body || !img.naturalWidth) return;
-          const size = { width: img.naturalWidth, height: img.naturalHeight };
-          const toks = state.body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.src === img.getAttribute("src"));
-          if (toks.every((t) => t.width && t.height && Math.abs(t.width / t.height / (size.width / size.height) - 1) < 0.01)) return;
-          toks.forEach((t) => Object.assign(t, size));
-          if (img.hasAttribute("width")) Object.assign(img, size);
-          state.index = indexBody(state.body);
-          relay(w);
-        }),
-      true,
-    );
-    el.addEventListener(
-      "error",
-      (e) => {
-        const img = e.target as HTMLElement;
-        if (img.tagName !== "IMG") return;
-        img.closest("figure")?.classList.add("broken");
+let space: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } | null = null;
+
+const letGo = () => void (space && clearTimeout(space.timer), (space = null));
+
+function onKeyUp(e: KeyboardEvent): void {
+  if (e.key !== " " || !space) return;
+  e.preventDefault();
+  const { shift, held } = space;
+  letGo();
+  if (!held) take({ key: " ", shift });
+}
+
+function onKeyDown(e: KeyboardEvent): void {
+  if ((e.target as HTMLElement).closest("input, textarea")) return;
+  if (e.key === " ") {
+    e.preventDefault();
+    if (space) return;
+    const shift = e.shiftKey;
+    const hold: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } = { shift, held: false, timer: setTimeout(() => ((hold.held = true), take({ key: " ", shift, hold: true })), HOLD) };
+    space = hold;
+    return;
+  }
+  // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
+  const said: Chord = { key: e.key, shift: e.shiftKey };
+  const chord = actionFor(said) ? said : { key: pressed(e), shift: e.shiftKey };
+  if (!actionFor(chord)) return;
+  if (e.key !== "Escape") e.preventDefault();
+  take(chord);
+}
+
+// an image whose size the trace could not read, or a remote one whose shape changed since, takes its own size once it
+// has loaded, and what stands beside the lane is laid again; one that fails to load leaves its alt text. Only the
+// shape is compared, since a vector sized by its view box loads at a size the browser picks for it
+let relaying = 0;
+
+const relay = (w: WorldName) => {
+  cancelAnimationFrame(relaying);
+  relaying = requestAnimationFrame(() => runIn(w, () => (alignEnds(), drawAdjuncts(), drawWings())));
+};
+
+const imagesOn = (el: HTMLElement, w: WorldName) => {
+  el.addEventListener(
+    "load",
+    (e) =>
+      runIn(w, () => {
+        const img = e.target as HTMLImageElement;
+        if (img.tagName !== "IMG" || !state.body || !img.naturalWidth) return;
+        const size = { width: img.naturalWidth, height: img.naturalHeight };
+        const toks = state.body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.src === img.getAttribute("src"));
+        if (toks.every((t) => t.width && t.height && Math.abs(t.width / t.height / (size.width / size.height) - 1) < 0.01)) return;
+        toks.forEach((t) => Object.assign(t, size));
+        if (img.hasAttribute("width")) Object.assign(img, size);
+        state.index = indexBody(state.body);
         relay(w);
-      },
-      true,
-    );
-  };
-
-  // a machine may hold both a pointer and a screen, so the first touch settles which the reader is using and the page
-  // is drawn again in that grain: the badges lose their caps, the presses gain their room
-  window.addEventListener(
-    "touchstart",
-    () => {
-      if (touch) return;
-      touch = true;
-      document.body.classList.add("touch");
-      drawAll();
-    },
-    { passive: true },
+      }),
+    true,
   );
+  el.addEventListener(
+    "error",
+    (e) => {
+      const img = e.target as HTMLElement;
+      if (img.tagName !== "IMG") return;
+      img.closest("figure")?.classList.add("broken");
+      relay(w);
+    },
+    true,
+  );
+};
 
+// the browser's back and forward, or an address typed, arrive as a change the reader made
+function onHashChange(): void {
+  // the address is the body's, so the browser's back and forward turn a phone's one pane back to the body first
+  if (narrowWorld === "history") narrowWorld = "body";
+  record();
+  state.scope = brief(readScope()) ? readScope() : "";
+  arrive(readHash());
+}
+
+function onResize(): void {
+  // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
+  pointerOn = null;
+  // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
+  // and how its areas are laid both turn on the width; and so is a row where a column gave way or came back
+  if (narrow() || !ui.areas.classList.contains("laid")) return drawAll();
+  const before = laid().cols.map((c) => c.c).join();
+  relayRow();
+  if (laid().cols.map((c) => c.c).join() !== before) return drawAll();
+  onBody(drawCanvas);
+  inGit(() => gitShown() && drawCanvas());
+  drawChooser();
+  drawWingsAligned();
+}
+
+/** A meter turns a step under the wheel. */
+function onKnobWheel(e: WheelEvent): void {
+  const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
+  if (!knob) return;
+  e.preventDefault();
+  const k = KNOBS.find((k) => k.key === knob.dataset.knob)!;
+  settings[k.key] = clamp(Math.round((settings[k.key] - Math.sign(e.deltaY) * k.step) / k.step) * k.step, k.min, k.max);
+  saveSettings();
+  drawAll();
+}
+
+/** The wheel scrolls the lane wherever the pointer rests, except over a meter, which turns instead. */
+function onWheel(e: WheelEvent): void {
+  holding = null;
+  const t = e.target as HTMLElement;
+  if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas")) return;
+  // from anywhere else the wheel scrolls the body's prose, so the reader never has to reach for it, or the
+  // history's where it is the only prose standing
+  const into: WorldName | null = narrow() ? narrowShown() : laidAt("prose") ? "body" : laidAt("gitProse") && gitReady() ? "history" : null;
+  if (into === null) return;
+  e.preventDefault();
+  runIn(into, () => {
+    ui.scroll.scrollTop += e.deltaY;
+    flick(e);
+    pull(e);
+  });
+}
+
+/**
+ * A machine may hold both a pointer and a screen, so the first touch settles which the reader is using and the page is
+ * drawn again in that grain: the badges lose their caps, the presses gain their room.
+ */
+function onFirstTouch(): void {
+  if (touch) return;
+  touch = true;
+  document.body.classList.add("touch");
+  drawAll();
+}
+
+/** Wires the gestures: which of them listens to what, on the page and on each world's own elements. */
+function wire(): void {
+  document.addEventListener("pointermove", onPointerMove);
+  document.documentElement.addEventListener("pointerleave", onPointerLeave);
+  document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
+  // a drag acts in the world it began in, to its end
+  document.addEventListener("pointerdown", (e) => {
+    const w = worldOfEl(e.target as Element);
+    runIn(w, () => pointerDown(e));
+    if (drag) drag.world = w;
+  });
+  document.addEventListener("pointermove", (e) => drag && runIn(drag.world ?? "body", () => dragged(e)));
+  document.addEventListener("pointerup", release);
+  document.addEventListener("pointercancel", release);
+  document.addEventListener("dblclick", onDoubleClick);
+  document.addEventListener("wheel", onKnobWheel, { passive: false });
+  document.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("blur", letGo);
+  document.addEventListener("keyup", onKeyUp);
+  document.addEventListener("keydown", onKeyDown);
+  window.addEventListener("touchstart", onFirstTouch, { passive: true });
   // each world's elements answer in that world
   [bodyWorld, gitWorld].forEach(({ name: w, ui: d }) => {
     pullOn(d.scroll, w);
@@ -7016,28 +7066,8 @@ function wire(): void {
     imagesOn(d.lane, w);
     d.scroll.addEventListener("scroll", () => requestAnimationFrame(() => runIn(w, onScroll)), { passive: true });
   });
-  // the browser's back and forward, or an address typed, arrive as a change the reader made
-  window.addEventListener("hashchange", () => {
-    // the address is the body's, so the browser's back and forward turn a phone's one pane back to the body first
-    if (narrowWorld === "history") narrowWorld = "body";
-    record();
-    state.scope = brief(readScope()) ? readScope() : "";
-    arrive(readHash());
-  });
-  window.addEventListener("resize", () => {
-    // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
-    pointerOn = null;
-    // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
-    // and how its areas are laid both turn on the width; and so is a row where a column gave way or came back
-    if (narrow() || !ui.areas.classList.contains("laid")) return drawAll();
-    const before = laid().cols.map((c) => c.c).join();
-    relayRow();
-    if (laid().cols.map((c) => c.c).join() !== before) return drawAll();
-    onBody(drawCanvas);
-    inGit(() => gitShown() && drawCanvas());
-    drawChooser();
-    drawWingsAligned();
-  });
+  window.addEventListener("hashchange", onHashChange);
+  window.addEventListener("resize", onResize);
 }
 
 // ## 3.15 Where the body comes from
