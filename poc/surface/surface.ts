@@ -2858,7 +2858,8 @@ const without = (L: Column[], k: string): Column[] => L.map((c) => ({ ...c, item
 function canTrade(k: string, t: string, L: Column[] = layoutNow()): boolean {
   const a = whereIs(k, L);
   const b = whereIs(t, L);
-  if (!b || k === t) return false;
+  // only two programs that stand trade places; one from the dock lands beside or in a stack instead
+  if (!a || !b || k === t) return false;
   const shared = (p: { c: number } | null) => !!p && L[p.c].items.length > 1;
   return !(isAlone(k) && shared(b)) && !(isAlone(t) && shared(a));
 }
@@ -2877,7 +2878,14 @@ function dropped(L: Column[], k: string, z: Zone): Column[] {
     next[t.c].items[t.i] = { k, ...(theirs.h ? { h: theirs.h } : {}) };
     if (from) next[from.c].items[from.i] = { k: theirs.k, ...(L[from.c].items[from.i].h ? { h: L[from.c].items[from.i].h } : {}) };
     // a column holds the width it was pulled to for what stands alone in it, so two that trade columns trade widths
-    if (from && isAlone(k) && isAlone(theirs.k)) [next[t.c].w, next[from.c].w] = [L[from.c].w, L[t.c].w];
+    // and where only one of the two stands alone, its width goes with it and the figures' column is pulled to none
+    if (from && (isAlone(k) || isAlone(theirs.k))) {
+      const [mine, other] = [isAlone(k) ? L[from.c].w : undefined, isAlone(theirs.k) ? L[t.c].w : undefined];
+      next[t.c] = { ...next[t.c], w: mine };
+      next[from.c] = { ...next[from.c], w: other };
+      if (next[t.c].w === undefined) delete next[t.c].w;
+      if (next[from.c].w === undefined) delete next[from.c].w;
+    }
     return next;
   }
   const next = without(L, k);
@@ -2925,7 +2933,10 @@ function pressProgram(k: string): void {
     state.settings.layout = without(L, k);
   } else {
     const kept = leftAt.get(k);
-    const zone: Zone = kept && standing(kept.near) ? kept.zone : { kind: "col", at: L.length };
+    // a program that never stood comes in after the last column on the page, before any that gave way
+    const shown = laid().cols;
+    const end = shown.length ? shown[shown.length - 1].c + 1 : L.length;
+    const zone: Zone = kept && standing(kept.near) ? kept.zone : { kind: "col", at: end };
     let next = dropped(L, k, zone);
     if (next === L) next = dropped(L, k, { kind: "col", at: L.length });
     const at = whereIs(k, next);
@@ -5020,6 +5031,8 @@ function headNear(x: number, y: number): string | null {
   const r = ui.areas.getBoundingClientRect();
   const px = x - r.left;
   const py = y - r.top;
+  // a gap between two figures of a stack is pulled there, so no head shows over it
+  if (stackGaps.some((g) => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + g.h)) return null;
   for (const [k, b] of boxes) {
     const top = headTop(k, b);
     if (px >= b.x && px <= b.x + b.w && py >= top - 4 && py <= top + HEADROOM + 14) return k;
@@ -5059,7 +5072,9 @@ function zoneAt(x: number, y: number, k: string): Zone | null {
   }
   const cols = laid().cols;
   const j = cols.findIndex((col) => px < col.x + col.w / 2);
-  return { kind: "col", at: j < 0 ? layoutNow().length : cols[j].c };
+  // past the last column standing, a new one stands just after it, before any that gave way, which would otherwise
+  // leave it the furthest out and the first to give way again
+  return { kind: "col", at: j < 0 ? (cols.length ? cols[cols.length - 1].c + 1 : layoutNow().length) : cols[j].c };
 }
 
 /** Shades the one zone a drop would land in, and nothing else moves until it is let go. */
@@ -5130,6 +5145,8 @@ function pullStack(c: number, i: number, dy: number, start: number[]): void {
   const down = growing[a + 1];
   if (!up || !down) return;
   const total = start[a] + start[a + 1];
+  // two figures too short to keep the floor between them are not pulled at all
+  if (total < 2 * FIGURE_FLOOR) return;
   const h = clamp(start[a] + dy, FIGURE_FLOOR, total - FIGURE_FLOOR);
   up.it.h = Math.round(h);
   down.it.h = Math.round(total - h);
