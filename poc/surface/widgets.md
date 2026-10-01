@@ -174,7 +174,7 @@ Each meter is a 270 degree arc with rounded ends, the value drawn in a warm red 
 
 The first row sets the type: the zoom, the heading ratio, the line height and the measure. The second sets the page: the gap, the dim and the edge fade. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3-the-gaps-are-the-handles) size them.*
 
 ### 6.2 The switches
 
@@ -200,7 +200,7 @@ Pressing a cell goes there, and pressing with the modifier key held, command or 
 
 At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough.*
 
 ### 7.1 A cell's room is how many stand beneath it
 
