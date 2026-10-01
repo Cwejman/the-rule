@@ -2934,8 +2934,8 @@ function pressProgram(k: string): void {
   } else {
     const kept = leftAt.get(k);
     // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
-    // stands alone comes in beside the body's prose where it stands on the page, so it is the last to give way and a
-    // press is never answered by nothing
+    // stands alone comes in beside the body's prose where it stands on the page, so the columns further out give way
+    // before it and a press is seldom answered only by the dock
     const shown = laid().cols;
     const end = shown.length ? shown[shown.length - 1].c + 1 : L.length;
     const fresh: Zone = isAlone(k) && laidAt("prose") ? { kind: "beside", target: "prose", after: true } : { kind: "col", at: end };
