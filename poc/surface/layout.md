@@ -54,11 +54,11 @@ A height pulled is kept as a share of what the growing ones have, as they share 
 
 *Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); the keys as fixed, heights kept as shares, standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
 
-### 2.2 The plate and the dish are one
+### 2.2 The plate is the plate
 
-The dish was the plate at the middle's size. Once a column is as wide as the reader pulls it, the plate is one program standing alone, and the width of its column is the size it is drawn at.
+The plate is one program standing alone, drawn at the width of its column. Once a column is as wide as the reader pulls it, the plate at a pane's size needs no name of its own, so the dish is not a program.
 
-*Reasoned, the session's, 2026-10-01, not yet answered.*
+*Preferred, the author's, 2026-10-01: the plate is the plate.*
 
 ### 2.3 Why a row and not a tree of splits
 
@@ -132,23 +132,25 @@ While it is dragged nothing on the page moves. The program under the pointer sha
 
 The prose and the canvas belong to one of two worlds, the body or git, and the plate to the body alone. Each world keeps in step with itself, so the history is no longer a mode the panes are turned to, and its switch and its key go: git's prose and canvas are programs that stand beside the body's.
 
-Each world keeps its own part of [the shared state](framework.md#4-one-shared-state-and-a-few-verbs): its focus, the address the pointer rests on, its scope, its folds, where the reader stands on its map, its trail, its undo and where its prose was scrolled, most of which [the history's world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) keeps today.
+Each world keeps its own part of [the shared state](framework.md#4-one-shared-state-and-a-few-verbs): its focus, the address the pointer rests on, its scope, its folds, where the reader stands on its map, its trail, its undo and where its prose was scrolled, most of which [the history's world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) keeps today. The page keeps the rest once: the layout, the settings and which world holds the keys.
 
-Each world's way down stands over its own prose, or over its canvas where its prose does not stand, and its depth moves that world's prose and canvas. Git's way down names the body's scope it is filtered by, [as the history says](history.md#42-only-the-commits-that-touch-where-you-stand). Going anywhere in a world whose prose does not stand brings that prose in, as a new column at its own width on the canvas's side towards the body's prose, or its right where none stands. The wheel scrolls the prose under the pointer, and from anywhere else that does not take the wheel itself, a map or a meter, the prose of the world holding the keys, or where that does not stand, the body's. The page keeps the rest once: the layout, the settings and the program holding the keys.
+Each world's way down stands over its own prose, or over its canvas where its prose does not stand, and its depth moves that world's prose and canvas. Git's way down names the body's scope it is filtered by, [as the history says](history.md#42-only-the-commits-that-touch-where-you-stand). Going anywhere in a world whose prose does not stand brings that prose in, as a new column at its own width on the canvas's side towards the body's prose, or its right where none stands.
 
 The worlds meet in two places. What is selected in git, a commit or a story, is git's world's own selection, and the body's programs read it. It shows what it touched there [as the history already says](history.md#43-a-selection-shows-what-it-touched): the shape, where it draws the body, greys all but it, the canvas lights it, the prose shows the change in place and the plate lights it, for as long as it is selected rather than once a mode is left. And git's programs show only the commits that touched [the body's scope](history.md#42-only-the-commits-that-touch-where-you-stand), as they do in the mode.
 
 The page's address stays the body's. Today the history's world is set in place of the body's while it is read, so both standing at once means the page holds two worlds together, which is the real work this asks of the code.
 
-*Preferred, the author's, 2026-10-01, that git's prose and canvas are programs of their own and that what belongs to one world stays together. What is kept per world and per page, the way down and the wheel for each world, the prose brought in by going, the two meeting places carried over from the history's design, the address and the cost are the session's, not yet answered.*
+*Preferred, the author's, 2026-10-01, that git's prose and canvas are programs of their own and that what belongs to one world stays together. What is kept per world and per page, the way down for each world, the prose brought in by going, the two meeting places carried over from the history's design, the address and the cost are the session's, not yet answered.*
 
 ### 6.1 The keys
 
-The keys belong to the program the pointer last rested on, and stay with it when the pointer leaves the row. A program with no act a key could fire, the plate or a figure, leaves the keys where they were when it is pointed at.
+Few programs contend for the keys: only git's against the body's. So the keys are the body's, and git's prose and canvas catch them while the pointer rests on them, giving them back when it leaves. Within the body they go as [they do today](framework.md#27-the-keys-belong-to-one-pane), to the canvas while it is pointed at and to the prose otherwise.
 
-On a page just opened they are the body's prose's, or where that does not stand, the leftmost program with acts, and they go there again when the program holding them is taken away or gives way. They act in that program's world.
+The wheel does not reach across: a prose scrolls only under the pointer, and a map takes the wheel as it does today. So the wheel no longer scrolls the body's prose from anywhere.
 
-*Reasoned, the session's, 2026-10-01, not yet answered, from [the pane at the left, or the right while pointed](framework.md#27-the-keys-belong-to-one-pane): it departs from it in keeping the keys where the pointer left them rather than sending them back to the left, since a row of any length has no one pane to send them to. The canvas keeps its quiet rim, and since 2026-10-01 it no longer says when it holds the keys, so nothing on the page says which program does.*
+The figures, the shape, the tree and the ahead, draw the world holding the keys, so they tell of what the reader is deliberately looking at rather than staying the body's. The plate stays the body's.
+
+*Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that a prose scrolls only under the pointer, and that the figures follow what the reader is deliberately looking at. Within the body as today, and the figures reading that as the world holding the keys, are the session's.*
 
 ### 6.2 A program of git's is told apart by its grip
 
@@ -168,17 +170,13 @@ A press on a program's icon takes it away, and a second press puts it back where
 
 ### 7.1 Git's status is a program
 
-Git's status is a program of git's world, telling of the diff the reader works in. What it shows is open, and so is its kind: a figure of a declared width, or a program standing alone.
+Git's status is a program of git's world, telling of the diff the reader works in. What is selected in git, a commit or a story, stands in it, and is let go there, as it stood [beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). What else it shows is open, and so is its kind: a figure of a declared width, or a program standing alone.
 
-*Preferred, the author's, 2026-10-01, left open by the author.*
+*Preferred, the author's, 2026-10-01: the selection in git's status; the rest left open by the author.*
 
 ## 8. What this leaves open
 
-Which world a figure draws: the shape, the tree and the ahead followed the lane into the mode, and with two proses standing they could follow the world of the program holding the keys, or stay the body's as the plate does.
-
-Where what is selected in git is shown and let go, now that the switch it stood beside is gone: git's status is where it would go, since the author once asked for a status by git's glyph.
-
-Whether anything should say which program holds the keys, now that nothing does. Layouts kept by number and called by a key were proposed and not answered. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
+Whether anything should say which world holds the keys, now that nothing does. Layouts kept by number and called by a key wait, the author's word of 2026-10-01. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
 
 A phone keeps [its own reading](touch.md) and none of this; whether a head or a drag has any place there is not asked yet.
 
