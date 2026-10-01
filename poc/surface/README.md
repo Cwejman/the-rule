@@ -60,7 +60,11 @@ Git's history is a reading of its own as well, stories told over runs of commits
 
 [History](history.md)
 
-*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open; built as a pane 2026-09-27, and as a mode 2026-09-28.*
+How the page is laid is to be the reader's by hand: a row of columns, each a stack of programs, moved and sized by dragging, with git's prose and canvas standing as programs beside the body's rather than as a mode.
+
+[The page laid by hand](layout.md)
+
+*The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open; built as a pane 2026-09-27, and as a mode 2026-09-28. The page laid by hand, 2026-10-01, is open and not built.*
 
 ## 5. What this does not answer
 
