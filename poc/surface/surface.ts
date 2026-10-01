@@ -1795,13 +1795,14 @@ const ACTIONS: Record<string, Action> = {
     },
   },
   history: {
-    label: () => (reading === "history" ? "the body" : "the history"),
+    label: () => (narrowWorld === "history" ? "the body" : "the history"),
     mark: () => ICON.history,
-    keys: [{ key: "g" }],
-    help: () => (reading === "history" ? "Turns the lane and the canvas back to the body." : "Turns the lane and the canvas to the history: the stories told over the commits, and the commits."),
-    also: "The switch first in the strip.",
-    can: () => true,
-    run: () => void (reading === "history" ? toBody() : toPast()),
+    keys: [],
+    help: () => (narrowWorld === "history" ? "Turns the pane back to the body." : "Turns the pane to the history: the stories told over the commits, and the commits."),
+    also: "The switch at the foot.",
+    // wide, the history is read in programs of its own, so the switch stands only where the lane stands alone
+    can: () => narrow(),
+    run: () => turnNarrow(),
   },
   face: {
     label: () => (state.settings.face === "shown" ? "hide the face" : "the face"),
@@ -2432,10 +2433,14 @@ const ICON: Record<string, string> = {
   openRight: `<path d="M3.5 8h6M7 5.5 9.5 8 7 10.5M12.5 3.5v9"/>`,
   closeRight: `<path d="M9.5 8h-6M6 5.5 3.5 8 6 10.5M12.5 3.5v9"/>`,
   dish: `<circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="1.2"/>`,
+  status: `<circle cx="5" cy="4" r="1.6"/><path d="M5 5.6v6.8"/><path d="M8.5 6.5h5M8.5 9.5h4"/>`,
   history: `<path d="M5 2v12"/><circle cx="5" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/><path d="M5 8h3.5a2 2 0 0 0 2-2V4.5"/><circle cx="10.5" cy="3.4" r="1.4"/>`,
   canvas: `<rect x="2.5" y="2.5" width="5" height="3.5" rx="1"/><rect x="8.5" y="7" width="5" height="3.5" rx="1"/><rect x="2.5" y="11" width="5" height="3.5" rx="1"/><path d="M7.5 4.5h2a1.5 1.5 0 0 1 1.5 1.5v1M7.5 12.5h2a1.5 1.5 0 0 0 1.5-1.5v-.5"/>`,
 };
 const icon = (name: string): string => `<svg class="icon" viewBox="0 0 16 16">${ICON[name] ?? ICON.none}</svg>`;
+/** A program's icon: its own, and for one of git's the git glyph as a mark beside it, in the dock and as its grip alike. */
+const programIcon = (k: string): string =>
+  PROGRAMS[k]?.world === "history" ? `<span class="gicon">${icon(PROGRAMS[k].icon)}<svg class="gmark" viewBox="0 0 16 16">${ICON.history}</svg></span>` : icon(PROGRAMS[k]?.icon ?? "none");
 
 const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
@@ -2445,6 +2450,7 @@ const WIDGETS: Record<string, Widget> = {
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => onBody(() => plateSvg(w, h)), width: () => onBody(plateWidth), grow: false, onFocus: true },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
   keys: { kind: "figure", name: "the keys: every act and what fires it", icon: "keys", draw: () => keysHtml(), width: () => 216, grow: false, onFocus: true },
+  gitStatus: { kind: "figure", name: "git's status: how far the history is read, and what is selected in it", icon: "status", draw: () => statusHtml(), width: () => 216, grow: false, onFocus: true },
   links: { kind: "adjunct", name: "links: what a brief points at, and what points at it", icon: "links", of: (b, el) => linkAdjuncts(b, el) },
   canvas: { kind: "pane", name: "the canvas: the scope as nodes", icon: "canvas" },
   lane: { kind: "pane", name: "the lane: the prose, read", icon: "lane" },
@@ -2610,7 +2616,7 @@ function chooseNarrow(k: string): void {
 /** How a program takes height: alone in its column at the page's whole height, sharing what its column has left, or only what it needs. */
 type Takes = "alone" | "grows" | "fixed";
 /** A program: what it is called, its icon, how it takes height, the width it stands at of its own and the least it is pulled to. */
-type Program = { name: string; icon: string; takes: Takes; own: () => number; least: () => number };
+type Program = { name: string; icon: string; takes: Takes; own: () => number; least: () => number; world?: WorldName };
 
 /** The least the prose is pulled to: its measure alone, its gutters gone. */
 const PROSE_LEAST = 440;
@@ -2626,10 +2632,13 @@ const figureWidth = (k: string): number => (WIDGETS[k] as Figure).width();
 const figure = (k: string, takes: Takes): Program => ({ name: WIDGETS[k].name, icon: WIDGETS[k].icon, takes, own: () => figureWidth(k), least: () => figureWidth(k) });
 
 const PROGRAMS: Record<string, Program> = {
-  prose: { name: "the prose: the body, read", icon: "lane", takes: "alone", own: () => proseOwn("body"), least: () => PROSE_LEAST },
-  canvas: { name: "the canvas: the body as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN },
+  prose: { name: "the prose: the body, read", icon: "lane", takes: "alone", own: () => proseOwn("body"), least: () => PROSE_LEAST, world: "body" },
+  canvas: { name: "the canvas: the body as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "body" },
+  gitProse: { name: "git's prose: the history, read as its stories and commits", icon: "lane", takes: "alone", own: () => proseOwn("history"), least: () => PROSE_LEAST, world: "history" },
+  gitCanvas: { name: "git's canvas: the history as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "history" },
+  gitStatus: { ...figure("gitStatus", "fixed"), world: "history" },
   // the plate and the dish are one program, and the width of its column says which it is drawn as
-  plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", takes: "alone", own: () => PLATE_SIDE, least: () => PLATE_LEAST },
+  plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", takes: "alone", own: () => PLATE_SIDE, least: () => PLATE_LEAST, world: "body" },
   shape: figure("shape", "grows"),
   tree: figure("tree", "grows"),
   ahead: figure("ahead", "grows"),
@@ -2637,8 +2646,9 @@ const PROGRAMS: Record<string, Program> = {
   keys: figure("keys", "fixed"),
 };
 
-/** The dock's groups, set apart by room: the readings, then the figures. */
+/** The dock's groups, set apart by room: git's, then the body's, then the figures. */
 const DOCK: string[][] = [
+  ["gitStatus", "gitProse", "gitCanvas"],
   ["prose", "canvas", "plate"],
   ["shape", "tree", "ahead", "settings", "keys"],
 ];
@@ -2773,8 +2783,16 @@ function layRow(): Laid {
     return need() <= W + 0.5;
   };
   const rank = (i: number): number => (proseAt >= 0 ? Math.abs(i - proseAt) * 2 + (i > proseAt ? 1 : 0) : i);
+  const at = (k: string) => L.findIndex((c) => c.items.some((it) => it.k === k));
+  const order = (): number[] => {
+    const o = live.filter((i) => i !== proseAt).sort((a, b) => rank(b) - rank(a));
+    // a world's canvas gives way before its prose, so a prose brought in by going is never the first to go
+    const [p, c] = [o.indexOf(at("gitProse")), o.indexOf(at("gitCanvas"))];
+    if (p >= 0 && c > p) o.splice(p, 0, ...o.splice(c, 1));
+    return o;
+  };
   while (!fit() && live.length > 1) {
-    const next = live.filter((i) => i !== proseAt).sort((a, b) => rank(b) - rank(a))[0];
+    const next = order()[0];
     if (next === undefined) break;
     live = live.filter((i) => i !== next);
   }
@@ -2806,15 +2824,23 @@ const laidAt = (k: string): { c: number; x: number; w: number } | undefined => {
   return at ? laid().cols.find((col) => col.c === at.c) : undefined;
 };
 
-/** What the width allows wide, in the terms the rest of the page asks in: which panes stand, and the prose's gutters. */
+/** A world's prose and canvas, by their names among the programs. */
+const proseKey = (w: WorldName): string => (w === "body" ? "prose" : "gitProse");
+const canvasKey = (w: WorldName): string => (w === "body" ? "canvas" : "gitCanvas");
+
+/**
+ * What the width allows wide, in the terms the rest of the page asks in, for the world the state holds: which of its
+ * panes stand, and its prose's gutters. The plate is the body's.
+ */
 function fitsLaid(): Fit {
   const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
-  const pane: Record<string, PaneName> = { prose: "lane", canvas: "canvas", plate: "dish" };
+  const w = worldNow();
+  const pane: Record<string, PaneName> = { [proseKey(w)]: "lane", [canvasKey(w)]: "canvas", ...(w === "body" ? { plate: "dish" as PaneName } : {}) };
   laid().cols.forEach((col) => layoutNow()[col.c].items.forEach((it) => pane[it.k] && on.panes.push(pane[it.k])));
   on.panes.forEach((p) => (on[p] = true));
-  const p = laidAt("prose");
+  const p = laidAt(proseKey(w));
   if (p) {
-    const f = proseIn(p.w, "body");
+    const f = proseIn(p.w, w);
     on.gutterL = f.sides[0];
     on.gutterR = f.sides[1];
     on.gutter = f.gutter;
@@ -3226,7 +3252,7 @@ const KEY_GROUPS: { of: string; acts: string[] }[] = [
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "out"] },
   { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
   { of: "the map", acts: ["wayHere", "onlyHere"] },
-  { of: "the lane", acts: ["undo", "redo", "history"] },
+  { of: "the lane", acts: ["undo", "redo"] },
 ];
 
 const keysHtml = (): string =>
@@ -3623,7 +3649,7 @@ function keyPane(): PaneName {
 
 /** Whether a key acts on a map: it does when the pane holding the keys is the canvas; the dish has no act a key could fire. */
 const handOnMap = (): boolean => keyPane() === "canvas";
-const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
+const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>(".stage");
 
 /**
  * The brief of the reading a line stands on. A card is drawn in its holder's prose, so the holder is the brief the
@@ -3859,7 +3885,7 @@ function fieldHtml(): string {
   if (narrow() || a === null || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
   const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
-  return acts.length ? `<div id="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
+  return acts.length ? `<div class="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
 }
 
 /**
@@ -3878,14 +3904,14 @@ function faceHtml(): string {
     const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
     const rest = other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "";
     return (
-      `<div id="face" ${hued(b.address)}>` +
+      `<div class="face" ${hued(b.address)}>` +
       `<div class="said">${pathHtml(parentOf(b.address))}<h3>${esc(c.subject)}</h3><span class="stamp chrome">${esc(c.author)} · ${esc(when)} · ${esc(c.hash.slice(0, 7))}</span>${touched || rest ? `<div class="touched">${touched}${rest}</div>` : ""}</div>` +
       `</div>`
     );
   }
   const stamp = stampOf(b);
   return (
-    `<div id="face" ${hued(b.address)}>` +
+    `<div class="face" ${hued(b.address)}>` +
     `<div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${blocks(blocksOf(b).slice(0, 1))}</div>` +
     `</div>`
   );
@@ -3908,11 +3934,11 @@ function drawCanvas(): void {
   if (state.picked === "") state.onHead = true;
   else if (state.onHead && !state.opened.includes(state.picked)) state.onHead = false;
   colOf.clear();
-  ui.canvas.innerHTML = `<div id="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg id="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  ui.canvas.innerHTML = `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
   // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
   // neither read nor reach
-  const field = ui.canvas.querySelector<HTMLElement>("#field");
+  const field = ui.canvas.querySelector<HTMLElement>(".field");
   if (field) field.classList.toggle("tight", field.offsetWidth > ui.canvas.clientWidth - 2 * CANVAS_INSET);
   if (fitted !== state.body.root || (!panned && fittedWidth !== ui.canvas.clientWidth)) {
     fitCanvas();
@@ -3941,7 +3967,7 @@ function refollow(): void {
 /** The lines: the nesting within each file, and the opening from a row to the head of the reading it named. */
 function drawEdges(): void {
   const st = stage();
-  const svg = st?.querySelector<SVGSVGElement>("#edges");
+  const svg = st?.querySelector<SVGSVGElement>(".edges");
   if (!st || !svg) return;
   const k = view.k;
   const s0 = st.getBoundingClientRect();
@@ -4056,6 +4082,8 @@ function pickNode(a: string, col: number | null, head = false): void {
   state.onHead = head;
   if (col !== null && !state.opened.includes(a)) state.opened.push(a);
   drawCanvas();
+  // what is selected in the history stands in git's status
+  if (inPast() && laidAt("gitStatus")) drawHosted("gitStatus");
   // an opening brings the reading it opened into the pane, since that is what the press was for
   // the row that was pressed and the reading it opened are brought in together, so the reader keeps the place they
   // pressed from and meets what it led to beside it. It waits a frame, since the browser has not finished laying the
@@ -4091,7 +4119,7 @@ function depthHtml(): string {
   if (n === 0) return "";
   const unfolded = unfoldedDepth();
   const cells = Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("");
-  return `<div id="depth" data-tip="how far the scope is unfolded">${cells}${badgePair("shallower", "deeper")}</div>`;
+  return `<div class="depth" data-tip="how far the scope is unfolded">${cells}${badgePair("shallower", "deeper")}</div>`;
 }
 
 /** Unfolds every brief of the scope to a depth and folds everything beyond, as one change the reader can undo. */
@@ -4193,8 +4221,8 @@ function bringInto(el: HTMLElement, leftAt: number): void {
   const w = (r.width / kx) * view.k;
   const h = (r.height / ky) * view.k;
   // the face and the acts stand over the map, so what is brought in is brought into what is left clear of them
-  const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#face")?.offsetWidth ?? 0);
-  const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>("#field") ? 44 : 0);
+  const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".face")?.offsetWidth ?? 0);
+  const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".field") ? 44 : 0);
   const top = canvasTop();
   const x = view.x + lx * view.k;
   const y = view.y + ly * view.k;
@@ -4223,7 +4251,7 @@ let viewTimer: ReturnType<typeof setTimeout> | undefined;
 function rememberView(): void {
   // a view is kept only for the body's canvas, since the history is opened afresh on a reload; and what is kept is
   // reckoned now, since by the time the write comes the state may hold the other world
-  if (inside || reading === "history") return;
+  if (worldNow() !== "body") return;
   const key = viewKey();
   const kept = JSON.stringify({ ...view, opened: state.opened, w: fittedWidth });
   clearTimeout(viewTimer);
@@ -4249,14 +4277,19 @@ function recallView(): void {
 
 // ### 3.11.2 The history: the same lane and map, over a second body
 //
-// The history is a mode, not a pane: a switch in the strip turns the lane and
-// the canvas to it, and back. It is drawn by the lane's and the canvas's own
-// code, since a second path would keep every rule twice. That code reads the
-// shared state, so the history holds a state of its own, a world, and while
-// the mode stands its world is the state and the body's is held aside. The
-// plate and the dish stay the body, so they draw inside the body's world.
+// The body and git's history are two worlds, and each is read in a prose and
+// on a canvas of its own, which stand beside each other as programs. Both are
+// drawn by the lane's and the canvas's own code, since a second path would keep
+// every rule twice. That code reads the shared state, so each world holds a
+// state of its own, with the elements it is drawn in, and the history's is set
+// in the state's place while something is drawn or done in it. The plate stays
+// the body, so it draws inside the body's world.
 
+type WorldName = "body" | "history";
+/** What a world is drawn in: its prose with its gutters, its way down and the pull's gauge over it, and its canvas. */
+type Dom = { scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; crumb: HTMLElement; pull: HTMLElement; canvas: HTMLElement; gutterL: HTMLElement; gutterR: HTMLElement };
 type World = {
+  name: WorldName;
   body: Body | null;
   index: Index | null;
   folds: Map<string, Fold>;
@@ -4273,21 +4306,33 @@ type World = {
   panned: boolean;
   waysLaidFor: string | null;
   colOf: Map<string, number>;
-  el: HTMLElement | null;
+  /** what the lane keeps beyond the state: the trail, what escape can undo and redo, and where its ends stand */
+  trail: Hop[];
+  undos: Snapshot[];
+  redos: Snapshot[];
+  ends: { top: number; bottom: number };
+  hang: number;
+  dom: Dom;
 };
 
 /** The world being drawn in, where it is not the one the state holds; and the state's own, held aside while it is. */
 let inside: World | null = null;
 let home: World | null = null;
 
+/** Which world the state holds now: the body's, unless the history's is set in its place. */
+const worldNow = (): WorldName => inside?.name ?? "body";
+
 const takeWorld = (): World => ({
+  name: worldNow(),
   body: state.body, index: state.index, folds: state.folds, focus: state.focus, scope: state.scope, pointed: state.pointed,
   picked: state.picked, onHead: state.onHead, opened: state.opened,
-  view: { ...view }, fitted, fittedWidth, followed, panned, waysLaidFor, colOf, el: ui.canvas,
+  view: { ...view }, fitted, fittedWidth, followed, panned, waysLaidFor, colOf,
+  trail: state.trail, undos: undos.slice(), redos: redos.slice(), ends: { ...ends }, hang,
+  dom: { scroll: ui.scroll, content: ui.content, lane: ui.lane, crumb: ui.crumb, pull: ui.pull, canvas: ui.canvas, gutterL: ui.parts.gutterL, gutterR: ui.parts.gutterR },
 });
 
 function putWorld(w: World): void {
-  Object.assign(state, { body: w.body, index: w.index, folds: w.folds, focus: w.focus, scope: w.scope, pointed: w.pointed, picked: w.picked, onHead: w.onHead, opened: w.opened });
+  Object.assign(state, { body: w.body, index: w.index, folds: w.folds, focus: w.focus, scope: w.scope, pointed: w.pointed, picked: w.picked, onHead: w.onHead, opened: w.opened, trail: w.trail });
   Object.assign(view, w.view);
   fitted = w.fitted;
   fittedWidth = w.fittedWidth;
@@ -4295,7 +4340,13 @@ function putWorld(w: World): void {
   panned = w.panned;
   waysLaidFor = w.waysLaidFor;
   colOf = w.colOf;
-  ui.canvas = w.el!;
+  undos.splice(0, undos.length, ...w.undos);
+  redos.splice(0, redos.length, ...w.redos);
+  Object.assign(ends, w.ends);
+  hang = w.hang;
+  Object.assign(ui, { scroll: w.dom.scroll, content: w.dom.content, lane: w.dom.lane, crumb: w.dom.crumb, pull: w.dom.pull, canvas: w.dom.canvas });
+  ui.parts.gutterL = w.dom.gutterL;
+  ui.parts.gutterR = w.dom.gutterR;
 }
 
 /** Runs something with a world set in the state's place, keeping what it changed there and setting the state's own back after. */
@@ -4308,7 +4359,7 @@ function inWorld<T>(w: World, fn: () => T): T {
   try {
     return fn();
   } finally {
-    Object.assign(w, takeWorld());
+    Object.assign(w, takeWorld(), { name: w.name });
     putWorld(home);
     ({ inside, home } = was);
   }
@@ -4320,24 +4371,63 @@ const frame = (fn: () => void): void => {
   requestAnimationFrame(() => (w ? inWorld(w, fn) : fn()));
 };
 
-/** Which substrate the lane and the canvas read: the body, or the history. */
-let reading: "body" | "history" = "body";
-
-/** The history's world while the body is read, empty until the mode is first turned to; and the body's while the history is. */
-const pastWorld: World = { body: null, index: null, folds: new Map(), focus: "", scope: "", pointed: null, picked: null, onHead: false, opened: [], view: { x: 24, y: 24, k: 1 }, fitted: null, fittedWidth: 0, followed: null, panned: false, waysLaidFor: null, colOf: new Map(), el: null };
-let bodyWorld: World | null = null;
+/** The history's world, made with the elements it is drawn in once the page stands; its body is read only once something of it is asked for. */
+let gitWorld: World;
+/** The elements the body is drawn in, which the state holds while the body is its world. */
+let bodyDom: Dom;
 
 /** The light tier the history's leaves are told from, and how far it has been read. */
-const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, asked: false, pending: null as Promise<void> | null, commits: new Map<string, Commit>() };
+const past = { status: "none" as "none" | "loading" | "ready" | "failed", said: "", stale: false, pending: null as Promise<void> | null, commits: new Map<string, Commit>() };
 
-/** Whether the state holds the history: the mode stands, and nothing is being drawn in the body's world. */
-const inPast = (): boolean => reading === "history" && inside === null;
+/** Whether the state holds the history now. */
+const inPast = (): boolean => worldNow() === "history";
+/** Whether the history has been read, so its world has a body to draw. */
+const gitReady = (): boolean => !!(inPast() ? state.body : gitWorld?.body);
 
-/** Runs something in the body's world, which while the history is read is held aside: what the plate and the dish draw. */
-const onBody = <T,>(fn: () => T): T => (inPast() ? inWorld(bodyWorld!, fn) : fn());
+/** Runs something in the body's world, which while something is done in the history is held aside: what the plate draws. */
+const onBody = <T,>(fn: () => T): T => (inPast() ? inWorld(home!, fn) : fn());
+
+/** Runs something in the history's world, where it has been read; otherwise nothing is run. */
+const inGit = <T,>(fn: () => T): T | undefined => (inPast() ? fn() : gitWorld?.body ? inWorld(gitWorld, fn) : undefined);
+
+/** Runs something in a world by its name. */
+const inNamed = <T,>(w: WorldName, fn: () => T): T | undefined => (w === "body" ? onBody(fn) : inGit(fn));
 
 /** The body's world, whichever the state holds: what a commit's touched readings and their hues are read against. */
-const bodyNow = (): World => (inPast() ? bodyWorld! : takeWorld());
+const bodyNow = (): World => (inPast() ? home! : takeWorld());
+
+/** Where the lane stands alone, which world its one pane reads: a switch at its foot turns it, as the mode did. */
+let narrowWorld: WorldName = "body";
+/** The world the one pane shows: the history once it has been read, the body until then. */
+const narrowShown = (): WorldName => (narrowWorld === "history" && gitReady() ? "history" : "body");
+
+/** The world the pointer last rested in: what it is set to by resting on a world's own prose or canvas, and kept while it rests on anything else. */
+let pointerWorld: WorldName = "body";
+
+/**
+ * The world the keys act in and the figures draw: wide, the history's while the pointer rests on its prose or its
+ * canvas, given back once it rests on the body's; where the lane stands alone, the world its one pane reads.
+ */
+const keysWorld = (): WorldName => (narrow() ? narrowShown() : pointerWorld === "history" && gitReady() && gitShown() ? "history" : "body");
+
+/** Whether anything of the history stands, so it is read and drawn. */
+const gitWanted = (): boolean => (narrow() ? narrowWorld === "history" : ["gitProse", "gitCanvas", "gitStatus"].some(standing));
+
+/** Whether the history's prose or canvas stands on the page now, not given way, so its lane is laid. */
+const gitShown = (): boolean => (narrow() ? narrowWorld === "history" : !!(laidAt("gitProse") || laidAt("gitCanvas")));
+
+/** The world an element belongs to: the history's own elements and programs, a figure the world it draws, and the rest the body's. */
+function worldOfEl(el: Element | null): WorldName {
+  if (!el) return "body";
+  const d = gitWorld?.dom;
+  if (d && [d.scroll, d.canvas, d.crumb, d.pull].some((x) => x.contains(el))) return "history";
+  const host = el.closest<HTMLElement>(".host, .phead");
+  const k = host?.dataset.slot ?? host?.dataset.head;
+  if (k && PROGRAMS[k]?.world) return PROGRAMS[k].world!;
+  if (el.closest("#dish, svg.plate")) return "body";
+  if (host || el.closest(".wing, #sheet")) return keysWorld();
+  return "body";
+}
 
 /**
  * Settles the world the state now holds against its body, which may have changed while it was held aside: what no
@@ -4355,26 +4445,17 @@ function settleWorld(): void {
   state.pointed = null;
 }
 
-/** What each world keeps of the lane beyond its world: the trail, the scroll, and what escape can undo and redo. */
-type LaneKept = { trail: Hop[]; scroll: number; undos: Snapshot[]; redos: Snapshot[] };
-const laneKept: Record<"body" | "history", LaneKept | null> = { body: null, history: null };
-const keepLane = (): LaneKept => ({ trail: state.trail, scroll: ui.scroll.scrollTop, undos: undos.splice(0), redos: redos.splice(0) });
-function takeLane(k: LaneKept | null): void {
-  state.trail = k?.trail ?? [];
-  undos.push(...(k?.undos ?? []));
-  redos.push(...(k?.redos ?? []));
-}
-
 /**
  * Reads the history: the stories, traced, and the light tier, at the paths the live process answers and the build
- * writes beside the page. A leaf carries only its hash, so its subject is joined from the light tier here, once. What
- * the reader had folded and selected stays where it still stands, in whichever place the history's world is kept.
+ * writes beside the page. A leaf carries only its hash, so its subject is joined from the light tier here, once. The
+ * first reading lays the history whole from its root; one read again keeps what the reader had folded and selected
+ * where it still stands.
  */
 function loadPast(): Promise<void> {
   return (past.pending ??= readPast().finally(() => {
     past.pending = null;
     // a change that came while this reading was under way is read again, since the fetch may have begun before it
-    if (past.stale && past.status === "ready" && inPast()) void loadPast();
+    if (past.stale && past.status === "ready" && gitWanted()) void loadPast();
   }));
 }
 
@@ -4382,6 +4463,7 @@ async function readPast(): Promise<void> {
   past.status = "loading";
   past.stale = false;
   drawChooser();
+  drawGitWaiting();
   const get = async (path: string) => {
     const r = await fetch(path, { cache: "no-store" });
     // the live process says in a word why there is none; a static host answers with a page of its own, which says nothing
@@ -4398,110 +4480,75 @@ async function readPast(): Promise<void> {
     stories.warnings.forEach((w) => console.warn(w));
     const index = indexBody(stories);
     past.status = "ready";
-    if (!inPast()) {
-      // held aside, it is settled when it is next turned to
-      Object.assign(pastWorld, { body: stories, index });
-      return;
-    }
-    // read again while the history stands: the lane is drawn again from it, as the body's is on a change
-    const top = ui.scroll.scrollTop;
-    state.body = stories;
-    state.index = index;
-    settleWorld();
-    drawAll();
-    ui.scroll.scrollTop = top;
+    const first = !gitWorld.body;
+    onBody(() => {
+      Object.assign(gitWorld, { body: stories, index });
+      // the first reading lays the history whole from its root; one read again stands as the reader left it
+      if (first) inWorld(gitWorld, () => arrive(""));
+      else {
+        inWorld(gitWorld, settleWorld);
+        drawAll();
+      }
+    });
   } catch (e) {
     past.status = "failed";
     past.said = (e as Error).message;
     console.warn(`no history: ${past.said}`);
+    drawGitWaiting();
   } finally {
     drawChooser();
+    // git's status tells how far the history has been read, so it is drawn again once the reading ends
+    if (standing("gitStatus")) drawWings();
   }
 }
 
-/**
- * Turns the lane and the canvas to the history. A history already read is turned to at once, and read again behind it
- * where it has changed since, so the reader never waits for what they have seen before. Only the first turn waits, and
- * it says so: the switch takes its weight at once and breathes, a word beside it says the history is being read, and a
- * second press lets the waiting go. The first time, the history is laid whole from its root; after that it stands as
- * the reader left it.
- */
-async function toPast(): Promise<void> {
-  if (reading === "history") return;
-  if (!pastWorld.body) {
-    if (past.asked) return void ((past.asked = false), drawChooser());
-    past.asked = true;
-    drawChooser();
-    await loadPast();
-    // the waiting may have been let go by a second press, or the reader may have turned to the history some other way
-    const asked = past.asked;
-    past.asked = false;
-    drawChooser();
-    if (!asked || !pastWorld.body || (reading as string) === "history") return void (past.status === "failed" && asked && notice(`No history: ${past.said}`));
-  }
-  laneKept.body = keepLane();
-  bodyWorld = takeWorld();
-  pastWorld.el = ui.canvas;
-  // what the body pointed at goes with it, or the plate would keep lighting it while the history is read
-  bodyWorld.pointed = null;
-  putWorld(pastWorld);
-  reading = "history";
-  if (laneKept.history !== null) settleWorld();
-  takeLane(laneKept.history);
-  chooser.sheet = null;
-  card.a = null;
-  if (laneKept.history === null) arrive("");
-  else {
-    drawAll();
-    ui.scroll.scrollTop = laneKept.history.scroll;
-    quiet();
-  }
-  // what changed since it was last read is read behind it, and drawn in when it arrives
-  if (past.stale) void loadPast();
-}
-
-/** Reads the history ahead of a turn to it, as the reader reaches for the switch, so the turn finds it read. */
+/** Reads the history ahead of its being asked for, as the reader reaches for it, so it stands read when it is placed. */
 const readAhead = (): void => void ((past.status === "none" || (past.stale && past.status !== "loading")) && loadPast());
 
-/**
- * Turns the lane and the canvas back to the body, as the reader left it. Where the browser has already moved to an
- * address, by its back or forward, the address is left as it moved, for the reader to arrive at.
- */
-function toBody(moved = false): void {
-  if (reading === "body") return;
-  laneKept.history = keepLane();
-  Object.assign(pastWorld, takeWorld());
-  putWorld(bodyWorld!);
-  bodyWorld = null;
-  reading = "body";
-  settleWorld();
-  takeLane(laneKept.body);
-  chooser.sheet = null;
-  card.a = null;
-  drawAll();
-  ui.scroll.scrollTop = laneKept.body?.scroll ?? 0;
-  quiet();
-  if (!moved) followHistory(hashFor(state.focus));
+/** Where the history stands but has not been read, its prose says so, or why there is none. */
+function drawGitWaiting(): void {
+  if (!gitWorld || gitWorld.body) return;
+  const said = past.status === "failed" ? `No history: ${past.said}` : "Reading the history…";
+  gitWorld.dom.lane.innerHTML = gitWanted() ? `<p class="waiting chrome">${esc(said)}</p>` : "";
+  gitWorld.dom.crumb.hidden = true;
 }
 
 /**
- * The switch in the strip: a mode has no side, so it is a switch and not a cycle, and it says which the lane reads.
- * Asked for and not yet read, it stands as it will once the history stands and breathes, with a word beside it; read
- * again behind a history already standing, it breathes alone, since what the reader has is there to read.
+ * The switch at the foot of a phone: where the lane stands alone its one pane reads the body or the history, and the
+ * switch turns it. It breathes while the history is being read.
  */
 function switchHtml(): string {
-  const on = reading === "history" || past.asked;
-  // a read ahead the reader did not ask for is not shown: the switch breathes only for a waiting or a history standing
+  const on = narrowWorld === "history";
   const busy = past.status === "loading" && on ? " busy" : "";
-  const tip = past.asked
-    ? "the history — being read; press to let it go"
-    : reading === "history"
-      ? "the history — reading it; press to read the body"
-      : past.status === "failed"
-        ? `the history — none: ${past.said}`
-        : "the history — press to read it";
-  const waiting = past.asked ? `<span class="waiting chrome">reading the history…</span>` : "";
-  return `<span class="switch"><button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button>${waiting}</span>`;
+  const tip = on ? "the history — reading it; press to read the body" : past.status === "failed" ? `the history — none: ${past.said}` : "the history — press to read it";
+  return `<span class="switch"><button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button></span>`;
+}
+
+/** Turns the one pane of a phone to the history or back to the body, reading the history the first time it is asked for. */
+function turnNarrow(): void {
+  narrowWorld = narrowWorld === "history" ? "body" : "history";
+  pointerWorld = narrowWorld;
+  if (narrowWorld === "history" && !gitWorld.body) void loadPast();
+  drawAll();
+}
+
+/**
+ * What git's status tells: how far the history has been read, how much it holds, and what is selected in it, which
+ * is where a selection that reaches the body will be shown and let go once it does.
+ */
+function statusHtml(): string {
+  const read = past.status === "loading" ? "reading the history…" : past.status === "failed" ? `no history: ${past.said}` : past.status === "ready" ? "" : "not read yet";
+  const held = inGit(() => {
+    const commits = state.body!.briefs.filter((b) => b.commit).length;
+    const stories = state.body!.briefs.filter((b) => !b.commit && b.address !== "").length;
+    const a = standing("gitCanvas") && state.picked !== null ? state.picked : state.focus;
+    const b = brief(a);
+    const c = b?.commit ? past.commits.get(b.commit) : undefined;
+    const when = c ? new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "";
+    const sel = b && a !== "" ? `<div class="sel" data-a="${esc(a)}" data-go="${esc(a)}" ${hued(a)}><span class="of dim">selected</span><span class="name">${esc(c?.subject ?? b.title)}</span>${c ? `<span class="said dim">${esc(c.hash.slice(0, 7))} · ${esc(when)}</span>` : ""}</div>` : "";
+    return `<div class="count">${stories} stories · ${commits} commits</div>${sel}`;
+  });
+  return `<div class="gstatus chrome">${read ? `<div class="read${past.status === "loading" ? " busy" : ""}">${esc(read)}</div>` : ""}${held ?? ""}</div>`;
 }
 
 /**
@@ -4693,7 +4740,12 @@ function drawLayout(): void {
   else document.documentElement.dataset.theme = s.theme;
   laidNow = null;
   if (!narrow()) return drawLaid();
+  // where the lane stands alone it reads one world, so the areas are laid in that world and the other's stand nowhere
+  if (worldNow() !== narrowShown()) return void inNamed(narrowShown(), drawLayout);
   unlay();
+  const other = worldNow() === "body" ? gitWorld.dom : bodyDom;
+  [other.scroll, other.canvas, other.crumb].forEach((el) => (el.hidden = true));
+  ui.scroll.hidden = false;
   const on = fits();
   // a viewport narrower than the measure gives the lane what there is, less what the rail takes: the rail stands at the
   // edge of the page, so it takes the space that stood there rather than a space of its own
@@ -4769,24 +4821,30 @@ function drawLaid(): void {
     el.style.left = `${Math.round(x)}px`;
     el.style.width = `${Math.round(w)}px`;
   };
-  const p = laidAt("prose");
-  const f = proseIn(p?.w ?? proseOwn("body"), "body");
-  // the prose taken away is kept laid out of sight rather than hidden, since the shape and the reading line measure it
-  ui.scroll.classList.toggle("off", !p);
-  put(ui.scroll, p?.x ?? 0, p?.w ?? proseOwn("body"));
-  if (p) boxes.set("prose", { x: p.x, y: 0, w: p.w, h: H });
-  ui.parts.gutterL.hidden = !f.sides[0];
-  ui.parts.gutterR.hidden = !f.sides[1];
-  ui.parts.gutterL.classList.remove("closed");
-  ui.parts.gutterR.classList.remove("closed");
-  const inner = [...(f.sides[0] ? [f.gutter] : []), f.measure, ...(f.sides[1] ? [f.gutter] : [])];
-  ui.content.style.gridTemplateColumns = inner.map((x) => `${Math.round(x)}px`).join(" ");
-  ui.content.style.columnGap = `${s.gap}px`;
-  document.documentElement.style.setProperty("--measure", `${Math.round(f.measure)}px`);
-  const c = laidAt("canvas");
-  ui.canvas.hidden = !c;
-  ui.canvas.classList.remove("bleed");
-  if (c) (put(ui.canvas, c.x, c.w), boxes.set("canvas", { x: c.x, y: 0, w: c.w, h: H }));
+  // each world's prose and canvas, drawn in elements of its own
+  (["body", "history"] as WorldName[]).forEach((w) => {
+    const D = w === "body" ? bodyDom : gitWorld.dom;
+    const p = laidAt(proseKey(w));
+    D.scroll.hidden = false;
+    const f = proseIn(p?.w ?? proseOwn(w), w);
+    // the prose taken away is kept laid out of sight rather than hidden, since the shape and the reading line measure it
+    D.scroll.classList.toggle("off", !p);
+    put(D.scroll, p?.x ?? 0, p?.w ?? proseOwn(w));
+    if (p) boxes.set(proseKey(w), { x: p.x, y: 0, w: p.w, h: H });
+    D.gutterL.hidden = !f.sides[0];
+    D.gutterR.hidden = !f.sides[1];
+    D.gutterL.classList.remove("closed");
+    D.gutterR.classList.remove("closed");
+    const inner = [...(f.sides[0] ? [f.gutter] : []), f.measure, ...(f.sides[1] ? [f.gutter] : [])];
+    D.content.style.gridTemplateColumns = inner.map((x) => `${Math.round(x)}px`).join(" ");
+    D.content.style.columnGap = `${s.gap}px`;
+    const c = laidAt(canvasKey(w));
+    D.canvas.hidden = !c;
+    D.canvas.classList.remove("bleed");
+    if (c) (put(D.canvas, c.x, c.w), boxes.set(canvasKey(w), { x: c.x, y: 0, w: c.w, h: H }));
+    // a world with nothing standing keeps no way down
+    if (!p && !c) D.crumb.hidden = true;
+  });
   const d = laidAt("plate");
   ui.dish.hidden = !d;
   if (d) (put(ui.dish, d.x, d.w), boxes.set("plate", { x: d.x, y: 0, w: d.w, h: H }));
@@ -4797,7 +4855,7 @@ function drawLaid(): void {
 /** Takes the row away where the lane stands alone, so the areas lay the page as they did. */
 function unlay(): void {
   ui.areas.classList.remove("laid");
-  [ui.scroll, ui.canvas, ui.dish].forEach((el) => {
+  [bodyDom.scroll, bodyDom.canvas, gitWorld.dom.scroll, gitWorld.dom.canvas, ui.dish].forEach((el) => {
     el.style.left = "";
     el.style.width = "";
   });
@@ -4883,7 +4941,15 @@ function drawHosted(k: string): void {
   const at = slots.get(`fig:${k}`);
   const f = WIDGETS[k];
   const col = laidAt(k);
-  if (!el.hidden && at && col && f?.kind === "figure") el.innerHTML = f.draw(Math.round(col.w), at.height);
+  if (el.hidden || !at || !col || f?.kind !== "figure") return;
+  el.innerHTML = f.draw(Math.round(col.w), at.height);
+  // a figure of fixed size takes the height it needs, so one that now needs another lays its stack again
+  if (!f.grow) {
+    el.style.height = "";
+    const need = el.scrollHeight;
+    el.style.height = `${at.height}px`;
+    if (Math.abs(need - at.height) > 1) drawStacks();
+  }
 }
 
 /**
@@ -4922,8 +4988,8 @@ function drawHeads(): void {
   ui.heads.innerHTML = Array.from(boxes)
     .map(
       ([k, b]) =>
-        `<div class="phead${k === nearHead ? " near" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
-        `<button class="grip" data-grip="${esc(k)}" data-tip="${esc(`${PROGRAMS[k].name} — drag to move it, or hold alt and drag anywhere on it`)}">${icon(PROGRAMS[k].icon)}</button>` +
+        `<div class="phead${k === nearHead ? " near" : ""}${PROGRAMS[k].world === "history" ? " git" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
+        `<button class="grip" data-grip="${esc(k)}" data-tip="${esc(`${PROGRAMS[k].name} — drag to move it, or hold alt and drag anywhere on it`)}">${programIcon(k)}</button>` +
         `<span class="own">${headSettings(k)}</span></div>`,
     )
     .join("");
@@ -4931,14 +4997,16 @@ function drawHeads(): void {
 
 /** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
 function headSettings(k: string): string {
-  if (k === "canvas") return badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true);
-  if (k !== "prose") return "";
-  const g = state.settings.gutters.body;
+  const w = PROGRAMS[k]?.world ?? "body";
+  // a canvas's acts are its world's, so what they say is reckoned there
+  if (k === "canvas" || k === "gitCanvas") return inNamed(w, () => badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true)) ?? "";
+  if (k !== "prose" && k !== "gitProse") return "";
+  const g = state.settings.gutters[w];
   return ([0, 1] as const)
     .map((i) => {
       const side = i ? "right" : "left";
       const tip = `the links in the gutter at the ${side} — press to ${g[i] ? "take them away" : "stand them there"}`;
-      return `<button class="pick gutter-pick${g[i] ? " on" : ""} side-${i ? "r" : "l"}" data-gutter="body:${i}" data-tip="${esc(tip)}">${icon("links")}</button>`;
+      return `<button class="pick gutter-pick${g[i] ? " on" : ""} side-${i ? "r" : "l"}" data-gutter="${w}:${i}" data-tip="${esc(tip)}">${icon("links")}</button>`;
     })
     .join("");
 }
@@ -5195,7 +5263,9 @@ function drawCrumb(): void {
   // the run of levels goes down to the brief in focus, not only to the scope: a reader scrolling into a brief has its
   // heading off the screen, and the address of where they stand is what the line is for
   const run = prefixesOf(state.focus);
-  ui.crumb.hidden = run.length < 2 && S === "" && trail.length === 0 && depth === "" && back === "";
+  // wide, a world with neither its prose nor its canvas on the page, nor the body's plate, has nothing to stand over
+  const over = narrow() || fits().lane || fits().canvas || fits().dish;
+  ui.crumb.hidden = !over || (run.length < 2 && S === "" && trail.length === 0 && depth === "" && back === "");
   // narrow, the whole run would cut every name to a letter, so it keeps the level above and stands for the rest with
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
@@ -5226,8 +5296,8 @@ function drawCrumb(): void {
 
 /**
  * Cuts the run at its root until every name it still shows can be read whole. A name squeezed to a letter says nothing,
- * where one mark says plainly that there is more above; and the brief in focus is never cut, since it is the answer the
- * line is there to give.
+ * where one mark says plainly that there is more above; and the brief in focus is cut last, since it is the answer the
+ * line is there to give, and then only at its end, where a commit's subject runs longer than the line has room for.
  */
 function trimPlace(): void {
   const place = ui.crumb.querySelector<HTMLElement>(".place");
@@ -5373,7 +5443,8 @@ function drawFocusMarks(): void {
   const onPath = new Set(prefixesOf(state.focus));
   // a card never dims, and opacity on a brief would take its cards with it, so a brief holding the focus keeps its ink
   const holder = isCard(brief(state.focus)) ? parentOf(state.focus) : null;
-  all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).forEach((el) => {
+  const ours = (el: Element) => worldOfEl(el) === worldNow();
+  all<HTMLElement>(".brief, .card, .row, .crow", ui.areas).filter(ours).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     // a placed file is drawn twice on the map, so the focus lights the row the reader stands on and not both of them
     const onRow = !el.classList.contains("crow") || (el.dataset.head === "1") === headFor(state.focus);
@@ -5381,7 +5452,7 @@ function drawFocusMarks(): void {
   });
   if (canvasOn()) (followFocus(), drawEdges());
   // the plate marks its own, since a cell of it may be a whole file and the focus stand anywhere inside it
-  all<HTMLElement>("svg.fig:not(.plate) [data-a]", ui.areas).forEach((el) => {
+  all<HTMLElement>("svg.fig:not(.plate) [data-a]", ui.areas).filter(ours).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
     el.classList.toggle("here", el.dataset.a === state.focus);
   });
@@ -5390,6 +5461,8 @@ function drawFocusMarks(): void {
 
 /** The tree's line lies under the highlighted row: the pointed brief while pointing, the focus otherwise. */
 function drawLaser(): void {
+  // the tree draws the world the keys act in, so only that world moves its line
+  if (worldNow() !== keysWorld()) return;
   const tree = ui.areas.querySelector<HTMLElement>(".tree");
   const laser = tree?.querySelector<HTMLElement>(".laser");
   if (!tree || !laser) return;
@@ -5466,17 +5539,21 @@ function drawSlot(area: "wingL" | "wingR", name: string): void {
 
 function drawWings(only?: "focus" | "point"): void {
   if (only !== "point") drawDish();
-  // wide, the figures stand in the row's stacks rather than in the wings
+  // wide, the figures stand in the row's stacks rather than in the wings, and draw the world the keys act in
   if (!narrow()) {
-    if (!only) drawStacks();
-    else
-      layoutNow().forEach((c) =>
-        c.items.forEach((it) => {
-          const f = WIDGETS[it.k];
-          if (f?.kind === "figure" && (only === "focus" ? f.onFocus : f.onPoint)) drawHosted(it.k);
-        }),
-      );
-    return drawFocusMarks();
+    inNamed(keysWorld(), () => {
+      if (!only) drawStacks();
+      else
+        layoutNow().forEach((c) =>
+          c.items.forEach((it) => {
+            const f = WIDGETS[it.k];
+            if (f?.kind === "figure" && (only === "focus" ? f.onFocus : f.onPoint)) drawHosted(it.k);
+          }),
+        );
+    });
+    onBody(drawFocusMarks);
+    inGit(drawFocusMarks);
+    return;
   }
   (["wingL", "wingR"] as const).forEach((area) => {
     if (!only) return drawWing(area);
@@ -5519,10 +5596,10 @@ function drawChooser(): void {
     // standing but given way at this width: the choice holds and only the room is missing
     const denied = at && laid().gone.has(at.c) ? " denied" : "";
     const fixed = at && layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1 ? " fixed" : "";
-    return `<button class="pick${at ? " on" : ""}${denied}${fixed}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${icon(PROGRAMS[k].icon)}</button>`;
+    return `<button class="pick${at ? " on" : ""}${denied}${fixed}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
   };
   const groups = DOCK.map((g) => `<span class="group">${g.map(pick).join("")}</span>`).join("");
-  ui.strips.innerHTML = `<div class="strip dock ${state.settings.dock}"><span class="group">${switchHtml()}</span>${groups}</div>`;
+  ui.strips.innerHTML = `<div class="strip dock ${state.settings.dock}">${groups}</div>`;
 }
 
 // ### 3.12.1 The card at the foot
@@ -5596,26 +5673,42 @@ function drawSheet(): void {
 }
 
 function drawAll(): void {
-  if (!state.body) return;
-  drawLayout();
-  drawLane();
+  if (!bodyNow().body) return;
+  // the history is read the first time anything of it comes to stand
+  if (gitWanted() && past.status === "none") void loadPast();
+  // where the lane stands alone, its one pane reads one world, and all of it is drawn there
+  if (narrow())
+    return void inNamed(narrowShown(), () => {
+      drawLayout();
+      drawLane();
+      drawChooser();
+      drawWingsAligned();
+      drawSheet();
+      drawCard();
+      light();
+    });
+  onBody(() => (drawLayout(), drawLane()));
+  inGit(() => gitShown() && drawLane());
+  drawGitWaiting();
   drawChooser();
   drawWingsAligned();
   drawSheet();
   drawCard();
-  light();
+  onBody(light);
+  inGit(light);
 }
 
 // ## 3.13 One brief lit, wherever it is drawn
 
 function light(): void {
   const a = state.pointed;
-  document.body.classList.toggle("pointing", a !== null);
-  all<HTMLElement>(".lit").forEach((el) => el.classList.remove("lit"));
+  // each world lights its own elements and nothing of the other's, whose addresses mean other things
+  const ours = (el: Element) => worldOfEl(el) === worldNow();
+  ui.scroll.classList.toggle("pointing", a !== null);
+  if (worldNow() === keysWorld()) all<HTMLElement>(".host, .wing").forEach((el) => el.classList.toggle("pointing", a !== null));
+  all<HTMLElement>(".lit").filter(ours).forEach((el) => el.classList.remove("lit"));
   drawLaser();
-  // while the history is read the plate is the body's, and a history's address lights nothing on it
-  const ours = (el: Element) => !inPast() || !el.closest("svg.plate, #dish");
-  lightPlate(inPast() ? null : a);
+  if (worldNow() === "body") lightPlate(a);
   if (a === null) return;
   const exact = all<HTMLElement>(`[data-a="${cssEsc(a)}"]`).filter(ours);
   exact.forEach((el) => el.classList.add("lit"));
@@ -5646,7 +5739,7 @@ function point(a: string | null): void {
 // draws one. It comes a moment after the pointer rests, beneath the element and
 // never under the pointer, and goes with any scroll or press.
 
-const TIP_SEL = "[data-tip], [data-act], [data-hop], #lane a[data-link], svg.fig [data-a], #crumb .step[data-a], .adj.foot .name[data-a], .crow[data-a]";
+const TIP_SEL = "[data-tip], [data-act], [data-hop], .lane a[data-link], svg.fig [data-a], .crumb .step[data-a], .adj.foot .name[data-a], .crow[data-a]";
 let tipped: Element | null = null;
 let tipTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -5672,7 +5765,7 @@ function tipHtml(el: HTMLElement): string {
     const b = h && brief(h.to);
     return b ? `<span class="what">${said(h)}</span>${pathHtml(h.to)}${name(b)}<span class="gloss">press to go back to before it</span>` : "";
   }
-  if (el.matches("#lane a[data-link]")) {
+  if (el.matches(".lane a[data-link]")) {
     // beside the lane the links already tell of every link, so the tooltip stays out of the way there
     if (fits().gutterL || fits().gutterR) return "";
     const to = el.dataset.link!;
@@ -5697,7 +5790,8 @@ function tip(e: PointerEvent): void {
 
   if (!el) return;
   // the plate is the body's while the history is read, so what a cell of it says is read from the body
-  const html = el.closest("svg.plate, #dish") ? onBody(() => tipHtml(el)) : tipHtml(el);
+  // what an element says is read in the world it belongs to
+  const html = inNamed(worldOfEl(el), () => tipHtml(el)) ?? "";
   if (html) tipTimer = setTimeout(() => showTip(el, html), 260);
 }
 
@@ -5724,7 +5818,7 @@ function showTip(el: Element, html: string): void {
     const leftSide = wing.classList.contains("host") ? f.left + f.width / 2 < innerWidth / 2 : wing.dataset.area === "wingL";
     left = leftSide ? f.right + 8 : f.left - w - 8;
     top = level();
-  } else if (el.closest("#canvas")) {
+  } else if (el.closest(".canvas")) {
     // past the row itself, on whichever side the pane has room for it
     const right = r.right + 12;
     left = right + w <= innerWidth - 8 ? right : r.left - w - 12;
@@ -5755,9 +5849,9 @@ const hashFor = (focus: string, scope = state.scope): string => `#/${focus}${sco
 let arriving = false;
 
 /** Enters a step into the browser's history at an address, for its back and forward. */
-const enterHistory = (hash: string): void => void (reading === "body" && history.pushState(null, "", hash));
+const enterHistory = (hash: string): void => void (!inPast() && history.pushState(null, "", hash));
 /** Replaces the address of the step the reader stands on. */
-const followHistory = (hash: string): void => void (reading === "body" && (history.replaceState(null, "", hash), rememberLane()));
+const followHistory = (hash: string): void => void (!inPast() && (history.replaceState(null, "", hash), rememberLane()));
 
 /** The lane as it stood: its scope, every fold, the focus and the scroll. */
 type Lane = { scope: string; folds: [string, Fold][]; focus: string; scroll: number };
@@ -5871,9 +5965,14 @@ function backTo(i: number): void {
  */
 function readOn(a: string): void {
   if (!fits().lane) {
-    // wide, the prose comes in as a column beside the canvas, the side towards the middle of the row
+    // wide, the world's prose comes in as a column beside its canvas, on the side towards the body's prose, or at its
+    // right where that does not stand
+    const [pk, ck] = [proseKey(worldNow()), canvasKey(worldNow())];
     if (narrow()) state.settings.areas = { ...state.settings.areas, middle: ["lane"] };
-    else if (!standing("prose")) state.settings.layout = dropped(layoutNow(), "prose", standing("canvas") ? { kind: "beside", target: "canvas", after: (whereIs("canvas")?.c ?? 0) < layoutNow().length / 2 } : { kind: "col", at: layoutNow().length });
+    else if (!standing(pk)) {
+      const [c, p] = [whereIs(ck)?.c, whereIs("prose")?.c];
+      state.settings.layout = dropped(layoutNow(), pk, c !== undefined ? { kind: "beside", target: ck, after: p === undefined || c < p } : { kind: "col", at: layoutNow().length });
+    }
     saveSettings();
     drawLayout();
     drawChooser();
@@ -5927,7 +6026,7 @@ let laneTimer: ReturnType<typeof setTimeout> | undefined;
 function rememberLane(): void {
   // the lane kept is the body's, which a reload lays again; and it is reckoned now, since by the time the write comes
   // the state may hold the history
-  if (reading === "history") return;
+  if (inPast()) return;
   const key = laneKey();
   const kept = JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail });
   clearTimeout(laneTimer);
@@ -6371,6 +6470,14 @@ function step(delta: number): void {
 /** Wires the gestures: pointing lights, pressing goes, a fold line folds, dragging scrubs, and keys do the same. */
 function wire(): void {
   const named = (e: Event) => (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-a]") ?? null;
+  /** Runs something in a world, the history's only once it has been read. */
+  const runIn = (w: WorldName, fn: () => void): void => void (w === "history" && gitReady() ? inGit(fn) : onBody(fn));
+  /** Lays the row again and what each world measures against it, without drawing either prose again. */
+  const relayRow = (): void => {
+    onBody(() => (drawLayout(), drawCrumb(), alignEnds(), drawAdjuncts()));
+    inGit(() => gitShown() && (drawCrumb(), alignEnds(), drawAdjuncts()));
+    drawWings();
+  };
 
   document.addEventListener("pointermove", (e) => {
     // after a scroll, a pointer lights a brief only once it has travelled a little: a scroll that comes to rest under a
@@ -6381,7 +6488,15 @@ function wire(): void {
     pointer.x = e.clientX;
     pointer.y = e.clientY;
     // the canvas takes the keys while the pointer rests on it, and they go back to the prose when it leaves
-    pointerOn = (["canvas", "lane", "dish"] as PaneName[]).find((p) => paneEl(p).contains(e.target as Node)) ?? null;
+    const target = e.target as HTMLElement;
+    pointerOn = target.closest?.(".canvas") ? "canvas" : target.closest?.(".scroll") ? "lane" : target.closest?.("#dish") ? "dish" : null;
+    // and the history's prose and canvas take them while the pointer rests there, and the body's take them back; the
+    // figures follow, so they tell of what the reader is looking at, and pointing at a figure moves neither
+    if (pointerOn !== null) {
+      const was = keysWorld();
+      pointerWorld = worldOfEl(target);
+      if (keysWorld() !== was) drawWings();
+    }
     // a program's head shows while the pointer is near its top edge, and not while a program is being moved
     if (!narrow() && !drag) {
       const near = headNear(e.clientX, e.clientY);
@@ -6396,25 +6511,26 @@ function wire(): void {
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
     // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
     // brief's opacity would take the card down with it, and a card pointed at is the one thing that must not give way
-    if (el && el.closest("#lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
-    // reaching for the switch reads the history ahead of the press
-    if (el === null && (e.target as HTMLElement | null)?.closest?.("[data-mode]")) readAhead();
-    // the plate stays the body while the history is read, so a cell of it lights the way on the plate alone
-    const onPlate = inPast() && !!el?.closest("svg.plate, #dish");
-    point(el && !onPlate ? el.dataset.a! : null);
-    if (inPast()) lightPlate(onPlate ? el!.dataset.a! : null);
+    if (el && el.closest(".lane") && (el.tagName === "A" || el.closest(".card"))) el.closest(".brief")?.classList.add("keep");
+    // reaching for the switch, or for one of git's programs in the dock, reads the history ahead of the press
+    if (el === null && target.closest?.('[data-mode], .dock [data-program^="git"]')) readAhead();
+    // pointing lights in the world the element belongs to, and lets go of what the other world had lit
+    const w = el ? worldOfEl(el) : null;
+    onBody(() => point(w === "body" ? el!.dataset.a! : null));
+    inGit(() => point(w === "history" ? el!.dataset.a! : null));
     tip(e);
   });
   document.documentElement.addEventListener("pointerleave", () => {
-    point(null);
-    if (inPast()) lightPlate(null);
+    onBody(() => point(null));
+    inGit(() => point(null));
     hideTip();
     pointerOn = null;
     nearHead = null;
     ui.heads.querySelector(".near")?.classList.remove("near");
   });
 
-  document.addEventListener("click", (e) => {
+  // a press acts in the world of what it lands on
+  const onClick = (e: MouseEvent): void => {
     hideTip();
     const t = e.target as HTMLElement;
     // a link within the body is followed by the page itself, as a change that can be undone; one held with a modifier is left to the browser
@@ -6425,7 +6541,7 @@ function wire(): void {
       return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
     }
     // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
-    if (t.closest("a[href]") || (!t.closest("#canvas") && window.getSelection()?.toString())) return;
+    if (t.closest("a[href]") || (!t.closest(".canvas") && window.getSelection()?.toString())) return;
     // a badge takes its own press, wherever it stands, and acts on the address it carries rather than on the focus
     const badge = t.closest<HTMLElement>("[data-act]");
     if (badge) {
@@ -6435,9 +6551,9 @@ function wire(): void {
       return void (badge.closest(".strip") && drawChooser());
     }
     // the switch turns the lane and the canvas to the history, and back
-    if (t.closest("[data-mode]")) return void (reading === "history" ? toBody() : void toPast());
+    if (t.closest("[data-mode]")) return void turnNarrow();
     // the face stands for what is selected, so a press on it reads that, which is what the reader opened it to decide
-    if (t.closest("#face") && state.picked && brief(state.picked)) return void goTo(state.picked);
+    if (t.closest(".face") && state.picked && brief(state.picked)) return void goTo(state.picked);
     // on the canvas one press selects a node and opens what it leads to; a press again on what is selected reads it
     const crow = t.closest<HTMLElement>(".crow");
     if (crow) {
@@ -6453,14 +6569,14 @@ function wire(): void {
       return void drawChooser();
     }
     // a press on the canvas that is not a row lets the card go, as pressing away from a thing lets it go anywhere
-    if (t.closest("#canvas") && !t.closest("#card") && card.a !== null && !state.scrubbing) dropCard();
+    if (t.closest(".canvas") && !t.closest("#card") && card.a !== null && !state.scrubbing) dropCard();
     const dc = t.closest<HTMLElement>("[data-depth]");
     if (dc) return void unfoldTo(Number(dc.dataset.depth));
-    if (t.closest("#canvas") && state.scrubbing) return;
+    if (t.closest(".canvas") && state.scrubbing) return;
     const fold = t.closest<HTMLElement>("[data-fold]");
     if (fold) return void cycle(fold.dataset.fold!);
     // a card is the part itself, standing here: pressing it goes there, as pressing a figure's cell does
-    const opened = t.closest<HTMLElement>("#lane .card[data-card]");
+    const opened = t.closest<HTMLElement>(".lane .card[data-card]");
     if (opened) return void goTo(opened.dataset.card!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
     if (pick) return void (narrow() && chooseNarrow(pick.dataset.widget!));
@@ -6484,9 +6600,8 @@ function wire(): void {
       (state.settings as unknown as Record<string, unknown>)[key] = typeof DEFAULTS[key] === "number" ? Number(v) : v;
       // what a brief weighs is in the index, so a change of weight indexes the body again
       if (key === "weight") {
-        if (state.body) state.index = indexBody(state.body);
-        const held = reading === "history" ? bodyWorld : pastWorld;
-        if (held?.body) held.index = indexBody(held.body);
+        onBody(() => (state.index = indexBody(state.body!)));
+        inGit(() => (state.index = indexBody(state.body!)));
       }
       saveSettings();
       return void drawAll();
@@ -6501,13 +6616,12 @@ function wire(): void {
     if (go) return void goTo(go.dataset.go!);
     const cell = t.closest<HTMLElement>("svg.fig [data-a]");
     if (!cell || state.scrubbing) return;
-    // the plate is the body's, so a press on it while the history is read goes back to the body first, and acts there
-    if (inPast() && cell.closest("svg.plate")) toBody();
     // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
     const press = t.closest<HTMLElement>("[data-press]")?.dataset.press;
     const folds = press ? press === "fold" : e.metaKey || e.ctrlKey;
     return void (folds ? cycle(cell.dataset.a!) : goTo(cell.dataset.a!));
-  });
+  };
+  document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
 
   // dragging: a knob turns, the shape scrubs
   let drag: {
@@ -6526,8 +6640,16 @@ function wire(): void {
     sides?: [number | null, number | null];
     widths?: Map<number, number>;
     heights?: number[];
+    /** the world the drag began in, which a pan or a scrub goes on acting in */
+    world?: WorldName;
   } | null = null;
+  // a drag acts in the world it began in, to its end
   document.addEventListener("pointerdown", (e) => {
+    const w = worldOfEl(e.target as Element);
+    runIn(w, () => down(e));
+    if (drag) drag.world = w;
+  });
+  const down = (e: PointerEvent): void => {
     if (e.button !== 0) return;
     // wide, a gap is pulled, and a program is taken by its grip, by its icon in the dock, or anywhere with alt held
     if (!narrow()) {
@@ -6558,7 +6680,7 @@ function wire(): void {
     const el = e.target as HTMLElement;
     // only the ground pans: a press on a row, on the acts or on the face is a press, and a shake of the hand in it
     // must neither cancel it nor drag the map out from under the reader
-    const cv = el.closest("#depth") || el.closest(".crow") || el.closest("#field") || el.closest("#face") ? null : el.closest<HTMLElement>("#canvas");
+    const cv = el.closest(".depth") || el.closest(".crow") || el.closest(".field") || el.closest(".face") ? null : el.closest<HTMLElement>(".canvas");
     if (held && !(e.target as HTMLElement).closest("[data-act]")) drag = { kind: "card", el: held, x: e.clientX, y: e.clientY, start: card.h, moved: false };
     else if (knob) drag = { kind: "knob", el: knob, x: e.clientX, y: e.clientY, start: state.settings[knob.dataset.knob as Knob["key"]], moved: false };
     // on the rail the point the finger is on is the place the reader is asking to see, so the lane goes there at once
@@ -6580,8 +6702,9 @@ function wire(): void {
       try {
         drag.el.setPointerCapture?.(e.pointerId);
       } catch {}
-  });
-  document.addEventListener("pointermove", (e) => {
+  };
+  document.addEventListener("pointermove", (e) => drag && runIn(drag.world ?? "body", () => dragged(e)));
+  const dragged = (e: PointerEvent): void => {
     if (!drag) return;
     if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
     if (drag.kind === "move" || drag.kind === "seam" || drag.kind === "vseam") {
@@ -6603,13 +6726,8 @@ function wire(): void {
       }
       if (drag.kind === "seam") pullSeam(drag.sides![0], drag.sides![1], e.clientX - drag.x, drag.widths!);
       else pullStack(drag.sides![0]!, drag.sides![1]!, e.clientY - drag.y, drag.heights!);
-      // the row is laid again under the hand; the map is fitted to its new width once the hand lets go
-      drawLayout();
-      drawCrumb();
-      alignEnds();
-      drawAdjuncts();
-      drawWings();
-      return;
+      // the row is laid again under the hand; the maps are fitted to their new widths once the hand lets go
+      return void relayRow();
     }
     // the card takes the whole of the movement: it grows until it is as tall as it may stand, and what is left over
     // scrolls its prose; going the other way the prose comes back first and then the card comes down
@@ -6656,8 +6774,9 @@ function wire(): void {
       const k = Number(drag.el.dataset.k);
       ui.scroll.scrollTop = drag.start + dy / k;
     }
-  });
-  const release = () => {
+  };
+  const release = () => runIn(drag?.world ?? "body", letGoOf);
+  const letGoOf = () => {
     if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
       document.body.classList.remove("moving", "pulling", "pulling-v");
       ui.zone.hidden = true;
@@ -6727,61 +6846,70 @@ function wire(): void {
     (e) => {
       state.holding = null;
       const t = e.target as HTMLElement;
-      if (t.closest("#scroll") || t.closest("[data-knob]") || t.closest("#canvas")) return;
+      if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas")) return;
+      // from anywhere else the wheel scrolls the body's prose, so the reader never has to reach for it, or the
+      // history's where it is the only prose standing
+      const into: WorldName | null = narrow() ? narrowShown() : laidAt("prose") ? "body" : laidAt("gitProse") && gitReady() ? "history" : null;
+      if (into === null) return;
       e.preventDefault();
-      ui.scroll.scrollTop += e.deltaY;
-      flick(e);
-      pull(e);
+      runIn(into, () => {
+        ui.scroll.scrollTop += e.deltaY;
+        flick(e);
+        pull(e);
+      });
     },
     { passive: false },
   );
   // over the lane the browser scrolls it, and the pull only watches — except once a pull has been spent, where the rest
   // of the same movement would scroll the reading it just landed in away from the card it put the reader on
-  ui.scroll.addEventListener(
-    "wheel",
-    (e) => {
-      pull(e);
-      // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
-      // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
-      if (spent && e.deltaY < 0) e.preventDefault();
-    },
-    { passive: false },
-  );
+  const pullOn = (el: HTMLElement, w: WorldName) =>
+    el.addEventListener(
+      "wheel",
+      (e) =>
+        runIn(w, () => {
+          pull(e);
+          // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
+          // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
+          if (spent && e.deltaY < 0) e.preventDefault();
+        }),
+      { passive: false },
+    );
 
   // over the map the wheel pans, and with a pinch, which arrives as a wheel with the control key, it zooms about the pointer
-  const wheelOn = (el: HTMLElement) =>
+  const wheelOn = (el: HTMLElement, w: WorldName) =>
     el.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
         hideTip();
-        // moving the map by hand is going looking: from here the reading no longer drags the view back
-        panned = true;
-        if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
-        view.x -= e.deltaX;
-        view.y -= e.deltaY;
-        applyView(false);
+        runIn(w, () => {
+          // moving the map by hand is going looking: from here the reading no longer drags the view back
+          panned = true;
+          if (e.ctrlKey || e.metaKey) return zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+          view.x -= e.deltaX;
+          view.y -= e.deltaY;
+          applyView(false);
+        });
       },
       { passive: false },
     );
-  wheelOn(ui.canvas);
   // the depth strip scrubs: with the button held, crossing a cell sets that depth
-  ui.crumb.addEventListener("pointerover", (e) => {
-    const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
-    if (dc && e.buttons & 1) unfoldTo(Number(dc.dataset.depth));
-  });
+  const scrubOn = (el: HTMLElement, w: WorldName) =>
+    el.addEventListener("pointerover", (e) => {
+      const dc = (e.target as HTMLElement).closest<HTMLElement>("[data-depth]");
+      if (dc && e.buttons & 1) runIn(w, () => unfoldTo(Number(dc.dataset.depth)));
+    });
   // Safari sends a pinch as a gesture of its own, with the scale so far
   let pinch = 1;
-  const pinchOn = (el: HTMLElement) => {
+  const pinchOn = (el: HTMLElement, w: WorldName) => {
     el.addEventListener("gesturestart", (e) => ((pinch = 1), e.preventDefault()));
     el.addEventListener("gesturechange", (e) => {
       e.preventDefault();
       const g = e as Event & { scale: number; clientX: number; clientY: number };
-      zoomAt(g.clientX, g.clientY, g.scale / pinch);
+      runIn(w, () => zoomAt(g.clientX, g.clientY, g.scale / pinch));
       pinch = g.scale;
     });
   };
-  pinchOn(ui.canvas);
 
   // the flick: a small reversal of the scroll, down then up then down within a moment, cycles the brief in focus
   const legs: { t: number; d: number }[] = [];
@@ -6803,7 +6931,7 @@ function wire(): void {
         }
       }
   };
-  ui.scroll.addEventListener("wheel", flick, { passive: true });
+  const flickOn = (el: HTMLElement, w: WorldName) => el.addEventListener("wheel", (e) => runIn(w, () => flick(e)), { passive: true });
 
   // Every key fires an action from the table, and nothing is named here: a chord is looked up, and taken only where the
   // action says it can be. The space bar keeps its own discipline, since it acts when it is let go, so a reader who only
@@ -6811,10 +6939,15 @@ function wire(): void {
   const take = (c: Chord): boolean => {
     // a chord may be claimed by more than one act, as return reads on the canvas and opens in the lane: the one that
     // can be taken where the reader stands takes it
-    const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
-    if (!act) return false;
-    act.run();
-    return true;
+    // a key acts in the world the keys belong to: the history's while the pointer rests on its prose or canvas
+    let taken = false;
+    runIn(keysWorld(), () => {
+      const act = Object.values(ACTIONS).find((x) => x.keys.some((k) => same(k, c)) && x.can());
+      if (!act) return;
+      act.run();
+      taken = true;
+    });
+    return taken;
   };
   let space: { shift: boolean; held: boolean; timer: ReturnType<typeof setTimeout> } | null = null;
   const letGo = () => void (space && clearTimeout(space.timer), (space = null));
@@ -6849,35 +6982,38 @@ function wire(): void {
   // has loaded, and what stands beside the lane is laid again; one that fails to load leaves its alt text. Only the
   // shape is compared, since a vector sized by its view box loads at a size the browser picks for it
   let relaying = 0;
-  const relay = () => {
+  const relay = (w: WorldName) => {
     cancelAnimationFrame(relaying);
-    relaying = requestAnimationFrame(() => (alignEnds(), drawAdjuncts(), drawWings()));
+    relaying = requestAnimationFrame(() => runIn(w, () => (alignEnds(), drawAdjuncts(), drawWings())));
   };
-  ui.lane.addEventListener(
-    "load",
-    (e) => {
-      const img = e.target as HTMLImageElement;
-      if (img.tagName !== "IMG" || !state.body || !img.naturalWidth) return;
-      const size = { width: img.naturalWidth, height: img.naturalHeight };
-      const toks = state.body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.src === img.getAttribute("src"));
-      if (toks.every((t) => t.width && t.height && Math.abs(t.width / t.height / (size.width / size.height) - 1) < 0.01)) return;
-      toks.forEach((t) => Object.assign(t, size));
-      if (img.hasAttribute("width")) Object.assign(img, size);
-      state.index = indexBody(state.body);
-      relay();
-    },
-    true,
-  );
-  ui.lane.addEventListener(
-    "error",
-    (e) => {
-      const img = e.target as HTMLElement;
-      if (img.tagName !== "IMG") return;
-      img.closest("figure")?.classList.add("broken");
-      relay();
-    },
-    true,
-  );
+  const imagesOn = (el: HTMLElement, w: WorldName) => {
+    el.addEventListener(
+      "load",
+      (e) =>
+        runIn(w, () => {
+          const img = e.target as HTMLImageElement;
+          if (img.tagName !== "IMG" || !state.body || !img.naturalWidth) return;
+          const size = { width: img.naturalWidth, height: img.naturalHeight };
+          const toks = state.body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.src === img.getAttribute("src"));
+          if (toks.every((t) => t.width && t.height && Math.abs(t.width / t.height / (size.width / size.height) - 1) < 0.01)) return;
+          toks.forEach((t) => Object.assign(t, size));
+          if (img.hasAttribute("width")) Object.assign(img, size);
+          state.index = indexBody(state.body);
+          relay(w);
+        }),
+      true,
+    );
+    el.addEventListener(
+      "error",
+      (e) => {
+        const img = e.target as HTMLElement;
+        if (img.tagName !== "IMG") return;
+        img.closest("figure")?.classList.add("broken");
+        relay(w);
+      },
+      true,
+    );
+  };
 
   // a machine may hold both a pointer and a screen, so the first touch settles which the reader is using and the page
   // is drawn again in that grain: the badges lose their caps, the presses gain their room
@@ -6892,14 +7028,20 @@ function wire(): void {
     { passive: true },
   );
 
-  ui.scroll.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  // each world's elements answer in that world
+  ([["body", bodyDom], ["history", gitWorld.dom]] as [WorldName, Dom][]).forEach(([w, d]) => {
+    pullOn(d.scroll, w);
+    flickOn(d.scroll, w);
+    wheelOn(d.canvas, w);
+    pinchOn(d.canvas, w);
+    scrubOn(d.crumb, w);
+    imagesOn(d.lane, w);
+    d.scroll.addEventListener("scroll", () => requestAnimationFrame(() => runIn(w, onScroll)), { passive: true });
+  });
   // the browser's back and forward, or an address typed, arrive as a change the reader made
   window.addEventListener("hashchange", () => {
-    // the address is the body's, so the browser's back and forward take the reader back to the body first, leaving the
-    // address where the browser moved it
-    if (reading === "history") toBody(true);
-    // and a turn still waiting is let go, since the reader has gone somewhere of their own
-    if (past.asked) (past.asked = false), drawChooser();
+    // the address is the body's, so the browser's back and forward turn a phone's one pane back to the body first
+    if (narrowWorld === "history") narrowWorld = "body";
     record();
     state.scope = brief(readScope()) ? readScope() : "";
     arrive(readHash());
@@ -6907,11 +7049,14 @@ function wire(): void {
   window.addEventListener("resize", () => {
     // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
     pointerOn = null;
-    drawLayout();
-    placeCrumb();
-    alignEnds();
-    drawAdjuncts();
-    drawCanvas();
+    // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
+    // and how its areas are laid both turn on the width; and so is a row where a column gave way or came back
+    if (narrow() || !ui.areas.classList.contains("laid")) return drawAll();
+    const before = laid().cols.map((c) => c.c).join();
+    relayRow();
+    if (laid().cols.map((c) => c.c).join() !== before) return drawAll();
+    onBody(drawCanvas);
+    inGit(() => gitShown() && drawCanvas());
     drawChooser();
     drawWingsAligned();
   });
@@ -6939,13 +7084,7 @@ function sayBody(body: Body): void {
 function setBody(body: Body): void {
   // while the history is read the body's world is held aside, so a change goes there, settled when it is turned back
   // to, and the history is read again
-  if (reading === "history" && bodyWorld) {
-    bodyWorld.body = body;
-    bodyWorld.index = indexBody(body);
-    sayBody(body);
-    past.stale = true;
-    return void loadPast();
-  }
+  if (inPast()) return void onBody(() => setBody(body));
   const first = state.body === null;
   state.body = body;
   state.index = indexBody(body);
@@ -6958,8 +7097,9 @@ function setBody(body: Body): void {
     recallView();
     return kept ? resume(readHash(), kept) : arrive(readHash());
   }
-  // a file changed, and the history may have with it: it is read again the next time it is drawn
+  // a file changed, and the history may have with it: it is read again, at once where it stands
   past.stale = true;
+  if (gitWanted()) void loadPast();
   // the lane is drawn again from the new body, keeping the folds that still resolve and the scroll
   const top = ui.scroll.scrollTop;
   settleWorld();
@@ -6972,11 +7112,15 @@ async function start(): Promise<void> {
   document.body.innerHTML = `
     <header id="header"><span class="warnings chrome dim"></span><span class="notice chrome"></span></header>
     <main id="areas">
-      <nav id="crumb" class="chrome" hidden></nav>
-      <div id="pull" hidden><i></i></div>
+      <nav id="crumb" class="crumb chrome" hidden></nav>
+      <div id="pull" class="pull" hidden><i></i></div>
+      <nav id="gcrumb" class="crumb chrome" hidden></nav>
+      <div id="gpull" class="pull" hidden><i></i></div>
       <section class="wing" data-area="wingL"></section>
-      <section id="canvas" hidden></section>
-      <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
+      <section id="canvas" class="canvas" hidden></section>
+      <section id="scroll" class="scroll"><div id="content" class="content"><div class="gutter" data-area="gutterL"></div><div id="lane" class="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
+      <section id="gcanvas" class="canvas" hidden></section>
+      <section id="gscroll" class="scroll off"><div id="gcontent" class="content"><div class="gutter" data-area="gutterL"></div><div id="glane" class="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section id="dish" hidden></section>
       <section class="wing" data-area="wingR"></section>
       <div id="seams"></div>
@@ -7008,14 +7152,24 @@ async function start(): Promise<void> {
     zone: $("#zone"),
     parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), middle: $("#scroll"), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
   };
+  bodyDom = { scroll: ui.scroll, content: ui.content, lane: ui.lane, crumb: ui.crumb, pull: ui.pull, canvas: ui.canvas, gutterL: ui.parts.gutterL, gutterR: ui.parts.gutterR };
+  const g = $("#gscroll");
+  gitWorld = {
+    name: "history", body: null, index: null, folds: new Map(), focus: "", scope: "", pointed: null, picked: null, onHead: false, opened: [],
+    view: { x: 24, y: 24, k: 1 }, fitted: null, fittedWidth: 0, followed: null, panned: false, waysLaidFor: null, colOf: new Map(),
+    trail: [], undos: [], redos: [], ends: { top: 0, bottom: 0 }, hang: 0,
+    dom: { scroll: g, content: $("#gcontent"), lane: $("#glane"), crumb: $("#gcrumb"), pull: $("#gpull"), canvas: $("#gcanvas"), gutterL: g.querySelector<HTMLElement>('[data-area="gutterL"]')!, gutterR: g.querySelector<HTMLElement>('[data-area="gutterR"]')! },
+  };
   document.body.classList.toggle("touch", touch);
   wire();
   setBody(await load());
+  // the history is read at once where something of it stands
+  if (gitWanted()) void loadPast();
   // the web fonts land after the first draw and reflow the prose, so what stands beside it is laid again
   document.fonts?.ready.then(() => {
-    alignEnds();
-    drawAdjuncts();
-    drawEdges();
+    const relaid = () => (alignEnds(), drawAdjuncts(), drawEdges());
+    onBody(relaid);
+    inGit(() => gitShown() && relaid());
     drawWings();
   });
   if (inlined === null) {
@@ -7024,7 +7178,7 @@ async function start(): Promise<void> {
     let version: string | null = null;
     new EventSource("/changes").onmessage = async (e) => {
       // git's head moved: the history is read again, at once if it is being read and otherwise when it is next turned to
-      if (e.data === "history") return void ((past.stale = true), inPast() && loadPast());
+      if (e.data === "history") return void ((past.stale = true), gitWanted() && loadPast());
       if (!String(e.data).startsWith("version ")) return setBody(await load());
       if (version !== null && version !== e.data) location.reload();
       version = e.data;
@@ -7117,7 +7271,7 @@ body { display: flex; flex-direction: column; background: var(--ground); color: 
 a { color: inherit; text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .18em; }
 a:hover, a.lit { text-decoration-color: var(--lit); }
 /* a link pointed at is lit as its target is, wherever the target is drawn, and the brief it sits in keeps its ink */
-#lane a.lit { color: var(--on); }
+:is(#lane, #glane) a.lit { color: var(--on); }
 a.web { text-decoration-style: dotted; }
 a.owed { text-decoration-style: dashed; color: var(--muted); cursor: help; }
 a.outside { text-decoration-style: dotted; color: var(--muted); cursor: help; }
@@ -7130,35 +7284,35 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #header { position: absolute; bottom: 10px; left: 12px; z-index: 4; display: flex; gap: 16px; pointer-events: none; }
 #header > * { pointer-events: auto; }
 #header .warnings { cursor: help; }
-#crumb { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
-#crumb .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
-#crumb .step:hover, #crumb .step.lit { color: var(--on); }
+:is(#crumb, #gcrumb) { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
+:is(#crumb, #gcrumb) .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
+:is(#crumb, #gcrumb) .step:hover, :is(#crumb, #gcrumb) .step.lit { color: var(--on); }
 /* the run's three parts are told apart by the type and nothing else: the scope bold, the address within it at normal
    weight, and the head at full ink, underlined in its hue where it opens onto a reading of its own */
-#crumb .step.scope { flex: none; font-weight: calc(600 - var(--thin)); color: var(--muted); }
-#crumb .step.in { font-weight: calc(400 - var(--thin)); color: var(--faint); }
-#crumb .step.root { flex: none; color: var(--muted); }
+:is(#crumb, #gcrumb) .step.scope { flex: none; font-weight: calc(600 - var(--thin)); color: var(--muted); }
+:is(#crumb, #gcrumb) .step.in { font-weight: calc(400 - var(--thin)); color: var(--faint); }
+:is(#crumb, #gcrumb) .step.root { flex: none; color: var(--muted); }
 /* the last step is where the reader stands, so it is the one that is not faint */
-#crumb .step.now { flex: none; color: var(--ink); cursor: default; }
-#crumb .step.now.opens { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .22em; }
-#crumb .step.now.opens:hover, #crumb .step.now.opens.lit { text-decoration-color: var(--lit); cursor: pointer; }
-#crumb .step.now.lit { color: var(--on); }
-#crumb .step.root.lit { color: var(--on); }
-#crumb .place, #crumb .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }
+:is(#crumb, #gcrumb) .step.now { flex: 0 1 auto; min-width: 3em; color: var(--ink); cursor: default; }
+:is(#crumb, #gcrumb) .step.now.opens { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+:is(#crumb, #gcrumb) .step.now.opens:hover, :is(#crumb, #gcrumb) .step.now.opens.lit { text-decoration-color: var(--lit); cursor: pointer; }
+:is(#crumb, #gcrumb) .step.now.lit { color: var(--on); }
+:is(#crumb, #gcrumb) .step.root.lit { color: var(--on); }
+:is(#crumb, #gcrumb) .place, :is(#crumb, #gcrumb) .trail { display: flex; align-items: center; gap: 7px; min-width: 0; }
 /* how the reader came here stands spaced away from how here is placed, on the same line */
-#crumb .trail { flex: none; padding-left: 28px; gap: 3px; }
-#crumb .place { flex: 1 1 auto; }
-#crumb .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; transition: color .15s, background .15s; }
-#crumb .cell svg { width: 10px; height: 10px; opacity: 1; }
-#crumb .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
-#crumb .cell:hover, #crumb .cell.lit { color: var(--on); background: var(--wash); }
-#crumb .step.more { color: var(--faint); cursor: default; margin-right: 2px; }
-#crumb svg { flex: none; width: 7px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+:is(#crumb, #gcrumb) .trail { flex: none; padding-left: 28px; gap: 3px; }
+:is(#crumb, #gcrumb) .place { flex: 1 1 auto; overflow: hidden; }
+:is(#crumb, #gcrumb) .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; transition: color .15s, background .15s; }
+:is(#crumb, #gcrumb) .cell svg { width: 10px; height: 10px; opacity: 1; }
+:is(#crumb, #gcrumb) .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
+:is(#crumb, #gcrumb) .cell:hover, :is(#crumb, #gcrumb) .cell.lit { color: var(--on); background: var(--wash); }
+:is(#crumb, #gcrumb) .step.more { color: var(--faint); cursor: default; margin-right: 2px; }
+:is(#crumb, #gcrumb) svg { flex: none; width: 7px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
 #header .notice { color: var(--lit); }
 /* the pull's gauge: a hairline over the prose that fills from its middle out as the reader pulls past the top */
-#pull { position: absolute; z-index: 5; height: 2px; pointer-events: none; }
-#pull i { position: absolute; top: 0; height: 2px; left: 50%; width: calc(var(--pull, 0) * 100%); transform: translateX(-50%); border-radius: 1px; background: var(--muted); }
-#pull.easing i { transition: width .25s ease-out; }
+:is(#pull, #gpull) { position: absolute; z-index: 5; height: 2px; pointer-events: none; }
+:is(#pull, #gpull) i { position: absolute; top: 0; height: 2px; left: 50%; width: calc(var(--pull, 0) * 100%); transform: translateX(-50%); border-radius: 1px; background: var(--muted); }
+:is(#pull, #gpull).easing i { transition: width .25s ease-out; }
 /* the one tooltip: on the page's own ground, lifted by a soft shadow and the rim an image keeps, never under the pointer */
 #tip { position: fixed; z-index: 9; max-width: 320px; padding: 7px 10px 8px; border-radius: 8px; background: var(--ground); color: var(--muted); font-size: 12px; line-height: 1.35; box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 6px 20px rgb(0 0 0 / .12), 0 0 0 1px var(--rim); pointer-events: none; white-space: pre-line; }
 #tip .what { display: block; color: var(--faint); margin-bottom: 1px; }
@@ -7171,11 +7325,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 /* wide, the row laid by hand: each program stands where its column is laid, those alone in a column at the page's height */
 #areas.laid { display: block; }
-#areas.laid > #scroll, #areas.laid > #canvas, #areas.laid > #dish { position: absolute; top: 0; bottom: 0; }
+#areas.laid > :is(#scroll, #gscroll), #areas.laid > :is(#canvas, #gcanvas), #areas.laid > #dish { position: absolute; top: 0; bottom: 0; }
 #areas.laid > .host { right: auto; }
 #areas:not(.laid) > .host, #areas:not(.laid) > #seams, #areas:not(.laid) > #heads { display: none; }
 /* the way down clears the heads that stand along the top edge */
-#areas.laid #crumb { top: ${HEADROOM + 4}px; }
+#areas.laid :is(#crumb, #gcrumb) { top: ${HEADROOM + 4}px; }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
@@ -7186,8 +7340,12 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* a head: the grip and the program's own settings along its top edge, quiet until the pointer comes near; leaving, it
    lingers a moment and fades, so a pointer on its way to it still finds it */
 #heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
-.phead { position: absolute; height: ${HEADROOM}px; display: flex; align-items: center; gap: 6px; opacity: 0; pointer-events: none; transition: opacity .3s ease .45s; font-family: var(--sans); font-size: 12px; }
-.phead.near { opacity: 1; pointer-events: auto; transition: opacity .12s ease 0s; }
+.phead { position: absolute; height: ${HEADROOM}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
+.phead > .grip, .phead > .own { opacity: 0; transition: opacity .3s ease .45s; }
+.phead.near { pointer-events: auto; }
+.phead.near > .grip, .phead.near > .own { opacity: 1; transition: opacity .12s ease 0s; }
+/* a program of git's keeps its grip standing, so git's mark always stands at its top edge */
+.phead.git > .grip { opacity: .75; pointer-events: auto; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
 .phead .grip:hover { background: var(--wash); color: var(--ink); }
 .phead .own { display: flex; align-items: center; gap: 2px; min-width: 0; }
@@ -7202,29 +7360,42 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .phead .badge .sign { display: grid; place-items: center; }
 .phead .badge .sign .icon { width: 13px; height: 13px; }
 .phead .badge .label { color: inherit; }
+/* git's mark stands beside the icon of each of git's programs, in the dock and as its grip */
+.gicon { position: relative; display: grid; place-items: center; }
+.gicon .gmark { position: absolute; right: -6px; bottom: -5px; width: 9px; height: 9px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+/* git's status: how far the history is read, how much it holds, and what is selected in it */
+.gstatus { width: 216px; display: flex; flex-direction: column; gap: 10px; }
+.gstatus .read { color: var(--faint); }
+.gstatus .read.busy { animation: busy 1s ease-in-out infinite alternate; }
+.gstatus .count { color: var(--muted); }
+.gstatus .sel { display: flex; flex-direction: column; gap: 1px; cursor: pointer; }
+.gstatus .sel .of, .gstatus .sel .said { font-size: 11px; }
+.gstatus .sel .name { color: var(--on); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+.gstatus .sel:hover .name, .gstatus .sel.lit .name { color: var(--lit); }
+.lane > .waiting { margin: 0; color: var(--faint); }
 /* the one zone a drop would land in, shaded; nothing else moves until it is let go */
 #zone { position: absolute; z-index: 7; border-radius: 10px; background: var(--veil); box-shadow: inset 0 0 0 1.5px var(--faint); pointer-events: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
 #dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
-#canvas { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
+:is(#canvas, #gcanvas) { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
    the viewport, since a map is read by moving it rather than by seeing all of it at once */
-#canvas.bleed { border-radius: 0; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); }
-#canvas.bleed::after { display: none; }
+:is(#canvas, #gcanvas).bleed { border-radius: 0; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge), #000 calc(100% - var(--edge)), transparent 100%); }
+:is(#canvas, #gcanvas).bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
-#canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
+:is(#canvas, #gcanvas)::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
 /* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
-#canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
+:is(#canvas, #gcanvas)::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
 /* a rim is written at the weight it is drawn at and divided by the view, so every line on the map keeps one weight however far it is zoomed */
-#stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; --hair: calc(1px / var(--k, 1)); --hair-on: calc(1.5px / var(--k, 1)); }
-#stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
-#edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
+.stage { position: absolute; left: 0; top: 0; width: max-content; transform-origin: 0 0; will-change: transform; --hair: calc(1px / var(--k, 1)); --hair-on: calc(1.5px / var(--k, 1)); }
+.stage.easing { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.edges { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
 /* the lines lie behind the rows: the nesting of a file, and the opening from a row to the reading it named */
-#edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-#edges path.open { stroke: var(--door); stroke-width: 1.5; }
+.edges path { fill: none; stroke: var(--track); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.edges path.open { stroke: var(--door); stroke-width: 1.5; }
 /* the way from the root down to where the reader stands, in the branch's own ink over the grey of the rest */
-#edges path.on { stroke: var(--on); stroke-width: 1.5; }
+.edges path.on { stroke: var(--on); stroke-width: 1.5; }
 /* the map is laid on one grid: a row is one width, the room between rows is one gap, a level steps in by one, and a
    reading stands one across from the row that named it. Nothing in it is a number of its own */
 .ccol { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ngap); }
@@ -7252,10 +7423,10 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .crow.head .title { font-weight: calc(650 - var(--thin)); }
 .crow.head { box-shadow: inset 0 0 0 var(--hair) var(--door); }
 /* the depth strip stands in the way down, before the trail: a cell per level, the unfolded ones marked */
-#depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
-#depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
-#depth .dc.on { background: var(--track); color: var(--ink); }
-#depth .dc:hover { background: var(--muted); color: var(--ground); }
+.depth { flex: none; margin-left: auto; display: flex; gap: 3px; font-size: 11px; color: var(--faint); cursor: ew-resize; user-select: none; }
+.depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
+.depth .dc.on { background: var(--track); color: var(--ink); }
+.depth .dc:hover { background: var(--muted); color: var(--ground); }
 .crow .num { flex: none; font-size: .8em; line-height: 1; color: var(--faint); }
 /* a row on the way from the root to where the reader stands says so in its own name, as the line that reaches it does */
 .crow.on .num, .crow.on .title { color: var(--on); }
@@ -7280,9 +7451,9 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* what a commit changed outside the readings the body places: one quiet mark, since what it was is in the face */
 .crow .marks i.other { width: 6px; height: 6px; border-radius: 3px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 /* a commit's face names the readings it touched, each in the hue it takes in the body */
-#face .touched { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 2px; font-size: 12px; line-height: 1.4; }
-#face .touched .reading { color: var(--on); }
-#face .touched .also { color: var(--faint); }
+.face .touched { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 2px; font-size: 12px; line-height: 1.4; }
+.face .touched .reading { color: var(--on); }
+.face .touched .also { color: var(--faint); }
 /* a commit in the history's lane is an entry of the record, not a heading of a reading: its subject at the prose's size, who and when beneath it, and the readings it touched */
 .brief.commit .head { font-size: var(--body); font-weight: 500; line-height: 1.35; margin: 0; }
 .brief.commit .said { margin: 2px 0 0; font-size: 12px; color: var(--faint); }
@@ -7290,36 +7461,36 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .brief.commit .touched .reading { color: var(--on); }
 .brief.commit .touched .also { color: var(--faint); }
 /* the acts of what is selected stand naked within the canvas at its foot: no surface, no rim, nothing but the acts */
-#field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
-#field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
-#field .badge:hover { background: var(--wash); color: var(--ink); }
-#field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
-#field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
-#field .badge .chord { display: flex; align-items: center; }
+.field { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; font-family: var(--sans); font-size: 12px; }
+.field .badge { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.field .badge:hover { background: var(--wash); color: var(--ink); }
+.field .badge .sign { position: static; flex: none; display: grid; place-items: center; width: 14px; height: 14px; }
+.field .badge .sign .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; }
+.field .badge .chord { display: flex; align-items: center; }
 /* tight: the glyph and the key alone, which is the badge's own answer to a room too narrow for its word */
-#field.tight .badge .label { display: none; }
-#field.tight .badge { gap: 3px; padding: 4px 6px; }
+.field.tight .badge .label { display: none; }
+.field.tight .badge { gap: 3px; padding: 4px 6px; }
 /* the face of what is selected: one fixed place at the top right of the canvas, a thing standing over the map, so it
    keeps its own edge; pressing it reads what it shows */
-#face { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
-#face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
-#face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-#face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
-#face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
-#face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
-#face::after { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 26px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
+.face { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
+.face .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
+.face .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+.face h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
+.face .stamp { display: block; margin-bottom: 6px; font-size: 11px; color: var(--faint); }
+.face p { margin: 0; font-family: var(--prose-face); font-size: calc(var(--body) * .82); line-height: 1.5; color: var(--muted); }
+.face::after { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 26px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground)); pointer-events: none; }
 .slot { position: absolute; left: 0; right: 0; display: flex; align-items: safe center; justify-content: center; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .slot::-webkit-scrollbar { display: none; }
 .slot > * { max-width: 100%; }
-#scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+:is(#scroll, #gscroll) { overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
   -webkit-mask-image: linear-gradient(to bottom, transparent max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))), black calc(max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))) + var(--edge) * var(--lift, 1)), black calc(100% - (var(--rim-foot) + var(--edge)) * var(--drop, 1)), transparent calc(100% - var(--rim-foot) * var(--drop, 1))); mask-image: linear-gradient(to bottom, transparent max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))), black calc(max(var(--rim-crumb, 0px), calc(var(--rim-top) * var(--lift, 1))) + var(--edge) * var(--lift, 1)), black calc(100% - (var(--rim-foot) + var(--edge)) * var(--drop, 1)), transparent calc(100% - var(--rim-foot) * var(--drop, 1))); }
-#scroll::-webkit-scrollbar { display: none; }
-#scroll.off { position: absolute; left: 0; top: 0; bottom: 0; visibility: hidden; pointer-events: none; }
+:is(#scroll, #gscroll)::-webkit-scrollbar { display: none; }
+:is(#scroll, #gscroll).off { position: absolute; left: 0; top: 0; bottom: 0; visibility: hidden; pointer-events: none; }
 /* the room above and below the lane is set by the reading line's setting, each time the lane is laid */
-#content { position: relative; display: grid; margin: 0 auto; padding: 50vh 0; }
+:is(#content, #gcontent) { position: relative; display: grid; margin: 0 auto; padding: 50vh 0; }
 .gutter { position: relative; }
 .gutter.closed { visibility: hidden; }
-#lane { min-width: 0; line-height: var(--leading); }
+:is(#lane, #glane) { min-width: 0; line-height: var(--leading); }
 
 #strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 8; pointer-events: none; }
 /* one row, centred at the foot, holding every choice once: the panes, the adjuncts, the figures, three groups spaced
@@ -7413,10 +7584,10 @@ svg.cardmap .away { fill: none; stroke: var(--door); stroke-width: .8; }
 .brief.here .badge.aimed .cap.key { display: grid; }
 .brief.here .badge.aimed .cap.pointer { display: none; }
 /* while a brief is pointed at, the key moves to it: the pointed brief inks the key, and the focus goes back to the pointer's cap */
-body.pointing .brief.here:not(.lit) .badge.aimed .cap.key { display: none; }
-body.pointing .brief.here:not(.lit) .badge.aimed .cap.pointer { display: grid; }
-body.pointing .brief.lit .badge.aimed .cap.key { display: grid; }
-body.pointing .brief.lit .badge.aimed .cap.pointer { display: none; }
+.pointing .brief.here:not(.lit) .badge.aimed .cap.key { display: none; }
+.pointing .brief.here:not(.lit) .badge.aimed .cap.pointer { display: grid; }
+.pointing .brief.lit .badge.aimed .cap.key { display: grid; }
+.pointing .brief.lit .badge.aimed .cap.pointer { display: none; }
 .badge .chord { display: inline-flex; gap: 2px; }
 /* the acts stand together at the right of the line, so the figures of every line begin at one edge */
 .act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
@@ -7441,15 +7612,15 @@ body.pointing .brief.lit .badge.aimed .cap.pointer { display: none; }
 /* on a strip the badge is its keys alone; two acts that share a modifier stand as one unit, the modifier drawn once */
 .pair { display: inline-flex; align-items: center; gap: 1px; }
 .pair .cap.lead { margin-right: 1px; }
-#depth .badge, .pair .badge { cursor: pointer; }
-#depth .pair { margin-left: 8px; }
-#depth .cap, #crumb .cap { width: 18px; height: 18px; border-radius: 5px; background: none; }
-#depth .cap svg, #crumb .cap svg { width: 13px; height: 13px; }
-#depth .badge:hover .cap, #crumb .badge:hover .cap { background: var(--track); color: var(--ink); }
+.depth .badge, .pair .badge { cursor: pointer; }
+.depth .pair { margin-left: 8px; }
+.depth .cap, :is(#crumb, #gcrumb) .cap { width: 18px; height: 18px; border-radius: 5px; background: none; }
+.depth .cap svg, :is(#crumb, #gcrumb) .cap svg { width: 13px; height: 13px; }
+.depth .badge:hover .cap, :is(#crumb, #gcrumb) .badge:hover .cap { background: var(--track); color: var(--ink); }
 /* widening the scope stands at the right of the placement, which is the run it acts on; undoing stands past the trail,
    which is the record of what it takes back */
-#crumb .place .badge { margin-left: 6px; }
-#crumb > .badge { flex: none; margin-left: 10px; }
+:is(#crumb, #gcrumb) .place .badge { margin-left: 6px; }
+:is(#crumb, #gcrumb) > .badge { flex: none; margin-left: 10px; }
 /* the figure on the line: the paragraphs a press gives, then the level that waits beyond them */
 svg.fig.marks { flex: none; overflow: visible; }
 svg.fig.marks .para { fill: var(--rest); }
@@ -7591,7 +7762,7 @@ svg.shape .cursor { fill: var(--veil); pointer-events: none; }
 body.touch svg.shape .cursor { fill: var(--wash); stroke: var(--track); stroke-width: 1; rx: 5; }
 body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
 /* a scrub drags across the prose, and a drag over text is a selection unless the page says otherwise */
-body.scrubbing, body.scrubbing #lane { user-select: none; -webkit-user-select: none; }
+body.scrubbing, body.scrubbing :is(#lane, #glane) { user-select: none; -webkit-user-select: none; }
 svg.shape { cursor: grab; }
 
 /* a droplet is filled and stroked in one colour, the stroke giving back the size its round corners took. The plate's
@@ -7693,11 +7864,11 @@ body.touch .tree .row { padding-top: 9px; padding-bottom: 9px; }
 body.touch .tree .row .mark { width: 30px; height: 34px; top: 0; left: calc(-5px + var(--d) * 14px); }
 body.touch .switches .pick { padding: 9px 8px; }
 /* the depth strip is scrubbed rather than aimed at, so its cells grow for a finger without taking the whole line */
-body.touch #depth { gap: 4px; }
-body.touch #depth .dc { width: 28px; height: 28px; font-size: 12px; }
+body.touch .depth { gap: 4px; }
+body.touch .depth .dc { width: 28px; height: 28px; font-size: 12px; }
 /* the rail and the canvas take their gestures whole, so the page does not scroll under a finger that is scrubbing the
    one or panning the other */
-svg.shape, #canvas { touch-action: none; }
+svg.shape, :is(#canvas, #gcanvas) { touch-action: none; }
 /* the tooltip in a touch grain: the callout beside the thumb, on the side away from the edge the rail stands on */
 #tip.callout { max-width: 210px; padding: 9px 12px 10px; }
 body.touch .act { min-height: 44px; padding: 8px; margin: -4px -8px 0; }
@@ -7710,9 +7881,9 @@ body.touch .badge.worded.off { background: none; }
 body.touch .act { flex-wrap: wrap; row-gap: 9px; padding-bottom: 12px; }
 body.touch .act .acts { flex-basis: 100%; margin-left: 0; gap: 10px; }
 body.touch .badge.worded .label { color: var(--muted); }
-body.touch #crumb { gap: 2px; }
-body.touch #crumb .step { padding: 10px 5px; }
-body.touch #crumb .place { gap: 2px; }
+body.touch :is(#crumb, #gcrumb) { gap: 2px; }
+body.touch :is(#crumb, #gcrumb) .step { padding: 10px 5px; }
+body.touch :is(#crumb, #gcrumb) .place { gap: 2px; }
 `;
 
 // The run, last, so that everything it calls stands above it.
