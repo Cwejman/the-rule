@@ -3209,14 +3209,8 @@ function loadSettings(): void {
   if (state.settings.areas.middle.length === 0) state.settings.areas.middle = ["lane"];
   state.settings.layout = keptLayout(state.settings.layout, saved);
   state.settings.gutters = keptGutters(state.settings.gutters, saved);
-  if (state.settings.room !== "spread" && state.settings.room !== "centred") state.settings.room = DEFAULTS.room;
-  if (state.settings.dock !== "foot" && state.settings.dock !== "left") state.settings.dock = DEFAULTS.dock;
-  if (!THEMES.includes(state.settings.theme)) state.settings.theme = DEFAULTS.theme;
-  if (!FACES.includes(state.settings.headings)) state.settings.headings = DEFAULTS.headings;
-  if (!FACES.includes(state.settings.prose)) state.settings.prose = DEFAULTS.prose;
-  if (state.settings.line !== "middle" && state.settings.line !== "ends") state.settings.line = DEFAULTS.line;
-  if (state.settings.weight !== "cost" && state.settings.weight !== "experience") state.settings.weight = DEFAULTS.weight;
-  if (state.settings.ahead !== "hidden" && state.settings.ahead !== "always") state.settings.ahead = DEFAULTS.ahead;
+  // a setting a switch turns holds one of the values the switch offers, and anything else is its default
+  SWITCHES.forEach((w) => w.values.includes(state.settings[w.key]) || ((state.settings as Record<string, unknown>)[w.key] = DEFAULTS[w.key]));
   const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
   const trunk = (state.settings.trunk ?? {}) as Partial<Settings["trunk"]>;
   state.settings.trunk = { body: runs(trunk.body, DEFAULTS.trunk.body), history: runs(trunk.history, DEFAULTS.trunk.history) };
