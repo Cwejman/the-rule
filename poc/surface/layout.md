@@ -30,7 +30,7 @@ Among the widgets, the dish as [a pane of its own](widgets.md#7-the-plate) goes,
 
 In the history it supersedes [the mode](history.md#41-it-is-a-mode-not-a-pane) and its switch, [a selection kept when the mode is left](history.md#43-a-selection-shows-what-it-touched), and [what stands beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). [Reading it ahead](history.md#411-turning-to-it-never-waits-for-what-was-read-before) stays, and so does a published page's history as files: a program of git's that waits on its first read says so in itself, and the icon of each program of git's that waits breathes in the dock as the switch did.
 
-In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down-stands-over-the-lane) and [the wheel scrolling the lane from anywhere](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere), as [the two worlds](#6-the-body-and-git-two-worlds) say. In the implementation it supersedes [the history's world set in the body's place](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own), and what turns back to the body before it goes, the browser's back and forward among it.
+In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down-stands-over-the-lane), and keeps [the wheel scrolling the lane from anywhere](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere) for the body's prose, with git's prose taking it where the pointer rests on it, as [the two worlds](#6-the-body-and-git-two-worlds) say. In the implementation it supersedes [the history's world set in the body's place](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own), and what turns back to the body before it goes, the browser's back and forward among it.
 
 *Reasoned, the session's, 2026-10-01, from the briefs this touches.*
 
@@ -54,11 +54,11 @@ A height pulled is kept as a share of what the growing ones have, as they share 
 
 *Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); the keys as fixed, heights kept as shares, standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
 
-### 2.2 The plate is the plate
+### 2.2 The plate and the dish are one program
 
-The plate is one program standing alone, drawn at the width of its column. Once a column is as wide as the reader pulls it, the plate at a pane's size needs no name of its own, so the dish is not a program.
+The plate and the dish are one program standing alone, and the width of its column says which it is drawn as: the plate at a figure's size, the dish at a pane's, where a large body has room for a cell per brief.
 
-*Preferred, the author's, 2026-10-01: the plate is the plate.*
+*Preferred, the author's, 2026-10-01: the same, perhaps depending only on the size.*
 
 ### 2.3 Why a row and not a tree of splits
 
@@ -146,11 +146,11 @@ The page's address stays the body's. Today the history's world is set in place o
 
 Few programs contend for the keys: only git's against the body's. So the keys are the body's, and git's prose and canvas catch them while the pointer rests on them, giving them back when it leaves. Within the body they go as [they do today](framework.md#27-the-keys-belong-to-one-pane), to the canvas while it is pointed at and to the prose otherwise.
 
-The wheel does not reach across: a prose scrolls only under the pointer, and a map takes the wheel as it does today. So the wheel no longer scrolls the body's prose from anywhere.
+The wheel scrolls the body's prose from anywhere, [as it does today](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere), so the reader never has to move to the prose to read on. Over git's prose it scrolls git's prose instead, over a map it pans that map, and over a meter it turns the meter. Where git's prose is the only prose standing, the wheel scrolls it from anywhere.
 
 The figures, the shape, the tree and the ahead, draw the world holding the keys, so they tell of what the reader is deliberately looking at rather than staying the body's. The plate stays the body's.
 
-*Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that a prose scrolls only under the pointer, and that the figures follow what the reader is deliberately looking at. Within the body as today, and the figures reading that as the world holding the keys, are the session's.*
+*Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that the wheel drives the body's prose from anywhere and git's only over it or where it stands alone, and that the figures follow what the reader is deliberately looking at. Within the body as today, and the figures reading that as the world holding the keys, are the session's.*
 
 ### 6.2 A program of git's is told apart by its grip
 
