@@ -1423,6 +1423,10 @@ type Index = {
 type Fold = "face" | "whole";
 
 type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
+/** A program standing in a column, and, where it grows, its share of the height the growing ones have. */
+type Item = { k: string; h?: number };
+/** A column of the row: its width where the reader pulled it, and the programs it stacks, the top first. */
+type Column = { w?: number; items: Item[] };
 /** The panes the middle can hold. It has two sides, and a pane stands on one of them: at most two, the first at the left. */
 const PANES = ["lane", "canvas", "dish"] as const;
 type PaneName = (typeof PANES)[number];
@@ -1478,8 +1482,16 @@ type Settings = {
   face: "shown" | "hidden";
   /** which way each canvas lays its root's level: down, as a file's levels go, or across as a trunk; the body's runs down and the history's across unless turned */
   trunk: { body: "down" | "across"; history: "down" | "across" };
-  /** the widgets each area holds, in order: a wing up to two, top then bottom; a gutter one; none is closed; the middle a pane or two, left then right, never none */
+  /** where the lane stands alone, the widgets each area holds: the pane the middle holds, and the wing the rail stands in */
   areas: Record<AreaName, string[]>;
+  /** wide, the page laid by hand: a row of columns, each a stack of programs, the left first */
+  layout: Column[];
+  /** the adjunct each prose holds in its gutter at the left and at the right, or none */
+  gutters: Record<"body" | "history", [string | null, string | null]>;
+  /** where the row is narrower than the page, whether the room left over is spread among the spaces or stands at the two edges */
+  room: "spread" | "centred";
+  /** the edge the dock stands along */
+  dock: "foot" | "left";
 };
 
 const DEFAULTS: Settings = {
@@ -1502,6 +1514,10 @@ const DEFAULTS: Settings = {
   face: "shown",
   trunk: { body: "down", history: "across" },
   areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
+  layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "ahead" }] }],
+  gutters: { body: [null, "links"], history: [null, "links"] },
+  room: "spread",
+  dock: "foot",
 };
 
 const state = {
@@ -2453,7 +2469,6 @@ const figureNames = (area: WingName): string[] => state.settings.areas[area].fil
 /** The first widget an area holds, which is all a gutter holds; nothing, where the area is closed. */
 const widgetOf = (area: AreaName): Widget | undefined => widgetsOf(area)[0];
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
-const choicesFor = (kind: Widget["kind"]): string[] => Object.keys(WIDGETS).filter((k) => WIDGETS[k].kind === kind);
 
 /** The two sides a widget of each kind can stand on; a pane's are the middle's own two, which the middle keeps in its order. */
 const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], adjunct: ["gutterL", "gutterR"], pane: [] };
@@ -2462,113 +2477,16 @@ const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], 
 const standsIn = (k: string): AreaName | null => AREAS.find(({ name }) => state.settings.areas[name].includes(k))?.name ?? null;
 
 /**
- * What each pane pushed out of the side it was pressed onto, so the next press gives it back: pressed onto the left, a
- * pane pushes out what stood there; moved on to the right, the left comes back and what stood at the right is pushed
- * out; taken away, the right comes back. Kept only while the page is open, since a reload begins a reading afresh.
- */
-const pushedOut = new Map<string, string | null>();
-
-/** Where a pane stands in the middle: its left, its right, the whole of it alone, or nowhere. */
-const paneSide = (k: string, held: string[] = state.settings.areas.middle): "left" | "right" | "alone" | null => {
-  const panes = panesHeld(held);
-  const i = panes.indexOf(k as PaneName);
-  return i < 0 ? null : panes.length === 1 ? "alone" : i === 0 ? "left" : "right";
-};
-
-/**
- * The panes the middle holds after one is pressed, and what the press pushes out. Nowhere, the left, the right, and
- * nowhere again, as every icon cycles; what differs is that a side holds one pane, so a press pushes out what stood
- * there and the next press gives it back. A lone pane moves on only where something it pushed out can come back to the
- * left; with that memory gone, it trades places with the pane beside it rather than leave a side empty.
- */
-function panePress(k: string): { middle: string[]; pushed: string | null } | null {
-  const panes = panesHeld();
-  const back = (x: string | null | undefined): string | null => (x && x !== k && !panes.includes(x as PaneName) ? x : null);
-  switch (paneSide(k)) {
-    case null:
-      return { middle: [k, ...panes.slice(1)], pushed: panes[0] ?? null };
-    case "alone": {
-      const was = back(pushedOut.get(k));
-      return was ? { middle: [was, k], pushed: null } : null;
-    }
-    case "left": {
-      const was = back(pushedOut.get(k));
-      const right = panes[1];
-      return was ? { middle: [was, k], pushed: right } : { middle: [right, k], pushed: null };
-    }
-    case "right": {
-      const was = back(pushedOut.get(k));
-      return { middle: was ? [panes[0], was] : [panes[0]], pushed: null };
-    }
-  }
-}
-
-/** The panes the middle holds after one is pressed, or as they are where a press would do nothing. */
-const panesPressed = (k: string): string[] => panePress(k)?.middle ?? state.settings.areas.middle;
-
-/**
- * What every area holds with a widget put at one side, or at none. A pane is pressed onto the middle's sides instead,
- * giving back what it pushed out. A wing holds two, and a third takes the place at its foot; a gutter holds one.
+ * What every area holds with a widget put at one side, or at none: where the lane stands alone, the wing the rail
+ * stands in. A wing holds two, and a third takes the place at its foot; a gutter holds one.
  */
 function placed(k: string, side: AreaName | null): Held {
   const w = WIDGETS[k];
   const held: Held = { ...state.settings.areas };
-  if (w.kind === "pane") return { ...held, middle: panesPressed(k) };
+  if (w.kind === "pane") return held;
   SIDES[w.kind].forEach((s) => (held[s] = held[s].filter((x) => x !== k)));
   if (side) held[side] = w.kind === "adjunct" ? [k] : held[side].length < 2 ? [...held[side], k] : [held[side][0], k];
   return held;
-}
-
-/** Whether a side would hold a widget at this width, reckoned with it taken off the side it stands on now. */
-const holds = (k: string, side: AreaName): boolean => fitsWith(placed(k, side))[side];
-
-/**
- * Where the next press puts a widget: the next side of the cycle that can hold it at this width, or nowhere. A side the
- * width denies is stepped over rather than offered, so a press never sends a widget somewhere it cannot stand.
- * Undefined where a press would do nothing at all, which is what makes an icon quiet.
- */
-function nextPlace(k: string): AreaName | null | undefined {
-  const [left, right] = SIDES[WIDGETS[k].kind];
-  const at = standsIn(k);
-  if (at === right) return null;
-  if (at === left) return holds(k, right) ? right : null;
-  return holds(k, left) ? left : holds(k, right) ? right : undefined;
-}
-
-const cycled = (k: string): Held => placed(k, nextPlace(k) ?? null);
-
-/** Whether pressing an icon would change anything a reader can see: a widget already standing can always be moved on. */
-function offered(k: string): boolean {
-  const w = WIDGETS[k];
-  const at = standsIn(k);
-  if (w.kind === "pane") {
-    const next = panePress(k);
-    // a press is offered where it changes the middle, and where the pane it stands would have room to stand
-    return next !== null && (!next.middle.includes(k) || fitsWith({ ...state.settings.areas, middle: next.middle })[k as PaneName]);
-  }
-  return nextPlace(k) !== undefined;
-}
-
-/** What the tooltip says of an icon: what it is, and what the next press would do with it. */
-function pickTip(k: string): string {
-  const w = WIDGETS[k];
-  const at = standsIn(k);
-  const said = (s: string) => `${w.name} — ${s}`;
-  if (!offered(k)) return said(w.kind === "pane" && at ? "the last pane cannot be taken away" : "no room for it at this width");
-  if (w.kind === "pane") {
-    const next = panePress(k)!;
-    const to = paneSide(k, next.middle);
-    const gives = next.pushed ? `, in place of ${WIDGETS[next.pushed].name.split(":")[0]}` : "";
-    // a pane the width denies says so, as a widget does, and still says what a press would do with it
-    const denied = at !== null && !fits()[k as PaneName] ? "asked for, but there is no room at this width; " : "";
-    const now = denied || { left: "at the left; ", right: "at the right; ", alone: "alone; ", none: "" }[paneSide(k) ?? "none"];
-    return said(`${now}press to ${to === null ? "take it away" : to === "right" ? "stand it at the right" : "stand it at the left"}${gives}`);
-  }
-  const [left] = SIDES[w.kind];
-  const where = (x: AreaName | null) => (x === null ? "take it away" : x === left ? "stand it at the left" : "stand it at the right");
-  // a widget the width denies says so, and still says what a press would do with it
-  const now = at === null ? "" : !fits()[at] ? "asked for, but there is no room at this width; " : at === left ? "at the left; " : "at the right; ";
-  return said(`${now}press to ${where(nextPlace(k) ?? null)}`);
 }
 
 // ### 3.4.1 Where the lane stands alone
@@ -2678,6 +2596,328 @@ function chooseNarrow(k: string): void {
     saveSettings();
   } else chooser.sheet = chooser.sheet === k ? null : k;
   drawAll();
+}
+
+// ### 3.4.2 The page laid by hand
+//
+// Wide, the page is a row of columns, each a stack of programs, and the reader
+// lays it by hand: a program is dragged by its grip to stand beside another, in
+// its stack or in its place, and the gaps between are pulled to size what stands
+// either side. A program is what was a pane or a figure; an adjunct is not one,
+// but a setting of the prose it stands beside. Where the lane stands alone none
+// of this holds, and the areas above lay the page as they always did.
+
+/** How a program takes height: alone in its column at the page's whole height, sharing what its column has left, or only what it needs. */
+type Takes = "alone" | "grows" | "fixed";
+/** A program: what it is called, its icon, how it takes height, the width it stands at of its own and the least it is pulled to. */
+type Program = { name: string; icon: string; takes: Takes; own: () => number; least: () => number };
+
+/** The least the prose is pulled to: its measure alone, its gutters gone. */
+const PROSE_LEAST = 440;
+/** The least the plate stands at, below which it has no droplet a reader can find. */
+const PLATE_LEAST = 160;
+/** The room a program's head takes along its top edge. */
+const HEADROOM = 22;
+/** The room the dock takes where it stands down the left edge. */
+const DOCK_LEFT = 52;
+
+/** The width a figure declares, which a column of it stands at and is never pulled from. */
+const figureWidth = (k: string): number => (WIDGETS[k] as Figure).width();
+const figure = (k: string, takes: Takes): Program => ({ name: WIDGETS[k].name, icon: WIDGETS[k].icon, takes, own: () => figureWidth(k), least: () => figureWidth(k) });
+
+const PROGRAMS: Record<string, Program> = {
+  prose: { name: "the prose: the body, read", icon: "lane", takes: "alone", own: () => proseOwn("body"), least: () => PROSE_LEAST },
+  canvas: { name: "the canvas: the body as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN },
+  // the plate and the dish are one program, and the width of its column says which it is drawn as
+  plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", takes: "alone", own: () => PLATE_SIDE, least: () => PLATE_LEAST },
+  shape: figure("shape", "grows"),
+  tree: figure("tree", "grows"),
+  ahead: figure("ahead", "grows"),
+  settings: figure("settings", "fixed"),
+  keys: figure("keys", "fixed"),
+};
+
+/** The dock's groups, set apart by room: the readings, then the figures. */
+const DOCK: string[][] = [
+  ["prose", "canvas", "plate"],
+  ["shape", "tree", "ahead", "settings", "keys"],
+];
+
+const isAlone = (k: string): boolean => PROGRAMS[k]?.takes === "alone";
+const layoutNow = (): Column[] => state.settings.layout;
+
+/** Where a program stands: its column and its place in the stack, or null where it stands nowhere. */
+function whereIs(k: string, L: Column[] = layoutNow()): { c: number; i: number } | null {
+  for (let c = 0; c < L.length; c++) {
+    const i = L[c].items.findIndex((it) => it.k === k);
+    if (i >= 0) return { c, i };
+  }
+  return null;
+}
+const standing = (k: string): boolean => whereIs(k) !== null;
+/** The program a column stands alone for, where it holds one. */
+const aloneIn = (c: Column): string | null => c.items.find((it) => isAlone(it.k))?.k ?? null;
+/** The width a column stands at of its own: a lone program at its pulled width or its own, a stack of figures at its widest. */
+const colOwn = (c: Column): number => {
+  const a = aloneIn(c);
+  return a ? Math.max(PROGRAMS[a].least(), c.w ?? PROGRAMS[a].own()) : Math.max(0, ...c.items.map((it) => PROGRAMS[it.k].own()));
+};
+/** The least a column narrows to before it gives way: a figure is never pulled, so its column stands at its own. */
+const colLeast = (c: Column): number => {
+  const a = aloneIn(c);
+  return a ? PROGRAMS[a].least() : colOwn(c);
+};
+
+/**
+ * The layout a reader keeps, made whole: every program at most once, a program standing alone in a column of its own,
+ * and no column empty. A reader who laid the page before it was laid by hand keeps what they had: the figures of each
+ * wing as a column, the panes of the middle each as a column in their order, the dish and the plate as the one plate.
+ */
+function keptLayout(layout: unknown, saved: Record<string, unknown> | null): Column[] {
+  const list = (x: unknown): string[] => (Array.isArray(x) ? x : typeof x === "string" && x !== "none" ? [x] : []).filter((k): k is string => typeof k === "string");
+  let raw: unknown = layout;
+  const areas = saved?.areas as Record<string, unknown> | undefined;
+  if (areas && saved?.layout === undefined) {
+    const pane: Record<string, string> = { lane: "prose", canvas: "canvas", dish: "plate" };
+    const wing = (x: unknown): Column[] => {
+      const ks = list(x).filter((k) => PROGRAMS[k]);
+      const figs = ks.filter((k) => !isAlone(k));
+      return [...(figs.length ? [{ items: figs.map((k) => ({ k })) }] : []), ...ks.filter(isAlone).map((k) => ({ items: [{ k }] }))];
+    };
+    const middle = list(areas.middle).flatMap((p) => (pane[p] ? [{ items: [{ k: pane[p] }] }] : []));
+    raw = [...wing(areas.wingL), ...(middle.length ? middle : [{ items: [{ k: "prose" }] }]), ...wing(areas.wingR)];
+  }
+  const seen = new Set<string>();
+  const cols: Column[] = [];
+  (Array.isArray(raw) ? raw : []).forEach((c) => {
+    const items: Item[] = (Array.isArray(c?.items) ? c.items : [])
+      .filter((it: unknown): it is Item => !!it && typeof (it as Item).k === "string" && !!PROGRAMS[(it as Item).k] && !seen.has((it as Item).k))
+      .map((it: Item) => (seen.add(it.k), typeof it.h === "number" && it.h > 0 ? { k: it.k, h: it.h } : { k: it.k }));
+    const w = typeof c?.w === "number" && c.w > 0 ? c.w : undefined;
+    // a program that stands alone never shares its column, so a stack holding one is parted around it
+    let run: Item[] = [];
+    const flush = () => void (run.length && cols.push({ items: run }), (run = []));
+    items.forEach((it) => (isAlone(it.k) ? (flush(), cols.push(w ? { w, items: [it] } : { items: [it] })) : run.push(it)));
+    flush();
+  });
+  return cols.length ? cols : structuredClone(DEFAULTS.layout);
+}
+
+/** The gutters each prose keeps: an adjunct's name or none, at the left and at the right; a reader's gutters of before are the body's. */
+function keptGutters(g: unknown, saved: Record<string, unknown> | null): Settings["gutters"] {
+  const adj = (x: unknown): string | null => (typeof x === "string" && WIDGETS[x]?.kind === "adjunct" ? x : null);
+  const pair = (x: unknown, d: [string | null, string | null]): [string | null, string | null] => (Array.isArray(x) ? [adj(x[0]), adj(x[1])] : d);
+  const kept = (g ?? {}) as Record<string, unknown>;
+  const areas = saved?.areas as Record<string, unknown> | undefined;
+  const first = (x: unknown) => (Array.isArray(x) ? x[0] : x);
+  const body: [string | null, string | null] = areas && saved?.gutters === undefined ? [adj(first(areas.gutterL)), adj(first(areas.gutterR))] : pair(kept.body, DEFAULTS.gutters.body);
+  return { body, history: pair(kept.history, DEFAULTS.gutters.history) };
+}
+
+/** The gutters a prose holds, at the left and at the right. */
+const gutterSides = (w: "body" | "history"): boolean[] => state.settings.gutters[w].map((x) => x !== null);
+
+/** The prose's own width: its measure, and beside it each gutter it holds at the width an adjunct reads best in. */
+const proseOwn = (w: "body" | "history"): number => state.settings.measure + gutterSides(w).filter(Boolean).length * (GUTTER.want + state.settings.gap);
+
+/**
+ * The prose in a column of a width: the measure takes what the gutters leave, and as the column narrows the gutters
+ * narrow first, then go as a pair, before the measure narrows.
+ */
+function proseIn(W: number, w: "body" | "history"): { measure: number; gutter: number; sides: boolean[] } {
+  const s = state.settings;
+  const sides = gutterSides(w);
+  const n = sides.filter(Boolean).length;
+  if (n) {
+    const each = Math.min(GUTTER.want, Math.floor((W - s.measure) / n - s.gap));
+    if (each >= GUTTER.least) return { measure: W - n * (each + s.gap), gutter: each, sides };
+    // the gutters gone, the measure keeps its own and stands in the middle of the room they left, rather than taking
+    // that room and growing wider under a hand that was pulling the prose narrower
+    return { measure: Math.min(W, s.measure), gutter: 0, sides: [false, false] };
+  }
+  return { measure: W, gutter: 0, sides: [false, false] };
+}
+
+/** The room the dock takes at the left edge, where it stands there. */
+const dockRoom = (): number => (state.settings.dock === "left" ? DOCK_LEFT : 0);
+
+/** The row as laid at this width: where each column stands and how wide, the spaces between, and the columns given way. */
+type Laid = { cols: { c: number; x: number; w: number }[]; spaces: { x: number; w: number; left: number | null; right: number | null }[]; gone: Set<number> };
+let laidNow: Laid | null = null;
+
+/**
+ * Lays the row. Every column wants its own width. Where the page is too narrow, the body's prose keeps its width and
+ * every other column shrinks to its least before any gives way; then they give way one at a time, the one furthest
+ * from the body's prose first, and of two as far the one at the right. Once only one is left, it narrows with the page.
+ * What the page leaves over is spread among the spaces, the edges among them, or stands at the two edges.
+ */
+function layRow(): Laid {
+  const s = state.settings;
+  const g = s.gap;
+  const L = s.layout;
+  const x0 = dockRoom();
+  const W = Math.max(0, ui.areas.clientWidth - x0);
+  const own = L.map(colOwn);
+  const least = L.map(colLeast);
+  const proseAt = L.findIndex((c) => c.items.some((it) => it.k === "prose"));
+  let live = L.map((_, i) => i);
+  const widths = new Map<number, number>();
+  const need = () => live.reduce((x, i) => x + widths.get(i)!, 0) + g * (live.length + 1);
+  const fit = (): boolean => {
+    live.forEach((i) => widths.set(i, own[i]));
+    if (need() <= W) return true;
+    const others = live.filter((i) => i !== proseAt);
+    const room = others.reduce((x, i) => x + own[i] - least[i], 0);
+    const over = need() - W;
+    if (room > 0) others.forEach((i) => widths.set(i, own[i] - (own[i] - least[i]) * Math.min(1, over / room)));
+    return need() <= W + 0.5;
+  };
+  const rank = (i: number): number => (proseAt >= 0 ? Math.abs(i - proseAt) * 2 + (i > proseAt ? 1 : 0) : i);
+  while (!fit() && live.length > 1) {
+    const next = live.filter((i) => i !== proseAt).sort((a, b) => rank(b) - rank(a))[0];
+    if (next === undefined) break;
+    live = live.filter((i) => i !== next);
+  }
+  // what is left narrows with the page: the body's prose where it stands, else the last column
+  if (need() > W && live.length) {
+    const i = live.includes(proseAt) ? proseAt : live[live.length - 1];
+    widths.set(i, Math.max(0, widths.get(i)! - (need() - W)));
+  }
+  const n = live.length;
+  const left = Math.max(0, W - need());
+  const space = (j: number): number => (s.room === "centred" ? (j === 0 || j === n ? g + left / 2 : g) : g + left / (n + 1));
+  let x = x0;
+  const cols: Laid["cols"] = [];
+  const spaces: Laid["spaces"] = [];
+  live.forEach((i, j) => {
+    spaces.push({ x, w: space(j), left: j ? live[j - 1] : null, right: i });
+    x += space(j);
+    cols.push({ c: i, x, w: widths.get(i)! });
+    x += widths.get(i)!;
+  });
+  spaces.push({ x, w: space(n), left: n ? live[n - 1] : null, right: null });
+  return { cols, spaces, gone: new Set(L.map((_, i) => i).filter((i) => !live.includes(i))) };
+}
+
+const laid = (): Laid => (laidNow ??= layRow());
+/** The column a program stands in on the page now, or none where it stands nowhere or its column gave way. */
+const laidAt = (k: string): { c: number; x: number; w: number } | undefined => {
+  const at = whereIs(k);
+  return at ? laid().cols.find((col) => col.c === at.c) : undefined;
+};
+
+/** What the width allows wide, in the terms the rest of the page asks in: which panes stand, and the prose's gutters. */
+function fitsLaid(): Fit {
+  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
+  const pane: Record<string, PaneName> = { prose: "lane", canvas: "canvas", plate: "dish" };
+  laid().cols.forEach((col) => layoutNow()[col.c].items.forEach((it) => pane[it.k] && on.panes.push(pane[it.k])));
+  on.panes.forEach((p) => (on[p] = true));
+  const p = laidAt("prose");
+  if (p) {
+    const f = proseIn(p.w, "body");
+    on.gutterL = f.sides[0];
+    on.gutterR = f.sides[1];
+    on.gutter = f.gutter;
+  }
+  return on;
+}
+
+/** Where a program is dropped: as a column of its own at a place in the row, beside another, in another's stack, in its place, or on the dock. */
+type Zone = { kind: "col"; at: number } | { kind: "beside"; target: string; after: boolean } | { kind: "stack"; target: string; after: boolean } | { kind: "trade"; target: string } | { kind: "dock" };
+
+/** The layout with a program taken out, and any column it leaves empty. */
+const without = (L: Column[], k: string): Column[] => L.map((c) => ({ ...c, items: c.items.filter((it) => it.k !== k) })).filter((c) => c.items.length > 0);
+
+/** Whether two programs can trade places: each must be able to stand where the other stands, and one that stands alone shares no stack. */
+function canTrade(k: string, t: string, L: Column[] = layoutNow()): boolean {
+  const a = whereIs(k, L);
+  const b = whereIs(t, L);
+  if (!b || k === t) return false;
+  const shared = (p: { c: number } | null) => !!p && L[p.c].items.length > 1;
+  return !(isAlone(k) && shared(b)) && !(isAlone(t) && shared(a));
+}
+
+/** The layout once a program is dropped in a zone. A program moved alone keeps the width its column was pulled to. */
+function dropped(L: Column[], k: string, z: Zone): Column[] {
+  const from = whereIs(k, L);
+  const item: Item = from ? { k } : { k };
+  const kept = from && L[from.c].items.length === 1 ? L[from.c].w : undefined;
+  const column = (it: Item): Column => (kept ? { w: kept, items: [it] } : { items: [it] });
+  if (z.kind === "trade") {
+    const t = whereIs(z.target, L);
+    if (!t || !canTrade(k, z.target, L)) return L;
+    const next = L.map((c) => ({ ...c, items: c.items.slice() }));
+    const theirs = next[t.c].items[t.i];
+    next[t.c].items[t.i] = { k, ...(theirs.h ? { h: theirs.h } : {}) };
+    if (from) next[from.c].items[from.i] = { k: theirs.k, ...(L[from.c].items[from.i].h ? { h: L[from.c].items[from.i].h } : {}) };
+    // a column holds the width it was pulled to for what stands alone in it, so two that trade columns trade widths
+    if (from && isAlone(k) && isAlone(theirs.k)) [next[t.c].w, next[from.c].w] = [L[from.c].w, L[t.c].w];
+    return next;
+  }
+  const next = without(L, k);
+  if (z.kind === "dock") return next;
+  if (z.kind === "col") {
+    const emptied = from && L[from.c].items.length === 1 ? from.c : -1;
+    const at = clamp(emptied >= 0 && emptied < z.at ? z.at - 1 : z.at, 0, next.length);
+    next.splice(at, 0, column(item));
+    return next;
+  }
+  const t = whereIs(z.target, next);
+  if (!t) return L;
+  if (z.kind === "beside") next.splice(t.c + (z.after ? 1 : 0), 0, column(item));
+  else if (!isAlone(k) && !isAlone(z.target)) next[t.c] = { ...next[t.c], items: next[t.c].items.toSpliced(t.i + (z.after ? 1 : 0), 0, item) };
+  else return L;
+  return next;
+}
+
+/** Where a program stood when it was taken away, so pressing its icon again puts it back there. */
+const leftAt = new Map<string, { zone: Zone; near: string; w?: number }>();
+
+/** Remembers where a program stands before it is taken away: beside or in the stack of the nearest program that stays. */
+function remember(k: string): void {
+  const L = layoutNow();
+  const at = whereIs(k, L);
+  if (!at) return;
+  const col = L[at.c];
+  const near = (z: Zone & { target: string }) => leftAt.set(k, { zone: z, near: z.target, w: col.items.length === 1 ? col.w : undefined });
+  if (col.items.length > 1) {
+    const up = col.items[at.i - 1] ?? null;
+    return void near(up ? { kind: "stack", target: up.k, after: true } : { kind: "stack", target: col.items[at.i + 1].k, after: false });
+  }
+  const before = L[at.c - 1]?.items[0];
+  const after = L[at.c + 1]?.items[0];
+  if (before) near({ kind: "beside", target: before.k, after: true });
+  else if (after) near({ kind: "beside", target: after.k, after: false });
+}
+
+/** Takes a program away, or puts it back where it stood: beside the nearest program that still stands there, or at the right end of the row. */
+function pressProgram(k: string): void {
+  const L = layoutNow();
+  if (standing(k)) {
+    if (L.reduce((n, c) => n + c.items.length, 0) <= 1) return;
+    remember(k);
+    state.settings.layout = without(L, k);
+  } else {
+    const kept = leftAt.get(k);
+    const zone: Zone = kept && standing(kept.near) ? kept.zone : { kind: "col", at: L.length };
+    let next = dropped(L, k, zone);
+    if (next === L) next = dropped(L, k, { kind: "col", at: L.length });
+    const at = whereIs(k, next);
+    if (at && kept?.w && next[at.c].items.length === 1) next[at.c] = { ...next[at.c], w: kept.w };
+    state.settings.layout = next;
+  }
+  saveSettings();
+  drawAll();
+}
+
+/** What the dock says of a program: what it is, and what a press and a drag would do with it. */
+function dockTip(k: string): string {
+  const at = whereIs(k);
+  const name = PROGRAMS[k].name;
+  if (!at) return `${name} — press to bring it back, or drag it where you want it`;
+  if (laid().gone.has(at.c)) return `${name} — standing, but there is no room for it at this width`;
+  if (layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return `${name} — the last program cannot be taken away`;
+  return `${name} — press to take it away, or drag it where you want it`;
 }
 
 // ## 3.5 The tree: the lane as an outline
@@ -2858,11 +3098,9 @@ const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
   { key: "leading", row: "type", name: "line height", min: 1.2, max: 2.2, step: 0.05, glyph: `<path d="M6 4h7M6 8h7M6 12h7M3 4v8"/>` },
-  { key: "measure", row: "type", name: "measure", min: 440, max: 900, step: 10, glyph: `<path d="M3 8h10M5 6v4M11 6v4"/>` },
   { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
   { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
-  { key: "canvas", row: "canvas", name: "the canvas's greatest width", min: 360, max: 1600, step: 40, glyph: `<rect x="2.5" y="4" width="11" height="8" rx="1.5"/><path d="M5 8h6M6.5 6.5 5 8l1.5 1.5M9.5 6.5 11 8l-1.5 1.5"/>` },
 ];
 
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
@@ -2878,7 +3116,7 @@ function meterArc(t: number, r: number): string {
  * greatest width, since it takes the page whole; the ahead, which does not stand there; and the flick, which reads a
  * wheel no finger sends. They are not drawn, rather than drawn and idle.
  */
-const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick"]);
+const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick", "room", "dock"]);
 const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
 function settingsHtml(): string {
@@ -2901,7 +3139,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -2912,6 +3150,8 @@ const SWITCHES: Switch[] = [
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
+  { key: "room", name: "room left over", values: ["spread", "centred"] },
+  { key: "dock", name: "the dock", values: ["foot", "left"] },
 ];
 
 /** Turns one meter to its setting's value in place, so a drag never redraws the wing under the pointer. */
@@ -2928,10 +3168,11 @@ function drawMeter(el: HTMLElement): void {
 
 const SETTINGS_KEY = "surface.settings";
 function loadSettings(): void {
+  let saved: Record<string, unknown> | null = null;
   try {
-    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "null");
-    if (saved) state.settings = { ...DEFAULTS, ...saved, areas: { ...DEFAULTS.areas, ...(saved.areas ?? {}) } };
-    if (saved && typeof saved.fade === "number" && saved.fade <= 1 && saved.dim === undefined) (state.settings.dim = saved.fade), (state.settings.fade = DEFAULTS.fade);
+    saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "null");
+    if (saved) state.settings = { ...DEFAULTS, ...saved, areas: { ...DEFAULTS.areas, ...((saved.areas as object) ?? {}) } } as Settings;
+    if (saved && typeof saved.fade === "number" && saved.fade <= 1 && saved.dim === undefined) (state.settings.dim = saved.fade as number), (state.settings.fade = DEFAULTS.fade);
     // the fade was lengthened on 2026-09-16, and a reader holding exactly the value it had before never chose it, so
     // they take the new one. This is the last such line: what is written from here on keeps only what a reader set
     if (saved && saved.fade === 8) state.settings.fade = DEFAULTS.fade;
@@ -2944,6 +3185,10 @@ function loadSettings(): void {
   });
   state.settings.areas.middle = panesHeld(state.settings.areas.middle);
   if (state.settings.areas.middle.length === 0) state.settings.areas.middle = ["lane"];
+  state.settings.layout = keptLayout(state.settings.layout, saved);
+  state.settings.gutters = keptGutters(state.settings.gutters, saved);
+  if (state.settings.room !== "spread" && state.settings.room !== "centred") state.settings.room = DEFAULTS.room;
+  if (state.settings.dock !== "foot" && state.settings.dock !== "left") state.settings.dock = DEFAULTS.dock;
   if (!THEMES.includes(state.settings.theme)) state.settings.theme = DEFAULTS.theme;
   if (!FACES.includes(state.settings.headings)) state.settings.headings = DEFAULTS.headings;
   if (!FACES.includes(state.settings.prose)) state.settings.prose = DEFAULTS.prose;
@@ -2962,7 +3207,9 @@ function loadSettings(): void {
 const saveSettings = (): void =>
   void localStorage.setItem(
     SETTINGS_KEY,
-    JSON.stringify(Object.fromEntries(Object.entries(state.settings).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(DEFAULTS[k as keyof Settings])))),
+    // the layout and the gutters are kept beside areas a reader set, even where they equal the defaults, since the
+    // layout is laid out from those areas wherever none is kept, and would be laid out from them again on every load
+    JSON.stringify(Object.fromEntries(Object.entries(state.settings).filter(([k, v]) => (k === "layout" || k === "gutters" ? JSON.stringify(state.settings.areas) !== JSON.stringify(DEFAULTS.areas) : false) || JSON.stringify(v) !== JSON.stringify(DEFAULTS[k as keyof Settings])))),
   );
 
 // ### 3.8.1 The keys: every act and what fires it
@@ -3291,7 +3538,9 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
 function drawDish(): void {
   if (ui.dish.hidden || !state.body) return;
   if (inPast()) return void onBody(drawDish);
-  const top = ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top;
+  // wide, the plate clears its head, and the way down where it stands over the plate alone
+  const crumbed = narrow() || (!fits().lane && !fits().canvas);
+  const top = Math.max(narrow() ? 0 : HEADROOM - 4, ui.crumb.hidden || !crumbed ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top);
   ui.dish.style.paddingTop = `${Math.max(12, Math.round(top + 12))}px`;
   ui.dish.style.paddingBottom = `${footRoom()}px`;
   ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - Math.max(12, top + 12) - footRoom(), Infinity);
@@ -3352,8 +3601,8 @@ let colOf = new Map<string, number>();
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
 
-/** Whether the pointer rests on the pane at the right, which is what hands it the keys. */
-let pointerRight = false;
+/** The pane the pointer rests on, which is what hands the canvas the keys. */
+let pointerOn: PaneName | null = null;
 
 /**
  * The pane the keys belong to: the pane at the left, and the pane at the right while the pointer rests on it. The dish
@@ -3366,10 +3615,10 @@ let pointerRight = false;
  * 2026-10-01: the history had become a mode of the one canvas, so no two maps stand side by side to be told apart.
  */
 function keyPane(): PaneName {
-  const panes = fits().panes;
-  const takes = panes.filter((p) => p !== "dish");
-  if (panes.length < 2 || takes.length < 2) return takes[0] ?? panes[0] ?? "lane";
-  return pointerRight ? panes[1] : panes[0];
+  const on = fits();
+  // wide, the canvas holds the keys while the pointer rests on it, and the prose otherwise
+  if (!narrow()) return pointerOn === "canvas" && on.canvas ? "canvas" : on.lane ? "lane" : on.canvas ? "canvas" : "lane";
+  return on.panes.find((p) => p !== "dish") ?? on.panes[0] ?? "lane";
 }
 
 /** Whether a key acts on a map: it does when the pane holding the keys is the canvas; the dish has no act a key could fire. */
@@ -3596,7 +3845,7 @@ const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { inde
 const treeForm = () => TREE[state.settings.tree] ?? TREE.spine;
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
-const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere", "face", "trunk"];
+const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere"];
 
 /**
  * The field: the acts of what is selected, standing within the canvas at its foot rather than at the foot of the page,
@@ -4303,7 +4552,7 @@ function commitHtml(b: Brief, c: Commit, after: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement; zone: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -4321,7 +4570,7 @@ const FOOT = STRIP + 10;
  * prose, and standing over the reading is the whole of what it is for, so the fade is what keeps it readable and the
  * prose keeps the room it would otherwise have lost.
  */
-const footRoom = (): number => (narrow() ? state.settings.gap : FOOT);
+const footRoom = (): number => (narrow() || state.settings.dock === "left" ? state.settings.gap : FOOT);
 /** Where the prose's fade lies at each edge of the lane: clear from the edge to here, then fading in over the fade setting. */
 const RIM = { top: 3, foot: 6 };
 
@@ -4338,7 +4587,7 @@ function band(h: number): { top: number; height: number } {
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
   // a wing's figures clear the strip wide; narrow, the rail stands at the edge and the mark at the middle, so they
   // never meet and the rail reaches as far down as the prose does
-  const foot = Math.max(narrow() ? s.gap : s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
+  const foot = Math.max(narrow() || s.dock === "left" ? s.gap : s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
   return { top: Math.round(top), height: Math.max(0, Math.round(h - top - foot)) };
 }
 
@@ -4407,7 +4656,8 @@ function fitsWith(held: Held): Fit {
   }
   return on;
 }
-const fits = (): Fit => fitsWith(state.settings.areas);
+/** What the width allows: where the lane stands alone, the areas; wide, the row laid by hand. */
+const fits = (): Fit => (narrow() ? fitsWith(state.settings.areas) : fitsLaid());
 
 /** The element each pane stands in. */
 const paneEl = (p: PaneName): HTMLElement => ({ lane: ui.scroll, canvas: ui.canvas, dish: ui.dish })[p];
@@ -4441,6 +4691,9 @@ function drawLayout(): void {
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
+  laidNow = null;
+  if (!narrow()) return drawLaid();
+  unlay();
   const on = fits();
   // a viewport narrower than the measure gives the lane what there is, less what the rail takes: the rail stands at the
   // edge of the page, so it takes the space that stood there rather than a space of its own
@@ -4496,6 +4749,321 @@ function drawLayout(): void {
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
 }
 
+/** What each program stands in on the page now, in the page's own measure: what a drop is aimed at, and what a head stands over. */
+const boxes = new Map<string, { x: number; y: number; w: number; h: number }>();
+/** The gaps between two growing figures of one stack, laid with the stacks, each a height that can be pulled. */
+let stackGaps: { c: number; i: number; x: number; w: number; y: number; h: number }[] = [];
+
+/** Lays the row wide: each program at its column's place and width, the prose with its gutters, then the gaps and the heads. */
+function drawLaid(): void {
+  const s = state.settings;
+  const H = ui.areas.clientHeight;
+  ui.areas.classList.add("laid");
+  ui.areas.style.gridTemplateColumns = "";
+  ui.areas.style.columnGap = "0px";
+  (["wingL", "wingR"] as const).forEach((a) => (ui.parts[a].hidden = true));
+  boxes.clear();
+  const put = (el: HTMLElement, x: number, w: number) => {
+    el.style.gridColumn = "";
+    el.style.gridRow = "";
+    el.style.left = `${Math.round(x)}px`;
+    el.style.width = `${Math.round(w)}px`;
+  };
+  const p = laidAt("prose");
+  const f = proseIn(p?.w ?? proseOwn("body"), "body");
+  // the prose taken away is kept laid out of sight rather than hidden, since the shape and the reading line measure it
+  ui.scroll.classList.toggle("off", !p);
+  put(ui.scroll, p?.x ?? 0, p?.w ?? proseOwn("body"));
+  if (p) boxes.set("prose", { x: p.x, y: 0, w: p.w, h: H });
+  ui.parts.gutterL.hidden = !f.sides[0];
+  ui.parts.gutterR.hidden = !f.sides[1];
+  ui.parts.gutterL.classList.remove("closed");
+  ui.parts.gutterR.classList.remove("closed");
+  const inner = [...(f.sides[0] ? [f.gutter] : []), f.measure, ...(f.sides[1] ? [f.gutter] : [])];
+  ui.content.style.gridTemplateColumns = inner.map((x) => `${Math.round(x)}px`).join(" ");
+  ui.content.style.columnGap = `${s.gap}px`;
+  document.documentElement.style.setProperty("--measure", `${Math.round(f.measure)}px`);
+  const c = laidAt("canvas");
+  ui.canvas.hidden = !c;
+  ui.canvas.classList.remove("bleed");
+  if (c) (put(ui.canvas, c.x, c.w), boxes.set("canvas", { x: c.x, y: 0, w: c.w, h: H }));
+  const d = laidAt("plate");
+  ui.dish.hidden = !d;
+  if (d) (put(ui.dish, d.x, d.w), boxes.set("plate", { x: d.x, y: 0, w: d.w, h: H }));
+  drawSeams();
+  drawHeads();
+}
+
+/** Takes the row away where the lane stands alone, so the areas lay the page as they did. */
+function unlay(): void {
+  ui.areas.classList.remove("laid");
+  [ui.scroll, ui.canvas, ui.dish].forEach((el) => {
+    el.style.left = "";
+    el.style.width = "";
+  });
+  all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = true));
+  ui.seams.innerHTML = "";
+  ui.heads.innerHTML = "";
+  ui.zone.hidden = true;
+  boxes.clear();
+  stackGaps = [];
+}
+
+/** The element a figure stands in wide, made the first time it is asked for. */
+function hostOf(k: string): HTMLElement {
+  let el = ui.areas.querySelector<HTMLElement>(`:scope > .host[data-slot="${cssEsc(k)}"]`);
+  if (!el) {
+    el = document.createElement("section");
+    el.className = "slot host";
+    el.dataset.slot = k;
+    ui.areas.insertBefore(el, ui.seams);
+  }
+  return el;
+}
+
+/**
+ * Lays each column of figures: those of fixed size drawn first and measured, the growing ones sharing what is left by
+ * the shares the reader pulled them to, evenly until they did. A lone figure has the whole room, centred. The figures
+ * stand in the band the prose reads in, between the middles of its fades.
+ */
+function drawStacks(): void {
+  const s = state.settings;
+  const L = layoutNow();
+  const { top, height: room } = band(ui.areas.clientHeight);
+  Array.from(slots.keys())
+    .filter((k) => k.startsWith("fig:"))
+    .forEach((k) => slots.delete(k));
+  Array.from(boxes.keys())
+    .filter((k) => !isAlone(k))
+    .forEach((k) => boxes.delete(k));
+  stackGaps = [];
+  const shown = new Set<string>();
+  laid().cols.forEach((col) => {
+    const items = L[col.c].items.filter((it) => WIDGETS[it.k]?.kind === "figure");
+    if (!items.length) return;
+    const W = Math.round(col.w);
+    const slotted = items.map((it) => {
+      const el = hostOf(it.k);
+      const f = WIDGETS[it.k] as Figure;
+      shown.add(it.k);
+      el.hidden = false;
+      el.style.left = `${Math.round(col.x)}px`;
+      el.style.width = `${W}px`;
+      el.style.top = `${top}px`;
+      el.style.height = "";
+      if (!f.grow) el.innerHTML = f.draw(W, items.length === 1 ? room : (room - s.gap) / 2);
+      return { it, el, f, height: f.grow ? 0 : Math.min(room, el.scrollHeight) };
+    });
+    const growing = slotted.filter((x) => x.f.grow);
+    const left = Math.max(0, room - slotted.reduce((n, x) => n + x.height, 0) - s.gap * (slotted.length - 1));
+    const total = growing.reduce((n, x) => n + (x.it.h ?? 1), 0);
+    growing.forEach((x) => (x.height = total ? (left * (x.it.h ?? 1)) / total : 0));
+    let y = top;
+    slotted.forEach((x, i) => {
+      const height = Math.round(slotted.length === 1 ? room : x.height);
+      x.el.style.top = `${Math.round(y)}px`;
+      x.el.style.height = `${height}px`;
+      slots.set(`fig:${x.it.k}`, { top: Math.round(y), height });
+      boxes.set(x.it.k, { x: col.x, y: Math.round(y), w: col.w, h: height });
+      // a slot shorter than a figure can draw in is left empty rather than drawn at a scale below nothing
+      if (x.f.grow) x.el.innerHTML = height >= FIGURE_FLOOR ? x.f.draw(W, height) : "";
+      const next = slotted[i + 1];
+      if (next && x.f.grow && next.f.grow) stackGaps.push({ c: col.c, i: L[col.c].items.indexOf(x.it), x: col.x, w: col.w, y: y + height, h: s.gap });
+      y += height + s.gap;
+    });
+  });
+  all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = !shown.has(el.dataset.slot!)));
+  drawSeams();
+  drawHeads();
+}
+
+/** Draws one figure again where it already stands, for what changes with the focus or the pointer. */
+function drawHosted(k: string): void {
+  const el = hostOf(k);
+  const at = slots.get(`fig:${k}`);
+  const f = WIDGETS[k];
+  const col = laidAt(k);
+  if (!el.hidden && at && col && f?.kind === "figure") el.innerHTML = f.draw(Math.round(col.w), at.height);
+}
+
+/**
+ * The gaps that can be pulled: between two columns where either side can be pulled, at either edge of the row beside
+ * one that can, and between two growing figures of a stack. Nothing is drawn for them but the pointer saying so.
+ */
+function drawSeams(): void {
+  const L = layoutNow();
+  const pulls = (c: number | null) => c !== null && !!L[c] && aloneIn(L[c]) !== null;
+  const reach = 24;
+  const html = laid().spaces.flatMap((sp, j) => {
+    if (!pulls(sp.left) && !pulls(sp.right)) return [];
+    // an edge may be wide where the room stands at the edges, so it is taken hold of beside the column it sizes
+    const w = Math.max(8, Math.min(reach, sp.w));
+    const x = sp.left === null ? sp.x + sp.w - w : sp.right === null ? sp.x : sp.x + (sp.w - w) / 2;
+    return [`<div class="seam" data-seam="${j}" style="left:${Math.round(x)}px;width:${Math.round(w)}px"></div>`];
+  });
+  stackGaps.forEach((g) =>
+    html.push(`<div class="seam v" data-vseam="${g.c}:${g.i}" style="left:${Math.round(g.x)}px;width:${Math.round(g.w)}px;top:${Math.round(g.y)}px;height:${Math.max(8, Math.round(g.h))}px"></div>`),
+  );
+  ui.seams.innerHTML = html.join("");
+}
+
+/** The program whose head the pointer is near, so it shows. */
+let nearHead: string | null = null;
+
+/** Where a program's head stands: along the top of a program alone in its column, in the room above a figure. */
+const headTop = (k: string, b: { y: number }): number => (isAlone(k) ? 0 : Math.max(0, b.y - HEADROOM));
+
+/**
+ * The heads: a thin row along each program's top edge, its grip at the left and the program's own settings after it.
+ * It shows only while the pointer is near that edge, since a reader with a mouse resting on the prose would otherwise
+ * read under it the whole time.
+ */
+function drawHeads(): void {
+  ui.heads.innerHTML = Array.from(boxes)
+    .map(
+      ([k, b]) =>
+        `<div class="phead${k === nearHead ? " near" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
+        `<button class="grip" data-grip="${esc(k)}" data-tip="${esc(`${PROGRAMS[k].name} — drag to move it, or hold alt and drag anywhere on it`)}">${icon(PROGRAMS[k].icon)}</button>` +
+        `<span class="own">${headSettings(k)}</span></div>`,
+    )
+    .join("");
+}
+
+/** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
+function headSettings(k: string): string {
+  if (k === "canvas") return badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true);
+  if (k !== "prose") return "";
+  const g = state.settings.gutters.body;
+  return ([0, 1] as const)
+    .map((i) => {
+      const side = i ? "right" : "left";
+      const tip = `the links in the gutter at the ${side} — press to ${g[i] ? "take them away" : "stand them there"}`;
+      return `<button class="pick gutter-pick${g[i] ? " on" : ""} side-${i ? "r" : "l"}" data-gutter="body:${i}" data-tip="${esc(tip)}">${icon("links")}</button>`;
+    })
+    .join("");
+}
+
+/** Which head the pointer is near: within the band along a program's top edge, a little past it either way. */
+function headNear(x: number, y: number): string | null {
+  const r = ui.areas.getBoundingClientRect();
+  const px = x - r.left;
+  const py = y - r.top;
+  for (const [k, b] of boxes) {
+    const top = headTop(k, b);
+    if (px >= b.x && px <= b.x + b.w && py >= top - 4 && py <= top + HEADROOM + 14) return k;
+  }
+  return null;
+}
+
+/** The program standing under a point, for a drag that takes hold of it anywhere. */
+function programAt(x: number, y: number): string | null {
+  const r = ui.areas.getBoundingClientRect();
+  const px = x - r.left;
+  const py = y - r.top;
+  for (const [k, b] of boxes) if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) return k;
+  return null;
+}
+
+/**
+ * Where a program dragged would land: the dock, which takes it away; the program under the pointer, by the zone of it the
+ * pointer is in, its middle to trade places, its top or bottom half to stand in its stack, its left or right half to
+ * stand beside it; and anywhere else a column of its own, at that place in the row.
+ */
+function zoneAt(x: number, y: number, k: string): Zone | null {
+  const over = document.elementFromPoint(x, y) as HTMLElement | null;
+  if (over?.closest(".dock")) return standing(k) && layoutNow().reduce((n, c) => n + c.items.length, 0) > 1 ? { kind: "dock" } : null;
+  const r = ui.areas.getBoundingClientRect();
+  const px = x - r.left;
+  const py = y - r.top;
+  for (const [t, b] of boxes) {
+    if (t === k || px < b.x || px > b.x + b.w || py < b.y || py > b.y + b.h) continue;
+    const rx = (px - b.x) / b.w;
+    const ry = (py - b.y) / b.h;
+    if (Math.abs(rx - 0.5) < 0.2 && Math.abs(ry - 0.5) < 0.2 && canTrade(k, t)) return { kind: "trade", target: t };
+    // only programs that share a stack are offered its top and bottom, and the edge nearer the pointer decides,
+    // reckoned as a share of the program and not in pixels, since a figure is tall and narrow and its sides are near
+    if (!isAlone(k) && !isAlone(t) && Math.min(ry, 1 - ry) < Math.min(rx, 1 - rx)) return { kind: "stack", target: t, after: ry > 0.5 };
+    return { kind: "beside", target: t, after: rx > 0.5 };
+  }
+  const cols = laid().cols;
+  const j = cols.findIndex((col) => px < col.x + col.w / 2);
+  return { kind: "col", at: j < 0 ? layoutNow().length : cols[j].c };
+}
+
+/** Shades the one zone a drop would land in, and nothing else moves until it is let go. */
+function drawZone(z: Zone | null): void {
+  ui.strips.querySelector(".dock")?.classList.toggle("taking", z?.kind === "dock");
+  if (!z || z.kind === "dock") return void (ui.zone.hidden = true);
+  let r: { x: number; y: number; w: number; h: number };
+  if (z.kind === "col") {
+    const sp = laid().spaces.find((x) => x.right === z.at) ?? laid().spaces[laid().spaces.length - 1];
+    r = { x: sp.x + sp.w / 2 - 3, y: 0, w: 6, h: ui.areas.clientHeight };
+  } else {
+    const b = boxes.get(z.target)!;
+    r = z.kind === "trade" ? b : z.kind === "beside" ? { ...b, x: z.after ? b.x + b.w / 2 : b.x, w: b.w / 2 } : { ...b, y: z.after ? b.y + b.h / 2 : b.y, h: b.h / 2 };
+  }
+  ui.zone.style.left = `${Math.round(r.x)}px`;
+  ui.zone.style.top = `${Math.round(r.y)}px`;
+  ui.zone.style.width = `${Math.round(r.w)}px`;
+  ui.zone.style.height = `${Math.round(r.h)}px`;
+  ui.zone.hidden = false;
+}
+
+/** Lands a program dragged in the zone it was let go in, remembering where it stood when the dock takes it. */
+function dropProgram(k: string, z: Zone): void {
+  if (z.kind === "dock") {
+    if (!standing(k) || layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return;
+    remember(k);
+  }
+  const next = dropped(layoutNow(), k, z);
+  if (next === layoutNow()) return;
+  state.settings.layout = next;
+  saveSettings();
+  drawAll();
+}
+
+/**
+ * Pulls a gap across: between two columns it trades width between them, and the rest of the row stands still; at an
+ * edge it sizes the column beside it alone, twice as fast where the row is centred, since the row then draws in from
+ * both sides and the edge would otherwise lag the pointer. A figure is never pulled, so beside one only the other moves.
+ */
+function pullSeam(left: number | null, right: number | null, dx: number, start: Map<number, number>): void {
+  const L = layoutNow().map((c) => ({ ...c }));
+  const pulls = (c: number | null): c is number => c !== null && !!L[c] && aloneIn(L[c]) !== null;
+  const w0 = (c: number) => start.get(c) ?? colOwn(L[c]);
+  const least = (c: number) => colLeast(L[c]);
+  const edge = state.settings.room === "centred" ? 2 : 1;
+  if (left !== null && right !== null) {
+    if (pulls(left) && pulls(right)) {
+      const total = w0(left) + w0(right);
+      const lw = clamp(w0(left) + dx, least(left), total - least(right));
+      L[left].w = Math.round(lw);
+      L[right].w = Math.round(total - lw);
+    } else if (pulls(left)) L[left].w = Math.round(Math.max(least(left), w0(left) + dx));
+    else if (pulls(right)) L[right].w = Math.round(Math.max(least(right), w0(right) - dx));
+  } else if (pulls(right)) L[right].w = Math.round(Math.max(least(right), w0(right) - dx * edge));
+  else if (pulls(left)) L[left].w = Math.round(Math.max(least(left), w0(left) + dx * edge));
+  state.settings.layout = L;
+}
+
+/** Pulls the gap between two growing figures of a stack, trading height between them; their shares are kept as the heights they stand at. */
+function pullStack(c: number, i: number, dy: number, start: number[]): void {
+  const L = layoutNow().map((col) => ({ ...col, items: col.items.map((it) => ({ ...it })) }));
+  const items = L[c]?.items;
+  if (!items) return;
+  const growing = items.map((it, j) => ({ it, j })).filter((x) => (WIDGETS[x.it.k] as Figure)?.grow);
+  growing.forEach((x, n) => (x.it.h = start[n]));
+  const a = growing.findIndex((x) => x.j === i);
+  const up = growing[a];
+  const down = growing[a + 1];
+  if (!up || !down) return;
+  const total = start[a] + start[a + 1];
+  const h = clamp(start[a] + dy, FIGURE_FLOOR, total - FIGURE_FLOOR);
+  up.it.h = Math.round(h);
+  down.it.h = Math.round(total - h);
+  state.settings.layout = L;
+}
+
 /** Draws the lane whole and lays the adjuncts beside it; the header says where the lane is scoped. */
 function drawLane(): void {
   drawCrumb();
@@ -4536,7 +5104,7 @@ function alignEnds(): void {
   let B = h / 2;
   if (state.settings.line === "ends") {
     // the shape's own room, wherever in a wing it stands; with no shape drawn, the room a lone figure would have
-    const slot = slots.get("wingL:shape") ?? slots.get("wingR:shape") ?? band(h);
+    const slot = (narrow() ? undefined : slots.get("fig:shape")) ?? slots.get("wingL:shape") ?? slots.get("wingR:shape") ?? band(h);
     const first = slot.top + SHAPE.inset;
     for (let i = 0; i < 6; i++) {
       const k = (slot.height - 8) / (P + laneH + tail + B);
@@ -4693,7 +5261,9 @@ function placeCanvas(): void {
     ui.canvas.style.marginBottom = "0px";
     return;
   }
-  const top = Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
+  // wide, the canvas clears its head, and the way down only where it stands over the canvas, the prose not standing
+  const under = narrow() || !fits().lane;
+  const top = Math.max(s.gap, narrow() ? 0 : HEADROOM + 4, ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
   ui.canvas.style.marginBottom = `${footRoom()}px`;
 }
@@ -4705,7 +5275,9 @@ function placeCanvas(): void {
 function placeCrumb(): void {
   // the bar stands flush with the prose's edges and with the canvas's rim, and with the rail's edge where one stands,
   // so the placement has the whole row to read in and the depth stands over the rail
-  const edges = [...panesShown(), ...(fits().rail ? [ui.parts.wingL] : [])].map((el) => {
+  // wide, the way down stands over the prose, or over the canvas where the prose does not stand
+  const over = fits().lane ? ui.scroll : fits().canvas ? ui.canvas : fits().dish ? ui.dish : ui.scroll;
+  const edges = (narrow() ? [...panesShown(), ...(fits().rail ? [ui.parts.wingL] : [])] : [over]).map((el) => {
     const r = el.getBoundingClientRect();
     return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
   });
@@ -4744,7 +5316,8 @@ function drawAdjuncts(): void {
   let overhang = 0;
   (["gutterL", "gutterR"] as const).forEach((area) => {
     const col = ui.parts[area];
-    const widget = widgetOf(area);
+    // wide, what a gutter holds is a setting of the prose it stands beside
+    const widget = narrow() ? widgetOf(area) : WIDGETS[state.settings.gutters[inPast() ? "history" : "body"][area === "gutterL" ? 0 : 1] ?? ""];
     col.innerHTML = "";
     if (!on[area] || widget?.kind !== "adjunct") return;
     // measured from the column itself, which starts below the room the reading line sets above the lane
@@ -4893,6 +5466,18 @@ function drawSlot(area: "wingL" | "wingR", name: string): void {
 
 function drawWings(only?: "focus" | "point"): void {
   if (only !== "point") drawDish();
+  // wide, the figures stand in the row's stacks rather than in the wings
+  if (!narrow()) {
+    if (!only) drawStacks();
+    else
+      layoutNow().forEach((c) =>
+        c.items.forEach((it) => {
+          const f = WIDGETS[it.k];
+          if (f?.kind === "figure" && (only === "focus" ? f.onFocus : f.onPoint)) drawHosted(it.k);
+        }),
+      );
+    return drawFocusMarks();
+  }
   (["wingL", "wingR"] as const).forEach((area) => {
     if (!only) return drawWing(area);
     figureNames(area).forEach((name) => {
@@ -4927,10 +5512,17 @@ function drawChooser(): void {
     ui.strips.innerHTML = `<div class="strip foot">${acts}<div class="pill glass">${switchHtml()}${narrowChoices().map(pickNarrowHtml).join("")}</div></div>`;
     return;
   }
-  // widened, the row comes back whole and nothing stands open over the reading
+  // widened, the dock comes back whole and nothing stands open over the reading
   chooser.sheet = null;
-  const group = (kind: Widget["kind"]) => `<span class="group">${choicesFor(kind).map(pickHtml).join("")}</span>`;
-  ui.strips.innerHTML = `<div class="strip"><span class="group">${switchHtml()}</span>${(["pane", "adjunct", "figure"] as const).map(group).join("")}</div>`;
+  const pick = (k: string): string => {
+    const at = whereIs(k);
+    // standing but given way at this width: the choice holds and only the room is missing
+    const denied = at && laid().gone.has(at.c) ? " denied" : "";
+    const fixed = at && layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1 ? " fixed" : "";
+    return `<button class="pick${at ? " on" : ""}${denied}${fixed}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${icon(PROGRAMS[k].icon)}</button>`;
+  };
+  const groups = DOCK.map((g) => `<span class="group">${g.map(pick).join("")}</span>`).join("");
+  ui.strips.innerHTML = `<div class="strip dock ${state.settings.dock}"><span class="group">${switchHtml()}</span>${groups}</div>`;
 }
 
 // ### 3.12.1 The card at the foot
@@ -5001,18 +5593,6 @@ function drawSheet(): void {
   ui.sheet.innerHTML = `<div class="slot"></div>`;
   const slot = ui.sheet.firstElementChild as HTMLElement;
   slot.innerHTML = (w as Figure).draw(slot.clientWidth, slot.clientHeight);
-}
-
-/** One icon: what it is, whether it stands and on which side, and whether it can be taken at all. */
-function pickHtml(k: string): string {
-  const at = standsIn(k);
-  // a pane's side is its place in the middle, and a lone pane has none, so it carries no dot
-  const pane = WIDGETS[k].kind === "pane" ? paneSide(k) : null;
-  const side = at === null || pane === "alone" ? "" : pane ? (pane === "left" ? " side-l" : " side-r") : at.endsWith("L") ? " side-l" : " side-r";
-  // in use but with no room at this width: the choice stands and the width denies it, which is neither in use nor out of reach
-  const denied = at !== null && !fits()[at === "middle" ? (k as PaneName) : at] ? " denied" : "";
-  const quiet = offered(k) ? "" : at ? " fixed" : " off";
-  return `<button class="pick${at ? " on" : ""}${side}${denied}${quiet}" data-widget="${esc(k)}" data-tip="${esc(pickTip(k))}">${icon(WIDGETS[k].icon)}</button>`;
 }
 
 function drawAll(): void {
@@ -5094,7 +5674,7 @@ function tipHtml(el: HTMLElement): string {
   }
   if (el.matches("#lane a[data-link]")) {
     // beside the lane the links already tell of every link, so the tooltip stays out of the way there
-    if (isOpen("gutterR") && fits().gutterR) return "";
+    if (fits().gutterL || fits().gutterR) return "";
     const to = el.dataset.link!;
     const b = brief(to);
     if (b) return `${pathHtml(to)}${name(b)}<span class="gloss">${esc(faceOf(b))}</span>`;
@@ -5135,12 +5715,14 @@ function showTip(el: Element, html: string): void {
   const h = t.offsetHeight;
   const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
   const fig = el.closest("svg.fig, .tree, .keys, .settings");
-  const wing = el.closest<HTMLElement>(".wing");
+  const wing = el.closest<HTMLElement>(".wing, .host");
   let left: number;
   let top: number;
   if (fig && wing) {
     const f = fig.getBoundingClientRect();
-    left = wing.dataset.area === "wingL" ? f.right + 8 : f.left - w - 8;
+    // beside the figure on the side nearer the middle of the page, which is where the reading is
+    const leftSide = wing.classList.contains("host") ? f.left + f.width / 2 < innerWidth / 2 : wing.dataset.area === "wingL";
+    left = leftSide ? f.right + 8 : f.left - w - 8;
     top = level();
   } else if (el.closest("#canvas")) {
     // past the row itself, on whichever side the pane has room for it
@@ -5289,8 +5871,9 @@ function backTo(i: number): void {
  */
 function readOn(a: string): void {
   if (!fits().lane) {
-    const middle = narrow() ? ["lane"] : ["canvas", "lane"];
-    state.settings.areas = { ...state.settings.areas, middle };
+    // wide, the prose comes in as a column beside the canvas, the side towards the middle of the row
+    if (narrow()) state.settings.areas = { ...state.settings.areas, middle: ["lane"] };
+    else if (!standing("prose")) state.settings.layout = dropped(layoutNow(), "prose", standing("canvas") ? { kind: "beside", target: "canvas", after: (whereIs("canvas")?.c ?? 0) < layoutNow().length / 2 } : { kind: "col", at: layoutNow().length });
     saveSettings();
     drawLayout();
     drawChooser();
@@ -5797,10 +6380,17 @@ function wire(): void {
     pointer.still = false;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    // the keys follow the pointer onto the pane at the right, and back to the left when it leaves
-    const right = fits().panes[1];
-    const onRight = !!right && paneEl(right).contains(e.target as Node);
-    pointerRight = onRight;
+    // the canvas takes the keys while the pointer rests on it, and they go back to the prose when it leaves
+    pointerOn = (["canvas", "lane", "dish"] as PaneName[]).find((p) => paneEl(p).contains(e.target as Node)) ?? null;
+    // a program's head shows while the pointer is near its top edge, and not while a program is being moved
+    if (!narrow() && !drag) {
+      const near = headNear(e.clientX, e.clientY);
+      if (near !== nearHead) {
+        ui.heads.querySelector(".near")?.classList.remove("near");
+        nearHead = near;
+        if (near !== null) ui.heads.querySelector(`[data-head="${cssEsc(near)}"]`)?.classList.add("near");
+      }
+    }
     // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
     const el = named(e);
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
@@ -5815,7 +6405,14 @@ function wire(): void {
     if (inPast()) lightPlate(onPlate ? el!.dataset.a! : null);
     tip(e);
   });
-  document.documentElement.addEventListener("pointerleave", () => (point(null), inPast() && lightPlate(null), hideTip(), (pointerRight = false)));
+  document.documentElement.addEventListener("pointerleave", () => {
+    point(null);
+    if (inPast()) lightPlate(null);
+    hideTip();
+    pointerOn = null;
+    nearHead = null;
+    ui.heads.querySelector(".near")?.classList.remove("near");
+  });
 
   document.addEventListener("click", (e) => {
     hideTip();
@@ -5866,15 +6463,17 @@ function wire(): void {
     const opened = t.closest<HTMLElement>("#lane .card[data-card]");
     if (opened) return void goTo(opened.dataset.card!);
     const pick = t.closest<HTMLElement>(".strip [data-widget]");
-    if (pick) {
-      const k = pick.dataset.widget!;
-      if (narrow()) return void chooseNarrow(k);
-      if (!offered(k)) return;
-      // a pane remembers what its press pushed out, so the next press can give it back; the press is reckoned once,
-      // since reckoning it again after the memory is written reads a memory the press has already spent
-      const next = WIDGETS[k].kind === "pane" ? panePress(k) : null;
-      state.settings.areas = next ? { ...state.settings.areas, middle: next.middle } : cycled(k);
-      if (next) pushedOut.set(k, next.pushed);
+    if (pick) return void (narrow() && chooseNarrow(pick.dataset.widget!));
+    // a program's icon in the dock takes it away, and a second press puts it back where it stood; a drag is not a press
+    const program = t.closest<HTMLElement>(".dock [data-program]");
+    if (program) return void (state.scrubbing || pressProgram(program.dataset.program!));
+    // a gutter is a setting of the prose it stands beside, set in its head
+    const gutter = t.closest<HTMLElement>("[data-gutter]");
+    if (gutter) {
+      const [w, i] = gutter.dataset.gutter!.split(":") as ["body" | "history", string];
+      const g = state.settings.gutters[w].slice() as [string | null, string | null];
+      g[Number(i)] = g[Number(i)] ? null : "links";
+      state.settings.gutters = { ...state.settings.gutters, [w]: g };
       saveSettings();
       return void drawAll();
     }
@@ -5911,9 +6510,48 @@ function wire(): void {
   });
 
   // dragging: a knob turns, the shape scrubs
-  let drag: { kind: "knob" | "shape" | "rail" | "canvas" | "card"; el: HTMLElement; x: number; y: number; start: number; vx?: number; vy?: number; moved: boolean } | null = null;
+  let drag: {
+    kind: "knob" | "shape" | "rail" | "canvas" | "card" | "move" | "seam" | "vseam";
+    el: HTMLElement;
+    x: number;
+    y: number;
+    start: number;
+    vx?: number;
+    vy?: number;
+    moved: boolean;
+    /** a program being moved, and the zone it would land in */
+    k?: string;
+    zone?: Zone | null;
+    /** a gap being pulled: the columns either side, or the stack and the figure above it, and what they stood at */
+    sides?: [number | null, number | null];
+    widths?: Map<number, number>;
+    heights?: number[];
+  } | null = null;
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
+    // wide, a gap is pulled, and a program is taken by its grip, by its icon in the dock, or anywhere with alt held
+    if (!narrow()) {
+      const t = e.target as HTMLElement;
+      const seam = t.closest<HTMLElement>("[data-seam]");
+      const vseam = t.closest<HTMLElement>("[data-vseam]");
+      const grip = t.closest<HTMLElement>("[data-grip]") ?? t.closest<HTMLElement>(".dock [data-program]");
+      const held = e.altKey && !grip ? programAt(e.clientX, e.clientY) : null;
+      const at = { el: ui.areas, x: e.clientX, y: e.clientY, start: 0, moved: false };
+      if (seam) {
+        const sp = laid().spaces[Number(seam.dataset.seam)];
+        drag = { ...at, kind: "seam", sides: [sp.left, sp.right], widths: new Map(laid().cols.map((c) => [c.c, c.w])) };
+      } else if (vseam) {
+        const [c, i] = vseam.dataset.vseam!.split(":").map(Number);
+        const heights = layoutNow()[c].items.filter((it) => (WIDGETS[it.k] as Figure)?.grow).map((it) => slots.get(`fig:${it.k}`)?.height ?? FIGURE_FLOOR);
+        drag = { ...at, kind: "vseam", sides: [c, i], heights };
+      } else if (grip || held) drag = { ...at, kind: "move", k: grip?.dataset.grip ?? grip?.dataset.program ?? held!, zone: null };
+      if (drag) {
+        // a press on an icon of the dock is still a press: only the text a drag would select is spared, and the pointer
+        // is held only once it moves, since holding it at the press would hand the press itself to the page
+        if (!grip?.dataset.program) e.preventDefault();
+        return;
+      }
+    }
     const knob = (e.target as HTMLElement).closest<HTMLElement>("[data-knob]");
     const held = (e.target as HTMLElement).closest<HTMLElement>("#card");
     const map = (e.target as HTMLElement).closest<HTMLElement>("svg.shape");
@@ -5946,6 +6584,33 @@ function wire(): void {
   document.addEventListener("pointermove", (e) => {
     if (!drag) return;
     if (drag.kind === "rail") return void railScrub(e.clientX, e.clientY);
+    if (drag.kind === "move" || drag.kind === "seam" || drag.kind === "vseam") {
+      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+      if (!drag.moved) {
+        drag.moved = true;
+        state.scrubbing = true;
+        try {
+          ui.areas.setPointerCapture(e.pointerId);
+        } catch {}
+        hideTip();
+        nearHead = null;
+        ui.heads.querySelector(".near")?.classList.remove("near");
+        document.body.classList.add(drag.kind === "move" ? "moving" : drag.kind === "seam" ? "pulling" : "pulling-v");
+      }
+      if (drag.kind === "move") {
+        drag.zone = zoneAt(e.clientX, e.clientY, drag.k!);
+        return void drawZone(drag.zone);
+      }
+      if (drag.kind === "seam") pullSeam(drag.sides![0], drag.sides![1], e.clientX - drag.x, drag.widths!);
+      else pullStack(drag.sides![0]!, drag.sides![1]!, e.clientY - drag.y, drag.heights!);
+      // the row is laid again under the hand; the map is fitted to its new width once the hand lets go
+      drawLayout();
+      drawCrumb();
+      alignEnds();
+      drawAdjuncts();
+      drawWings();
+      return;
+    }
     // the card takes the whole of the movement: it grows until it is as tall as it may stand, and what is left over
     // scrolls its prose; going the other way the prose comes back first and then the card comes down
     if (drag.kind === "card") {
@@ -5993,6 +6658,18 @@ function wire(): void {
     }
   });
   const release = () => {
+    if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
+      document.body.classList.remove("moving", "pulling", "pulling-v");
+      ui.zone.hidden = true;
+      ui.strips.querySelector(".dock")?.classList.remove("taking");
+      const { kind, k, zone, moved } = drag;
+      drag = null;
+      setTimeout(() => (state.scrubbing = false), 0);
+      if (!moved) return;
+      if (kind === "move") return void (zone && dropProgram(k!, zone));
+      saveSettings();
+      return void drawAll();
+    }
     // let down past the least it is held at, the card goes, with what was chosen; anywhere else it stays where the
     // finger left it, since the reader put it there
     if (drag?.kind === "card") {
@@ -6015,6 +6692,21 @@ function wire(): void {
   };
   document.addEventListener("pointerup", release);
   document.addEventListener("pointercancel", release);
+  // a gap pressed twice gives the programs either side their own widths back, and a stack its even shares
+  document.addEventListener("dblclick", (e) => {
+    const t = e.target as HTMLElement;
+    const seam = t.closest<HTMLElement>("[data-seam]");
+    const vseam = t.closest<HTMLElement>("[data-vseam]");
+    if (!seam && !vseam) return;
+    const L = layoutNow().map((c) => ({ ...c, items: c.items.map((it) => ({ ...it })) }));
+    if (seam) {
+      const sp = laid().spaces[Number(seam.dataset.seam)];
+      [sp.left, sp.right].forEach((c) => c !== null && L[c] && delete L[c].w);
+    } else L[Number(vseam!.dataset.vseam!.split(":")[0])]?.items.forEach((it) => delete it.h);
+    state.settings.layout = L;
+    saveSettings();
+    drawAll();
+  });
   document.addEventListener(
     "wheel",
     (e) => {
@@ -6213,8 +6905,8 @@ function wire(): void {
     arrive(readHash());
   });
   window.addEventListener("resize", () => {
-    // what stands at the right may have changed under a still pointer, so the keys go back to the left until it moves
-    pointerRight = false;
+    // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
+    pointerOn = null;
     drawLayout();
     placeCrumb();
     alignEnds();
@@ -6287,6 +6979,9 @@ async function start(): Promise<void> {
       <section id="scroll"><div id="content"><div class="gutter" data-area="gutterL"></div><div id="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section id="dish" hidden></section>
       <section class="wing" data-area="wingR"></section>
+      <div id="seams"></div>
+      <div id="heads"></div>
+      <div id="zone" hidden></div>
       <div id="sheet" hidden></div>
       <div id="card" hidden></div>
       <div id="strips"></div>
@@ -6308,6 +7003,9 @@ async function start(): Promise<void> {
     sheet: $("#sheet"),
     card: $("#card"),
     strips: $("#strips"),
+    seams: $("#seams"),
+    heads: $("#heads"),
+    zone: $("#zone"),
     parts: { wingL: $('[data-area="wingL"]'), gutterL: $('[data-area="gutterL"]'), middle: $("#scroll"), gutterR: $('[data-area="gutterR"]'), wingR: $('[data-area="wingR"]') },
   };
   document.body.classList.toggle("touch", touch);
@@ -6471,6 +7169,41 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 #areas { position: relative; flex: 1 1 auto; min-height: 0; display: grid; justify-content: center; }
 #areas > [hidden] { display: none; }
+/* wide, the row laid by hand: each program stands where its column is laid, those alone in a column at the page's height */
+#areas.laid { display: block; }
+#areas.laid > #scroll, #areas.laid > #canvas, #areas.laid > #dish { position: absolute; top: 0; bottom: 0; }
+#areas.laid > .host { right: auto; }
+#areas:not(.laid) > .host, #areas:not(.laid) > #seams, #areas:not(.laid) > #heads { display: none; }
+/* the way down clears the heads that stand along the top edge */
+#areas.laid #crumb { top: ${HEADROOM + 4}px; }
+/* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
+#seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
+.seam.v { bottom: auto; cursor: row-resize; }
+body.pulling, body.pulling * { cursor: col-resize !important; user-select: none; }
+body.pulling-v, body.pulling-v * { cursor: row-resize !important; user-select: none; }
+body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
+/* a head: the grip and the program's own settings along its top edge, quiet until the pointer comes near; leaving, it
+   lingers a moment and fades, so a pointer on its way to it still finds it */
+#heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.phead { position: absolute; height: ${HEADROOM}px; display: flex; align-items: center; gap: 6px; opacity: 0; pointer-events: none; transition: opacity .3s ease .45s; font-family: var(--sans); font-size: 12px; }
+.phead.near { opacity: 1; pointer-events: auto; transition: opacity .12s ease 0s; }
+.phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
+.phead .grip:hover { background: var(--wash); color: var(--ink); }
+.phead .own { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.phead .pick { position: relative; width: 26px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--ink); opacity: .25; transition: opacity .15s; }
+.phead .pick.on { opacity: .8; color: var(--muted); }
+.phead .pick:hover { opacity: .7; background: var(--wash); }
+.phead .pick.side-l::after, .phead .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+.phead .pick.side-l::after { left: 2px; }
+.phead .pick.side-r::after { right: 2px; }
+.phead .badge { display: flex; align-items: center; gap: 5px; padding: 2px 7px; border-radius: 6px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.phead .badge:hover { background: var(--wash); color: var(--ink); }
+.phead .badge .sign { display: grid; place-items: center; }
+.phead .badge .sign .icon { width: 13px; height: 13px; }
+.phead .badge .label { color: inherit; }
+/* the one zone a drop would land in, shaded; nothing else moves until it is let go */
+#zone { position: absolute; z-index: 7; border-radius: 10px; background: var(--veil); box-shadow: inset 0 0 0 1.5px var(--faint); pointer-events: none; }
 /* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
 .wing { position: relative; overflow: hidden; }
 #dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
@@ -6620,6 +7353,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .strip .pick.side-l::after { left: 1px; }
 .strip .pick.side-r::after { right: 1px; }
 .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+/* the dock down the left edge is the same row, standing; a drag over it lifts it, since letting go there takes the program away */
+.strip.dock.left { position: fixed; left: 12px; bottom: auto; top: 50%; transform: translateY(-50%); flex-direction: column; }
+.strip.dock.left .group { flex-direction: column; }
+.strip.dock.left .group + .group { margin: 20px 0 0; }
+.strip.dock .pick { touch-action: none; }
+.strip.dock.taking .pick { opacity: .5; }
 
 .opening { margin-bottom: 40px; }
 .opening h1 { font-family: var(--head-face); font-size: var(--t); font-weight: calc(600 - var(--thin)); line-height: 1.12; letter-spacing: calc(-.014em * var(--head-tight)); margin: 6px 0 .56em; }
