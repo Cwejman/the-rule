@@ -1633,10 +1633,11 @@ const offsets = (widths: number[], gap: number): number[] => widths.map((_, i) =
  * The hue of a branch: every brief carries the hue of the root-level brief it stands under, so colour says
  * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ.
  */
-const hueOf = (address: string): number => {
-  const i = level("").findIndex((b) => b.address === address.split("/")[0]);
+const hueAmong = (roots: Brief[], address: string): number => {
+  const i = roots.findIndex((b) => b.address === address.split("/")[0]);
   return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
 };
+const hueOf = (address: string): number => hueAmong(level(""), address);
 const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
 
 // ### 3.1.1 The actions
@@ -2015,17 +2016,16 @@ function badgeHtml(id: string, a?: string, tight = false, marked = false): strin
   if (!act) return "";
   // where a badge stands in a field of acts rather than beside its object, it leads with its glyph, so the row reads
   // as acts rather than as words
-  const glyph = marked && act.mark ? `<span class="sign"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></span>` : "";
+  const sign = act.mark ? `<span class="sign"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></span>` : "";
+  const glyph = marked ? sign : "";
   // a badge keeps its room when it cannot be taken so that no row shifts under the pointer; with no pointer there is
   // nothing to shift under, and the room is wanted for the words, so a phone draws only what can be taken
   if (touch && !act.can(a)) return "";
   // the badge's third grain, beside the worded and the tight: a phone has no key, so the badge carries the word alone
   // and the cap's room goes with the cap. A tight badge falls back to the word, since its keys were all it had to show
-  if (touch)
-    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${glyph}<span class="label">${esc(act.label(a))}</span></span>`;
-  // an act with no key of its own has no cap to draw, so it carries its word alone, as it does under a finger
-  if (!act.keys.length)
-    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${act.mark ? `<span class="sign"><svg class="icon" viewBox="0 0 16 16">${act.mark(a)}</svg></span>` : ""}<span class="label">${esc(act.label(a))}</span></span>`;
+  // and an act with no key of its own has no cap to draw, so it carries its word alone, as it does under a finger
+  if (touch || !act.keys.length)
+    return `<span class="badge worded${act.can(a) ? "" : " off"}" data-act="${esc(id)}"${a !== undefined ? ` data-a="${esc(a)}"` : ""}>${touch ? glyph : sign}<span class="label">${esc(act.label(a))}</span></span>`;
   // tight, the badge is its keys alone, since it stands on the very thing it acts on and its place says what it does
   const said = tight ? "" : `<span class="label">${esc(act.label(a))}</span>`;
   // the caps cannot show that a key is leaned on rather than tapped, so a held chord says the word
@@ -2297,6 +2297,14 @@ function cardMap(a: string): string {
   return `<svg class="fig cardmap" width="${CARDMAP.w}" height="${h}" viewBox="0 0 ${CARDMAP.w} ${h}">${rows}</svg>`;
 }
 
+/** The line of acts beneath a brief or a card: what unfolding it would show, how much lies beneath, and its badges. */
+const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; beneath: number; unfold: boolean }): string =>
+  `<div class="act ${kind} chrome"${o.fold ? ` data-fold="${esc(a)}"` : ""}>` +
+  o.figure +
+  (o.beneath ? `<span class="beneath">${o.beneath} beneath</span>` : "") +
+  `<span class="acts">${o.unfold ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
+  `</div>`;
+
 function cardHtml(a: string): string {
   const b = brief(a);
   if (!b) return `<p class="chrome dim">a part that is not in the body</p>`;
@@ -2311,12 +2319,7 @@ function cardHtml(a: string): string {
   const hidden = all.filter((t) => !shown.includes(t));
   const beneath = beneathCount(a);
   const stamp = stampOf(b);
-  const line =
-    `<div class="act card-act chrome" ${foldable ? `data-fold="${esc(a)}"` : ""}>` +
-    (hidden.length ? actFigure(b, hidden, []) : "") +
-    (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-    `<span class="acts">${foldable ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
-    `</div>`;
+  const line = actLine("card-act", a, { fold: foldable, figure: hidden.length ? actFigure(b, hidden, []) : "", beneath, unfold: foldable });
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
@@ -2337,16 +2340,10 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
   const beneath = beneathIn(b.address);
   // a folded brief says beneath its face that it unfolds: the badge for the key, a bar per paragraph it hides, a frame
   // per image, and how many briefs lie beneath; the badge for opening it as the scope stands at the end of the line
-  const more =
-    g === "face" && (rest.length > 0 || beneath > 0)
-      ? `<div class="act more chrome" data-fold="${esc(b.address)}">` +
-        actFigure(b, rest) +
-        (beneath ? `<span class="beneath">${beneath} beneath</span>` : "") +
-        `<span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("scope", b.address)}</span>` +
-        `</div>`
-      : "";
+  const hasActs = rest.length > 0 || beneath > 0;
+  const more = g === "face" && hasActs ? actLine("more", b.address, { fold: true, figure: actFigure(b, rest), beneath, unfold: true }) : "";
   // a whole brief folds from a line at its foot
-  const less = g === "whole" && (rest.length > 0 || beneath > 0) ? `<div class="act less chrome" data-fold="${esc(b.address)}"><span class="acts">${badgeHtml("unfold", b.address)}${badgeHtml("scope", b.address)}</span></div>` : "";
+  const less = g === "whole" && hasActs ? actLine("less", b.address, { fold: true, figure: "", beneath: 0, unfold: true }) : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
@@ -2589,10 +2586,12 @@ function chooseNarrow(k: string): void {
 // but a setting of the prose it stands beside. Where the lane stands alone none
 // of this holds, and the areas above lay the page as they always did.
 
-/** How a program takes height: alone in its column at the page's whole height, sharing what its column has left, or only what it needs. */
-type Takes = "alone" | "grows" | "fixed";
-/** A program: what it is called, its icon, how it takes height, the width it stands at of its own and the least it is pulled to. */
-type Program = { name: string; icon: string; takes: Takes; own: () => number; least: () => number; world?: WorldName };
+/**
+ * A program: what it is called, its icon, whether it stands alone in its column at the page's whole height or is a figure
+ * in a stack, which then grows or takes what it needs as the figure itself says, the width it stands at of its own and
+ * the least it is pulled to.
+ */
+type Program = { name: string; icon: string; alone: boolean; own: () => number; least: () => number; world?: WorldName };
 
 /** The least the prose is pulled to: its measure alone, its gutters gone. */
 const PROSE_LEAST = 440;
@@ -2605,21 +2604,21 @@ const DOCK_LEFT = 52;
 
 /** The width a figure declares, which a column of it stands at and is never pulled from. */
 const figureWidth = (k: string): number => (WIDGETS[k] as Figure).width();
-const figure = (k: string, takes: Takes): Program => ({ name: WIDGETS[k].name, icon: WIDGETS[k].icon, takes, own: () => figureWidth(k), least: () => figureWidth(k) });
+const figure = (k: string): Program => ({ name: WIDGETS[k].name, icon: WIDGETS[k].icon, alone: false, own: () => figureWidth(k), least: () => figureWidth(k) });
 
 const PROGRAMS: Record<string, Program> = {
-  prose: { name: "the prose: the body, read", icon: "lane", takes: "alone", own: () => proseOwn("body"), least: () => PROSE_LEAST, world: "body" },
-  canvas: { name: "the canvas: the body as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "body" },
-  gitProse: { name: "git's prose: the history, read as its stories and commits", icon: "lane", takes: "alone", own: () => proseOwn("history"), least: () => PROSE_LEAST, world: "history" },
-  gitCanvas: { name: "git's canvas: the history as nodes", icon: "canvas", takes: "alone", own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "history" },
-  gitStatus: { ...figure("gitStatus", "fixed"), world: "history" },
+  prose: { name: "the prose: the body, read", icon: "lane", alone: true, own: () => proseOwn("body"), least: () => PROSE_LEAST, world: "body" },
+  canvas: { name: "the canvas: the body as nodes", icon: "canvas", alone: true, own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "body" },
+  gitProse: { name: "git's prose: the history, read as its stories and commits", icon: "lane", alone: true, own: () => proseOwn("history"), least: () => PROSE_LEAST, world: "history" },
+  gitCanvas: { name: "git's canvas: the history as nodes", icon: "canvas", alone: true, own: () => Math.max(CANVAS_MIN, state.settings.canvas), least: () => CANVAS_MIN, world: "history" },
+  gitStatus: { ...figure("gitStatus"), world: "history" },
   // the plate and the dish are one program, and the width of its column says which it is drawn as
-  plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", takes: "alone", own: () => PLATE_SIDE, least: () => PLATE_LEAST, world: "body" },
-  shape: figure("shape", "grows"),
-  tree: figure("tree", "grows"),
-  ahead: figure("ahead", "grows"),
-  settings: figure("settings", "fixed"),
-  keys: figure("keys", "fixed"),
+  plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", alone: true, own: () => PLATE_SIDE, least: () => PLATE_LEAST, world: "body" },
+  shape: figure("shape"),
+  tree: figure("tree"),
+  ahead: figure("ahead"),
+  settings: figure("settings"),
+  keys: figure("keys"),
 };
 
 /** The dock's groups, set apart by room: git's, then the body's, then the figures. */
@@ -2629,7 +2628,7 @@ const DOCK: string[][] = [
   ["shape", "tree", "ahead", "settings", "keys"],
 ];
 
-const isAlone = (k: string): boolean => PROGRAMS[k]?.takes === "alone";
+const isAlone = (k: string): boolean => PROGRAMS[k]?.alone === true;
 const layoutNow = (): Column[] => state.settings.layout;
 
 /** Where a program stands: its column and its place in the stack, or null where it stands nowhere. */
@@ -3092,6 +3091,10 @@ function pathHtml(to: string): string {
   return titles.length ? `<span class="path">${titles.map((t) => `<span>${esc(t)}</span>`).join(CHEVRON)}</span>` : "";
 }
 
+/** What a thing says of itself where it is chosen: where it stands, its title, its stamp, and what follows. */
+const saidHtml = (path: string, title: string, stamp: string, rest: string): string =>
+  `<div class="said">${pathHtml(path)}<h3>${esc(title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${rest}</div>`;
+
 /** The opening words of a brief's face, cut shorter where the gutter has been given less room to read them in. */
 const faceOf = (b: Brief, room = GUTTER.want): string => trim(textOf([blocksOf(b).find((t) => t.type === "paragraph") ?? { type: "space" }]), room < 170 ? 56 : 90);
 
@@ -3119,6 +3122,9 @@ const KNOBS: Knob[] = [
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
 ];
 
+/** A knob's value as it reads: the gap in pixels, the fade as a share of the height, the rest to two places. */
+const knobText = (k: Knob, v: number): string => (k.key === "gap" ? `${Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2));
+
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
 function meterArc(t: number, r: number): string {
   const a0 = (135 * Math.PI) / 180;
@@ -3139,7 +3145,7 @@ function settingsHtml(): string {
   const s = state.settings;
   const knob = (k: Knob) => {
     const t = clamp((s[k.key] - k.min) / (k.max - k.min), 0, 1);
-    const shown = k.key === "gap" ? `${Math.round(s[k.key])}px` : k.key === "fade" ? `${Math.round(s[k.key])}%` : s[k.key].toFixed(2);
+    const shown = knobText(k, s[k.key]);
     return (
       `<div class="knob" data-knob="${k.key}" title="${k.name}: ${shown}">` +
       `<svg viewBox="0 0 40 40"><path class="track" d="${meterArc(1, 15)}"/><path class="value" d="${meterArc(Math.max(t, 0.002), 15)}"/><g class="glyph" transform="translate(12 12)">${k.glyph}</g></svg>` +
@@ -3175,7 +3181,7 @@ function drawMeter(el: HTMLElement): void {
   const k = KNOBS.find((k) => k.key === el.dataset.knob)!;
   const v = state.settings[k.key];
   const t = clamp((v - k.min) / (k.max - k.min), 0, 1);
-  const shown = k.key === "gap" ? `${Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2);
+  const shown = knobText(k, v);
   el.querySelector(".value")?.setAttribute("d", meterArc(Math.max(t, 0.002), 15));
   el.title = `${k.name}: ${shown}`;
   const hint = el.querySelector(".hint");
@@ -3889,22 +3895,10 @@ function faceHtml(): string {
   // a commit's face says its subject, who made it and when, and the readings it touched, each in its own hue
   const c = b.commit ? past.commits.get(b.commit) : undefined;
   if (c) {
-    const { readings, other } = touchedBy(c);
-    const when = new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-    const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
-    const rest = other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "";
-    return (
-      `<div class="pickface" ${hued(b.address)}>` +
-      `<div class="said">${pathHtml(parentOf(b.address))}<h3>${esc(c.subject)}</h3><span class="stamp chrome">${esc(c.author)} · ${esc(when)} · ${esc(c.hash.slice(0, 7))}</span>${touched || rest ? `<div class="touched">${touched}${rest}</div>` : ""}</div>` +
-      `</div>`
-    );
+    const touched = touchedHtml(c);
+    return `<div class="pickface" ${hued(b.address)}>${saidHtml(parentOf(b.address), c.subject, bylineOf(c), touched ? `<div class="touched">${touched}</div>` : "")}</div>`;
   }
-  const stamp = stampOf(b);
-  return (
-    `<div class="pickface" ${hued(b.address)}>` +
-    `<div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${blocks(blocksOf(b).slice(0, 1))}</div>` +
-    `</div>`
-  );
+  return `<div class="pickface" ${hued(b.address)}>${saidHtml(b.address, b.title, stampOf(b), blocks(blocksOf(b).slice(0, 1)))}</div>`;
 }
 
 /** Draws the canvas whole from the state: the root's column with the state.opened opened through it, then the lines between. */
@@ -3966,6 +3960,8 @@ function drawEdges(): void {
     return { left: (r.left - s0.left) / k, top: (r.top - s0.top) / k, right: (r.right - s0.left) / k, bottom: (r.bottom - s0.top) / k };
   };
   const mid = (q: { top: number; bottom: number }) => (q.top + q.bottom) / 2;
+  /** The rows a level holds, its own and none of theirs. */
+  const rowsOf = (kids: HTMLElement): HTMLElement[] => Array.from(kids.children).flatMap((n) => n.querySelector<HTMLElement>(":scope > .crow") ?? []);
   const form = treeForm();
   const paths: string[] = [];
   // the way from the root down to where the reader stands, drawn over the rest in the branch's own ink: a line a reader
@@ -3976,10 +3972,7 @@ function drawEdges(): void {
   // from it into the head of each; the way to where the reader stands is lit along it and down into the one row on it
   all<HTMLElement>(".ckids.across", st).forEach((kids) => {
     const row = kids.previousElementSibling as HTMLElement | null;
-    const rows = Array.from(kids.children).flatMap((n) => {
-      const r = n.querySelector<HTMLElement>(":scope > .crow");
-      return r ? [r] : [];
-    });
+    const rows = rowsOf(kids);
     if (!row || !rows.length) return;
     const p = at(row);
     const x0 = p.left + form.x;
@@ -3994,10 +3987,7 @@ function drawEdges(): void {
   // the nesting of a file: one line dropping from the brief that holds them, as a file tree draws it
   all<HTMLElement>(".ckids:not(.across)", st).forEach((kids) => {
     const row = kids.previousElementSibling;
-    const rows = Array.from(kids.children).flatMap((n) => {
-      const r = n.querySelector<HTMLElement>(":scope > .crow");
-      return r ? [r] : [];
-    });
+    const rows = rowsOf(kids);
     if (!row || !rows.length) return;
     const p = at(row);
     const x = p.left + form.x;
@@ -4236,20 +4226,24 @@ function zoomAt(px: number, py: number, factor: number): void {
   applyView(false);
 }
 
+/** The writes waiting, one of each kind, so a run of changes writes to the browser's storage once, a moment after the last. */
+const keeping: Record<string, ReturnType<typeof setTimeout>> = {};
+function keepLater(kind: string, key: string, value: string): void {
+  clearTimeout(keeping[kind]);
+  keeping[kind] = setTimeout(() => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {}
+  }, 150);
+}
+
 const viewKey = (): string => `surface.view:${laneKey()}`;
-let viewTimer: ReturnType<typeof setTimeout> | undefined;
 function rememberView(): void {
   // a view is kept only for the body's canvas, since the history is opened afresh on a reload; and what is kept is
   // reckoned now, since by the time the write comes the state may hold the other world
   if (worldNow() !== "body") return;
   const key = viewKey();
-  const kept = JSON.stringify({ ...view, opened: state.opened, w: fittedWidth });
-  clearTimeout(viewTimer);
-  viewTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(key, kept);
-    } catch {}
-  }, 150);
+  keepLater("view", key, JSON.stringify({ ...view, opened: state.opened, w: fittedWidth }));
 }
 /** The view as the reader left it for this scope, if any, so a reload keeps the canvas where it stood. */
 function recallView(): void {
@@ -4553,8 +4547,7 @@ function statusHtml(): string {
     const a = standing("gitCanvas") && state.picked !== null ? state.picked : state.focus;
     const b = brief(a);
     const c = b?.commit ? past.commits.get(b.commit) : undefined;
-    const when = c ? new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "";
-    const sel = b && a !== "" ? `<div class="sel" data-a="${esc(a)}" data-go="${esc(a)}" ${hued(a)}><span class="of dim">selected</span><span class="name">${esc(c?.subject ?? b.title)}</span>${c ? `<span class="said dim">${esc(c.hash.slice(0, 7))} · ${esc(when)}</span>` : ""}</div>` : "";
+    const sel = b && a !== "" ? `<div class="sel" data-a="${esc(a)}" data-go="${esc(a)}" ${hued(a)}><span class="of dim">selected</span><span class="name">${esc(c?.subject ?? b.title)}</span>${c ? `<span class="said dim">${esc(c.hash.slice(0, 7))} · ${esc(whenOf(c))}</span>` : ""}</div>` : "";
     return `<div class="count">${stories} stories · ${commits} commits</div>${sel}`;
   });
   return `<div class="gstatus chrome">${read ? `<div class="read${past.status === "loading" ? " busy" : ""}">${esc(read)}</div>` : ""}${held ?? ""}</div>`;
@@ -4583,22 +4576,29 @@ function touchedBy(c: Commit): { readings: Brief[]; other: number } {
 }
 
 /** The hue a reading takes in the body, by the root-level brief it stands under, whichever world the state holds. */
-const bodyHue = (a: string): number => {
-  const i = (bodyNow().index?.children.get("") ?? []).findIndex((b) => b.address === a.split("/")[0]);
-  return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
-};
+const bodyHue = (a: string): number => hueAmong(bodyNow().index?.children.get("") ?? [], a);
+
+/** When a commit was made, as the page writes it. */
+const whenOf = (c: Commit): string => new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+
+/** Who made a commit, when, and its hash, as one line. */
+const bylineOf = (c: Commit): string => `${c.author} · ${whenOf(c)} · ${c.hash.slice(0, 7)}`;
+
+/** The readings a commit touched, each in its hue in the body, and a word for what else it changed; nothing where neither. */
+function touchedHtml(c: Commit): string {
+  const { readings, other } = touchedBy(c);
+  const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
+  return touched + (other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "");
+}
 
 /** A commit in the history's lane: its subject, who made it and when, and the readings it touched, each in its hue. */
 function commitHtml(b: Brief, c: Commit, after: number): string {
-  const { readings, other } = touchedBy(c);
-  const when = new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-  const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
-  const rest = other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "";
+  const touched = touchedHtml(c);
   return (
     `<article class="brief commit whole${prefixesOf(state.focus).includes(b.address) ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface"><h2 class="head"><span class="title">${esc(c.subject)}</span></h2>` +
-    `<p class="said chrome">${esc(c.author)} · ${esc(when)} · ${esc(c.hash.slice(0, 7))}</p>` +
-    (touched || rest ? `<div class="touched chrome">${touched}${rest}</div>` : "") +
+    `<p class="said chrome">${esc(bylineOf(c))}</p>` +
+    (touched ? `<div class="touched chrome">${touched}</div>` : "") +
     `</div></article>`
   );
 }
@@ -5643,7 +5643,7 @@ function drawCard(): void {
     ui.card.dataset.a = b.address;
     card.h = CARD.base;
     ui.card.className = "glass";
-    ui.card.innerHTML = `<div class="hold"><div class="said">${pathHtml(b.address)}<h3>${esc(b.title)}</h3>${blocks(blocksOf(b).slice(0, 1))}</div></div>`;
+    ui.card.innerHTML = `<div class="hold">${saidHtml(b.address, b.title, "", blocks(blocksOf(b).slice(0, 1)))}</div>`;
   }
   ui.card.style.height = `${Math.round(clamp(card.h, CARD.least, cardMost()))}px`;
 }
@@ -6024,7 +6024,6 @@ function settle(a: string): void {
 
 /** Where the lane as laid is kept for this page and this body, in the browser's own storage. */
 const laneKey = (): string => `surface.lane:${location.pathname}:${state.body?.root ?? ""}:${state.body?.title ?? ""}`;
-let laneTimer: ReturnType<typeof setTimeout> | undefined;
 
 /** Keeps the lane as laid, its scope and every fold, with the address the reader stands at; written a moment after it settles. */
 function rememberLane(): void {
@@ -6032,13 +6031,7 @@ function rememberLane(): void {
   // the state may hold the history
   if (inPast()) return;
   const key = laneKey();
-  const kept = JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail });
-  clearTimeout(laneTimer);
-  laneTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(key, kept);
-    } catch {}
-  }, 150);
+  keepLater("lane", key, JSON.stringify({ hash: location.hash, scope: state.scope, folds: Array.from(state.folds), trail: state.trail }));
 }
 
 /** The lane as the reader left it, when they left it at the address the page now stands at. */
