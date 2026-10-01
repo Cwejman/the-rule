@@ -178,7 +178,7 @@ Going takes the reader to the prose, so where the middle holds the canvas alone 
 
 A press that both selected and opened was built first and refused: it took a requirement the author had given in two parts and made it one, so a node that arrived already selected answered its first press by going where the reader already stood, and a reader who only wanted to look at a node had the map grow under them.
 
-*The author's decision, 2026-09-18, given as one press selects and two presses go; as built the same day, after a first cut conflated the two.*
+*The author's decision, 2026-09-18, given as one press selects and two presses go; as built the same day, after a first cut conflated the two. Wide, from 2026-10-01, going where the canvas stands without the prose brings the prose in [as a column beside it](layout.md#6-the-body-and-git-two-worlds), rather than in its place.*
 
 ### 5.1 The field the acts stand in
 
@@ -192,7 +192,7 @@ The field is naked. No surface is drawn under it and no rim around it, since the
 
 So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
-*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open.*
+*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-one-chooser-in-two-grains), and what becomes of the page's own strip while the canvas stands is open. Wide, from 2026-10-01, the face's eye and the root's direction stand in [the canvas's head](layout.md#4-every-program-has-a-head) rather than here, and the field holds the acts of what is selected.*
 
 ### 5.2 The moves on a map
 
