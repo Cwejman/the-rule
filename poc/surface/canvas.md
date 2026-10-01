@@ -196,7 +196,7 @@ So [the mark that opened a pill of choices](touch.md#3-one-chooser-in-two-grains
 
 ### 5.2 The moves on a map
 
-Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane-and-its-rim-says-which). Where they belong to a map, these are the moves.
+Which pane the keys belong to is [the framework's to say](framework.md#27-the-keys-belong-to-one-pane). Where they belong to a map, these are the moves.
 
 Three of the moves act on the map's structure: right, left and backspace; in the lane, left and backspace have meanings of their own, given with each. The rest have a meaning in the lane as well, given with each where it differs, and each acts in the pane the keys belong to.
 

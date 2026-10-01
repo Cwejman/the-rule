@@ -3362,7 +3362,8 @@ let pointerRight = false;
  * It was the pane the reader last acted in until 2026-09-19. That made every key modal on something the page never
  * showed: a reader who opened the canvas and pressed an arrow moved the prose, because their hand had never been put
  * on the map, and nothing on the page could tell them so. Then the keys were the map's whenever it stood, which held
- * while one map could stand. With two sides, the pane holding them says so by its rim, so the page always shows it.
+ * while one map could stand. With two sides, the pane holding them said so by its rim, until the author let it go on
+ * 2026-10-01: the history had become a mode of the one canvas, so no two maps stand side by side to be told apart.
  */
 function keyPane(): PaneName {
   const panes = fits().panes;
@@ -3373,13 +3374,6 @@ function keyPane(): PaneName {
 
 /** Whether a key acts on a map: it does when the pane holding the keys is the canvas; the dish has no act a key could fire. */
 const handOnMap = (): boolean => keyPane() === "canvas";
-
-/** The pane holding the keys draws its rim in ink, where two stand; a lone pane has nothing to be told apart from. */
-function drawKeyRim(): void {
-  const panes = fits().panes;
-  const holder = keyPane();
-  PANES.forEach((p) => paneEl(p).classList.toggle("holds-keys", panes.length === 2 && p === holder));
-}
 const stage = (): HTMLElement | null => ui.canvas.querySelector<HTMLElement>("#stage");
 
 /**
@@ -4500,7 +4494,6 @@ function drawLayout(): void {
   AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !takesRoom(name))));
   (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
   (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
-  drawKeyRim();
 }
 
 /** Draws the lane whole and lays the adjuncts beside it; the header says where the lane is scoped. */
@@ -5807,7 +5800,7 @@ function wire(): void {
     // the keys follow the pointer onto the pane at the right, and back to the left when it leaves
     const right = fits().panes[1];
     const onRight = !!right && paneEl(right).contains(e.target as Node);
-    if (onRight !== pointerRight) (pointerRight = onRight), drawKeyRim();
+    pointerRight = onRight;
     // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
     const el = named(e);
     all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
@@ -5822,7 +5815,7 @@ function wire(): void {
     if (inPast()) lightPlate(onPlate ? el!.dataset.a! : null);
     tip(e);
   });
-  document.documentElement.addEventListener("pointerleave", () => (point(null), inPast() && lightPlate(null), hideTip(), pointerRight && ((pointerRight = false), drawKeyRim())));
+  document.documentElement.addEventListener("pointerleave", () => (point(null), inPast() && lightPlate(null), hideTip(), (pointerRight = false)));
 
   document.addEventListener("click", (e) => {
     hideTip();
@@ -6488,8 +6481,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #canvas.bleed::after { display: none; }
 /* the rim lies over everything on the canvas, as a layer that takes no pointer, so no node paints over it */
 #canvas::after { content: ""; position: absolute; inset: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--rim); pointer-events: none; z-index: 3; }
-/* of two panes, the one the keys belong to draws its rim in ink, so a key never acts somewhere the reader cannot see */
-#canvas.holds-keys::after { box-shadow: inset 0 0 0 1px var(--muted); }
 /* the acts stand naked over the map, so the page's own ground rises behind them rather than a surface under them */
 #canvas::before { content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px; border-radius: 0 0 10px 10px; background: linear-gradient(to bottom, transparent, var(--ground) 62%); pointer-events: none; z-index: 3; }
 /* a rim is written at the weight it is drawn at and divided by the view, so every line on the map keeps one weight however far it is zoomed */

@@ -26,7 +26,7 @@ A pane stands in the middle, and there are three: the lane, which is the reading
 
 ## 2. The areas
 
-Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim the canvas keeps](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
+Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim the canvas keeps](#27-the-keys-belong-to-one-pane), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
 
 ![A row of five areas across the page: a narrow wing on the left holding small bars and blocks with a shaded viewport over them, an empty gutter, a wide lane of grey prose lines with one coloured link in its third line, a gutter holding a short note level with that link, and a narrow wing on the right holding bars and a framed block; a thin rule beneath each area and its name under the rule, lane in bold](.img/areas.svg)\
 The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5-links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4-the-ahead) in the right wing.
@@ -77,13 +77,13 @@ The gutters belong to the lane and stand only beside it, wherever in the middle 
 
 *The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22.*
 
-### 2.7 The keys belong to one pane, and its rim says which
+### 2.7 The keys belong to one pane
 
 A key names no place, so where two panes stand the page decides which of them a key acts on, and the reader's hand says it: the keys belong to the pane at the left, and to the pane at the right while the pointer rests on it, back to the left when it leaves. The dish has no act a key could fire, so it never holds them, and they stay with the other.
 
-The canvas keeps a quiet rim, the one border the page draws, since it is moved by hand and need an edge to be moved within; the lane and the dish, which are not moved so, keep none. The pane holding the keys draws its rim in ink, so a key never acts somewhere the reader cannot see, which is what the keys did until 2026-09-19, acting in the pane the reader had last acted in and moving the prose under a reader who had pressed an arrow on the map. A lone pane draws no difference, since there is nothing to tell apart, and where the lane holds the keys the map beside it keeps its quiet rim.
+The canvas keeps a quiet rim, the one border the page draws, since it is moved by hand and need an edge to be moved within; the lane and the dish, which are not moved so, keep none. The rim stays quiet whichever pane holds the keys: it was drawn in ink while the canvas held them, so two maps side by side could be told apart, and once the history became a mode of the one canvas no two maps stand so.
 
-*The author's, 2026-09-27; that the dish passes the keys on and that the lane has no rim to ink are the session's. It supersedes the keys belonging to the map whenever it stood, 2026-09-19, which held while only one map could stand.*
+*The author's, 2026-09-27; that the dish passes the keys on is the session's. The rim's ink was let go by the author on 2026-10-01. It supersedes the keys belonging to the map whenever it stood, 2026-09-19, which held while only one map could stand.*
 
 ### 2.8 Giving way
 
@@ -131,7 +131,7 @@ A lone pane pressed moves to the right where what it pushed out can come back to
 
 Every widget reads one state and nothing else, and acts through the same few verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane-and-its-rim-says-which), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
 
 Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 
