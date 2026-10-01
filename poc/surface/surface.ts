@@ -4440,7 +4440,8 @@ function worldOfEl(el: Element | null): WorldName {
   const k = host?.dataset.slot ?? host?.dataset.head;
   if (k && PROGRAMS[k]?.world) return PROGRAMS[k].world!;
   if (el.closest("#dish, svg.plate")) return "body";
-  if (host || el.closest(".wing, #sheet")) return keysWorld();
+  // the figures, and a phone's foot and the card above it, act in the world the keys belong to
+  if (host || el.closest(".wing, #sheet, #strips, #card")) return keysWorld();
   return "body";
 }
 
@@ -4509,6 +4510,8 @@ async function readPast(): Promise<void> {
     past.status = "failed";
     past.said = (e as Error).message;
     console.warn(`no history: ${past.said}`);
+    // a phone that turned its pane to the history is told why it still shows the body
+    if (narrow() && narrowWorld === "history") (notice(`No history: ${past.said}`), (narrowWorld = "body"));
     drawGitWaiting();
   } finally {
     drawChooser();
@@ -4533,7 +4536,8 @@ function drawGitWaiting(): void {
  * switch turns it. It breathes while the history is being read.
  */
 function switchHtml(): string {
-  const on = narrowWorld === "history";
+  // it stands for what the pane shows, or is about to: the history once read, or while it is being read for the pane
+  const on = narrowShown() === "history" || (narrowWorld === "history" && past.status === "loading");
   const busy = past.status === "loading" && on ? " busy" : "";
   const tip = on ? "the history — reading it; press to read the body" : past.status === "failed" ? `the history — none: ${past.said}` : "the history — press to read it";
   return `<span class="switch"><button class="pick mode${on ? " on" : ""}${busy}" data-mode="history" data-tip="${esc(tip)}">${icon("history")}</button></span>`;
@@ -4543,6 +4547,9 @@ function switchHtml(): string {
 function turnNarrow(): void {
   narrowWorld = narrowWorld === "history" ? "body" : "history";
   pointerWorld = narrowWorld;
+  // what was chosen and what stood open over the reading were the other world's, so they go
+  card.a = null;
+  chooser.sheet = null;
   if (narrowWorld === "history" && !gitWorld.body) void loadPast();
   drawAll();
 }
@@ -5600,6 +5607,8 @@ function drawWingsAligned(): void {
  * not five. It stands wherever the middle stands, which is always, so nothing is ever out of reach at any width.
  */
 function drawChooser(): void {
+  // a phone's foot offers the acts of the world its one pane reads, so it is drawn there
+  if (narrow() && worldNow() !== narrowShown()) return void inNamed(narrowShown(), drawChooser);
   if (narrow()) {
     // the mark gets out of the way as a reader reads; opening it brings the foot back, since a pill laid away would
     // answer a press with nothing
@@ -6177,7 +6186,7 @@ function pull(e: WheelEvent): void {
   // is the lane merely standing somewhere else, so it is asked before anything about where the lane stands.
   if (spent) {
     if (e.deltaY > 0) spent = false;
-    else pullTimer = setTimeout(restPull, rest);
+    else pullTimer = setTimeout(restIn(worldNow()), rest);
     return drainPull();
   }
   if (state.scope === "" || ui.scroll.scrollTop > 0 || e.deltaY >= 0) return drainPull();
@@ -6193,11 +6202,11 @@ function pull(e: WheelEvent): void {
     spent = true;
     pushing = false;
     drawPull(true);
-    pullTimer = setTimeout(restPull, rest);
+    pullTimer = setTimeout(restIn(worldNow()), rest);
     return popUp();
   }
   // a swipe with its momentum seldom reaches the whole pull, so the pull is held long enough for the next swipe to continue it
-  pullTimer = setTimeout(restPull, rest);
+  pullTimer = setTimeout(restIn(worldNow()), rest);
 }
 
 /** The gauge springs back. */
@@ -6207,6 +6216,9 @@ function drainPull(): void {
   pulled = 0;
   drawPull(true);
 }
+
+/** The pull let go of in the world whose gauge it filled, since a timer runs wherever the state happens to stand. */
+const restIn = (w: WorldName) => (): void => void inNamed(w, restPull);
 
 /** The hand has let go: the gauge springs back and a spent pull can be made again. */
 function restPull(): void {
@@ -6464,7 +6476,7 @@ function popUp(): void {
   scopeTo(out, card);
   // the lane is measured as it is laid, and what a card draws of the reading behind it settles a frame later, so the
   // landing is taken again once it has: without it the card came to rest a card's height below the reading line
-  requestAnimationFrame(() => void (state.focus === card && scrollToFocus(false)));
+  frame(() => void (state.focus === card && scrollToFocus(false)));
 }
 
 /** How long the space bar is held before it acts on the whole scope rather than the brief in focus. */
