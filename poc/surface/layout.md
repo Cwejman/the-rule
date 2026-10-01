@@ -8,7 +8,7 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-Nothing of it is built. Once it is, it supersedes in the framework [the three kinds of widget](framework.md#1-three-kinds-of-widget), [the areas](framework.md#2-the-areas) with the keys among them, [the strip](framework.md#3-the-strip), which becomes the dock, with what a pane gives back, [the one shared state](framework.md#4-one-shared-state-and-a-few-verbs), which is kept for each world, and the measure, the canvas's width and the widget of each area among [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them). The dish as [a pane of its own](widgets.md#7-the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters). The standing acts in [the canvas's field](canvas.md#51-the-field-the-acts-stand-in) move to its head. In the history it supersedes [the mode](history.md#41-it-is-a-mode-not-a-pane) with [the switch's wait](history.md#411-turning-to-it-never-waits-for-what-was-read-before), [a selection kept when the mode is left](history.md#43-a-selection-shows-what-it-touched), and [what stands beside the switch](history.md#44-what-is-selected-stands-beside-the-switch).
+Nothing of it is built, and [what it supersedes](#11-what-it-supersedes) once it is stands beneath its reason.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session. What the session proposed says so where it stands, and whether the author let it stand or has not answered it.*
 
@@ -20,6 +20,16 @@ What a reader wants is to put a thing where they want it and to pull it to the s
 
 *Preferred, the author's, 2026-10-01.*
 
+### 1.1 What it supersedes
+
+In the framework it supersedes [the three kinds of widget](framework.md#1-three-kinds-of-widget), the adjunct kept as a setting of each prose; [the areas](framework.md#2-the-areas) with the keys among them; [the strip](framework.md#3-the-strip), which becomes the dock, with what a pane gives back; [the one shared state](framework.md#4-one-shared-state-and-a-few-verbs), which is kept for each world; and the measure, the canvas's width and the widget of each area among [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them).
+
+Among the widgets, the dish as [a pane of its own](widgets.md#7-the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters); where they say a wing, read a column. On the canvas, [the face's eye](canvas.md#53-what-is-selected-shows-its-face) and [the root's direction](canvas.md#410-the-roots-level-runs-down-or-across) leave [its field](canvas.md#51-the-field-the-acts-stand-in) for its head.
+
+In the history it supersedes [the mode](history.md#41-it-is-a-mode-not-a-pane) and its switch, [a selection kept when the mode is left](history.md#43-a-selection-shows-what-it-touched), and [what stands beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). [Reading it ahead](history.md#411-turning-to-it-never-waits-for-what-was-read-before) stays, and so does a published page's history as files: a program of git's that waits on its first read says so in itself, and its icon breathes in the dock as the switch did.
+
+*Reasoned, the session's, 2026-10-01, from the briefs this touches.*
+
 ## 2. A row of columns, each a stack
 
 The page is a row of columns from left to right, and a column holds one program or several stacked from top to bottom.
@@ -28,15 +38,17 @@ A program is what was a pane or a figure: the prose, which is what was the lane,
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
-By default the row is the shape, the body's prose with the links in its right gutter, and the ahead, which is the page as it opens today.
+By default the row is the shape, the body's prose with the links in its right gutter, and the ahead, which is the page as it opens today. Git's prose comes in with the links in its right gutter as well.
 
 *Reasoned, the session's proposal, 2026-10-01, from the wings that already stack two figures; the author built on it, asking for splits across and down. The default is the session's, not yet answered.*
 
 ### 2.1 Three ways to take height
 
-A program says how it takes height. One that stands alone has its column to itself at the page's whole height: the prose and the canvas, the body's and git's, and the plate. One that grows shares what its column has left with the others that grow: the shape, the tree and the ahead. One of fixed size takes only the height it needs: the settings and the keys. How git's status takes height is open.
+A program says how it takes height. One that stands alone has its column to itself at the page's whole height: the prose and the canvas, the body's and git's, and the plate. One that grows shares what its column has left with the others that grow: the shape, the tree and the ahead. One of fixed size takes only the height it needs, and is not pulled: the settings and the keys.
 
-*Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
+A height pulled is kept as a share of what the growing ones have, as they share it evenly today. How git's status takes height is open.
+
+*Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); the keys as fixed, heights kept as shares, standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
 
 ### 2.2 The plate and the dish are one
 
@@ -54,11 +66,11 @@ The layout is kept as a tree of any number of children, held to two levels, a ro
 
 ## 3. The gaps are the handles
 
-Every gap can be dragged. The gap between two columns trades width between those two, and the rest of the row stands still; the gap between two programs in a stack trades height between them; the gap at either edge of the row sizes the column beside it alone. Nothing new is drawn for a gap but the pointer saying it can pull there.
+Every gap beside something that can be pulled can be dragged. The gap between two columns trades width between those two, and the rest of the row stands still; the gap between two growing programs in a stack trades height between them; the gap at either edge of the row sizes the column beside it alone. Nothing new is drawn for a gap but the pointer saying it can pull there.
 
 The gap setting stays what it is, the least room between two programs. A width pulled is kept as a length and not as a share, so a column keeps its width as the screen changes until the page narrows past it, and no column is pulled narrower than its program's least width. So the knobs that set a width go: the prose's measure and the canvas's width are pulled at their gaps.
 
-A figure keeps the width it declares, as [it does today](framework.md#21-widths), so a column of figures is as wide as its widest figure and is not pulled; a gap beside it sizes only the column on its other side. A program standing alone has a least width and a width of its own: the prose its default measure with its gutters, the canvas 360 and 720 as its floor and greatest width are today, and the plate the figure's size as least and the dish's as its own.
+A figure keeps the width it declares, as [it does today](framework.md#21-widths), so a column of figures is as wide as its widest figure and is not pulled; a gap beside it sizes only the column on its other side. A program standing alone has a least width and a width of its own, and no greatest: the prose 440 and its default measure, as the measure's least and default are today, each with its gutters; the canvas 360 and 720, as its floor and greatest width are today; and the plate the figure's size and the dish's.
 
 The prose's column holds the prose and its gutters. A gutter takes the width an adjunct reads best in, and the measure takes what the gutters leave. As the column is pulled narrower the gutters narrow first, then go as a pair, before the measure narrows, as [they give way](framework.md#28-giving-way) today.
 
@@ -68,7 +80,7 @@ A gap double-pressed gives its programs back their own widths: the prose's measu
 
 ### 3.1 Centred, or the room spread between
 
-Where the row is narrower than the viewport, what is left is a setting. Spread, as the page does today and by default, it is shared among the gaps between columns and the two edges alike, [as the spaces are one](framework.md#22-the-spaces-between-are-one).
+Where the row is narrower than the viewport, how the room left over is placed is a setting. Spread, as the page does today and by default, it is shared among the gaps between columns and the two edges alike, [as the spaces are one](framework.md#22-the-spaces-between-are-one).
 
 Kept to the centre, the room stands at the two edges and the row in the middle. Pulling in at either edge narrows the column there, so a centred row draws in from both sides and stays centred.
 
@@ -76,11 +88,11 @@ Kept to the centre, the room stands at the two edges and the row in the middle. 
 
 ### 3.2 Giving way
 
-As the screen narrows, the body's prose keeps its width, and every other column shrinks to its program's least width and then gives way, the one furthest from the body's prose first, and of two as far, the one at the right first.
+As the screen narrows, the body's prose keeps its width, and every other column shrinks to its program's least width before any gives way. Then they give way one at a time, the one furthest from the body's prose first, and of two as far, the one at the right first.
 
-Once the body's prose stands alone it narrows as its column is pulled: its gutters, then its measure. Where no prose of the body stands, the row gives way from its right end. A column given way stands in [the dock](#7-the-dock) between the quiet and the light, as a widget denied its room does today.
+Once the body's prose stands alone it narrows as its column is pulled: its gutters, then its measure. Where no prose of the body stands, the row gives way from its right end. Each program of a column given way stands in [the dock](#7-the-dock) between the quiet and the light, as a widget denied its room does today.
 
-*Reasoned, the session's, 2026-10-01, not yet answered, from [the order today](framework.md#28-giving-way), the pane beside the lane first, the right before the left and the lane last. It departs from it on the gutters, which today give way before the wings and here only once the body's prose stands alone.*
+*Reasoned, the session's, 2026-10-01, not yet answered, from [the order today](framework.md#28-giving-way), the pane beside the lane first, the right before the left and the lane last. It departs from it on the gutters, which today give way before the wings and here only once the body's prose stands alone, and in letting the columns at the ends give way before a map beside the prose, where today that map goes first.*
 
 ## 4. Every program has a head
 
@@ -100,7 +112,7 @@ What each head holds:
 | figures | nothing yet |
 | git's status | open |
 
-So the gutters are not in the dock but a setting of each prose, and both proses can carry links. The canvas's two standing acts at its foot today, the face of what is selected and which way its root's level runs, move into its head; the acts of what is selected stay at its foot. The settings program keeps what belongs to the whole page, as [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) list them less the measure, the canvas's width and the widget of each area, with the centring and the dock's edge added.
+So the gutters are not in the dock but a setting of each prose, and both proses can carry links. Of the acts in the canvas's field today, the face of what is selected and which way its root's level runs move into its head, and the acts of what is selected stay at its foot. The field's brief still names the other pane and the settings as its standing acts, which the strip has since taken and the field no longer carries. The settings program keeps what belongs to the whole page, as [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) list them less the measure, the canvas's width and the widget of each area, with the centring and the dock's edge added.
 
 *Preferred, the author's, 2026-10-01, that a program's own settings stand where its grip stands and show on pointing, and that a gutter is a setting of each prose. The head showing only near the top edge is the session's, which the author let stand; where it stands on a map or a figure is the session's, not yet answered.*
 
@@ -130,7 +142,7 @@ The keys belong to the program the pointer last rested on, and stay with it when
 
 On a page just opened they are the body's prose's, or where that does not stand, the leftmost program with acts, and they go there again when the program holding them is taken away or gives way. They act in that program's world.
 
-*Reasoned, the session's, 2026-10-01, not yet answered, from [the pane at the left, or the right while pointed](framework.md#27-the-keys-belong-to-one-pane): it departs from it in keeping the keys where the pointer left them rather than sending them back to the left, since a row of any length has no one pane to send them to. Its rim no longer says which, since 2026-10-01.*
+*Reasoned, the session's, 2026-10-01, not yet answered, from [the pane at the left, or the right while pointed](framework.md#27-the-keys-belong-to-one-pane): it departs from it in keeping the keys where the pointer left them rather than sending them back to the left, since a row of any length has no one pane to send them to. The canvas keeps its quiet rim, and since 2026-10-01 it no longer says when it holds the keys, so nothing on the page says which program does.*
 
 ### 6.2 A program of git's is told apart by its grip
 
@@ -160,7 +172,7 @@ Which world a figure draws: the shape, the tree and the ahead followed the lane 
 
 Where what is selected in git is shown and let go, now that the switch it stood beside is gone: git's status is where it would go, since the author once asked for a status by git's glyph.
 
-Layouts kept by number and called by a key were proposed and not answered. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
+Whether anything should say which program holds the keys, now that nothing does. Layouts kept by number and called by a key were proposed and not answered. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
 
 A phone keeps [its own reading](touch.md) and none of this; whether a head or a drag has any place there is not asked yet.
 
