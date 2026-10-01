@@ -35,15 +35,15 @@ The page is to be a row of columns, each a stack of programs, moved by a grip or
 
 The canvas keeps only its quiet rim, and the framework's brief on the keys says so. The keys still follow the pointer, to the pane at the right while it rests there.
 
-[The rim stays quiet whichever pane holds the keys](git:42a135d)
+[The rim stays quiet whichever pane holds the keys](git:42a135d..3883710)
 
 ### The whole history is told
 
 On 2026-09-29 the author asked that this file be cared for before the history is taken further, so that the whole of the repository stands in it under the law. The session read every commit, told them all in four periods and the days, sittings and labs within them, and read the telling five times with a fresh head and against the commits, until a round changed only words.
 
-[The whole history is told](git:5e60ae9..98d473d)
+[The whole history is told](git:5e60ae9..d751882)
 
-*Told by the session that made these commits, as its debrief, 2026-09-29; the commit that tells it stands untold above it.*
+*Told by the session that made these commits, as its debrief, 2026-09-29; the commit that told it is placed in its run since a later day was told above it.*
 
 ### History becomes a mode
 
