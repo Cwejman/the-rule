@@ -6,177 +6,263 @@ status: open
 
 # The surface, assembled again
 
-The surface's code has grown from 1,223 lines to 7,945 in eighteen days, and most of the growth is not new function but the same function reached twice: two worlds made by copying one state in and out, two layouts kept side by side, and a list of what to draw again written out by hand at every place something changes.
+The surface's code has grown from 1,223 lines to 7,945 in eighteen days. Most of the growth is not new function but the same function reached twice: two worlds made by copying one state in and out, two layouts kept side by side, one thing drawn by three renderers, and what to draw again written out by hand wherever something changes.
 
-This brief says what the code is for, the lore it is built on, and how it is assembled again on that lore without changing anything a reader sees or does.
+Assembled again on the lore of building programs, the page's script keeps every behaviour in roughly a sixth fewer lines of code and up to half its comments, and each part does one thing that can be named.
 
-*Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there, as the sister project's principles hold it, and "of course not changing behaviour".*
+*Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there as the sister project's principles hold it, "of course not changing behaviour", and "there must be immense simplification possible under that wisdom". Read cold twice, once as a brief and once against the code, before anything is built.*
 
-## 1. The lore it stands on
+## 1. What the program is for
 
-Two traditions say most of what is known about building programs that stay small, and the sister project's [principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-) carry both into plain TypeScript. Each move [beneath](#4-how-it-is-assembled) names the principle it serves, so a reader can weigh the move against the lore and not against taste.
+A reader takes in a body of knowledge laid by the gradient, at the depth they need, and always sees where they stand in it. Beside it they can read how it came to be, git's history, laid the same way. Everything the page does serves that, and it comes to four parts.
 
-*Established, of the two traditions; the principles are the author's, carried from the sister project, where [the implementation](implementation.md#71-taste-in-the-rule-itself) brought them as taste and this brief brings them as ground.*
+1. **The reading: where the reader stands.** One reading of one body: its scope, the fold of every brief, the focus, what the pointer rests on, what is selected and open on the map, and how the reader came here. Two readings stand at once, the body's and the history's, and the reader's settings stand beside them.
+2. **The views: what they see.** The prose, the canvas and the figures. Each is a projection of one reading, drawn from it and from nothing else.
+3. **The layout: where each view stands.** It follows from the settings and the screen.
+4. **The acts: what a key, a press or a drag changes.** An act changes a reading or a setting, and the page is drawn again from them.
 
-### 1.1 Unix: small parts that each do one thing
+The process that traces the body and the history and serves the page is apart from all four, and already in good order.
 
-A program is made of parts that each do one thing well and are joined by a plain interface: in Unix, text through a pipe. A part is understood alone, replaced alone, and tested alone, and what is clever lives in how parts compose rather than inside any of them. Data stands in a form any part can read.
+*Reasoned, the session's, 2026-10-01, from the whole file read through; that the surface is for reading a body at the depth one needs is [the surface's own](README.md).*
 
-Here the plain interface is data: the body is already handed from the process to the page as flat data, and the same holds within the page, where a part takes a value and gives a value.
+## 2. What the code is now
 
-*Established: McIlroy's summary of the Unix philosophy, 1978, and its long practice.*
+The file has three parts.
 
-### 1.2 Functional programming: a pure core in an imperative shell
+- **The process**, 984 lines of code. It stands in the order the lore asks: the substrate's types first, pure functions beneath them, and the effects at the edge.
+- **The page's script**, 4,069 lines of code and 1,374 of comment.
+- **The style**, 700 lines.
 
-A function that returns the same result for the same input and touches nothing else can be read, reasoned about and tested on its own.
+The pilot's script was 915 lines of code in all.
 
-A program cannot be only that, since it must draw and listen, so the side effects are gathered at the edge, a thin shell, around a core of pure functions. State is a value with one owner, derived values are computed from it rather than stored beside it, and data flows one way: from the state through the functions to what is drawn, and from a reader's act back to the state.
+The type checker finds two unused names, so the weight is not dead code. It is the same thing done more than once:
 
-*Established, as functional programming has long practised it; the shell and core as Bernhardt named them in 2012.*
+- **A world is copied, not held.** The history's reading is made by copying twenty-two fields of one global state, and the elements it is drawn in, out to a record and the other world's in, and back when done. A copy held across a nested call goes stale, and a helper was added for each case found. Of the cold reviews' faults in the two worlds, at least three were stale copies or a shared global left behind.
+- **Two layouts.** Wide, the page is the row laid by hand. On a phone it is still the five areas the row superseded, with their own grid, wing drawing, slots and fitting. The wide row is translated back into the areas' terms so the rest can ask the old questions, which it does through `fits()` 32 times and `narrow()` 45. The settings keep both arrangements.
+- **One thing, several renderers.** A commit's line is drawn three times, and so is the line of acts beneath a brief. A figure's slot is drawn by the stacks and again by the wings. The programs are described by five overlapping tables.
+- **What to draw again, by hand.** About eighteen places each draw again a hand-picked part of the page. Some drawing also changes the reading: drawing the map decides what is selected and open.
+- **The gestures in one function.** One function of 594 lines wires 25 listeners. A press is a chain of some thirty cases, and the acts it reaches are spread through it.
+- **Dead paths.** Some code can never run: the gutters on a phone, which the width forbids; an act nothing calls; knobs that no longer exist; and style for markup no longer drawn.
 
-### 1.3 The sister project's principles
+The comments carry the dated story of many decisions, which [the briefs](implementation.md) and [the history](../../history.md) already hold.
 
-These are the two traditions as the author holds them, and the measure every move here is weighed against:
+*Measured, the session's, 2026-10-01, at commit 25ee761, by reading and by count; the faults by the reviews of 977f285, 1a54efb and f927248.*
 
-- **Simplicity and coherence.** The simplest way that meets the need, and one pattern for one kind of thing, so the code is predictable.
-- **Dumb is smart.** Plain repetition is better than a clever abstraction, and few abstractions are better than many. So vanilla TypeScript, and no currying, piping or framework.
-- **Describe over instruct.** What is wanted, not how to get it step by step.
-- **Data over logic.** Restructure the data so the logic falls away: a table of cases rather than a branch for each.
-- **Pure functions, side effects decoupled, one thing well.** Larger things are composed from parts that each do one thing.
-- **A single source of truth.** Data is flat and normalized, derived values are computed when needed, and data flows one way.
-- **Context and decisions are documented.** The code says why where it is not plain, and a decision is written where it is made.
-- **Never fail silently.**
+## 3. The lore it stands on
 
-*The author's, carried from the sister project.*
+The author's [principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-) carry two traditions into plain TypeScript, and a third names this kind of program. Each move [beneath](#4-how-it-is-assembled) names the principle it serves, so it is weighed against the lore and not against taste.
 
-## 2. What the program is for
+*The principles are the author's, carried from the sister project, where [the implementation](implementation.md#71-taste-in-the-rule-itself) brought them as taste; this brief brings them as ground.*
 
-The surface reads a body: a flat list of briefs, traced once by the process and handed to the page as data. It answers four questions, and that is the whole of its function.
+### 3.1 Unix: small parts joined by plain data
 
-1. **Where does the reader stand?** A reading of one body: its scope, the fold of every brief in it, the focus, what the pointer rests on, what is selected and open on the map, and how the reader came here. There are two such readings at once, of the body and of git's history.
-2. **What do they see?** Views, each a projection of one reading: the prose, the canvas, and the figures beside them.
-3. **Where does each view stand?** The page's arrangement, from the reader's settings and the screen.
-4. **What does an act change?** A key, a press or a drag changes a reading or a setting, and the page is drawn again from them.
+A program is made of parts that each do one thing well, joined by a plain interface: in Unix, text through a pipe. A part is understood alone and replaced alone, and what is clever lives in how the parts compose. Here the interface is data. The body already crosses from the process to the page as flat data, and within the page a part should take a value and give one.
 
-Everything else is either the process that makes the body, which is already apart and in good order, or one of these four done more than once.
+*Reasoned, carried from McIlroy's summary of the Unix philosophy, 1978; not checked against this code beyond the reading.*
 
-*Reasoned, the session's, 2026-10-01, from the whole file read through.*
+### 3.2 Functional programming: a pure core in a thin shell
 
-## 3. What the code is now
+A function that returns the same result for the same input, and touches nothing else, can be read and tested on its own. A page must draw and listen, so its effects are gathered in a thin shell around a pure core.
 
-The file has three parts. The process, which traces the body and git's history and serves or writes the page, is 984 lines of code, and it stands in the order these principles ask: the substrate's types first, pure functions beneath them, the effects at the edge.
+State is a value with one owner. What can be derived from it is computed, not stored beside it, and data flows one way.
 
-The page's script is 4,069 lines of code and 1,374 of comment, and its style is 700 lines. The pilot's script was 915 lines of code in all.
+*Reasoned, carried from functional programming's long practice and Bernhardt's naming of the core and the shell, 2012; not checked.*
 
-Almost nothing in the script is dead: the type checker finds two unused names. The weight is four things done twice:
+### 3.3 Model, view, update
 
-- **A world is copied, not held.** The history's reading is made by copying twenty-two fields of one global state and its elements out to a record, copying the other world's in, and back again when done. Copies held across a nested call go stale, and the code carries a helper for each case found: one maps a stale copy back to the live world, one reaches the body's world from inside the history, and one reads a copy of the history held one step out. Several of the faults the cold reviews of the two worlds found were this.
-- **Two layouts.** Wide, the page is the row laid by hand; on a phone it is still the five areas the row superseded, with their own grid, their own wing drawing, their own slots and their own fitting. And the wide row is translated back into the areas' terms so the rest of the code can go on asking the old questions: `fits()` is asked 32 times and `narrow()` 45.
-- **What to draw again is written out by hand.** One function draws everything. Beside it, place after place draws again a hand-picked part of the page, for a fold, a resize, the fonts arriving, an image loading, a pulled gap or a turned knob, and each list was written apart.
-- **The acts branch on where the keys are.** Most actions ask in each of their four parts whether the keys are on the map or the prose, so one entry holds two acts.
+A page like this one has a known shape:
+- a **model**, the state;
+- a **view**, a pure function from the model to what is drawn;
+- an **update**, which takes an act and the model and gives the next model.
 
-The comments carry much of the history of decisions, dated, which [the briefs](implementation.md) and [the history](../../history.md) already hold.
+The program's four parts are that shape, with the layout as a view of the settings. Taken whole, as a framework, it would bring a compile step and a runtime the surface refused when it [chose plain functions](implementation.md#8-plain-functions-before-a-framework). Taken as a shape, it costs nothing and tells each function where it belongs.
 
-*Measured, the session's, 2026-10-01, at commit c3cfaa4.*
+*Reasoned, carried from the Elm architecture as Czaplicki described it, 2012 onward; not checked.*
+
+### 3.4 The sister project's principles
+
+The author holds these, and every move is weighed against them:
+
+- **Simplicity and coherence.** The simplest way that meets the need, and one pattern for one kind of thing.
+- **Dumb is smart.** Plain repetition beats a clever abstraction, and few abstractions beat many. So it stays vanilla TypeScript, with no currying, no piping and no framework.
+- **Describe over instruct, and data over logic.** A table of cases rather than a branch for each.
+- **Pure functions, effects kept apart, one thing well.** Large things are composed of small ones.
+- **A single source of truth.** Flat, normalized data, derived when needed, flowing one way.
+
+From the project's rules, two more apply here: a decision is documented where it is made, and nothing fails silently.
+
+*The author's, carried from the sister project: the first five from its principles, the last two from its rules.*
 
 ## 4. How it is assembled
 
-Each move keeps every behaviour, and each says the principle it serves.
+Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 600 to 750 lines of the page's code, and 300 to 600 of its comments.
 
-*Proposed, the session's, 2026-10-01; none is answered yet.*
+*Reasoned, the session's, 2026-10-01; the estimates are a cold reader's, made against the code at 25ee761 and not yet measured. None of the moves is answered by the author.*
 
-### 4.1 A world is a value the page points at
+### 4.1 What can never run goes
 
-A reading is one object, a world: its body and index, its scope, folds, focus, pointer and selection, what stands open, its trail, undo and redo, its map's view and how that view was fitted, and the elements it is drawn in.
+The gutters on a phone can never stand, since a width narrow enough to be a phone is too narrow for them. The act that turned a phone to the history is drawn nowhere, since the switch acts directly. Two knobs and their formatting are gone from the page. The style still holds rules for markup the page no longer draws.
 
-The page holds two, the body's and the history's. "The world now" is a pointer to one of them, and doing something in the other world sets the pointer and sets it back, so nothing is ever copied and no copy can go stale.
+All of it goes, and nothing a reader can reach changes, since none of it can be reached. About 60 lines.
 
-The copying, the record of fields to copy, the helpers that patched stale copies and the nesting rules between the two worlds all go. What is left is one line: run this with that world set.
+*Simplicity. Reasoned from the code; that each is unreachable is checked by the harness before it goes.*
 
-*A single source of truth: each fact of a reading has one home. Proposed, the session's.*
+### 4.2 One thing, one renderer
 
-### 4.2 The settings are the page's, apart from the worlds
+These are each written once and used where each is wanted:
+- a commit's line: who made it, when, its hash and the readings it touched;
+- a brief's line of acts;
+- a hue against a body;
+- a brief's path, title and face;
+- a knob's value as it reads;
+- a debounced write to the browser's storage.
 
-The settings are one value, the reader's, kept in the browser. They are held apart from any world, since they belong to no reading, and they are read and written in one place.
+The five tables that describe the programs become one: each program says how it draws, how wide it stands, whether it grows, what it answers and which world it is of. A program's height is then said once, where it is now said in two tables that can disagree. About 90 lines.
 
-*A single source of truth, and flat data. Proposed, the session's.*
+*One pattern for one kind of thing, and a single source of truth. Reasoned; each renderer's output stays character for character what it was.*
 
-### 4.3 One layout, a pure function of the settings and the screen
+### 4.3 A world is a value the page points at
 
-Where each program stands is computed by one pure function from the settings, the screen's width and height, and whether the reader has a finger.
+A reading is one object, a world. It holds:
+- its body, its index, scope, folds, focus and pointer;
+- what is selected and open on the map;
+- its trail, undo and redo;
+- its map's view and how that view was fitted;
+- the elements it is drawn in.
 
-It returns where each program stands and how wide, and which gave way. On a phone it returns the one pane the phone shows, the rail beside it where it stands, and the figures where a narrow screen still has room for them beside a map. One function then sets the elements where the layout says, and every other part asks the layout where a program stands, not the areas.
+The page holds two worlds. "The world now" points at one of them, and acting in the other sets the pointer and sets it back. Since both are the live objects, nothing is copied and no copy can go stale. A timer or a frame that waits captures the world it began in, not a copy of it.
 
-The five areas, their grid, the wing drawing beside the stacks, the slots kept apart for each and the translation of the row into the areas' terms all go. A phone draws its figures with the same stack code the wide page does.
+The copying, the list of fields to copy, the helpers that patched stale copies, and the four wrappers with their different nesting rules all go. Each world's elements carry its name, so which world an element belongs to is read off the element, not reckoned. About 100 to 130 lines.
 
-*One pattern for one kind of thing, and pure functions with effects at the edge. Proposed, the session's. A phone's layout is exactly what it is today, area for area, and where the one function cannot reproduce a pixel of today's phone, that is found by [the harness](#5-how-the-behaviour-is-kept) before anything is committed.*
+The pointer is chosen over handing each function its world as an argument. Some three hundred functions read the reading, and threading one more argument through all of them is the clever form of what one variable says plainly. The views are kept pure all the same: they read the world now and change nothing in it.
 
-### 4.4 A view is a function from a reading to markup
+*A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken.*
 
-Each view draws from a world and the settings and returns markup: the lane, a card, the map's columns, the way down, every figure, the dock. The few that must measure what the browser laid out, such as the lane's ends, the gutters beside the lines and the map's edges, are a second step after the markup is set, and they are named as such.
+### 4.4 Drawing changes nothing
 
-Most of the views already are this. What changes is that each reads the world it is handed, not whichever world a global happens to hold.
+Drawing the map today also decides what is selected and what stands open, and drawing a row records which column it stands in. Each of those decisions moves to the act or the arrival that makes it, before anything is drawn, so data flows one way: an act changes the reading, and the views draw it. This removes no lines, but it removes the reason a draw could not be called twice.
 
-*Pure functions, and one thing well. Proposed, the session's.*
+*Unidirectional flow. Reasoned; the order of those decisions within an act stays what it is, which the harness checks.*
 
-### 4.5 One draw, from what changed
+### 4.5 The settings are a table
 
-An act changes a world or the settings, and says what it changed: the reading, the folds, the focus, the pointer, the layout or a setting. One function draws again what depends on that, in one order, every time. The hand-written lists go, and so do the cases where one list forgot a part another remembered.
+The settings are the page's, apart from both worlds. Today they are checked by hand, one setting at a time. The switches already list each setting's legal values, so the check becomes one pass over that list. The dated repairs to settings kept from before 2026-09-17 are [the author's to let go](#5-what-only-the-author-can-let-go).
 
-*Describe over instruct, and data flowing one way. Proposed, the session's. [The implementation](implementation.md#6-how-it-is-drawn) already says that every change draws again only what depends on it; this is that said once in the code.*
+About 30 lines.
 
-### 4.6 The acts as data, one table for each hand
+*Data over logic. Reasoned. A setting that is not checked today, such as the nesting line or the flick, is checked once it is in the table, which changes nothing for a value the page itself wrote.*
 
-What a key does on the prose and what it does on the map are two acts. So the actions become two tables, the lane's and the map's, and which hand holds the keys picks the table. A badge names an act in its own table. An entry no longer asks in its every part where the keys are.
+### 4.6 One layout, as a function of the settings and the screen
 
-*Data over logic. Proposed, the session's.*
+Where each program stands is computed by one pure function of four things: the settings, the screen's width and height, and whether the reader has a finger. It returns where each program stands, how wide, and which gave way. One function then places the elements, and every other part asks the layout, not the areas.
 
-### 4.7 The comments say why, and the briefs say how it came to be
+A phone's arrangement is not the wide row, and it stays what it is. What it needs of the settings are the pane it shows, the side its rail stands on, and the figures it has room for beside a map. Those are read from the areas as they are kept now, so a reader's saved arrangement still lays their phone. The areas' grid, wing drawing and slots then go, and a phone's figures are drawn by the same stack code as the wide page's. About 250 to 300 lines.
 
-A comment says what is not plain from the code: why it is so, and what it guards against. The story of how a decision was reached, with its dates, stands in the briefs and in the history, which already hold it, and leaves the code.
+This is the move most likely to move a pixel. Today the grid lays the phone and the browser rounds, and the one function will place in whole pixels. Two fixed figures in one wing stand at its top and its foot, where a stack sets them one under the other. And the wings give way in their own order. Each such case is matched, not let go, and [the harness](#6-how-the-behaviour-is-kept) finds any that is missed.
 
-*Context and decisions documented, each in its place. Proposed, the session's. Which comments go is the author's to see in the diff, since the comments are written in his voice.*
+*One pattern for one kind of thing, and pure functions. Reasoned, the session's; a phone exactly as it is today.*
 
-### 4.8 One file, or a few
+### 4.7 One draw, at a few levels
 
-[The implementation](implementation.md#7-one-file-laid-by-the-gradient) keeps the surface in one file because it is the proof of concept, and says that once the file outgrows reading by depth, each widget becomes a file of its own.
+An act changes a reading or the settings, and never draws. When it is done, the shell draws the page at one of a few named levels:
+- **all**: the layout, both proses, the map and the figures;
+- **the lanes**: both proses and the map;
+- **the figures**;
+- **the light**: what is lit.
 
-At 7,945 lines it may have reached that point. Bun bundles a page's script from several files as it serves it, so a split would cost no build step: the process, the substrate, the page's state, the layout, the views, the acts and the style could each be a file.
+A discrete act draws at all where that is fast enough, and the cost is measured first. A continuous gesture keeps its own narrow redraw, named, since a scroll, a drag or a turned knob must not lay the whole page again under the hand. The two places where one measure settles another stay explicit: the prose's ends with the shape's slot, and the gutters with the room they hang below the lane.
 
-*Small parts that each do one thing. Whether it is time is the author's: it reverses his decision of 2026-09-12. The assembly above holds either way, since every move here is a seam a file could later be cut along.*
+There is no tracking of what depends on what, which would be a small framework. About 40 to 60 lines.
 
-## 5. How the behaviour is kept
+*Describe over instruct, unidirectional flow, and dumb is smart. Reasoned, the session's. It departs from [the implementation](implementation.md#6-how-it-is-drawn), in force since 2026-09-13, that every change draws again only what depends on it: a discrete act may now draw more than it needs, where that costs the reader nothing.*
+
+### 4.8 An act, and its other hand
+
+The actions stay one table. About eleven of them act differently while the keys are on the map, and today they ask which hand holds the keys in each of their parts.
+
+Each such entry gains one override for the map: a label, a help, a test and a doing, taken whole while the keys are there. Entries that act the same either way are written once, as now. A chord still goes to the first act that can take it, so return reads on the map before it scopes the prose.
+
+About 20 to 30 lines.
+
+*Data over logic, and an action named in one place. Reasoned; a cold reader showed that two tables would copy the twelve entries that do not care.*
+
+### 4.9 The gestures, as data
+
+A press is a table of what it can land on, the first match taking it: a badge, a row of the map, a fold line, a program in the dock, a gutter, a setting, a cell of the trail, a name in the way down, a cell of a figure. Each case says what it acts on.
+
+A drag is a table of its kinds: a gap, a stack's gap, a program, a knob, the shape, the rail, the map's ground and a phone's card. Each kind says how it starts, follows the hand and lets go. The wheel, the keys and the pointer are each one small function. The acts they reach stand in the section of acts, not inside the wiring.
+
+About 80 lines go. The rest becomes several readable parts instead of one function nobody reads whole.
+
+*Data over logic, and one thing well. Reasoned, the session's; the order in which a press tries its cases is behaviour and stays as it is.*
+
+### 4.10 The comments say why
+
+A comment says what is not plain from the code: why it is so, and what it guards against. The story of how a decision was reached, with its dates, stands in the briefs and the history, which already hold it, and it leaves the code. About 300 to 600 lines.
+
+*A decision documented where it is made, and once. Reasoned. The comments are written in the author's voice, so which go is his to see in the diff before it is committed.*
+
+### 4.11 One file, or a few
+
+[The implementation](implementation.md#7-one-file-laid-by-the-gradient) keeps the surface in one file because it is the proof of concept. It says that once the file outgrows reading by depth, each widget becomes a file of its own.
+
+The page's script is cut out of the file by its comment headings and transpiled. Bun would bundle it from a few files as it serves the page, with no build step of its own. The parts would be the process, the substrate, the readings, the layout, the views, the acts with their gestures, and the style. A split saves no lines, but it replaces cutting by headings, which breaks on a renamed heading, with imports.
+
+*Small parts that each do one thing. Whether it is time is the author's, since it reverses his decision of 2026-09-12. Every move above holds either way, and each is a seam a file could be cut along.*
+
+## 5. What only the author can let go
+
+Keeping behaviour keeps some that exists only because of how the code grew. Each would simplify further, and each is the author's to let go or keep:
+
+- **A phone kept by the areas.** A phone could be laid from the row as a narrow screen, instead of from the five areas the row superseded. That would make the areas go as data too, but it changes a phone.
+- **The figures beside a map on a screen just too narrow for the prose's gutters.** They stand there today only because the areas fit them there.
+- **Settings kept from before 2026-09-17.** The repairs for a fade, an area that held one name, and the areas before the row change nothing for a reader who has opened the page since.
+- **The heavy tier of git's history, what each commit changed line by line.** It is served and written, but no part of the page reads it yet. [The history](history.md) plans it, so it is not dead, only waiting.
+
+*Seen in the code, 2026-10-01; each is unanswered.*
+
+## 6. How the behaviour is kept
 
 Nothing a reader sees or does may change, and that is shown, not argued.
 
-Before the first move, a harness drives the page in a browser through scenarios at several widths, in both themes, with a pointer and with a finger, in both worlds: arriving, scrolling, folding, scoping, following links, undoing, the map, git's history, dragging programs, pulling gaps, the dock, the knobs and switches, the phone's foot, its card and its rail. After every step it takes the screen as a picture, together with the address, the settings kept, each scroll and what the page drew.
+A harness drives the page in a browser through scenarios. It runs at several widths, in both themes, with a pointer and with a finger, and in both worlds. It covers:
+- arriving, scrolling, folding, scoping, following links and undoing;
+- the map and git's history;
+- dragging programs, pulling gaps, the dock, the knobs and the switches;
+- a phone's foot, its card and its rail;
+- a reload that resumes, and the browser's back.
 
-The page as it stands now and the page after each move are run side by side against the same body. A move is committed only when every picture and every fact is equal, or when each difference has been looked at and is only in how something is written, never in what is drawn or done. The process's own outputs, the check, the history and the written page, are compared the same way.
+After every step it takes the screen as a picture, and the facts a reader could observe: the address, the settings kept, each scroll, the visible text, where each brief stands on the screen, and the markup.
 
-Then each move gets a cold review, as every build here does, and the author looks at the page.
+The page as it stands and the page after a move are served side by side, against one frozen copy of the repository, so neither the body nor the history moves while the work goes on. The web fonts are left out, so both lay the prose in the same faces. Animations are stilled, and so is the blur behind a frosted pane.
 
-*Proposed, the session's, 2026-10-01; the author's ask was that behaviour not change.*
+A move is committed only when every record is equal, or each difference has been looked at and found to be only how the markup is written. The type checker passes at every step, and the process's own outputs are compared the same way: the check, the history and the written page. Then each move has a cold review, and the author looks at the page.
 
-## 6. The order of the work
+The harness sits outside the surface and ships nothing. The scenarios cover what they list, so a cold reviewer reads each move for what they do not.
 
-Each step is one commit, and the harness is equal after each.
+*Measured, 2026-10-01: the page run against itself through the harness, 166 records over twelve scenarios, comes out equal. Two things had to be stilled first: the rasteriser's shade at a rounded corner, which the comparison sets aside below a few pixels, and the blur behind a phone's frosted pill, which the harness turns off on both sides. Reasoned, of the rest.*
 
-1. The harness, and the page as it stands recorded through it.
-2. Two unused names go, and the dated stories of the comments leave for the briefs that hold them.
-3. The worlds become values the page points at, with the settings apart.
-4. One layout, and the phone drawn by it.
-5. One draw from what changed.
-6. The acts as two tables.
-7. Files, if the author wants them.
+## 7. The order of the work
 
-The order puts the moves that only remove first, and the one that touches every part, the world, before the ones that build on it.
+Each move is one commit, after the harness, the type checker and a cold review are each clean. The removals come first, then what makes one thing one, then the world, which every later move stands on. Then the layout, the draw, the acts and the gestures.
 
-*Proposed, the session's, 2026-10-01.*
+1. What can never run goes.
+2. One thing, one renderer, and one table of programs.
+3. The settings as a table.
+4. A world as a value, and drawing that changes nothing.
+5. One layout.
+6. One draw, at a few levels.
+7. An act and its other hand.
+8. The gestures as data.
+9. The comments, shown to the author before they are committed.
+10. Files, if the author wants them.
 
-## 7. What this leaves open
+*Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves.*
 
-- Whether the file is split into a few, [above](#48-one-file-or-a-few).
-- How far the comments are cut back. The proposal moves the dated stories to the briefs and keeps the reasons.
-- Whether anything can be simplified beyond keeping behaviour. A behaviour that exists only because of how the code grew, such as figures standing beside a map on a screen just too narrow for the prose's gutters, is kept unless the author lets it go.
+## 8. What this leaves open
+
+- Whether the file becomes a few, [above](#411-one-file-or-a-few).
+- Which comments go.
+- Each of [the things only the author can let go](#5-what-only-the-author-can-let-go).
 
 *Open, 2026-10-01.*
