@@ -146,13 +146,15 @@ The move is mechanical but wide: every reading of the view, the ends or a world'
 
 *A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken. It supersedes the world set in the state's place of [the implementation](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) and of [the framework's shared state](framework.md#4-one-shared-state-and-a-few-verbs), where they say so.*
 
-### 4.4 Drawing changes nothing
+### 4.4 What the map decides before it draws
 
 Drawing the map today also decides what is selected and what stands open, and drawing a row records which column it stands in.
 
-Each of those decisions moves to the act or the arrival that makes it, before anything is drawn, so data flows one way: an act changes the reading, and the views draw it. What drawing measures of the browser, the map's fit and the prose's ends, stays in the draw as a measured step, and is kept as the shell's. This removes no lines, but it removes the reason a draw could not be called twice.
+These cannot move out to the acts, as was first proposed, without changing behaviour. The map makes its decisions only while it stands, and what it leaves open is kept for the reader's next visit. Made with no map on the page, the same decisions would keep something different. So they stay where they are, as one named step at the head of the map's draw: the map settles what it shows, then draws it. The column a row was drawn in is a measure of what was drawn, as the lane's ends are, and is kept with the shell's measures.
 
-*Unidirectional flow. Reasoned; the order of those decisions within an act stays what it is, which the harness checks.*
+This removes no lines. It makes plain the one place a view decides anything.
+
+*Unidirectional flow, as far as keeping behaviour allows. Reasoned, the session's, 2026-10-02, while building the world; it revises the move as first proposed, which said the decisions would move to the acts.*
 
 ### 4.5 The settings are a table
 
