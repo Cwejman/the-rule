@@ -17,7 +17,19 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-09-29 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-10-01 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+
+### The canvas's rim goes quiet
+
+On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart.
+
+*Told by the session that made the commit, 2026-10-01.*
+
+#### The rim stays quiet whichever pane holds the keys
+
+The canvas keeps only its quiet rim, and the framework's brief on the keys says so. The keys still follow the pointer, to the pane at the right while it rests there.
+
+[The rim stays quiet whichever pane holds the keys](git:42a135d)
 
 ### The whole history is told
 
