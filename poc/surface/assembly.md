@@ -208,7 +208,9 @@ A press and a drag were also to become tables. A press already reads as one list
 
 ### 4.10 The comments say why
 
-A comment says what is not plain from the code: in a line, why it is so and what it guards against, which is the story the sister project's rules ask for where code would otherwise be overrun. The longer story of how a decision was reached, with its dates, stands in the briefs and in the record of the repository's commits, which already hold it, and it leaves the code. Counted, it is smaller than first thought: four lines carry a date and some sixty tell what once was, and the rest of the comments are reasons, which the sister project's rules ask to keep. About 60 to 100 lines.
+A comment says what is not plain from the code: in a line, why it is so and what it guards against, which is the story the sister project's rules ask for where code would otherwise be overrun.
+
+The longer story of how a decision was reached, with its dates, stands in the briefs and in the record of the repository's commits, which already hold it, and it leaves the code. Counted, it is smaller than first thought: four lines carry a date and some sixty tell what once was, and the rest of the comments are reasons, which the sister project's rules ask to keep. About 60 to 100 lines.
 
 *Self-documenting code, and its context in a line. Reasoned. The comments are written in the author's voice, so which go is his to see in the diff before it is committed.*
 
