@@ -278,7 +278,7 @@ Nothing of the lane or the canvas is written twice. What the history needs of it
 
 Its addresses are its own, so nothing the body lights reaches its briefs, and as yet nothing it lights reaches the body's.
 
-*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world.*
+*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world. Superseded on 2026-10-01 by [two worlds standing at once](layout.md#6-the-body-and-git-two-worlds): the history's world holds the elements it is drawn in, and is set in the state's place while anything is drawn or done there; where the lane stands alone it is set there for as long as the one pane reads it.*
 
 ### 6.6 What the browser keeps
 
