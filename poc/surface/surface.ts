@@ -1623,23 +1623,11 @@ const levelIn = (b: Brief): Brief[] => level(b.address).filter((k) => !isCard(k)
 /** Whether a brief unfolds at all: blocks past its face, the cards among them, or a level of its own. */
 const unfolds = (b: Brief): boolean => blocksOf(b).length > 1 || levelIn(b).length > 0;
 
-const fmt = (n: number) => n.toLocaleString("en-US");
-/** The number a heading shows in the lane: counted from the scope, as the canvas counts, since a reader stands in the substrate and not in a file. */
-const shownNumber = (b: Brief): string => scopedNumber(b);
 const trim = (s: string, n: number): string => (n <= 0 ? "" : s.length <= n ? s : n < 4 ? "" : s.slice(0, n - 1).trimEnd() + "…");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 /** Where each of a row of widths starts, laid end to end with a gap between. */
 const offsets = (widths: number[], gap: number): number[] => widths.map((_, i) => widths.slice(0, i).reduce((x, w) => x + w + gap, 0));
-
-/** Shares of a span by weight, with the small ones lifted to a floor and the large ones yielding the difference. */
-function spread(weights: number[], span: number, floor: number): number[] {
-  const total = weights.reduce((x, y) => x + y, 0);
-  const raw = weights.map((w) => (w / total) * span);
-  const owed = raw.reduce((s, x) => s + (x < floor ? floor - x : 0), 0);
-  const large = raw.reduce((s, x) => s + (x < floor ? 0 : x), 0);
-  return raw.map((x) => (x < floor ? floor : large > 0 ? x - (owed * x) / large : x));
-}
 
 /**
  * The hue of a branch: every brief carries the hue of the root-level brief it stands under, so colour says
@@ -1793,16 +1781,6 @@ const ACTIONS: Record<string, Action> = {
       followed = null;
       drawCanvas();
     },
-  },
-  history: {
-    label: () => (narrowWorld === "history" ? "the body" : "the history"),
-    mark: () => ICON.history,
-    keys: [],
-    help: () => (narrowWorld === "history" ? "Turns the pane back to the body." : "Turns the pane to the history: the stories told over the commits, and the commits."),
-    also: "The switch at the foot.",
-    // wide, the history is read in programs of its own, so the switch stands only where the lane stands alone
-    can: () => narrow(),
-    run: () => turnNarrow(),
   },
   face: {
     label: () => (state.settings.face === "shown" ? "hide the face" : "the face"),
@@ -2372,7 +2350,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
     `<div class="surface">` +
-    `<h2 class="head d${d}"><span class="num">${esc(shownNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
+    `<h2 class="head d${d}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
     more +
     `</div>` +
@@ -2472,8 +2450,6 @@ const widgetsOf = (area: AreaName): Widget[] => state.settings.areas[area].map((
 type WingName = "wingL" | "wingR";
 /** The figures a wing draws, in order. */
 const figureNames = (area: WingName): string[] => state.settings.areas[area].filter((k) => WIDGETS[k]?.kind === "figure");
-/** The first widget an area holds, which is all a gutter holds; nothing, where the area is closed. */
-const widgetOf = (area: AreaName): Widget | undefined => widgetsOf(area)[0];
 const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
 
 /** The two sides a widget of each kind can stand on; a pane's are the middle's own two, which the middle keeps in its order. */
@@ -2867,7 +2843,7 @@ function canTrade(k: string, t: string, L: Column[] = layoutNow()): boolean {
 /** The layout once a program is dropped in a zone. A program moved alone keeps the width its column was pulled to. */
 function dropped(L: Column[], k: string, z: Zone): Column[] {
   const from = whereIs(k, L);
-  const item: Item = from ? { k } : { k };
+  const item: Item = { k };
   const kept = from && L[from.c].items.length === 1 ? L[from.c].w : undefined;
   const column = (it: Item): Column => (kept ? { w: kept, items: [it] } : { items: [it] });
   if (z.kind === "trade") {
@@ -3133,7 +3109,7 @@ function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null;
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "measure" | "gap" | "dim" | "fade" | "canvas"; row: "type" | "page" | "canvas"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
@@ -3156,14 +3132,14 @@ function meterArc(t: number, r: number): string {
  * greatest width, since it takes the page whole; the ahead, which does not stand there; and the flick, which reads a
  * wheel no finger sends. They are not drawn, rather than drawn and idle.
  */
-const IDLE_NARROW = new Set(["measure", "canvas", "ahead", "flick", "room", "dock"]);
+const IDLE_NARROW = new Set(["ahead", "flick", "room", "dock"]);
 const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
 function settingsHtml(): string {
   const s = state.settings;
   const knob = (k: Knob) => {
     const t = clamp((s[k.key] - k.min) / (k.max - k.min), 0, 1);
-    const shown = k.key === "measure" || k.key === "gap" ? `${Math.round(s[k.key])}px` : k.key === "fade" ? `${Math.round(s[k.key])}%` : s[k.key].toFixed(2);
+    const shown = k.key === "gap" ? `${Math.round(s[k.key])}px` : k.key === "fade" ? `${Math.round(s[k.key])}%` : s[k.key].toFixed(2);
     return (
       `<div class="knob" data-knob="${k.key}" title="${k.name}: ${shown}">` +
       `<svg viewBox="0 0 40 40"><path class="track" d="${meterArc(1, 15)}"/><path class="value" d="${meterArc(Math.max(t, 0.002), 15)}"/><g class="glyph" transform="translate(12 12)">${k.glyph}</g></svg>` +
@@ -3174,7 +3150,7 @@ function settingsHtml(): string {
     `<span class="name">${w.name}</span><span class="values">${w.values
       .map((v, i) => `<button class="pick${s[w.key] === v ? " on" : ""}" data-set="${w.key}" data-value="${v}">${w.labels?.[i] ?? v}</button>`)
       .join("")}</span>`;
-  const rows = (["type", "page", "canvas"] as const).map((r) => KNOBS.filter((k) => k.row === r && shownHere(k.key))).filter((ks) => ks.length);
+  const rows = (["type", "page"] as const).map((r) => KNOBS.filter((k) => k.row === r && shownHere(k.key))).filter((ks) => ks.length);
   return `<div class="settings">${rows.map((ks) => `<div class="knobs">${ks.map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.filter((w) => shownHere(w.key)).map(row).join("")}</div></div>`;
 }
 
@@ -3199,7 +3175,7 @@ function drawMeter(el: HTMLElement): void {
   const k = KNOBS.find((k) => k.key === el.dataset.knob)!;
   const v = state.settings[k.key];
   const t = clamp((v - k.min) / (k.max - k.min), 0, 1);
-  const shown = k.key === "measure" || k.key === "gap" ? `${Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2);
+  const shown = k.key === "gap" ? `${Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2);
   el.querySelector(".value")?.setAttribute("d", meterArc(Math.max(t, 0.002), 15));
   el.title = `${k.name}: ${shown}`;
   const hint = el.querySelector(".hint");
@@ -3830,7 +3806,7 @@ function marksHtml(b: Brief, hides: boolean): string {
 }
 
 /** One row: its number counted from its column's head, its title, and the marks of what it does not show. */
-function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens: boolean; open: boolean; hides: boolean }): string {
+function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens: boolean; hides: boolean }): string {
   const a = b.address;
   // the head of a column draws the same brief a second time; the column it can be opened from is the one that named it
   if (!o.head) colOf.set(a, col);
@@ -3856,7 +3832,7 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   const opens = isCard(b) && !head;
   const open = !head && state.opened.includes(a);
   const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
-  const row = rowHtml(b, root, col, { head, opens, open, hides: kids.length === 0 && (opens || level(a).length > 0) });
+  const row = rowHtml(b, root, col, { head, opens, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
   // the root's level may run across as a trunk, each of its rows with its own level hanging down beneath it
   const across = head && a === "" && rootRuns() === "across" ? " across" : "";
@@ -3898,8 +3874,8 @@ function fieldHtml(): string {
   // and the eye that brings a hidden face back stands only in this field
   if (narrow() || a === null || !b) return "";
   // a card has no fold of its own on the canvas: its own reading is a column, and what folds is a level within one
-  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(id === "face" ? undefined : a));
-  return acts.length ? `<div class="field">${acts.map((id) => badgeHtml(id, id === "face" ? undefined : a, false, true)).join("")}</div>` : "";
+  const acts = FIELD_ACTS.filter((id) => !(id === "unfold" && isCard(b)) && ACTIONS[id].can(a));
+  return acts.length ? `<div class="field">${acts.map((id) => badgeHtml(id, a, false, true)).join("")}</div>` : "";
 }
 
 /**
@@ -4678,8 +4654,6 @@ type Held = Record<AreaName, string[]>;
 const widthIn = (held: Held, area: AreaName): number =>
   held[area].length === 0 || area === "middle" || area.startsWith("gutter") ? 0 : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
 const widthOf = (area: AreaName): number => widthIn(state.settings.areas, area);
-/** A closed area takes no room at all; its strip stands at the foot of where it would open. */
-const takesRoom = (area: AreaName): boolean => isOpen(area);
 
 /**
  * Which areas the width allows, taken in the order they give way last: after the lane, the left wing, then the right
@@ -4708,18 +4682,6 @@ function fitsWith(held: Held): Fit {
     if (used + need > ui.areas.clientWidth) break;
     used += need;
     on[wing] = true;
-  }
-  // the gutters belong to the lane and stand only beside it, and they take the room the wings left them rather than a
-  // width of their own: a narrower gutter is still a gutter, aligned to its lines and scrolling with them, where one
-  // carried somewhere else is not. Below the least a preview reads in they give way as a pair
-  const wanted = (["gutterL", "gutterR"] as const).filter((a) => held[a].length > 0);
-  if (on.lane && wanted.length) {
-    const room = ui.areas.clientWidth - used - wanted.length * s.gap;
-    const each = Math.min(GUTTER.want, Math.floor(room / wanted.length));
-    if (each >= GUTTER.least) {
-      on.gutter = each;
-      wanted.forEach((a) => (on[a] = true));
-    }
   }
   // the exception at the end of the order of giving way: where every area has gone and the lane would stand alone, the
   // shape keeps standing as a narrow rail, if the reader has asked for it and the lane is left room enough to read in
@@ -4786,8 +4748,9 @@ function drawLayout(): void {
   root.setProperty("--measure", `${measure}px`);
   // the gutters hug the lane at the gap, since what stands in them is aligned to its lines; only what the width allows
   // takes a column, since an absent element leaves the grid and would pull the lane into the empty track it left
-  const inner = (["gutterL", "lane", "gutterR"] as const).flatMap((a) => (a === "lane" ? [measure] : on[a] && takesRoom(a) ? [on.gutter] : []));
-  const mid = inner.reduce((x, y) => x + y, 0) + s.gap * (inner.length - 1);
+  // the gutters never stand here: a width narrow enough for the lane to stand alone is too narrow for them
+  const inner = [measure];
+  const mid = measure;
   // every area is as wide as what it holds, and the spaces beside them are one: at the two edges of the viewport as
   // between the wings and the lane. The gap is the least a space is given, and what the width leaves over is shared
   // among the spaces evenly, so no area carries room it does not use
@@ -4809,7 +4772,7 @@ function drawLayout(): void {
     el.style.gridRow = "1";
   };
   if (railL) place(ui.parts.wingL, `${on.rail}px`);
-  else if (on.wingL && takesRoom("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
+  else if (on.wingL && isOpen("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
   // the panes stand in the middle in their order, the left first. The lane keeps its measure; a map beside it keeps its
   // least width, and the canvas grows to its greatest width and no further, so the row stays centred with its space
   // around it. Standing alone a map takes whatever the width is, since there is nothing to give way to and a floor would
@@ -4818,7 +4781,7 @@ function drawLayout(): void {
     bleed && p === "canvas" ? "1fr" : maps === 2 ? `minmax(${CANVAS_MIN}px, 1fr)` : p === "dish" ? (on.lane ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr") : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`;
   on.panes.forEach((p) => place(paneEl(p), p === "lane" ? `${mid}px` : mapWidth(p)));
   if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
-  else if (on.wingR && takesRoom("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
+  else if (on.wingR && isOpen("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
   ui.areas.style.gridTemplateColumns = tracks.join(" ");
   ui.areas.style.columnGap = "0px";
   ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
@@ -4829,9 +4792,7 @@ function drawLayout(): void {
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
   ui.scroll.style.width = on.lane ? "" : `${mid}px`;
-  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !takesRoom(name))));
-  (["gutterL", "gutterR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
-  (["wingL", "wingR"] as const).forEach((a) => ui.parts[a].classList.toggle("closed", !isOpen(a)));
+  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !isOpen(name))));
 }
 
 /** What each program stands in on the page now, in the page's own measure: what a drop is aimed at, and what a head stands over. */
@@ -4866,8 +4827,6 @@ function drawLaid(): void {
     if (p) boxes.set(proseKey(w), { x: p.x, y: 0, w: p.w, h: H });
     D.gutterL.hidden = !f.sides[0];
     D.gutterR.hidden = !f.sides[1];
-    D.gutterL.classList.remove("closed");
-    D.gutterR.classList.remove("closed");
     const inner = [...(f.sides[0] ? [f.gutter] : []), f.measure, ...(f.sides[1] ? [f.gutter] : [])];
     D.content.style.gridTemplateColumns = inner.map((x) => `${Math.round(x)}px`).join(" ");
     D.content.style.columnGap = `${s.gap}px`;
@@ -5429,10 +5388,10 @@ function drawAdjuncts(): void {
   let overhang = 0;
   (["gutterL", "gutterR"] as const).forEach((area) => {
     const col = ui.parts[area];
-    // wide, what a gutter holds is a setting of the prose it stands beside
-    const widget = narrow() ? widgetOf(area) : WIDGETS[state.settings.gutters[inPast() ? "history" : "body"][area === "gutterL" ? 0 : 1] ?? ""];
+    // what a gutter holds is a setting of the prose it stands beside, and where the lane stands alone none stands
+    const widget = WIDGETS[state.settings.gutters[inPast() ? "history" : "body"][area === "gutterL" ? 0 : 1] ?? ""];
     col.innerHTML = "";
-    if (!on[area] || widget?.kind !== "adjunct") return;
+    if (narrow() || !on[area] || widget?.kind !== "adjunct") return;
     // measured from the column itself, which starts below the room the reading line sets above the lane
     const top0 = col.getBoundingClientRect().top;
     let floor = 0;
@@ -5707,13 +5666,11 @@ function drawSheet(): void {
   const on = !!w && w.kind === "figure";
   ui.sheet.hidden = !on;
   if (!on) return void (ui.sheet.innerHTML = "");
-  const s = state.settings;
-  // narrow, a figure opened whole is the page: standing in a band left the prose showing above and below it, which
-  // read as an overlay over a reading the reader had left
-  const whole = narrow();
-  ui.sheet.classList.toggle("bleed", whole);
-  ui.sheet.style.top = whole ? "0px" : `${Math.round(Math.max(s.gap, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10))}px`;
-  ui.sheet.style.bottom = whole ? "0px" : `${footRoom()}px`;
+  // a figure is opened whole only where the lane stands alone, and there it is the page: standing in a band left the
+  // prose showing above and below it, which read as an overlay over a reading the reader had left
+  ui.sheet.classList.add("bleed");
+  ui.sheet.style.top = "0px";
+  ui.sheet.style.bottom = "0px";
   ui.sheet.innerHTML = `<div class="slot"></div>`;
   const slot = ui.sheet.firstElementChild as HTMLElement;
   slot.innerHTML = (w as Figure).draw(slot.clientWidth, slot.clientHeight);
@@ -7543,7 +7500,6 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* the room above and below the lane is set by the reading line's setting, each time the lane is laid */
 :is(#content, #gcontent) { position: relative; display: grid; margin: 0 auto; padding: 50vh 0; }
 .gutter { position: relative; }
-.gutter.closed { visibility: hidden; }
 :is(#lane, #glane) { min-width: 0; line-height: var(--leading); }
 
 #strips { position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 8; pointer-events: none; }
@@ -7555,8 +7511,6 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .strip .pick { position: relative; width: 30px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); opacity: .2; transition: opacity .15s, color .15s; }
 /* the whole row lifts a little while the pointer is on it, so what cannot be had is still seen when a reader looks */
 .strip:hover .pick { opacity: .34; }
-.strip .pick.off, .strip .pick.off:hover { opacity: .1; cursor: default; }
-.strip:hover .pick.off { opacity: .17; }
 .strip .pick:hover { opacity: .6; }
 .strip .pick.on, .strip:hover .pick.on { opacity: .9; color: var(--muted); }
 /* asked for, but the width denies it: it stands between what is in use and what is not */
@@ -7565,18 +7519,8 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .strip .pick.fixed { cursor: default; }
 /* the switch has no side and carries no dot; while the history is read it stands darkest, and while it is read in it breathes */
 .strip .pick.mode.busy { animation: busy 1s ease-in-out infinite alternate; }
-/* the word stands clear of the row at the switch's left, so nothing in the row moves while the reader waits; it comes in only once the waiting is felt */
 .strip .switch { position: relative; display: inline-flex; }
-.strip .waiting { position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 10px; font-size: 12px; color: var(--faint); white-space: nowrap; pointer-events: none; animation: arrive .3s ease-out both .25s; }
-@keyframes arrive { from { opacity: 0; } to { opacity: 1; } }
-/* at the foot of a phone the row is centred on the page, so the word stands above the switch rather than beside it, where it would run off the edge */
-.strip.foot .waiting { right: auto; top: auto; left: 50%; bottom: 100%; transform: translateX(-50%); margin: 0 0 12px; }
 @keyframes busy { from { opacity: .2; } to { opacity: .6; } }
-/* a widget in use says which side holds it, as a dot beside its icon, level with the middle of it so it balances the
-   round forms the icons are made of. It is the icon's own ink, three pixels across and three clear of the glyph */
-.strip .pick.side-l::after, .strip .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
-.strip .pick.side-l::after { left: 1px; }
-.strip .pick.side-r::after { right: 1px; }
 .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 /* the dock down the left edge is the same row, standing; a drag over it lifts it, since letting go there takes the program away */
 .strip.dock.left { position: fixed; left: 12px; bottom: auto; top: 50%; transform: translateY(-50%); flex-direction: column; }
@@ -7871,18 +7815,9 @@ body.touch .knob.turning .hint { opacity: 1; }
    beneath, with a light rim and a soft shadow, since a translucent grey alone read as a fade rather than as a thing */
 #strips { transition: transform .42s cubic-bezier(.22,.9,.24,1), opacity .3s ease; }
 #strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
-/* the foot is one row: what stands in it follows what the reader has chosen, with the mark always at its end */
+/* the foot is one row: what stands in it follows what the reader has chosen */
 .strip.foot { bottom: 22px; gap: 8px; }
-/* two glasses, and the difference is deliberate: what a reader opened stands on the solid one, since they are looking
-   at it; the mark, which stands there the whole time they read, is sheerer and quieter */
 .glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8); }
-.strip .mark.glass { background: var(--sheer); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); }
-/* the fold chevron in a tree is also called a mark and stands absolutely, so this one says where it stands: left to
-   itself it hung out of the strip, which is what put it off centre and below the foot */
-.strip .mark { position: relative; flex: none; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); transition: color .15s, transform .2s; }
-.strip .mark:active { transform: scale(.94); }
-.strip .mark:hover { color: var(--ink); }
-.strip .mark .icon { width: 19px; height: 19px; stroke-width: 1.2; }
 .strip .pill { display: flex; align-items: center; border-radius: 26px; padding: 3px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
 @keyframes pill-in { from { opacity: 0; transform: translateY(10px) scale(.92); } }
 .strip .pill .pick { width: 40px; height: 40px; border-radius: 20px; opacity: .5; }
