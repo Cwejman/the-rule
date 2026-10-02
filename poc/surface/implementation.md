@@ -222,7 +222,7 @@ The lane's ends and the shape's slot depend on each other, so they are settled i
 
 Should the plate ever hold more cells than an element per cell bears, it alone moves to a canvas.
 
-*In force, the author's decision, 2026-09-13.*
+*In force, the author's decision, 2026-09-13. Superseded on 2026-10-01 and 2026-10-02: the figures stand in [the row's stacks](layout.md#21-three-ways-to-take-height) wide and as the rail where the lane stands alone, each in an element of its own placed where the layout says; the settling of the lane's ends against the shape's slot stands.*
 
 ### 6.3 The address on every element
 
@@ -296,15 +296,15 @@ And every change a reader makes is recorded as the lane stood before it, the sco
 
 The first is carried as a class on the body, so most of what a finger changes is style and not branches: the room around a press, an act drawn as a button, the acts moved to a row of their own. What it cannot be is drawn differently: a badge without its cap, a rail that nests tighter and fits its marks to the room each row has left.
 
-The rail is the left wing at a width the fit hands it, whichever wing the reader had the shape in, and the lane's measure gives it its room by taking the page's own edge. A figure opened whole is one element over the areas, drawn into the band the prose reads in, with the lane left laid beneath it, since the rail and the reading line both measure it.
+The rail is the shape at a width the fit hands it, at the edge the reader put it at, and the lane's measure gives it its room by taking the page's own edge. A figure opened whole is one element over the page, drawn into the band the prose reads in, with the lane left laid beneath it, since the rail and the reading line both measure it.
 
-*In force, 2026-09-16, as built.*
+*In force, 2026-09-16, as built; the rail as the shape at an edge rather than a wing, 2026-10-02.*
 
 ## 7. One file, laid by the gradient
 
 The file is composed the way a brief is, so it is read by depth like anything else under the rule. What it is and how it is run come first, then how the body is assembled, then how it is drawn, and the details beneath, with numbered headings in comments.
 
-The drawing holds the lane, then the areas and their strip, then one section per widget, then what wires the gestures. Every widget is one entry in one table, so the day the file outgrows reading by depth, each entry becomes a file of its own and nothing else moves.
+The drawing holds the lane, then the widgets and the layout, then one section per widget, then the moves and the gestures that reach them. Every widget is one entry in one table, so the day the file outgrows reading by depth, each entry becomes a file of its own and nothing else moves.
 
 *In force, the author's decision, 2026-09-12; the widget table 2026-09-13.*
 
