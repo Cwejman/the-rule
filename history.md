@@ -17,13 +17,44 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-10-01 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-10-02 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+On the last day the surface's program was assembled again without changing what it does.
+
+### The surface is assembled again
+
+On 2026-10-02 the author found the surface's program grown to more than three times the first one, and asked that it be assembled again by what it is really for, as prose is, on the lore of building programs that the sister project's principles hold, without changing what it does. The session wrote the assembly as an open brief, read it cold until a reading changed only words, and built it a move at a time. A harness drove the page as it was and the page as built side by side through fourteen scenarios, a phone and the two worlds among them. It recorded the pictures, the storage, the scrolls, the text and the marks of each step, and a cold review read each move before it was committed. The program went from 7,945 lines to 7,676. Most of what is left is what the program does, and the comments that say why. The author let the size stand once making it smaller would no longer serve the same function, and the heavier cut of the comments that was offered waits on them.
+
+*Told by the session that made these commits, as its debrief, 2026-10-02; the commit that tells it stands untold above it.*
+
+#### The comments say why, and the lane alone is laid by the row's placing
+
+The comments were cut to the reasons they guard, since how the code came to be is held by the briefs and this file. Asked what of the lane alone must be kept, the author kept the phone's foot, which appears when the reader scrolls up, and let the rest go to common sense. So where the lane stands alone the page is one pane, the prose or the map, placed as the row places its stacks. The shape stands as a rail at the edge the reader chose. The five areas, their grid, the wings and their slots are gone. A phone's pictures are the same as before; what changed is only in the markup, and a narrow window showing the map no longer keeps the rail beside it.
+
+[The comments say why, and the lane alone is laid by the row's placing](git:938ac02..9259c06)
+
+#### Each thing once, a world as a value, an act's other hand, and the gestures as functions
+
+Each thing the page shows in more than one place is written once. A world is a value the page points at, each reading holding its own place, folds, trail, undo, map view and elements, so nothing is copied and no copy goes stale. An act that does something else on the map says so once, in a form of its own. Each gesture is a function, and the wiring says only which listens to what. Two moves the brief weighed were not built, and it says why: drawing at a few coarser levels would cost what a reader holds, and gestures as tables would hide their order.
+
+[Each thing once, a world as a value, an act's other hand, and the gestures as functions](git:83f7a96..a77ef50)
+
+#### What can never run goes, and the brief holds
+
+What could never run was taken out, the page, its outputs and its pictures unchanged, and the brief was read cold twice more until the last reading changed only words.
+
+[What can never run goes, and the brief holds](git:3c3aeca..84025bf)
+
+#### The assembly is written, and read cold twice
+
+The brief says what the program is for first, then the lore it stands on, among it Unix's small parts and plain data, a pure core in a thin shell, and model, view and update. Then come the moves, each sized, and what only the author can let go.
+
+[The assembly is written, and read cold twice](git:31cd05c..ff900da)
 
 ### The page is laid by hand, and the canvas's rim goes quiet
 
 On 2026-10-01 the author let go of the ink the canvas's rim took while the canvas held the keys, since the history had become a mode of the one canvas and no two maps stand side by side to be told apart. Then the author asked for more freedom in how the page is laid than the strip's presses give, and the session wrote the design they settled in discussion as an open brief, then built it in two stages, the page laid by hand and then the two worlds standing at once, and reviewed it cold until a round found nothing more.
 
-*Told by the session that made these commits, as its debrief, 2026-10-01; the commit that tells it stands untold above it.*
+*Told by the session that made these commits, as its debrief, 2026-10-01; the commit that told it is placed in its run since a later day was told above it.*
 
 #### The page is laid by hand, and the two worlds stand at once
 
@@ -31,7 +62,7 @@ The surface was built as the brief says, but for the meeting of the two worlds. 
 
 Two cold reviews, one of the layout and one of the two worlds, found nine faults, and the rounds that read only the mending found two, then four, then nothing but one head too wide to press through. All were mended. The pass on a cold page found that a card folded to its face was taken for the canvas's face and pinned over the prose, and that a press bringing git's prose in was answered by nothing, since it came in where it gave way first. Now it comes in at the left of the body's prose, the side that gives way last.
 
-[The page is laid by hand, and the two worlds stand at once](git:abf7713..84b2b4d)
+[The page is laid by hand, and the two worlds stand at once](git:abf7713..c3cfaa4)
 
 #### The page laid by hand is written, and read ten times
 
