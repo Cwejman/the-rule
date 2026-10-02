@@ -1401,11 +1401,11 @@ async function historyOf(rootArg: string): Promise<History> {
 //
 // The page draws from a small shared state and nothing else: the body and its
 // index, the address in focus, the address the pointer rests on, the scope, the
-// fold of every brief in the lane, and the settings. Five areas stand in a row, a wing,
-// a gutter, the lane, a gutter, a wing. The lane is prose; the rest is widgets,
-// plain functions in one table, chosen per area from a strip of icons at its
-// foot, and a closed area takes no room, leaving its icons where it would open. Everything drawn that
-// names a brief carries its address, which is what keeps every widget in step.
+// fold of every brief in the lane, and the settings. Wide, the page is a row of
+// programs the reader lays by hand; where the lane stands alone it is one pane, the
+// prose or the map, with the shape as a rail beside the prose. The prose is the lane;
+// the rest are widgets, plain functions in one table. Everything drawn that names a
+// brief carries its address, which is what keeps every widget in step.
 // The pure functions come first, the ones that touch the document after them.
 
 // ## 3.1 What the page holds
@@ -1422,16 +1422,12 @@ type Index = {
 /** A brief in the lane stands at its face or whole; a brief not in the lane has no fold. */
 type Fold = "face" | "whole";
 
-type AreaName = "wingL" | "gutterL" | "middle" | "gutterR" | "wingR";
 /** A program standing in a column, and, where it grows, its share of the height the growing ones have. */
 type Item = { k: string; h?: number };
 /** A column of the row: its width where the reader pulled it, and the programs it stacks, the top first. */
 type Column = { w?: number; items: Item[] };
-/** The panes the middle can hold. It has two sides, and a pane stands on one of them: at most two, the first at the left. */
-const PANES = ["lane", "canvas", "dish"] as const;
-type PaneName = (typeof PANES)[number];
-/** A map among the panes, the one that holds no prose: it is what gives way beside the lane, and what the keys move on. */
-const isMap = (p: string): boolean => p !== "lane";
+/** The panes: the prose, the map, and the plate at full size, which wide is the plate's program. */
+type PaneName = "lane" | "canvas" | "dish";
 /** The least width the canvas stands in beside the lane; narrower, it gives way. */
 const CANVAS_MIN = 360;
 type Theme = "light" | "dark" | "system";
@@ -1482,8 +1478,8 @@ type Settings = {
   face: "shown" | "hidden";
   /** which way each canvas lays its root's level: down, as a file's levels go, or across as a trunk; the body's runs down and the history's across unless turned */
   trunk: { body: "down" | "across"; history: "down" | "across" };
-  /** where the lane stands alone, the widgets each area holds: the pane the middle holds, and the wing the rail stands in */
-  areas: Record<AreaName, string[]>;
+  /** where the lane stands alone: the one pane it shows, and the edge the rail stands at beside the prose, if anywhere */
+  alone: { pane: "lane" | "canvas"; rail: "left" | "right" | null };
   /** wide, the page laid by hand: a row of columns, each a stack of programs, the left first */
   layout: Column[];
   /** the adjunct each prose holds in its gutter at the left and at the right, or none */
@@ -1513,7 +1509,7 @@ const DEFAULTS: Settings = {
   tree: "spine",
   face: "shown",
   trunk: { body: "down", history: "across" },
-  areas: { wingL: ["shape"], gutterL: [], middle: ["lane"], gutterR: ["links"], wingR: ["ahead"] },
+  alone: { pane: "lane", rail: "left" },
   layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "ahead" }] }],
   gutters: { body: [null, "links"], history: [null, "links"] },
   room: "spread",
@@ -1521,7 +1517,7 @@ const DEFAULTS: Settings = {
 };
 
 /** The reader's settings: the page's own, and no reading's. */
-let settings: Settings = { ...DEFAULTS, areas: { ...DEFAULTS.areas } };
+let settings: Settings = { ...DEFAULTS };
 /** Set while a drag is in progress, so pointing does not fight it. */
 let scrubbing = false;
 /** The focus a keyed move is scrolling to; held until the scroll settles, so the marks do not follow every brief passed. */
@@ -2443,17 +2439,16 @@ function laneHtml(): string {
   );
 }
 
-// ## 3.4 The areas, the widgets, and the strip
+// ## 3.4 The widgets
 //
-// Five areas in a row. A widget is one entry in one table: an adjunct stands in
-// a gutter and returns what belongs beside a brief; a figure stands in a wing
-// and returns a drawing of the body. The strip at an area's foot chooses, and
-// choosing nothing closes the area, which then takes no room and leaves its icons.
+// A widget is one entry in one table: an adjunct stands in a gutter and returns
+// what belongs beside a brief; a figure stands in a column of the row, or as the
+// rail, and returns a drawing of the body; a pane is what the lane alone shows.
 
 type Adjunct = { kind: "adjunct"; name: string; icon: string; of: (b: Brief, article: HTMLElement) => { at: HTMLElement | null; html: string }[] };
 /**
- * A figure draws into the room its wing gives it. It declares the width it stands in, which never changes with what it
- * draws, so nothing beside it moves as it redraws; and whether it grows into the wing's height or takes only what it needs.
+ * A figure draws into the room its column gives it. It declares the width it stands in, which never changes with what it
+ * draws, so nothing beside it moves as it redraws; and whether it grows into its column's height or takes only what it needs.
  */
 type Figure = { kind: "figure"; name: string; icon: string; draw: (w: number, h: number) => string; width: () => number; grow: boolean; onFocus?: boolean; onPoint?: boolean };
 /** A pane stands in the middle: the lane, the canvas, or the dish. It draws itself from the state through its own functions; the history is a mode the lane and the canvas are turned to, not a pane. */
@@ -2502,41 +2497,6 @@ const WIDGETS: Record<string, Widget> = {
   dish: { kind: "pane", name: "the dish: the plate at full size", icon: "dish" },
 };
 
-const AREAS: { name: AreaName; kind: Widget["kind"] }[] = [
-  { name: "wingL", kind: "figure" },
-  { name: "gutterL", kind: "adjunct" },
-  { name: "middle", kind: "pane" },
-  { name: "gutterR", kind: "adjunct" },
-  { name: "wingR", kind: "figure" },
-];
-/** The panes the middle holds, the left first: any pane at most once, and two at most, since the middle has two sides. */
-const panesHeld = (held: string[] = settings.areas.middle): PaneName[] =>
-  held.filter((p, i): p is PaneName => (PANES as readonly string[]).includes(p) && held.indexOf(p) === i).slice(0, 2);
-/** The widgets an area holds, in order. */
-const widgetsOf = (area: AreaName): Widget[] => settings.areas[area].map((k) => WIDGETS[k]).filter((w): w is Widget => !!w);
-type WingName = "wingL" | "wingR";
-/** The figures a wing draws, in order. */
-const figureNames = (area: WingName): string[] => settings.areas[area].filter((k) => WIDGETS[k]?.kind === "figure");
-const isOpen = (area: AreaName): boolean => widgetsOf(area).length > 0;
-
-/** The two sides a widget of each kind can stand on; a pane's are the middle's own two, which the middle keeps in its order. */
-const SIDES: Record<Widget["kind"], AreaName[]> = { figure: ["wingL", "wingR"], adjunct: ["gutterL", "gutterR"], pane: [] };
-
-/** The area holding a widget now, or null when it stands nowhere. */
-const standsIn = (k: string): AreaName | null => AREAS.find(({ name }) => settings.areas[name].includes(k))?.name ?? null;
-
-/**
- * What every area holds with a widget put at one side, or at none: where the lane stands alone, the wing the rail
- * stands in. A wing holds two, and a third takes the place at its foot; a gutter holds one.
- */
-function placed(k: string, side: AreaName | null): Held {
-  const w = WIDGETS[k];
-  const held: Held = { ...settings.areas };
-  if (w.kind === "pane") return held;
-  SIDES[w.kind].forEach((s) => (held[s] = held[s].filter((x) => x !== k)));
-  if (side) held[side] = w.kind === "adjunct" ? [k] : held[side].length < 2 ? [...held[side], k] : [held[side][0], k];
-  return held;
-}
 
 // ### 3.4.1 Where the lane stands alone
 //
@@ -2551,7 +2511,7 @@ function placed(k: string, side: AreaName | null): Held {
 // but the rail beside the prose; nor is the ahead, which answers for a brief the
 // pointer rests on, and a phone has no pointer.
 
-/** Whether the lane stands alone: the width holds no wing at the width a figure declares, and no gutter beside it. */
+/** Whether the lane stands alone: the width holds nothing beside the prose at its measure, not even a gutter. */
 const narrow = (): boolean => ui.areas.clientWidth < settings.measure + 3 * settings.gap + GUTTER.least;
 
 /**
@@ -2572,7 +2532,7 @@ const narrowChoices = (): string[] => [
 const chooser = { sheet: null as string | null };
 
 /** Whether a choice stands now: a pane in the middle, the shape as the rail beside the prose, any other figure opened whole. */
-const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? fits().panes.includes(k as PaneName) : k === "shape" ? standsIn(k) !== null : chooser.sheet === k);
+const narrowOn = (k: string): boolean => (WIDGETS[k].kind === "pane" ? fits().panes.includes(k as PaneName) : k === "shape" ? settings.alone.rail !== null : chooser.sheet === k);
 
 /** One choice in the pill: what it is, and whether it stands. No side, since the pill has none. */
 function pickNarrowHtml(k: string): string {
@@ -2619,7 +2579,7 @@ function chooseNarrow(k: string): void {
   if (WIDGETS[k].kind === "pane") {
     const taking = !narrowOn(k);
     if (taking) {
-      settings.areas = { ...settings.areas, middle: [k] };
+      settings.alone = { ...settings.alone, pane: k as "lane" | "canvas" };
       saveSettings();
     }
     chooser.sheet = null;
@@ -2639,8 +2599,8 @@ function chooseNarrow(k: string): void {
   } else if (k === "shape") {
     // the rail cycles through the sides as the strip does on a desk, since a reader scrubbing with the hand they have
     // wants the rail under that hand and the callout away from it
-    const at = standsIn(k);
-    settings.areas = placed(k, at === "wingL" ? "wingR" : at === "wingR" ? null : "wingL");
+    const rail = settings.alone.rail;
+    settings.alone = { ...settings.alone, rail: rail === "left" ? "right" : rail === "right" ? null : "left" };
     saveSettings();
   } else chooser.sheet = chooser.sheet === k ? null : k;
   drawAll();
@@ -2653,7 +2613,7 @@ function chooseNarrow(k: string): void {
 // its stack or in its place, and the gaps between are pulled to size what stands
 // either side. A program is what was a pane or a figure; an adjunct is not one,
 // but a setting of the prose it stands beside. Where the lane stands alone none
-// of this holds, and the areas above lay the page as they always did.
+// of this holds: the page is one pane, laid by the section above.
 
 /**
  * A program: what it is called, its icon, whether it stands alone in its column at the page's whole height or is a figure
@@ -2722,25 +2682,8 @@ const colLeast = (c: Column): number => {
   return a ? PROGRAMS[a].least() : colOwn(c);
 };
 
-/**
- * The layout a reader keeps, made whole: every program at most once, a program standing alone in a column of its own,
- * and no column empty. A reader who laid the page before it was laid by hand keeps what they had: the figures of each
- * wing as a column, the panes of the middle each as a column in their order, the dish and the plate as the one plate.
- */
-function keptLayout(layout: unknown, saved: Record<string, unknown> | null): Column[] {
-  const list = (x: unknown): string[] => (Array.isArray(x) ? x : typeof x === "string" && x !== "none" ? [x] : []).filter((k): k is string => typeof k === "string");
-  let raw: unknown = layout;
-  const areas = saved?.areas as Record<string, unknown> | undefined;
-  if (areas && saved?.layout === undefined) {
-    const pane: Record<string, string> = { lane: "prose", canvas: "canvas", dish: "plate" };
-    const wing = (x: unknown): Column[] => {
-      const ks = list(x).filter((k) => PROGRAMS[k]);
-      const figs = ks.filter((k) => !isAlone(k));
-      return [...(figs.length ? [{ items: figs.map((k) => ({ k })) }] : []), ...ks.filter(isAlone).map((k) => ({ items: [{ k }] }))];
-    };
-    const middle = list(areas.middle).flatMap((p) => (pane[p] ? [{ items: [{ k: pane[p] }] }] : []));
-    raw = [...wing(areas.wingL), ...(middle.length ? middle : [{ items: [{ k: "prose" }] }]), ...wing(areas.wingR)];
-  }
+/** The layout a reader keeps, made whole: every program at most once, a program standing alone in a column of its own, and no column empty. */
+function keptLayout(raw: unknown): Column[] {
   const seen = new Set<string>();
   const cols: Column[] = [];
   (Array.isArray(raw) ? raw : []).forEach((c) => {
@@ -2757,15 +2700,12 @@ function keptLayout(layout: unknown, saved: Record<string, unknown> | null): Col
   return cols.length ? cols : structuredClone(DEFAULTS.layout);
 }
 
-/** The gutters each prose keeps: an adjunct's name or none, at the left and at the right; a reader's gutters of before are the body's. */
-function keptGutters(g: unknown, saved: Record<string, unknown> | null): Settings["gutters"] {
+/** The gutters each prose keeps: an adjunct's name or none, at the left and at the right. */
+function keptGutters(g: unknown): Settings["gutters"] {
   const adj = (x: unknown): string | null => (typeof x === "string" && WIDGETS[x]?.kind === "adjunct" ? x : null);
   const pair = (x: unknown, d: [string | null, string | null]): [string | null, string | null] => (Array.isArray(x) ? [adj(x[0]), adj(x[1])] : d);
   const kept = (g ?? {}) as Record<string, unknown>;
-  const areas = saved?.areas as Record<string, unknown> | undefined;
-  const first = (x: unknown) => (Array.isArray(x) ? x[0] : x);
-  const body: [string | null, string | null] = areas && saved?.gutters === undefined ? [adj(first(areas.gutterL)), adj(first(areas.gutterR))] : pair(kept.body, DEFAULTS.gutters.body);
-  return { body, history: pair(kept.history, DEFAULTS.gutters.history) };
+  return { body: pair(kept.body, DEFAULTS.gutters.body), history: pair(kept.history, DEFAULTS.gutters.history) };
 }
 
 /** The gutters a prose holds, at the left and at the right. */
@@ -2877,7 +2817,7 @@ const canvasKey = (w: WorldName): string => (w === "body" ? "canvas" : "gitCanva
  * panes stand, and its prose's gutters. The plate is the body's.
  */
 function fitsLaid(): Fit {
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
+  const on: Fit = { lane: false, canvas: false, dish: false, panes: [], gutterL: false, gutterR: false, gutter: 0, rail: 0, railSide: "left" };
   const w = worldNow();
   const pane: Record<string, PaneName> = { [proseKey(w)]: "lane", [canvasKey(w)]: "canvas", ...(w === "body" ? { plate: "dish" as PaneName } : {}) };
   laid().cols.forEach((col) => layoutNow()[col.c].items.forEach((it) => pane[it.k] && on.panes.push(pane[it.k])));
@@ -3093,7 +3033,7 @@ function aheadSvg(W: number, H: number): string {
   walk(target, 1);
   const GAP = { block: 0.35, brief: 1.2 };
   const totalOf = (rs: ARow[]) => rs.reduce((sum, r) => sum + r.blocks.reduce((x, blk) => x + blk.lines + GAP.block, 0) + GAP.brief, 0);
-  // a line of the lane is a couple of pixels here, as in the shape, and the whole must fit the wing
+  // a line of the lane is a couple of pixels here, as in the shape, and the whole must fit its room
   const scale = (rs: ARow[]) => Math.min(2.4, (H - 8) / Math.max(1, totalOf(rs)));
   // the ladder keeps the structure: blocks while legible, else one block per brief as tall as its blocks, else the
   // deepest level dropped and its weight shown as a tail on the brief that holds it, until what is left fits
@@ -3245,7 +3185,7 @@ const SWITCHES: Switch[] = [
   { key: "dock", name: "the dock", values: ["foot", "left"] },
 ];
 
-/** Turns one meter to its setting's value in place, so a drag never redraws the wing under the pointer. */
+/** Turns one meter to its setting's value in place, so a drag never redraws the figure under the pointer. */
 function drawMeter(el: HTMLElement): void {
   const k = KNOBS.find((k) => k.key === el.dataset.knob)!;
   const v = settings[k.key];
@@ -3262,18 +3202,16 @@ function loadSettings(): void {
   let saved: Record<string, unknown> | null = null;
   try {
     saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "null");
-    if (saved) settings = { ...DEFAULTS, ...saved, areas: { ...DEFAULTS.areas, ...((saved.areas as object) ?? {}) } } as Settings;
+    // only what a setting is now is kept, so a name the page no longer knows is let go
+    if (saved) settings = { ...DEFAULTS, ...Object.fromEntries(Object.entries(saved).filter(([k]) => k in DEFAULTS)) } as Settings;
   } catch {}
-  // an area once held one name, "none" when closed; it now holds a list, and anything it cannot hold is dropped
-  AREAS.forEach(({ name, kind }) => {
-    const held = settings.areas[name] as unknown;
-    const list = Array.isArray(held) ? held : typeof held === "string" && held !== "none" ? [held] : [];
-    settings.areas[name] = list.filter((k) => WIDGETS[k]?.kind === kind && k !== "none").slice(0, kind === "adjunct" ? 1 : kind === "pane" ? PANES.length : 2);
-  });
-  settings.areas.middle = panesHeld(settings.areas.middle);
-  if (settings.areas.middle.length === 0) settings.areas.middle = ["lane"];
-  settings.layout = keptLayout(settings.layout, saved);
-  settings.gutters = keptGutters(settings.gutters, saved);
+  settings.layout = keptLayout(settings.layout);
+  settings.gutters = keptGutters(settings.gutters);
+  const alone = (settings.alone ?? {}) as Partial<Settings["alone"]>;
+  settings.alone = {
+    pane: alone.pane === "canvas" ? "canvas" : "lane",
+    rail: alone.rail === "left" || alone.rail === "right" || alone.rail === null ? alone.rail : DEFAULTS.alone.rail,
+  };
   // a setting a switch turns holds one of the values the switch offers, and anything else is its default
   SWITCHES.forEach((w) => w.values.includes(settings[w.key]) || ((settings as Record<string, unknown>)[w.key] = DEFAULTS[w.key]));
   const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
@@ -3288,9 +3226,7 @@ function loadSettings(): void {
 const saveSettings = (): void =>
   void localStorage.setItem(
     SETTINGS_KEY,
-    // the layout and the gutters are kept beside areas a reader set, even where they equal the defaults, since the
-    // layout is laid out from those areas wherever none is kept, and would be laid out from them again on every load
-    JSON.stringify(Object.fromEntries(Object.entries(settings).filter(([k, v]) => (k === "layout" || k === "gutters" ? JSON.stringify(settings.areas) !== JSON.stringify(DEFAULTS.areas) : false) || JSON.stringify(v) !== JSON.stringify(DEFAULTS[k as keyof Settings])))),
+    JSON.stringify(Object.fromEntries(Object.entries(settings).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(DEFAULTS[k as keyof Settings])))),
   );
 
 // ### 3.8.1 The keys: every act and what fires it
@@ -3378,10 +3314,10 @@ function shapeSvg(W: number, H: number): string {
   // which reaches over the rail, names those levels and is a press a finger can find
   const anc = rail ? [] : prefixesOf(state.scope).slice(0, -1);
   const L = anc.length ? anc.length * 8 + 4 : 0;
-  // the shape stands in its own width, never a wider figure's beside it in the same wing
+  // the shape stands in its own width, never a wider figure's beside it in the same column
   const w = Math.min(W, shapeWidth());
   const cells = laid.map((l) => {
-    // the rail nests a step tighter than the wing does, so a level six deep still leaves a row room for its marks
+    // the rail nests a step tighter than a column does, so a level six deep still leaves a row room for its marks
     const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
       .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1)))
@@ -3583,7 +3519,7 @@ function cellPath(c: Cell, S: number): { d: string; round: number } {
   };
 }
 
-/** The side of the square a plate is laid in for a room, no larger than `most`: the wing's side, or in the dish the room itself. */
+/** The side of the square a plate is laid in for a room, no larger than `most`: a column's side, or in the dish the room itself. */
 const plateScale = (W: number, H: number, most = PLATE_SIDE): number => Math.floor(Math.min(W, H, most));
 
 /** The width the plate stands in. */
@@ -3613,15 +3549,15 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
 }
 
 /**
- * The dish: the plate at full size, as a pane of the middle, so a body too large for the wing's plate is seen a cell
+ * The dish: the plate at full size, as a program of its own, so a body too large for a column's plate is seen a cell
  * per brief. It stands clear of the way down at the top and the strip at the foot.
  */
 function drawDish(): void {
   if (ui.dish.hidden || !state.body) return;
   if (inPast()) return void onBody(drawDish);
-  // wide, the plate clears its head, and the way down where it stands over the plate alone
-  const crumbed = narrow() || (!fits().lane && !fits().canvas);
-  const top = Math.max(narrow() ? 0 : HEADROOM - 4, ui.crumb.hidden || !crumbed ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top);
+  // the plate clears its head, and the way down where it stands over the plate alone
+  const crumbed = !fits().lane && !fits().canvas;
+  const top = Math.max(HEADROOM - 4, ui.crumb.hidden || !crumbed ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top);
   ui.dish.style.paddingTop = `${Math.max(12, Math.round(top + 12))}px`;
   ui.dish.style.paddingBottom = `${footRoom()}px`;
   ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - Math.max(12, top + 12) - footRoom(), Infinity);
@@ -4386,7 +4322,7 @@ function worldOfEl(el: Element | null): WorldName {
   if (k && PROGRAMS[k]?.world) return PROGRAMS[k].world!;
   if (el.closest("#dish, svg.plate")) return "body";
   // the figures, and a phone's foot and the card above it, act in the world the keys belong to
-  if (host || el.closest(".wing, #sheet, #strips, #card")) return keysWorld();
+  if (host || el.closest("#sheet, #strips, #card")) return keysWorld();
   return "body";
 }
 
@@ -4574,15 +4510,15 @@ function commitHtml(b: Brief, c: Commit, after: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: Record<AreaName, HTMLElement>; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement; zone: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement; zone: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
 const cssEsc = (s: string): string => s.replace(/["\\]/g, "\\$&");
 
-/** A gutter's width: what an adjunct reads best in, and the least it still reads in when the wings have taken their room. */
+/** A gutter's width: what an adjunct reads best in, and the least it still reads in. */
 const GUTTER = { want: 210, least: 132 };
-/** The room beneath a wing's figures that its strip stands in, above the space every area keeps. */
+/** The room beneath the figures that the dock at the foot stands in, above the gap. */
 const STRIP = 34;
 /** The room the foot keeps clear: the strip's icons with as much above them as below. */
 const FOOT = STRIP + 10;
@@ -4597,7 +4533,7 @@ const footRoom = (): number => (narrow() || settings.dock === "left" ? settings.
 const RIM = { top: 3, foot: 6 };
 
 /**
- * The band a wing's figures stand in, as tall as the prose reads: from the middle of the fade at the top to the middle
+ * The band the figures stand in, as tall as the prose reads: from the middle of the fade at the top to the middle
  * of the fade at the foot, where the prose stands half seen, so no figure reaches further up or down than the prose
  * does. It keeps at least one gap at the top, and the strip's room and a gap at the foot.
  */
@@ -4607,70 +4543,47 @@ const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hid
 function band(h: number): { top: number; height: number } {
   const s = settings;
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
-  // a wing's figures clear the strip wide; narrow, the rail stands at the edge and the mark at the middle, so they
+  // the figures clear the dock wide; narrow, the rail stands at the edge and the foot at the middle, so they
   // never meet and the rail reaches as far down as the prose does
   const foot = Math.max(narrow() || s.dock === "left" ? s.gap : s.gap + STRIP, footRoom() + (h * s.fade) / 2 / 100);
   return { top: Math.round(top), height: Math.max(0, Math.round(h - top - foot)) };
 }
 
-/** What each area holds, as the settings keep it or as a press would leave it. */
-type Held = Record<AreaName, string[]>;
-
-/** How wide an area stands with what it holds: closed, nothing; a gutter its column; a wing its widest figure, its strip free to reach a little past it; the middle is laid apart. */
-const widthIn = (held: Held, area: AreaName): number =>
-  held[area].length === 0 || area === "middle" || area.startsWith("gutter") ? 0 : Math.max(...held[area].map((k) => (WIDGETS[k]?.kind === "figure" ? (WIDGETS[k] as Figure).width() : 0)));
-const widthOf = (area: AreaName): number => widthIn(settings.areas, area);
+/** What stands on the page now: which panes, the gutters beside the prose and how wide, and the rail where the lane stands alone. */
+type Fit = Record<PaneName, boolean> & {
+  /** the panes that stand, the left first */
+  panes: PaneName[];
+  gutterL: boolean;
+  gutterR: boolean;
+  /** the width each gutter stands in */
+  gutter: number;
+  /** the width the shape stands in as the rail, where the lane stands alone and the reader put it beside the prose */
+  rail: number;
+  /** the edge the rail stands at */
+  railSide: "left" | "right";
+};
 
 /**
- * Which areas the width allows, taken in the order they give way last: after the lane, the left wing, then the right
- * wing, then the gutters as a pair. So as the viewport narrows the gutters go first, then the right wing, then the
- * left, and the lane stands alone. An open area costs its own width and one space; a closed one costs nothing and is
- * always allowed, since all it shows is its strip.
+ * Where the lane stands alone: the one pane the reader chose, and beside the prose the shape as a narrow rail at the
+ * edge they put it at, if they asked for it and the lane is left room enough to read in.
  */
-/** Which areas the width allows, and which panes of the middle. */
-type Fit = Record<AreaName, boolean> & Record<PaneName, boolean> & { /** the panes that stand, the left first */ panes: PaneName[]; /** the width each gutter stands in, once the wings have taken theirs */ gutter: number; /** the width the shape stands in as the rail, where every area has given way */ rail: number; /** the wing the rail stands in, which is the side the reader put the shape on */ railSide: WingName };
-function fitsWith(held: Held): Fit {
+function fitsAlone(): Fit {
   const s = settings;
-  const on: Fit = { wingL: false, gutterL: false, middle: true, gutterR: false, wingR: false, lane: false, canvas: false, dish: false, panes: [], gutter: 0, rail: 0, railSide: "wingL" };
-  AREAS.forEach(({ name }) => name !== "middle" && (on[name] = held[name].length === 0));
-  // the middle first: the lane at its measure, a map at its least width. Too narrow for two, one gives way: the map
-  // beside the lane, since the lane is the reading, or with no lane the pane at the right
-  const room = (ps: PaneName[]) => {
-    const maps = ps.filter(isMap).length;
-    return (ps.includes("lane") ? s.measure + 2 * s.gap : 0) + maps * CANVAS_MIN + (maps ? (ps.includes("lane") ? maps : maps + 1) * s.gap : 0);
-  };
-  const asked = panesHeld(held.middle);
-  on.panes = asked.length > 1 && room(asked) > ui.areas.clientWidth ? [asked.includes("lane") ? "lane" : asked[0]] : asked;
-  on.panes.forEach((p) => (on[p] = true));
-  let used = room(on.panes);
-  for (const wing of ["wingL", "wingR"] as AreaName[]) {
-    const need = held[wing].length ? widthIn(held, wing) + s.gap : 0;
-    if (used + need > ui.areas.clientWidth) break;
-    used += need;
-    on[wing] = true;
-  }
-  // the exception at the end of the order of giving way: where every area has gone and the lane would stand alone, the
-  // shape keeps standing as a narrow rail, if the reader has asked for it and the lane is left room enough to read in
-  const stands = (a: AreaName) => on[a] && held[a].length > 0;
-  // the rail stands on the side the reader put the shape on, as it does on a desk
-  const side: WingName | null = held.wingL.includes("shape") ? "wingL" : held.wingR.includes("shape") ? "wingR" : null;
-  if (on.lane && side && !(["wingL", "wingR", "gutterL", "gutterR"] as AreaName[]).some(stands)) {
-    const w = railWidth();
-    if (ui.areas.clientWidth - w - 2 * s.gap >= RAIL.lane) {
-      on.rail = w;
-      on.railSide = side;
-      on[side] = true;
-    }
-  }
-  return on;
+  const pane = s.alone.pane;
+  const w = railWidth();
+  const rail = pane === "lane" && s.alone.rail !== null && ui.areas.clientWidth - w - 2 * s.gap >= RAIL.lane ? w : 0;
+  return { lane: pane === "lane", canvas: pane === "canvas", dish: false, panes: [pane], gutterL: false, gutterR: false, gutter: 0, rail, railSide: s.alone.rail ?? "left" };
 }
-/** What the width allows: where the lane stands alone, the areas; wide, the row laid by hand. */
-const fits = (): Fit => (narrow() ? fitsWith(settings.areas) : fitsLaid());
+/** What stands: where the lane stands alone, its one pane; wide, the row laid by hand. */
+const fits = (): Fit => (narrow() ? fitsAlone() : fitsLaid());
 
-/** The element each pane stands in. */
-const paneEl = (p: PaneName): HTMLElement => ({ lane: ui.scroll, canvas: ui.canvas, dish: ui.dish })[p];
+/** Places an element at a left and a width in the page's own measure, in whole pixels. */
+const put = (el: HTMLElement, x: number, w: number): void => {
+  el.style.left = `${Math.round(x)}px`;
+  el.style.width = `${Math.round(w)}px`;
+};
 
-/** Applies the settings: type registers from zoom and ratio, and the row of areas from measure, gap and what is open. */
+/** Applies the settings: type registers from zoom and ratio, and where each program stands, wide or alone. */
 function drawLayout(): void {
   const s = settings;
   const root = document.documentElement.style;
@@ -4701,64 +4614,36 @@ function drawLayout(): void {
   else document.documentElement.dataset.theme = s.theme;
   laidNow = null;
   if (!narrow()) return drawLaid();
-  // where the lane stands alone it reads one world, so the areas are laid in that world and the other's stand nowhere
+  // where the lane stands alone it reads one world, so its one pane is laid in that world and the other's stand nowhere
   if (worldNow() !== narrowShown()) return void inNamed(narrowShown(), drawLayout);
   unlay();
   const other = (worldNow() === "body" ? gitWorld : bodyWorld).ui;
   [other.scroll, other.canvas, other.crumb].forEach((el) => (el.hidden = true));
   ui.scroll.hidden = false;
   const on = fits();
+  const W = ui.areas.clientWidth;
   // a viewport narrower than the measure gives the lane what there is, less what the rail takes: the rail stands at the
-  // edge of the page, so it takes the space that stood there rather than a space of its own
-  const measure = Math.min(s.measure, ui.areas.clientWidth - 2 * s.gap - on.rail);
+  // edge of the page, so it takes the space that stood there rather than a space of its own, and the prose stands in
+  // the middle of the room it leaves. The gutters never stand here, since this width is too narrow for them
+  const measure = Math.min(s.measure, W - 2 * s.gap - on.rail);
   root.setProperty("--measure", `${measure}px`);
-  // the gutters hug the lane at the gap, since what stands in them is aligned to its lines; only what the width allows
-  // takes a column, since an absent element leaves the grid and would pull the lane into the empty track it left
-  // the gutters never stand here: a width narrow enough for the lane to stand alone is too narrow for them
-  const inner = [measure];
-  const mid = measure;
-  // every area is as wide as what it holds, and the spaces beside them are one: at the two edges of the viewport as
-  // between the wings and the lane. The gap is the least a space is given, and what the width leaves over is shared
-  // among the spaces evenly, so no area carries room it does not use
-  // with the canvas standing, the spaces are the gap exactly and the canvas takes what is left; without it they share what is left
-  // standing alone on a narrow screen the canvas takes the page whole, edge to edge: there is too little room to spend
-  // any of it on a margin, and what falls outside is cut by the viewport as a map is
-  const bleed = narrow() && on.canvas && on.panes.length === 1;
-  const maps = on.panes.filter(isMap).length;
-  const space = bleed ? "0px" : maps ? `${s.gap}px` : `minmax(${s.gap}px, 1fr)`;
-  // the rail hugs the edge it stands on, so the space at that edge is nothing and the rail takes it
-  const railL = on.rail > 0 && on.railSide === "wingL";
-  const railR = on.rail > 0 && on.railSide === "wingR";
-  const tracks = [railL ? "0px" : space];
-  // every area stands in the one row: an element given only its column is placed by the browser after the one before
-  // it in the document, so a pane standing left of one written before it would drop to a row of its own
-  const place = (el: HTMLElement, width: string) => {
-    tracks.push(width, space);
-    el.style.gridColumn = `${tracks.length - 1}`;
-    el.style.gridRow = "1";
-  };
-  if (railL) place(ui.parts.wingL, `${on.rail}px`);
-  else if (on.wingL && isOpen("wingL")) place(ui.parts.wingL, `${widthOf("wingL")}px`);
-  // the panes stand in the middle in their order, the left first. The lane keeps its measure; a map beside it keeps its
-  // least width, and the canvas grows to its greatest width and no further, so the row stays centred with its space
-  // around it. Standing alone a map takes whatever the width is, since there is nothing to give way to and a floor would
-  // only overflow the page; and two maps share the middle evenly
-  const mapWidth = (p: PaneName): string =>
-    bleed && p === "canvas" ? "1fr" : maps === 2 ? `minmax(${CANVAS_MIN}px, 1fr)` : p === "dish" ? (on.lane ? `minmax(${CANVAS_MIN}px, 1fr)` : "1fr") : `minmax(${on.lane ? CANVAS_MIN : 0}px, ${Math.max(CANVAS_MIN, s.canvas)}px)`;
-  on.panes.forEach((p) => place(paneEl(p), p === "lane" ? `${mid}px` : mapWidth(p)));
-  if (railR) (place(ui.parts.wingR, `${on.rail}px`), (tracks[tracks.length - 1] = "0px"));
-  else if (on.wingR && isOpen("wingR")) place(ui.parts.wingR, `${widthOf("wingR")}px`);
-  ui.areas.style.gridTemplateColumns = tracks.join(" ");
-  ui.areas.style.columnGap = "0px";
-  ui.content.style.gridTemplateColumns = inner.map((x) => `${x}px`).join(" ");
+  ui.content.style.gridTemplateColumns = `${measure}px`;
   ui.content.style.columnGap = `${s.gap}px`;
-  ui.canvas.hidden = !on.canvas;
-  ui.dish.hidden = !on.dish;
-  ui.canvas.classList.toggle("bleed", bleed);
+  ui.parts.gutterL.hidden = true;
+  ui.parts.gutterR.hidden = true;
   // the lane off is kept laid out of sight rather than hidden, since the shape and the reading line measure it
   ui.scroll.classList.toggle("off", !on.lane);
-  ui.scroll.style.width = on.lane ? "" : `${mid}px`;
-  AREAS.forEach(({ name }) => name !== "middle" && (ui.parts[name].hidden = !(on.rail && name === on.railSide) && (!on[name] || !isOpen(name))));
+  put(ui.scroll, on.lane ? (on.railSide === "left" ? on.rail : 0) + (W - on.rail - measure) / 2 : 0, measure);
+  // the canvas takes the page whole, edge to edge: there is too little room to spend any of it on a margin, and what
+  // falls outside is cut by the viewport as a map is
+  ui.canvas.hidden = !on.canvas;
+  ui.canvas.classList.toggle("bleed", on.canvas);
+  put(ui.canvas, 0, W);
+  ui.dish.hidden = true;
+  // the rail stands where it will be drawn before anything measures against it, as the way down does
+  const rail = hostOf("shape");
+  rail.hidden = !on.rail;
+  if (on.rail) put(rail, on.railSide === "left" ? 0 : W - on.rail, on.rail);
 }
 
 /** What each program stands in on the page now, in the page's own measure: what a drop is aimed at, and what a head stands over. */
@@ -4770,17 +4655,8 @@ let stackGaps: { c: number; i: number; x: number; w: number; y: number; h: numbe
 function drawLaid(): void {
   const s = settings;
   const H = ui.areas.clientHeight;
-  ui.areas.classList.add("laid");
-  ui.areas.style.gridTemplateColumns = "";
-  ui.areas.style.columnGap = "0px";
-  (["wingL", "wingR"] as const).forEach((a) => (ui.parts[a].hidden = true));
+  ui.areas.classList.remove("alone");
   boxes.clear();
-  const put = (el: HTMLElement, x: number, w: number) => {
-    el.style.gridColumn = "";
-    el.style.gridRow = "";
-    el.style.left = `${Math.round(x)}px`;
-    el.style.width = `${Math.round(w)}px`;
-  };
   // each world's prose and canvas, drawn in elements of its own
   (["body", "history"] as WorldName[]).forEach((w) => {
     const D = (w === "body" ? bodyWorld : gitWorld).ui;
@@ -4810,13 +4686,9 @@ function drawLaid(): void {
   drawHeads();
 }
 
-/** Takes the row away where the lane stands alone, so the areas lay the page as they did. */
+/** Takes the row away where the lane stands alone: no columns, no gaps to pull, no heads, and no figure but the rail. */
 function unlay(): void {
-  ui.areas.classList.remove("laid");
-  [bodyWorld.ui.scroll, bodyWorld.ui.canvas, gitWorld.ui.scroll, gitWorld.ui.canvas, ui.dish].forEach((el) => {
-    el.style.left = "";
-    el.style.width = "";
-  });
+  ui.areas.classList.add("alone");
   all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = true));
   ui.seams.innerHTML = "";
   ui.heads.innerHTML = "";
@@ -5137,8 +5009,8 @@ function alignEnds(): void {
   let P = h / 2;
   let B = h / 2;
   if (settings.line === "ends") {
-    // the shape's own room, wherever in a wing it stands; with no shape drawn, the room a lone figure would have
-    const slot = (narrow() ? undefined : slots.get("fig:shape")) ?? slots.get("wingL:shape") ?? slots.get("wingR:shape") ?? band(h);
+    // the shape's own room, in its column or as the rail; with no shape drawn, the room a lone figure would have
+    const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
     const first = slot.top + SHAPE.inset;
     for (let i = 0; i < 6; i++) {
       const k = (slot.height - 8) / (P + laneH + tail + B);
@@ -5279,7 +5151,7 @@ function trimPlace(): void {
   }
 }
 
-/** The panes of the middle that stand on the screen. */
+/** The panes that stand on the screen. */
 const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.scroll].filter((el) => !el.hidden && !el.classList.contains("off"));
 
 /** How far the nodes stand in from the canvas's rim. */
@@ -5297,9 +5169,9 @@ function placeCanvas(): void {
     ui.canvas.style.marginBottom = "0px";
     return;
   }
-  // wide, the canvas clears its head, and the way down only where it stands over the canvas, the prose not standing
-  const under = narrow() || !fits().lane;
-  const top = Math.max(s.gap, narrow() ? 0 : HEADROOM + 4, ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
+  // the canvas clears its head, and the way down only where it stands over the canvas, the prose not standing
+  const under = !fits().lane;
+  const top = Math.max(s.gap, HEADROOM + 4, ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
   ui.canvas.style.marginTop = `${Math.round(top)}px`;
   ui.canvas.style.marginBottom = `${footRoom()}px`;
 }
@@ -5313,7 +5185,7 @@ function placeCrumb(): void {
   // so the placement has the whole row to read in and the depth stands over the rail
   // wide, the way down stands over the prose, or over the canvas where the prose does not stand
   const over = fits().lane ? ui.scroll : fits().canvas ? ui.canvas : fits().dish ? ui.dish : ui.scroll;
-  const edges = (narrow() ? [...panesShown(), ...(fits().rail ? [ui.parts.wingL] : [])] : [over]).map((el) => {
+  const edges = (narrow() ? [...panesShown(), ...(fits().rail ? [hostOf("shape")] : [])] : [over]).map((el) => {
     const r = el.getBoundingClientRect();
     return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
   });
@@ -5444,66 +5316,34 @@ function drawLaser(): void {
   if (rr.top < wr.top + 24 || rr.bottom > wr.bottom - 48) wing.scrollTo({ top: row.offsetTop - wing.clientHeight / 2, behavior: "smooth" });
 }
 
-/** Where each figure stands in its wing, keyed by the wing and the widget, measured as the wing is laid. */
+/** Where each figure stands, measured as it is laid: a figure of the row by its name, and the rail apart. */
 const slots = new Map<string, { top: number; height: number }>();
 
 /** The least height a growing figure is drawn into; below it the slot is left empty rather than drawn at no scale. */
 const FIGURE_FLOOR = 48;
 
 /**
- * Lays one wing whole. One figure has the wing's height; two stand at its top and its foot, with one space between. A
- * figure that takes only what it needs is drawn first and measured, and a figure that grows takes what is left, shared
- * evenly when both grow. The figures stand in the band the prose reads in, between the middles of its fades.
+ * The rail: where the lane stands alone the shape stands narrow at the edge the reader put it at, in the band the prose
+ * reads in, or nowhere.
  */
-function drawWing(area: "wingL" | "wingR"): void {
-  const el = ui.parts[area];
-  const s = settings;
+function drawRail(): void {
   const on = fits();
-  // the rail is the shape and nothing else, whichever wing the reader had it in
-  const names = on.rail ? (area === on.railSide ? ["shape"] : []) : on[area] ? figureNames(area) : [];
-  const figures = names.map((n) => WIDGETS[n] as Figure);
-  el.innerHTML = "";
-  Array.from(slots.keys())
-    .filter((k) => k.startsWith(area + ":"))
-    .forEach((k) => slots.delete(k));
-  if (figures.length === 0) return;
-  const W = el.clientWidth;
-  const { top, height: room } = band(el.clientHeight);
-  const slotted = figures.map((f) => {
-    const div = document.createElement("div");
-    div.className = "slot";
-    div.dataset.slot = names[figures.indexOf(f)];
-    el.appendChild(div);
-    if (!f.grow) div.innerHTML = f.draw(W, figures.length === 1 ? room : (room - s.gap) / 2);
-    return { f, div, height: f.grow ? 0 : Math.min(room, div.scrollHeight) };
-  });
-  const growing = slotted.filter((x) => x.f.grow);
-  const fixed = slotted.reduce((x, y) => x + y.height, 0);
-  const share = growing.length ? (room - fixed - s.gap * (slotted.length - 1)) / growing.length : 0;
-  growing.forEach((x) => (x.height = Math.max(0, share)));
-  slotted.forEach((x, i) => {
-    // one figure stands in the whole room, centred; of two, the first stands at the top and the second at the foot
-    const height = slotted.length === 1 ? room : x.height;
-    const y = i === 0 ? top : top + room - height;
-    x.div.style.top = `${Math.round(y)}px`;
-    x.div.style.height = `${Math.round(height)}px`;
-    slots.set(`${area}:${x.div.dataset.slot}`, { top: Math.round(y), height: Math.round(height) });
-    // a slot shorter than a figure can draw in is left empty rather than drawn at a scale below nothing
-    if (x.f.grow) x.div.innerHTML = height >= FIGURE_FLOOR ? x.f.draw(W, Math.round(height)) : "";
-  });
-}
-
-/** Draws one figure again in the slot it already has, for what changes with the focus or the pointer. */
-function drawSlot(area: "wingL" | "wingR", name: string): void {
-  const div = ui.parts[area].querySelector<HTMLElement>(`.slot[data-slot="${name}"]`);
-  const at = slots.get(`${area}:${name}`);
-  const f = WIDGETS[name];
-  if (div && at && f?.kind === "figure") div.innerHTML = f.draw(ui.parts[area].clientWidth, at.height);
+  const el = hostOf("shape");
+  slots.delete("rail");
+  el.hidden = !on.rail;
+  if (!on.rail) return void (el.innerHTML = "");
+  const { top, height } = band(ui.areas.clientHeight);
+  put(el, on.railSide === "left" ? 0 : ui.areas.clientWidth - on.rail, on.rail);
+  el.style.top = `${top}px`;
+  el.style.height = `${height}px`;
+  slots.set("rail", { top, height });
+  // a slot shorter than a figure can draw in is left empty rather than drawn at a scale below nothing
+  el.innerHTML = height >= FIGURE_FLOOR ? (WIDGETS.shape as Figure).draw(on.rail, height) : "";
 }
 
 function drawWings(only?: "focus" | "point"): void {
   if (only !== "point") drawDish();
-  // wide, the figures stand in the row's stacks rather than in the wings, and draw the world the keys act in
+  // wide, the figures stand in the row's stacks, and draw the world the keys act in
   if (!narrow()) {
     inNamed(keysWorld(), () => {
       if (!only) drawStacks();
@@ -5519,17 +5359,12 @@ function drawWings(only?: "focus" | "point"): void {
     inGit(drawFocusMarks);
     return;
   }
-  (["wingL", "wingR"] as const).forEach((area) => {
-    if (!only) return drawWing(area);
-    figureNames(area).forEach((name) => {
-      const f = WIDGETS[name];
-      if (f?.kind === "figure" && (only === "focus" ? f.onFocus : f.onPoint)) drawSlot(area, name);
-    });
-  });
+  // where the lane stands alone the only figure beside it is the rail, which answers neither the focus nor the pointer
+  if (!only) drawRail();
   drawFocusMarks();
 }
 
-/** Lays the wings, then settles the lane's ends against where the shape now stands, and draws again if they moved. */
+/** Lays the figures, then settles the lane's ends against where the shape now stands, and draws again if they moved. */
 function drawWingsAligned(): void {
   drawWings();
   const before = `${ui.content.style.paddingTop} ${ui.content.style.paddingBottom}`;
@@ -5671,7 +5506,7 @@ function light(): void {
   // each world lights its own elements and nothing of the other's, whose addresses mean other things
   const ours = (el: Element) => worldOfEl(el) === worldNow();
   ui.scroll.classList.toggle("pointing", a !== null);
-  if (worldNow() === keysWorld()) all<HTMLElement>(".host, .wing").forEach((el) => el.classList.toggle("pointing", a !== null));
+  if (worldNow() === keysWorld()) all<HTMLElement>(".host").forEach((el) => el.classList.toggle("pointing", a !== null));
   all<HTMLElement>(".lit").filter(ours).forEach((el) => el.classList.remove("lit"));
   drawLaser();
   if (worldNow() === "body") lightPlate(a);
@@ -5775,13 +5610,13 @@ function showTip(el: Element, html: string): void {
   const h = t.offsetHeight;
   const level = () => clamp(r.top + r.height / 2 - h / 2, 8, innerHeight - h - 8);
   const fig = el.closest("svg.fig, .tree, .keys, .settings");
-  const wing = el.closest<HTMLElement>(".wing, .host");
+  const wing = el.closest<HTMLElement>(".host");
   let left: number;
   let top: number;
   if (fig && wing) {
     const f = fig.getBoundingClientRect();
     // beside the figure on the side nearer the middle of the page, which is where the reading is
-    const leftSide = wing.classList.contains("host") ? f.left + f.width / 2 < innerWidth / 2 : wing.dataset.area === "wingL";
+    const leftSide = f.left + f.width / 2 < innerWidth / 2;
     left = leftSide ? f.right + 8 : f.left - w - 8;
     top = level();
   } else if (el.closest(".canvas")) {
@@ -5932,7 +5767,7 @@ function readOn(a: string): void {
     // wide, the world's prose comes in as a column beside its canvas, on the side towards the body's prose, or at its
     // right where that does not stand
     const [pk, ck] = [proseKey(worldNow()), canvasKey(worldNow())];
-    if (narrow()) settings.areas = { ...settings.areas, middle: ["lane"] };
+    if (narrow()) settings.alone = { ...settings.alone, pane: "lane" };
     else if (!standing(pk)) {
       const [c, p] = [whereIs(ck)?.c, whereIs("prose")?.c];
       settings.layout = dropped(layoutNow(), pk, c !== undefined ? { kind: "beside", target: ck, after: p === undefined || c < p } : { kind: "col", at: layoutNow().length });
@@ -6401,11 +6236,11 @@ let armed = false;
  * lifts, which then lays it back.
  */
 function railScrub(x: number, y: number): void {
-  const svg = ui.parts[fits().railSide].querySelector<SVGSVGElement>("svg.shape");
+  const svg = hostOf("shape").querySelector<SVGSVGElement>("svg.shape");
   if (!svg) return;
   const r = svg.getBoundingClientRect();
   // away from the rail's own edge: right of a rail at the left, left of one at the right
-  const right = fits().railSide === "wingL";
+  const right = fits().railSide === "left";
   armed = right ? x > r.right + RESET : x < r.left - RESET;
   if (!armed) {
     const k = Number(svg.dataset.k);
@@ -6422,7 +6257,7 @@ function railCallout(y: number, edge: number): void {
   t.innerHTML = armed ? `<span class="name plain">let go to lay the lane back</span>` : b ? `${pathHtml(b.address)}<span class="name">${esc(b.title || state.body!.title)}</span>` : "";
   t.hidden = false;
   // beside the thumb on the side away from the edge the rail stands on, so the hand never covers the answer
-  t.style.left = `${Math.round(fits().railSide === "wingL" ? edge + 14 : edge - 14 - t.offsetWidth)}px`;
+  t.style.left = `${Math.round(fits().railSide === "left" ? edge + 14 : edge - 14 - t.offsetWidth)}px`;
   t.style.top = `${Math.round(clamp(y - t.offsetHeight / 2, 8, innerHeight - t.offsetHeight - 8))}px`;
 }
 
@@ -6967,7 +6802,7 @@ function onResize(): void {
   pointerOn = null;
   // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
   // and how its areas are laid both turn on the width; and so is a row where a column gave way or came back
-  if (narrow() || !ui.areas.classList.contains("laid")) return drawAll();
+  if (narrow() || ui.areas.classList.contains("alone")) return drawAll();
   const before = laid().cols.map((c) => c.c).join();
   relayRow();
   if (laid().cols.map((c) => c.c).join() !== before) return drawAll();
@@ -7105,13 +6940,11 @@ async function start(): Promise<void> {
       <div id="pull" class="pull" hidden><i></i></div>
       <nav id="gcrumb" class="crumb chrome" hidden></nav>
       <div id="gpull" class="pull" hidden><i></i></div>
-      <section class="wing" data-area="wingL"></section>
       <section id="canvas" class="canvas" hidden></section>
       <section id="scroll" class="scroll"><div id="content" class="content"><div class="gutter" data-area="gutterL"></div><div id="lane" class="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section id="gcanvas" class="canvas" hidden></section>
       <section id="gscroll" class="scroll off"><div id="gcontent" class="content"><div class="gutter" data-area="gutterL"></div><div id="glane" class="lane"></div><div class="gutter" data-area="gutterR"></div></div></section>
       <section id="dish" hidden></section>
-      <section class="wing" data-area="wingR"></section>
       <div id="seams"></div>
       <div id="heads"></div>
       <div id="zone" hidden></div>
@@ -7123,7 +6956,6 @@ async function start(): Promise<void> {
   const $ = (sel: string) => document.querySelector<HTMLElement>(sel)!;
   // the page's own elements stand in both worlds' sets; each world has its own prose, way down, gauge, canvas and gutters
   const page = { header: $("#header"), tip: $("#tip"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads"), zone: $("#zone") };
-  const parts = { wingL: $('[data-area="wingL"]'), middle: $("#scroll"), wingR: $('[data-area="wingR"]') };
   const of = (scroll: HTMLElement, at: string): UI => ({
     ...page,
     scroll,
@@ -7132,7 +6964,7 @@ async function start(): Promise<void> {
     crumb: $(`#${at}crumb`),
     pull: $(`#${at}pull`),
     canvas: $(`#${at}canvas`),
-    parts: { ...parts, gutterL: scroll.querySelector<HTMLElement>('[data-area="gutterL"]')!, gutterR: scroll.querySelector<HTMLElement>('[data-area="gutterR"]')! },
+    parts: { gutterL: scroll.querySelector<HTMLElement>('[data-area="gutterL"]')!, gutterR: scroll.querySelector<HTMLElement>('[data-area="gutterR"]')! },
   });
   bodyWorld.ui = of($("#scroll"), "");
   gitWorld.ui = of($("#gscroll"), "g");
@@ -7298,15 +7130,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #tip .name.plain { font-weight: calc(400 - var(--thin)); color: var(--ink); }
 #tip .gloss { display: block; color: var(--muted); margin-top: 2px; }
 
-#areas { position: relative; flex: 1 1 auto; min-height: 0; display: grid; justify-content: center; }
+/* each program stands where it is laid, those alone in a column at the page's height; where the lane stands alone
+   there are no gaps to pull and no heads */
+#areas { position: relative; flex: 1 1 auto; min-height: 0; }
 #areas > [hidden] { display: none; }
-/* wide, the row laid by hand: each program stands where its column is laid, those alone in a column at the page's height */
-#areas.laid { display: block; }
-#areas.laid > :is(#scroll, #gscroll), #areas.laid > :is(#canvas, #gcanvas), #areas.laid > #dish { position: absolute; top: 0; bottom: 0; }
-#areas.laid > .host { right: auto; }
-#areas:not(.laid) > .host, #areas:not(.laid) > #seams, #areas:not(.laid) > #heads { display: none; }
-/* the way down clears the heads that stand along the top edge */
-#areas.laid :is(#crumb, #gcrumb) { top: ${HEADROOM + 4}px; }
+#areas > :is(#scroll, #gscroll), #areas > :is(#canvas, #gcanvas), #areas > #dish { position: absolute; top: 0; bottom: 0; }
+#areas > .host { right: auto; }
+#areas.alone > #seams, #areas.alone > #heads { display: none; }
+/* wide, the way down clears the heads that stand along the top edge */
+#areas:not(.alone) :is(#crumb, #gcrumb) { top: ${HEADROOM + 4}px; }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
@@ -7352,8 +7184,6 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .lane > .waiting { margin: 0; color: var(--faint); }
 /* the one zone a drop would land in, shaded; nothing else moves until it is let go */
 #zone { position: absolute; z-index: 7; border-radius: 10px; background: var(--veil); box-shadow: inset 0 0 0 1.5px var(--faint); pointer-events: none; }
-/* a wing is as wide as what it holds and has no padding of its own; its figures stand in slots the layout places */
-.wing { position: relative; overflow: hidden; }
 #dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
 :is(#canvas, #gcanvas) { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
