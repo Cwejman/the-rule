@@ -166,15 +166,15 @@ About 30 lines.
 
 ### 4.6 One layout, as a function of the settings and the screen
 
-Where each program stands is computed by one pure function of four things: the settings, the screen's width and height, and whether the reader has a finger. It returns where each program stands, how wide, and which gave way. One function then places the elements, and every other part asks the layout, not the areas.
+Where each program stands is computed from the settings, the screen's width and height, and whether the reader has a finger, and one placing sets every element where that says, at every width. Wide it is the row laid by hand. Where the lane stands alone it is one pane, the prose or the map, with the shape as a rail at the edge the reader put it at.
 
-Where the lane stands alone the arrangement is not the wide row, and it stays what it is. What it needs of the settings are the pane it shows, the side its rail stands on, and the figures it has room for beside a map. Those are read from the areas as they are kept now, so a reader's saved arrangement still lays it. The areas' grid, wing drawing and slots then go, and the figures there are drawn by the same stack code as the wide page's. About 250 to 300 lines.
+What the lane alone needs of the settings is now said in two facts: the pane it shows and the edge its rail stands at. The five areas, their grid, the wings, their slots and the translation of the row into their terms are gone, and the rail is drawn as a figure of the row is.
 
-This is the move most likely to move a pixel. Today the grid lays the lone pane and the browser rounds, and the one function will place in whole pixels. Two fixed figures in one wing stand at its top and its foot, where a stack sets them one under the other. And the wings give way in their own order. Each such case is matched, not let go, and [the harness](#6-how-the-behaviour-is-kept) finds any that is missed.
+Asked whether the lane alone must stay exactly as it was, the author kept its experience and let the rest go: "the current mobile experience of a menu that appears when scrolling up is the best experience we've come up with so far. But of course make the most reasonable changes in the code". So one pane, the rail, a figure opened whole over the page, the card at the foot for what was chosen on the map, the foot's row leaving as the reader reads and coming back as they scroll up, and the switch to the history all stand as they were; on a phone every picture the harness takes is the same. What went is what only the areas gave: a window just too narrow for the row kept the rail beside a lone map, a shallow body could have a narrow figure beside its prose, two maps could stand side by side just below the width where the lane stands alone, and a reader's areas laid before the row were carried into it.
 
-Building it to keep the lane alone exactly as it is means writing in the page's own code what the browser's grid does for the areas today, its rounding included, to the pixel. Some of what that keeps exists only because the areas fit it: a narrow figure beside the prose where the body is shallow, two maps side by side just below the width where the lane stands alone, and a wing beside a lone map. That is much risk for what it removes, so the move waits on [the author's word](#5-what-only-the-author-can-let-go) on whether the lane alone may be laid from the row.
+Two quirks were mended with it. A link's tooltip never showed in a narrow window with a pointer, since a gutter area left empty counted as standing; and the way down measured itself against the left wing even where the rail stood at the right.
 
-*One pattern for one kind of thing, and pure functions. Reasoned, the session's; the lane alone exactly as it is today. Not built, 2026-10-02: it waits on the author. It leaves [the framework's five areas](framework.md#2-the-areas) standing only as what the lane alone keeps, and says so there.*
+*One pattern for one kind of thing. Preferred, the author's, 2026-10-02, on what the lane alone keeps; fulfilled the same day, 193 lines lighter, the harness equal wide and on a phone, and a narrow window with a map no longer keeping the rail beside it.*
 
 ### 4.7 One draw, at a few levels
 
@@ -212,7 +212,7 @@ A comment says what is not plain from the code: in a line, why it is so and what
 
 The longer story of how a decision was reached, with its dates, stands in the briefs and in the record of the repository's commits, which already hold it, and it leaves the code. Counted, it is smaller than first thought: four lines carry a date and some sixty tell what once was, and the rest of the comments are reasons, which the sister project's rules ask to keep. About 60 to 100 lines.
 
-*Self-documenting code, and its context in a line. Reasoned. The comments are written in the author's voice, so which go is his to see in the diff before it is committed.*
+*Self-documenting code, and its context in a line. Reasoned. Asked, the author answered that the rule wants one source of truth and what is outdated does not matter; fulfilled 2026-10-02 in 938ac02, the stories cut to their reasons and the dated repairs of settings gone.*
 
 ### 4.11 One file, or a few
 
@@ -226,9 +226,8 @@ The page's script is cut out of the file by its comment headings and transpiled.
 
 Keeping behaviour keeps some that exists only because of how the code grew. Each would simplify further, and each is the author's to let go or keep:
 
-- **The lane alone kept by the areas.** Where the lane stands alone the page could be laid from the row as a narrow screen, instead of from the five areas the row superseded. That would make the areas go as data too, but it changes the page there, a phone first among it.
-- **The figures beside a map on a screen just too narrow for the prose's gutters.** They stand there today only because the areas fit them there.
-- **Settings kept from before 2026-09-17.** The repairs for a fade, an area that held one name, and the areas before the row change nothing for a reader who has opened the page since.
+- **The lane alone kept by the areas**, and **the figures beside a map on a screen just too narrow for the prose's gutters**. Let go by the author on 2026-10-02, keeping the lone pane's experience; [the layout](#46-one-layout-as-a-function-of-the-settings-and-the-screen) says what went.
+- **Settings kept from before 2026-09-17.** Let go by the author on 2026-10-02: "outdated of course doesn't matter".
 - **The heavy tier of git's history, what each commit changed line by line.** It is served and written, but no part of the page reads it yet. [The surface's brief on git's history](history.md) plans it, so it is not dead, only waiting.
 
 *Seen in the code, 2026-10-01; each is unanswered.*
@@ -262,19 +261,18 @@ Each move is one commit, after the harness, the type checker and a cold review a
 2. One thing, one renderer, and one table of programs. *Built but for the one table, 83f7a96.*
 3. The settings as a table. *Built, 9ce04e4.*
 4. A world as a value, and what the map decides named. *Built, c1becf3.*
-5. One layout. *Waits on the author.*
+5. One layout. *Built, the author keeping the lone pane's experience.*
 6. One draw, at a few levels. *Not built: it would cost what a reader holds.*
 7. An act and its other hand. *Built, d6dff6d.*
 8. The gestures, each a function of its own. *Built.*
-9. The comments, shown to the author before they are committed. *Waits on the author.*
-10. Files, if the author wants them. *Waits on the author.*
+9. The comments say why. *Built, 938ac02: the author asked for one source of truth, so the stories went.*
+10. Files, if the author wants them. *Not yet, the author's word of 2026-10-02.*
 
 *Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves. Measured, 2026-10-02, after the eighth: the page's script went from 4,069 lines of code to 3,956, every record of the harness equal throughout. The three largest moves are the author's, so the larger part of the estimate waits with them.*
 
 ## 8. What this leaves open
 
-- Whether the file becomes a few, [above](#411-one-file-or-a-few).
-- Which comments go.
-- Each of [the things only the author can let go](#5-what-only-the-author-can-let-go).
+- Whether the file becomes a few, [above](#411-one-file-or-a-few): not yet, the author's word of 2026-10-02.
+- Whether the heavy tier of git's history, served and written but read by nothing yet, stays until [the history](history.md) reaches it.
 
 *Open, 2026-10-01.*
