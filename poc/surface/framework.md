@@ -10,9 +10,9 @@ Five areas stand in a row: a wing at either edge, the middle between them, and a
 
 One light row of icons at the page's foot chooses what each holds. That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
 
-Wide, the page is now [laid by hand](layout.md): a row of columns, each a stack of programs, moved and sized by dragging, with a dock in place of the strip. What [it supersedes](layout.md#11-what-it-supersedes) here is marked where it stands; the areas, the strip and the middle's two sides still lay the page where the lane stands alone.
+Wide, the page is now [laid by hand](layout.md): a row of columns, each a stack of programs, moved and sized by dragging, with a dock in place of the strip. What [it supersedes](layout.md#11-what-it-supersedes) here is marked where it stands. Where the lane stands alone the areas are gone as well: the page there is one pane, the prose or the map, with the shape as a rail at the edge the reader puts it at, a figure opened whole over the page, and the foot's row in place of the strip, laid by the same placing the row is.
 
-*Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it had two sides and the lane need not stand in it. Laid by hand wide, 2026-10-01.*
+*Reasoned, the author's, 2026-09-13; the middle named in the face, 2026-09-27, once it had two sides and the lane need not stand in it. Laid by hand wide, 2026-10-01. The areas superseded where the lane stands alone too, 2026-10-02, in [the surface assembled again](assembly.md#46-one-layout-as-a-function-of-the-settings-and-the-screen), the author keeping the lone pane's experience and letting go what only the areas gave it.*
 
 ## 1. Three kinds of widget
 
