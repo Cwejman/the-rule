@@ -2559,8 +2559,7 @@ const narrow = (): boolean => ui.areas.clientWidth < settings.measure + 3 * sett
  * not in, which is one press to the other; the rail, while the prose stands and nothing is open over it; and the
  * settings. Three at most, and the acts of what is chosen stand beside them rather than behind a mark.
  *
- * The outline and the radial are not among them. Both were built and read badly on a phone, the outline poor whole and
- * the radial impossible to hit, so they wait until each has a touch reading of its own.
+ * The outline and the radial are not among them: neither has a touch reading of its own.
  */
 const narrowChoices = (): string[] => [
   fits().lane ? "canvas" : "lane",
@@ -3264,10 +3263,6 @@ function loadSettings(): void {
   try {
     saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "null");
     if (saved) settings = { ...DEFAULTS, ...saved, areas: { ...DEFAULTS.areas, ...((saved.areas as object) ?? {}) } } as Settings;
-    if (saved && typeof saved.fade === "number" && saved.fade <= 1 && saved.dim === undefined) (settings.dim = saved.fade as number), (settings.fade = DEFAULTS.fade);
-    // the fade was lengthened on 2026-09-16, and a reader holding exactly the value it had before never chose it, so
-    // they take the new one. This is the last such line: what is written from here on keeps only what a reader set
-    if (saved && saved.fade === 8) settings.fade = DEFAULTS.fade;
   } catch {}
   // an area once held one name, "none" when closed; it now holds a list, and anything it cannot hold is dropped
   AREAS.forEach(({ name, kind }) => {
@@ -3679,12 +3674,6 @@ let pointerOn: PaneName | null = null;
 /**
  * The pane the keys belong to: the pane at the left, and the pane at the right while the pointer rests on it. The dish
  * has no act a key could fire, so it never holds them and they stay with the pane beside it.
- *
- * It was the pane the reader last acted in until 2026-09-19. That made every key modal on something the page never
- * showed: a reader who opened the canvas and pressed an arrow moved the prose, because their hand had never been put
- * on the map, and nothing on the page could tell them so. Then the keys were the map's whenever it stood, which held
- * while one map could stand. With two sides, the pane holding them said so by its rim, until the author let it go on
- * 2026-10-01: the history had become a mode of the one canvas, so no two maps stand side by side to be told apart.
  */
 function keyPane(): PaneName {
   const on = fits();
@@ -3955,10 +3944,8 @@ function faceHtml(): string {
  * a row the map draws.
  */
 function settleMap(): void {
-  // The canvas draws the path the reader has opened, and going into another reading lays the path to it. Only going:
-  // this was asked on every draw, so the chain was thrown away and rebuilt from the lane's own path whenever it did
-  // not prefix it — which meant nothing outside the reading the lane stood in could be opened at all, since the act
-  // set the chain and the very next draw undid it.
+  // going into another reading lays the path to it, and only going: laid on every draw, it would undo whatever an act
+  // opened outside the reading the lane stands in
   const held = fileRootOf(state.scope);
   if (state.waysLaidFor !== held) {
     state.waysLaidFor = held;
@@ -4192,8 +4179,7 @@ function applyView(ease: boolean): void {
     if (st.style.getPropertyValue("--kz") !== kz) {
       st.style.setProperty("--kz", kz);
       // the node keeps the room it had, so a name held at a larger type is cut to one line rather than wrapping into a
-      // taller node. Held at two lines, every node grew as the type resisted and the whole map grew with it: the map
-      // was laid 7031 tall at the floor against 3004 at life size, so zooming out gave back exactly what it took
+      // taller node, which would grow the whole map back as it was zoomed out
       st.style.setProperty("--lines", Number(kz) > 1 ? "1" : "2");
       frame(drawEdges);
     }
@@ -6257,10 +6243,7 @@ function scopeTo(S: string, at?: string): void {
 /**
  * Going out of this reading: the lane takes the reading that placed it, and the reader stands on the card, beside the
  * reading rather than inside it, which is where going in with return left from.
- *
- * It went to the parent brief until 2026-09-20, which is a heading inside the placing file rather than the reading
- * itself, so the lane was laid from a section of a run nobody composed and the reader was left at an address the lane
- * no longer held. The boundary is what going out crosses, so the reading above it is where it lands.
+ * The boundary is what going out crosses, so the reading above it is where it lands, not the heading that placed it.
  */
 function popUp(): void {
   const card = state.scope;
@@ -6337,11 +6320,9 @@ function pull(e: WheelEvent): void {
   const gap = now - lastWheelAt;
   lastWheelAt = now;
   const rest = notched(e) ? 1500 : 1000;
-  // One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands
-  // in is scrolled to the card it left, so the events after it met a lane no longer at its top, drained the pull and
-  // armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for
-  // the hand to let go, which is a push the other way or the quiet the gauge already springs back after — and neither
-  // is the lane merely standing somewhere else, so it is asked before anything about where the lane stands.
+  // One movement of the hand is one pull: a swipe carries on past the moment the gauge fills, and the rest of it must
+  // not carry the reader out of the reading it landed in as well. A spent pull waits for the hand to let go, a push the
+  // other way or the quiet the gauge springs back after, so it is asked before anything about where the lane stands.
   if (spent) {
     if (e.deltaY > 0) spent = false;
     else pullTimer = setTimeout(restIn(worldNow()), rest);
@@ -6815,8 +6796,8 @@ const pullOn = (el: HTMLElement, w: WorldName) =>
     (e) =>
       runIn(w, () => {
         pull(e);
-        // asked after, so that the very event that spent the pull does not scroll either: the browser applies its own
-        // scroll once the handler returns, and it was carrying the reader 400 past the card the pull had put them on
+        // asked after, so the very event that spent the pull does not scroll the reading it landed in: the browser
+        // applies its own scroll once the handler returns
         if (spent && e.deltaY < 0) e.preventDefault();
       }),
     { passive: false },
@@ -7439,8 +7420,8 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; min-width: 0; overflow: hidden; }
 .crow .marks i { display: block; flex: none; width: 8px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .crow .marks i.image { width: 8px; height: 6px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
-/* the level beneath is bars of its own, a brief each, in the branch's hue a step stronger than the prose's: the two
-   are kinds of the same thing, where one grey blob for the whole level said they were not */
+/* the level beneath is bars of its own, a brief each, in the branch's hue a step stronger than the prose's, since the
+   two are kinds of the same thing */
 .crow .marks .brief { display: block; flex: none; width: var(--w); height: 3px; border-radius: 1.5px; background: var(--door); }
 .crow .marks .sep { width: 4px; background: none; }
 .crow .marks .more { flex: none; font-size: .72em; line-height: 1; color: var(--faint); background: none; }
