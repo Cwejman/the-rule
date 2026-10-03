@@ -4754,7 +4754,8 @@ function drawStacks(): void {
   stackGaps = [];
   const shown = new Set<string>();
   laid().cols.forEach((col) => {
-    const items = L[col.c].items.filter((it) => WIDGETS[it.k]?.kind === "figure");
+    // the plate is a figure where the lane stands alone, but wide it stands alone and is drawn as its own program
+    const items = L[col.c].items.filter((it) => WIDGETS[it.k]?.kind === "figure" && !isAlone(it.k));
     if (!items.length) return;
     const W = Math.round(col.w);
     const slotted = items.map((it) => {
