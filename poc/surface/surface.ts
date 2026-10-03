@@ -2627,7 +2627,9 @@ const PROSE_LEAST = 440;
 /** The least the plate stands at, below which it has no droplet a reader can find. */
 const PLATE_LEAST = 160;
 /** The room a program's head takes along its top edge. */
-const HEADROOM = 22;
+const HEADROOM = 26;
+/** How tall a head's things stand, the rest of its row being the room between it and its box. */
+const HEAD_ROW = 22;
 /** The room the dock takes where it stands down the left edge. */
 const DOCK_LEFT = 52;
 
@@ -4553,12 +4555,12 @@ const RIM = { top: 3, foot: 6 };
  */
 function boxFrame(h: number): { top: number; height: number } {
   const t = Math.round(settings.gap / 2);
-  const top = WAY.top + WAY.height + t + HEADROOM;
+  const top = WAY.top + WAY.height + 2 + HEADROOM;
   return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : FOOT + t)) };
 }
 
-/** The way down's row wide: near the page's top edge, since nothing stands above it, and half a gap clear of the heads. */
-const WAY = { top: 8, height: 18 };
+/** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
+const WAY = { top: 6, height: 18 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
@@ -4630,7 +4632,8 @@ function drawLayout(): void {
   root.setProperty("--gap", `${s.gap}px`);
   root.setProperty("--dim", `${s.dim}`);
   root.setProperty("--edge", `${s.fade}%`);
-  root.setProperty("--rim-top", `${RIM.top}%`);
+  // wide nothing stands over the prose's box, so it keeps no clear rim at its top, only the fade
+  root.setProperty("--rim-top", narrow() ? `${RIM.top}%` : "0%");
   // the prose clears the foot by the strip's room, as it clears the way down at the top, so the two fades balance
   root.setProperty("--rim-foot", `${narrow() ? footRoom() : 0}px`);
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
@@ -4849,18 +4852,31 @@ function drawHeads(): void {
       ([k, b]) =>
         `<div class="phead${k === nearHead ? " near" : ""}${PROGRAMS[k].world === "history" ? " git" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
         `<button class="grip" data-grip="${esc(k)}" data-tip="${esc(`${PROGRAMS[k].name} — drag to move it, or hold alt and drag anywhere on it`)}">${programIcon(k)}</button>` +
-        `<span class="own">${headSettings(k)}</span></div>`,
+        `<span class="own">${headSettings(k)}</span>${headDepth(k)}</div>`,
     )
     .join("");
+}
+
+/** An act standing in a head: its glyph alone, as every head's settings are, with what it does and its key in the tip. */
+function headAct(id: string): string {
+  const act = ACTIONS[id];
+  if (!act?.mark) return "";
+  const k0 = act.keys[0];
+  const key = k0 ? ` (${k0.shift ? "shift " : ""}${k0.key})` : "";
+  return `<span class="pick deed${act.can() ? "" : " off"}" data-act="${esc(id)}" data-tip="${esc(act.label() + key)}"><svg class="icon" viewBox="0 0 16 16">${act.mark()}</svg></span>`;
+}
+
+/** The depth a world is unfolded to, which is its own, so the head of each of its prose and canvas carries it at its right end. */
+function headDepth(k: string): string {
+  if (!["prose", "gitProse", "canvas", "gitCanvas"].includes(k)) return "";
+  return inNamed(PROGRAMS[k].world ?? "body", () => (state.body ? depthHtml() : "")) ?? "";
 }
 
 /** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
 function headSettings(k: string): string {
   const w = PROGRAMS[k]?.world ?? "body";
-  // the depth a world is unfolded to is its own, so each of its prose and canvas carries it
-  const depth = k === "prose" || k === "gitProse" || k === "canvas" || k === "gitCanvas" ? (inNamed(w, () => (state.body ? depthHtml() : "")) ?? "") : "";
   // a canvas's acts are its world's, so what they say is reckoned there
-  if (k === "canvas" || k === "gitCanvas") return depth + (inNamed(w, () => badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true)) ?? "");
+  if (k === "canvas" || k === "gitCanvas") return inNamed(w, () => headAct("face") + headAct("trunk")) ?? "";
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
   return ([0, 1] as const)
@@ -4869,7 +4885,7 @@ function headSettings(k: string): string {
       const tip = `the links in the gutter at the ${side} — press to ${g[i] ? "take them away" : "stand them there"}`;
       return `<button class="pick gutter-pick${g[i] ? " on" : ""} side-${i ? "r" : "l"}" data-gutter="${w}:${i}" data-tip="${esc(tip)}">${icon("links")}</button>`;
     })
-    .join("") + depth;
+    .join("");
 }
 
 /** Which program's head shows: the program the pointer is anywhere on, its head's row or its box. */
@@ -5238,7 +5254,7 @@ function placeCrumb(): void {
   const span = Math.round(Math.min(right, narrow() ? a0.right - gap : Infinity) - left);
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
   ui.crumb.style.width = "max-content";
-  ui.crumb.style.minWidth = `${span}px`;
+  ui.crumb.style.minWidth = narrow() ? `${span}px` : "0px";
   ui.crumb.style.maxWidth = `${Math.max(span, Math.round(a0.width - (left - a0.left) - gap))}px`;
   // the pull's gauge lies over the top of the prose, just under the way down
   const lane = ui.lane.getBoundingClientRect();
@@ -7222,16 +7238,21 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* a head: the grip and the program's own settings along its top edge, quiet until the pointer comes near; leaving, it
    lingers a moment and fades, so a pointer on its way to it still finds it */
 #heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
-.phead { position: absolute; height: ${HEADROOM}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
-.phead > .grip, .phead > .own { opacity: 0; transition: opacity .3s ease .45s; }
-.phead.near > .grip, .phead.near > .own { pointer-events: auto; }
-.phead.near > .grip, .phead.near > .own { opacity: 1; transition: opacity .12s ease 0s; }
+.phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
+.phead > .grip, .phead > .own, .phead > .depth { opacity: 0; transition: opacity .3s ease .45s; }
+.phead.near > .grip, .phead.near > .own, .phead.near > .depth { pointer-events: auto; }
+.phead.near > .grip, .phead.near > .own, .phead.near > .depth { opacity: 1; transition: opacity .12s ease 0s; }
+.phead > .depth { margin-left: auto; align-items: center; }
+.phead .depth .badge { padding: 0; gap: 0; border-radius: 5px; }
 /* a program of git's keeps its grip standing, so git's mark always stands at its top edge */
 .phead.git > .grip { opacity: .75; pointer-events: auto; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
 .phead .grip:hover { background: var(--wash); color: var(--ink); }
-.phead .own { display: flex; align-items: center; gap: 2px; min-width: 0; }
-.phead .pick { position: relative; width: 26px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--ink); opacity: .25; transition: opacity .15s; }
+.phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.phead .pick { position: relative; width: 26px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--ink); opacity: .4; transition: opacity .15s; cursor: pointer; }
+.phead .pick .icon { width: 14px; height: 14px; }
+.phead .pick.deed { opacity: .7; color: var(--muted); }
+.phead .pick.deed.off { opacity: .25; cursor: default; }
 .phead .pick.on { opacity: .8; color: var(--muted); }
 .phead .pick:hover { opacity: .7; background: var(--wash); }
 .phead .pick.side-l::after, .phead .pick.side-r::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
