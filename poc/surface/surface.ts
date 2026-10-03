@@ -2745,10 +2745,9 @@ let laidNow: Laid | null = null;
  * from the body's prose first, and of two as far the one at the right. Once only one is left, it narrows with the page.
  * What the page leaves over is spread among the spaces, the edges among them, or stands at the two edges.
  */
-function layRow(): Laid {
+function layRow(L: Column[] = settings.layout): Laid {
   const s = settings;
   const g = s.gap;
-  const L = s.layout;
   const x0 = dockRoom();
   const W = Math.max(0, ui.areas.clientWidth - x0);
   const own = L.map(colOwn);
@@ -2892,8 +2891,7 @@ function dropped(L: Column[], k: string, z: Zone): Column[] {
 const leftAt = new Map<string, { zone: Zone; near: string; w?: number }>();
 
 /** Remembers where a program stands before it is taken away: beside or in the stack of the nearest program that stays. */
-function remember(k: string): void {
-  const L = layoutNow();
+function remember(k: string, L: Column[] = layoutNow()): void {
   const at = whereIs(k, L);
   if (!at) return;
   const col = L[at.c];
@@ -2908,26 +2906,53 @@ function remember(k: string): void {
   else if (after) near({ kind: "beside", target: after.k, after: false });
 }
 
-/** Takes a program away, or puts it back where it stood: beside the nearest program that still stands there, or at the right end of the row. */
+/** Whether a program can be seen: it stands, and its column has not given way at this width. */
+const shownNow = (k: string): boolean => {
+  const at = whereIs(k);
+  return at !== null && !laid().gone.has(at.c);
+};
+
+/**
+ * Closes a program that can be seen, or opens one that cannot: back where it stood, beside the nearest program that
+ * still stands there, or where it first comes in. What has to give way for it is taken away as though it were pressed,
+ * so an icon is lit exactly while its program can be seen, and a press never only moves what is hidden.
+ */
 function pressProgram(k: string): void {
   const L = layoutNow();
-  if (standing(k)) {
+  if (shownNow(k)) {
     if (L.reduce((n, c) => n + c.items.length, 0) <= 1) return;
     remember(k);
     settings.layout = without(L, k);
   } else {
+    // what can be seen before the press, so only what gives way for this one is taken away
+    const seen = new Set(L.flatMap((c, i) => (laid().gone.has(i) ? [] : c.items.map((it) => it.k))));
+    const base = without(L, k);
     const kept = leftAt.get(k);
     // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
-    // stands alone comes in beside the body's prose where it stands on the page, at its left, the side that gives way
-    // last, so the columns further out give way before it and a press is seldom answered only by the dock
-    const shown = laid().cols;
-    const end = shown.length ? shown[shown.length - 1].c + 1 : L.length;
-    const fresh: Zone = isAlone(k) && laidAt("prose") ? { kind: "beside", target: "prose", after: false } : { kind: "col", at: end };
-    const zone: Zone = kept && standing(kept.near) ? kept.zone : fresh;
-    let next = dropped(L, k, zone);
-    if (next === L) next = dropped(L, k, { kind: "col", at: L.length });
+    // stands alone comes in beside the body's prose, at its left, the side that gives way last
+    const shown = layRow(base).cols;
+    const end = shown.length ? shown[shown.length - 1].c + 1 : base.length;
+    const fresh: Zone = isAlone(k) && whereIs("prose", base) ? { kind: "beside", target: "prose", after: false } : { kind: "col", at: end };
+    const zone: Zone = kept && whereIs(kept.near, base) ? kept.zone : fresh;
+    let next = dropped(base, k, zone);
+    if (next === base) next = dropped(base, k, { kind: "col", at: base.length });
     const at = whereIs(k, next);
     if (at && kept?.w && next[at.c].items.length === 1) next[at.c] = { ...next[at.c], w: kept.w };
+    // where there is no room for it, the column furthest from the body's prose goes, as the row gives way, until it can be seen
+    for (;;) {
+      const r = layRow(next);
+      const mine = whereIs(k, next)!.c;
+      const prose = whereIs("prose", next)?.c ?? -1;
+      const rank = (i: number): number => (prose >= 0 ? Math.abs(i - prose) * 2 + (i > prose ? 1 : 0) : i);
+      const out = r.cols.map((col) => col.c).filter((i) => i !== mine && i !== prose).sort((a, b) => rank(b) - rank(a))[0];
+      if (!r.gone.has(mine) || out === undefined) break;
+      next[out].items.forEach((it) => remember(it.k, next));
+      next = next.filter((_, i) => i !== out);
+    }
+    // and what gave way for it is taken away, rather than left standing out of sight
+    const r = layRow(next);
+    const gave = next.flatMap((c, i) => (r.gone.has(i) ? c.items.map((it) => it.k).filter((x) => x !== k && seen.has(x)) : []));
+    gave.forEach((x) => (remember(x, next), (next = without(next, x))));
     settings.layout = next;
   }
   saveSettings();
@@ -2939,7 +2964,7 @@ function dockTip(k: string): string {
   const at = whereIs(k);
   const name = PROGRAMS[k].name;
   if (!at) return `${name} — press to bring it back, or drag it where you want it`;
-  if (laid().gone.has(at.c)) return `${name} — standing, but there is no room for it at this width`;
+  if (laid().gone.has(at.c)) return `${name} — there is no room for it at this width — press to bring it in`;
   if (layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return `${name} — the last program cannot be taken away`;
   return `${name} — press to take it away, or drag it where you want it`;
 }
