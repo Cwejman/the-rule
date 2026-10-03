@@ -2910,20 +2910,34 @@ function pressProgram(k: string): void {
     if (next === base) next = dropped(base, k, { kind: "col", at: base.length });
     const at = whereIs(k, next);
     if (at && kept?.w && next[at.c].items.length === 1) next[at.c] = { ...next[at.c], w: kept.w };
-    // where there is no room for it, the column furthest from the body's prose goes, as the row gives way, until it can be seen
+    // where there is no room for it, the column furthest from the body's prose goes, as the row gives way, a world's
+    // canvas before its prose, until it can be seen; where even that leaves it no room, nothing is taken away for it
+    const placed = next;
+    const away: string[] = [];
     for (;;) {
       const r = layRow(next);
       const mine = whereIs(k, next)!.c;
+      if (!r.gone.has(mine)) break;
       const prose = whereIs("prose", next)?.c ?? -1;
       const rank = (i: number): number => (prose >= 0 ? Math.abs(i - prose) * 2 + (i > prose ? 1 : 0) : i);
-      const out = r.cols.map((col) => col.c).filter((i) => i !== mine && i !== prose).sort((a, b) => rank(b) - rank(a))[0];
-      if (!r.gone.has(mine) || out === undefined) break;
-      next[out].items.forEach((it) => remember(it.k, next));
-      next = next.filter((_, i) => i !== out);
+      const order = r.cols.map((col) => col.c).filter((i) => i !== mine && i !== prose).sort((a, b) => rank(b) - rank(a));
+      const [p, c] = [order.indexOf(whereIs("gitProse", next)?.c ?? -1), order.indexOf(whereIs("gitCanvas", next)?.c ?? -1)];
+      if (p >= 0 && c > p) order.splice(p, 0, ...order.splice(c, 1));
+      // no room even beside the body's prose alone: it stands at the far end of the row, the first to give way, so it
+      // moves nothing else and the dock says it is out of sight
+      if (order[0] === undefined) {
+        next = [...without(placed, k), { items: [{ k }] }];
+        away.length = 0;
+        break;
+      }
+      away.push(...next[order[0]].items.map((it) => it.k));
+      next = next.filter((_, i) => i !== order[0]);
     }
+    if (away.length) away.forEach((x) => remember(x, placed));
     // and what gave way for it is taken away, rather than left standing out of sight
     const r = layRow(next);
-    const gave = next.flatMap((c, i) => (r.gone.has(i) ? c.items.map((it) => it.k).filter((x) => x !== k && seen.has(x)) : []));
+    const room = !r.gone.has(whereIs(k, next)!.c);
+    const gave = room ? next.flatMap((c, i) => (r.gone.has(i) ? c.items.map((it) => it.k).filter((x) => x !== k && seen.has(x)) : [])) : [];
     gave.forEach((x) => (remember(x, next), (next = without(next, x))));
     settings.layout = next;
   }
@@ -2936,7 +2950,7 @@ function dockTip(k: string): string {
   const at = whereIs(k);
   const name = PROGRAMS[k].name;
   if (!at) return `${name} — press to bring it back, or drag it where you want it`;
-  if (laid().gone.has(at.c)) return `${name} — there is no room for it at this width — press to bring it in`;
+  if (laid().gone.has(at.c)) return `${name} — out of sight, with no room for it at this width — press to make room for it where there can be`;
   if (layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return `${name} — the last program cannot be taken away`;
   return `${name} — press to take it away, or drag it where you want it`;
 }
@@ -4883,9 +4897,10 @@ function programAt(x: number, y: number): string | null {
  * column it goes beside it, at the side of the half the pointer is in; a figure over the middle of a column of figures
  * goes into that stack, above or below the figure the pointer is on. In a gap it goes there, as a column of its own.
  */
-function zoneAt(x: number, y: number, k: string): Zone | null | "stay" {
+function zoneAt(x: number, y: number, k: string, from: Column[]): Zone | null | "stay" {
   const over = document.elementFromPoint(x, y) as HTMLElement | null;
-  if (over?.closest(".dock")) return standing(k) && layoutNow().reduce((n, c) => n + c.items.length, 0) > 1 ? { kind: "dock" } : null;
+  // the dock is judged against the row before the drag, since the row as it stands may already be without the program
+  if (over?.closest(".dock")) return whereIs(k, from) && from.reduce((n, c) => n + c.items.length, 0) > 1 ? { kind: "dock" } : null;
   const r = ui.areas.getBoundingClientRect();
   const px = x - r.left;
   const py = y - r.top;
@@ -6536,7 +6551,7 @@ const dragged = (e: PointerEvent): void => {
       }
       // once the row has moved, the pointer travels a little before it moves again, so two places never trade back and forth
       if (drag.still && Math.hypot(e.clientX - drag.still.x, e.clientY - drag.still.y) < 12) return;
-      const z = zoneAt(e.clientX, e.clientY, drag.k!);
+      const z = zoneAt(e.clientX, e.clientY, drag.k!, drag.from);
       if (z === "stay") return;
       drag.zone = z;
       if (showMove(drag.k!, z, drag.from, drag.w)) drag.still = { x: e.clientX, y: e.clientY };
@@ -6596,6 +6611,14 @@ const dragged = (e: PointerEvent): void => {
 
 const release = () => runIn(drag?.world ?? "body", letGoOf);
 
+/** A move cancelled, by the browser, by leaving the window or by escape, puts the row back as it stood before the drag. */
+const cancelMove = (): void => {
+  if (drag?.kind !== "move") return;
+  if (drag.from) drag.zone = null;
+  else drag.moved = false;
+  letGoOf();
+};
+
 const letGoOf = () => {
   if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
     document.body.classList.remove("moving", "pulling", "pulling-v");
@@ -6605,6 +6628,7 @@ const letGoOf = () => {
     setTimeout(() => (scrubbing = false), 0);
     if (!moved) return;
     // the row already stands as it will: taken to the dock, it remembers where it stood; let go nowhere, it goes back
+    if (kind === "move") nearHead = null;
     if (kind === "move" && from) {
       if (zone?.kind === "dock") remember(k!, from);
       if (!zone) settings.layout = from;
@@ -6759,6 +6783,7 @@ function onKeyUp(e: KeyboardEvent): void {
 
 function onKeyDown(e: KeyboardEvent): void {
   if ((e.target as HTMLElement).closest("input, textarea")) return;
+  if (e.key === "Escape" && drag?.kind === "move") return void (e.preventDefault(), cancelMove());
   if (e.key === " ") {
     e.preventDefault();
     if (space) return;
@@ -6890,11 +6915,11 @@ function wire(): void {
   });
   document.addEventListener("pointermove", (e) => drag && runIn(drag.world ?? "body", () => dragged(e)));
   document.addEventListener("pointerup", release);
-  document.addEventListener("pointercancel", release);
+  document.addEventListener("pointercancel", () => (drag?.kind === "move" ? cancelMove() : release()));
   document.addEventListener("dblclick", onDoubleClick);
   document.addEventListener("wheel", onKnobWheel, { passive: false });
   document.addEventListener("wheel", onWheel, { passive: false });
-  window.addEventListener("blur", letGo);
+  window.addEventListener("blur", () => (letGo(), cancelMove()));
   document.addEventListener("keyup", onKeyUp);
   document.addEventListener("keydown", onKeyDown);
   window.addEventListener("touchstart", onFirstTouch, { passive: true });
