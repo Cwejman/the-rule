@@ -8,7 +8,7 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-It is built, wide, as laid here, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#8-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
+It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7-the-dock), which are being built, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#8-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
@@ -51,6 +51,10 @@ By default the row is the shape, the body's prose with the links in its right gu
 A program says how it takes height. One that stands alone has its column to itself at the page's whole height: the prose and the canvas, the body's and git's, and the plate. One that grows shares what its column has left with the others that grow: the shape, the tree and the ahead. One of fixed size takes only the height it needs, and is not pulled: the settings and the keys.
 
 A height pulled is kept as a share of what the growing ones have, as they share it evenly today. How git's status takes height is open.
+
+Every program stands in the same frame, whatever its kind. Its head is a row along the top, and its box lies beneath, reaching down to the foot's room: the dock's room where the dock stands at the foot, and one gap where it stands down the left. The prose is no exception. Its fades lie inside its box, and its way down stands at the box's top, so no column reaches further up or down than another. In a stack each program has its head above its box, and a gap lies between one program and the next.
+
+*Preferred, the author's, 2026-10-03, that the room is divided alike, the prose standing no higher than any other program, and that the dock moved to the left releases the foot. The head as a row of its own above the box is the session's. It supersedes the figures' band between the middles of the prose's fades, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose).*
 
 *Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); the keys as fixed, heights kept as shares, standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
 
@@ -104,7 +108,9 @@ A program's head is a thin row along its top edge: the grip at its left, and aft
 
 The grip is the program's icon, the one it has in the dock. On the prose the head stands in the fade the prose already has at its top, above the way down, so it covers nothing read. On a map it stands bare over the map's top, above its way down where one stands there, as the acts stand bare over its foot today, and on a figure over the room above it.
 
-It shows only near the top edge rather than whenever the pointer is on the program, since a reader with a mouse resting on the prose would otherwise read under it the whole time. Leaving, it goes quiet before it goes, so a pointer on its way to it still finds it.
+It shows whenever the pointer is anywhere on the program, so the reader always sees what they are pointing at, and it covers nothing, since it stands in its own row above the box. Nothing else lights: the program's ground stays as it is. Leaving, it goes quiet before it goes, so a pointer on its way to it still finds it.
+
+*Preferred, the author's, 2026-10-03, that pointing at a program always shows its head with its icon, since nothing said what the pointer was on, and that its ground need not lighten. It supersedes the head showing only near the top edge, which was laid while the head stood over the prose's fade.*
 
 What each head holds:
 
@@ -124,9 +130,13 @@ So the gutters are not in the dock but a setting of each prose, and both proses 
 
 A program is taken by its grip, or anywhere on it with the alt key held. The grip is for whoever does not know the key, the key for whoever does.
 
-While it is dragged nothing on the page moves. The program under the pointer shades one zone of itself: its left or right half to stand beside it as a new column, its top or bottom half to stand in its stack, its middle to trade places. A program that stands alone shades no top or bottom, and while one that stands alone is dragged, no program shades its top or bottom; the middle shades only where each of the two could stand where the other stood. Let go, and the program stands in the zone shaded.
+A program is only ever put between others, never on one. It goes between two columns, or at either end of the row, as a column of its own. A figure can also go between two figures of a stack, or at its top or its foot, in that stack. A program that stands alone only ever goes as a column.
 
-*Preferred, the author's, 2026-10-01, that moving is by drag and that both the grip and the key are needed. The one shaded zone, nothing moving until it is let go, and where a trade is allowed are the session's, not yet answered.*
+The page moves while the program is dragged. The program leaves its place and the row closes behind it. Where it would land, the row opens a place of the program's own width, or of its share of the stack, and the others move aside. Let go, and it stands there. Let go over the dock, and it is taken away. Let go where no place opens, and it goes back to where it stood.
+
+Where it would land is judged against the row as it stood without it when the drag began, not against the row as it moves, so a place opened never moves out from under the pointer. Over a column, the half nearer the pointer says which side. Over a column of figures, its middle offers its stack, and the place between the two figures nearest the pointer.
+
+*Preferred, the author's, 2026-10-01, that moving is by drag and that both the grip and the key are needed; and the author's, 2026-10-03, that a program is put between and never on, since putting it on another only replaces that one, and that the page moves as it is dragged, live moving not being a problem. Laying the row again took 13 to 31 milliseconds, measured on the page. Judging against the row as it stood is the session's, so that nothing flickers. It supersedes the five zones of a program, its halves and its middle, and the trade.*
 
 ## 6. The body and git, two worlds
 
@@ -166,9 +176,9 @@ A program of git's has its own icon carrying git's glyph as a mark, in the dock 
 
 The dock is what the strip becomes. It holds every program once, in groups set apart by room: git's status, git's prose and git's canvas; then the prose, the canvas and the plate; then the figures: the shape, the tree, the ahead, the settings and the keys. It stands down the left edge or along the foot, which is a setting, and it keeps the strip's four weights of ink.
 
-A press on a program's icon takes it away, and a second press puts it back where it stood, beside the nearest program that still stands there if its own place is gone. A figure that has not stood since the page opened comes in as a new column at the right end of the row as it stands, at its own width. A program that stands alone comes in beside the body's prose, at its left, the side that gives way last, so the columns further out give way before it, and where it gives way all the same, as a world's canvas before its prose, the dock says so. The last program cannot be taken away, so the row is never empty. An icon dragged from the dock onto the page is placed by the same shaded zones as a program moved, and a program dragged onto the dock is taken away.
+An icon is lit exactly while its program can be seen. A press on a lit icon takes the program away; a press on one unlit brings it in, back where it stood, beside the nearest program that still stands there if its own place is gone. Whatever has to give way for it is taken away as though it were pressed, and its icon goes unlit, rather than staying where it stood out of sight. Only a screen that narrows leaves a program standing out of sight, and its icon says so; a press on it brings it in the same way. A figure that has not stood since the page opened comes in as a new column at the right end of the row as it stands, at its own width. A program that stands alone comes in beside the body's prose, at its left, the side that gives way last, so the columns further out give way before it, and where it gives way all the same, as a world's canvas before its prose, the dock says so. The last program cannot be taken away, so the row is never empty. An icon dragged from the dock onto the page is placed by the same shaded zones as a program moved, and a program dragged onto the dock is taken away.
 
-*Preferred, the author's, 2026-10-01. Where a program returns once its neighbours have moved, where and how wide a new one comes in, and that the last one stays are the session's, not yet answered.*
+*Preferred, the author's, 2026-10-01; and the author's, 2026-10-03, that a press opens what is closed and closes what is open, since programs given way out of sight made the presses seem to rotate the panes. Where a program returns once its neighbours have moved, where and how wide a new one comes in, that what gives way for it is taken away, and that the last one stays are the session's, not yet answered.*
 
 ### 7.1 Git's status is a program
 
