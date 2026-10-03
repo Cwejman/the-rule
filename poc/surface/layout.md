@@ -52,9 +52,11 @@ A program says how it takes height. One that stands alone has its column to itse
 
 A height pulled is kept as a share of what the growing ones have, as they share it evenly today. How git's status takes height is open.
 
-Every program stands in the same frame, whatever its kind. Its head is a row along the top, and its box lies beneath, reaching down to the foot's room: the dock's room where the dock stands at the foot, and one gap where it stands down the left. The prose is no exception. Its fades lie inside its box, and its way down stands at the box's top, so no column reaches further up or down than another. In a stack each program has its head above its box, and a gap lies between one program and the next.
+Every program stands in the same frame, whatever its kind. Its head is a row along the top, and its box lies beneath, reaching down to the foot's room: the dock's room where the dock stands at the foot, and one gap where it stands down the left. The prose is no exception. Its fades lie inside its box, so no column reaches further up or down than another. In a stack each program has its head above its box, and a gap lies between one program and the next.
 
-*Preferred, the author's, 2026-10-03, that the room is divided alike, the prose standing no higher than any other program, and that the dock moved to the left releases the foot. The head as a row of its own above the box is the session's. It supersedes the figures' band between the middles of the prose's fades, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose).*
+Above every head stands the way down, in a row of its own across the page. It is the body's: where the reader stands, the way in and out of a reading, the trail and undo, which are true for the whole page, since git's programs read the body's scope too. Git has no way down of its own, only its folding. The depth a world is unfolded to is that world's alone, so it stands in the head of each prose and canvas, the body's and git's apart.
+
+*Preferred, the author's, 2026-10-03, that the room is divided alike, the prose standing no higher than any other program, that the dock moved to the left releases the foot, that the way down is not on the prose but across the top of the page, and that its depth is each world's, standing in its panes. The head as a row of its own above the box, and the trail and undo staying with the way down, are the session's. It supersedes the figures' band between the middles of the prose's fades, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose).*
 
 *Preferred, the author's, 2026-10-01, that the prose stands alone, since a reading cut short by height is no reading. Growing and fixed are carried from [what a wing holds](framework.md#25-what-an-area-holds); the keys as fixed, heights kept as shares, standing alone as a kind, with the canvas in it, and the plate moved there from fixed are the session's, not yet answered.*
 
@@ -116,8 +118,8 @@ What each head holds:
 
 | Program | Its head |
 |---|---|
-| prose, the body's or git's | the gutter at its left and at its right, each holding nothing, the links or another adjunct |
-| canvas, the body's or git's | whether the face of what is selected stands beside it, and which way its root's level runs |
+| prose, the body's or git's | the depth its world is unfolded to, and the gutter at its left and at its right, each holding nothing, the links or another adjunct |
+| canvas, the body's or git's | the depth its world is unfolded to, whether the face of what is selected stands beside it, and which way its root's level runs |
 | plate | nothing yet |
 | figures | nothing yet |
 | git's status | open |
