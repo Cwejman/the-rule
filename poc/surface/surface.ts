@@ -3555,12 +3555,12 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
 function drawDish(): void {
   if (ui.dish.hidden || !state.body) return;
   if (inPast()) return void onBody(drawDish);
-  // the plate clears its head, and the way down where it stands over the plate alone
+  // the plate fills its box, clearing the way down where it stands over the plate alone
   const crumbed = !fits().lane && !fits().canvas;
-  const top = Math.max(HEADROOM - 4, ui.crumb.hidden || !crumbed ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight - ui.dish.getBoundingClientRect().top);
-  ui.dish.style.paddingTop = `${Math.max(12, Math.round(top + 12))}px`;
-  ui.dish.style.paddingBottom = `${footRoom()}px`;
-  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - Math.max(12, top + 12) - footRoom(), Infinity);
+  const top = ui.crumb.hidden || !crumbed ? 0 : Math.max(0, Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight + 12 - ui.dish.offsetTop));
+  ui.dish.style.paddingTop = `${top}px`;
+  ui.dish.style.paddingBottom = "0px";
+  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - top, Infinity);
 }
 
 /** Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone. */
@@ -4537,11 +4537,23 @@ const RIM = { top: 3, foot: 6 };
  * of the fade at the foot, where the prose stands half seen, so no figure reaches further up or down than the prose
  * does. It keeps at least one gap at the top, and the strip's room and a gap at the foot.
  */
+/**
+ * The frame every program stands in wide, the prose as much as a figure: a head's row along the top, half a gap in from
+ * the page's edge, and the box beneath it down to the foot's room, the dock's where it stands at the foot and half a gap
+ * where it stands down the left. This is the box's top and height.
+ */
+function boxFrame(h: number): { top: number; height: number } {
+  const t = Math.round(settings.gap / 2);
+  const top = t + HEADROOM;
+  return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : FOOT + t)) };
+}
+
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
 
 function band(h: number): { top: number; height: number } {
   const s = settings;
+  if (!narrow()) return boxFrame(h);
   const top = Math.max(s.gap, rimTop(h) + (h * s.fade) / 2 / 100);
   // the figures clear the dock wide; narrow, the rail stands at the edge and the foot at the middle, so they
   // never meet and the rail reaches as far down as the prose does
@@ -4608,7 +4620,7 @@ function drawLayout(): void {
   root.setProperty("--edge", `${s.fade}%`);
   root.setProperty("--rim-top", `${RIM.top}%`);
   // the prose clears the foot by the strip's room, as it clears the way down at the top, so the two fades balance
-  root.setProperty("--rim-foot", `${footRoom()}px`);
+  root.setProperty("--rim-foot", `${narrow() ? footRoom() : 0}px`);
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
@@ -4655,7 +4667,10 @@ let stackGaps: { c: number; i: number; x: number; w: number; y: number; h: numbe
 function drawLaid(): void {
   const s = settings;
   const H = ui.areas.clientHeight;
+  const F = boxFrame(H);
+  const inFrame = (el: HTMLElement) => ((el.style.top = `${F.top}px`), (el.style.height = `${F.height}px`));
   ui.areas.classList.remove("alone");
+  document.documentElement.style.setProperty("--frame-top", `${F.top}px`);
   boxes.clear();
   // each world's prose and canvas, drawn in elements of its own
   (["body", "history"] as WorldName[]).forEach((w) => {
@@ -4666,7 +4681,8 @@ function drawLaid(): void {
     // the prose taken away is kept laid out of sight rather than hidden, since the shape and the reading line measure it
     D.scroll.classList.toggle("off", !p);
     put(D.scroll, p?.x ?? 0, p?.w ?? proseOwn(w));
-    if (p) boxes.set(proseKey(w), { x: p.x, y: 0, w: p.w, h: H });
+    inFrame(D.scroll);
+    if (p) boxes.set(proseKey(w), { x: p.x, y: F.top, w: p.w, h: F.height });
     D.parts.gutterL.hidden = !f.sides[0];
     D.parts.gutterR.hidden = !f.sides[1];
     const inner = [...(f.sides[0] ? [f.gutter] : []), f.measure, ...(f.sides[1] ? [f.gutter] : [])];
@@ -4675,13 +4691,13 @@ function drawLaid(): void {
     const c = laidAt(canvasKey(w));
     D.canvas.hidden = !c;
     D.canvas.classList.remove("bleed");
-    if (c) (put(D.canvas, c.x, c.w), boxes.set(canvasKey(w), { x: c.x, y: 0, w: c.w, h: H }));
+    if (c) (put(D.canvas, c.x, c.w), inFrame(D.canvas), boxes.set(canvasKey(w), { x: c.x, y: F.top, w: c.w, h: F.height }));
     // a world with nothing standing keeps no way down
     if (!p && !c) D.crumb.hidden = true;
   });
   const d = laidAt("plate");
   ui.dish.hidden = !d;
-  if (d) (put(ui.dish, d.x, d.w), boxes.set("plate", { x: d.x, y: 0, w: d.w, h: H }));
+  if (d) (put(ui.dish, d.x, d.w), inFrame(ui.dish), boxes.set("plate", { x: d.x, y: F.top, w: d.w, h: F.height }));
   drawSeams();
   drawHeads();
 }
@@ -4689,6 +4705,7 @@ function drawLaid(): void {
 /** Takes the row away where the lane stands alone: no columns, no gaps to pull, no heads, and no figure but the rail. */
 function unlay(): void {
   ui.areas.classList.add("alone");
+  [bodyWorld.ui.scroll, bodyWorld.ui.canvas, gitWorld.ui.scroll, gitWorld.ui.canvas, ui.dish].forEach((el) => (el.style.top = el.style.height = ""));
   all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = true));
   ui.seams.innerHTML = "";
   ui.heads.innerHTML = "";
@@ -4712,7 +4729,7 @@ function hostOf(k: string): HTMLElement {
 /**
  * Lays each column of figures: those of fixed size drawn first and measured, the growing ones sharing what is left by
  * the shares the reader pulled them to, evenly until they did. A lone figure has the whole room, centred. The figures
- * stand in the band the prose reads in, between the middles of its fades.
+ * stand in the frame every program does, each below a figure above it by a gap and its own head's row.
  */
 function drawStacks(): void {
   const s = settings;
@@ -4739,11 +4756,11 @@ function drawStacks(): void {
       el.style.width = `${W}px`;
       el.style.top = `${top}px`;
       el.style.height = "";
-      if (!f.grow) el.innerHTML = f.draw(W, items.length === 1 ? room : (room - s.gap) / 2);
+      if (!f.grow) el.innerHTML = f.draw(W, items.length === 1 ? room : (room - s.gap - HEADROOM) / 2);
       return { it, el, f, height: f.grow ? 0 : Math.min(room, el.scrollHeight) };
     });
     const growing = slotted.filter((x) => x.f.grow);
-    const left = Math.max(0, room - slotted.reduce((n, x) => n + x.height, 0) - s.gap * (slotted.length - 1));
+    const left = Math.max(0, room - slotted.reduce((n, x) => n + x.height, 0) - (s.gap + HEADROOM) * (slotted.length - 1));
     const total = growing.reduce((n, x) => n + (x.it.h ?? 1), 0);
     growing.forEach((x) => (x.height = total ? (left * (x.it.h ?? 1)) / total : 0));
     let y = top;
@@ -4757,7 +4774,7 @@ function drawStacks(): void {
       if (x.f.grow) x.el.innerHTML = height >= FIGURE_FLOOR ? x.f.draw(W, height) : "";
       const next = slotted[i + 1];
       if (next && x.f.grow && next.f.grow) stackGaps.push({ c: col.c, i: L[col.c].items.indexOf(x.it), x: col.x, w: col.w, y: y + height, h: s.gap });
-      y += height + s.gap;
+      y += height + s.gap + HEADROOM;
     });
   });
   all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = !shown.has(el.dataset.slot!)));
@@ -4806,12 +4823,8 @@ function drawSeams(): void {
 /** The program whose head the pointer is near, so it shows. */
 let nearHead: string | null = null;
 
-/**
- * Where a program's head stands: along the top of a program alone in its column, in the room above a figure, or just
- * inside a figure's top where a gap of its stack lies above, so the gap stays to be pulled and the grip to be reached.
- */
-const headTop = (k: string, b: { y: number }): number =>
-  isAlone(k) ? 0 : stackGaps.some((g) => layoutNow()[g.c]?.items[g.i + 1]?.k === k) ? b.y : Math.max(0, b.y - HEADROOM);
+/** Where a program's head stands: in its own row, just above its box. */
+const headTop = (_k: string, b: { y: number }): number => b.y - HEADROOM;
 
 /**
  * The heads: a thin row along each program's top edge, its grip at the left and the program's own settings after it.
@@ -4845,7 +4858,7 @@ function headSettings(k: string): string {
     .join("");
 }
 
-/** Which head the pointer is near: within the band along a program's top edge, a little past it either way. */
+/** Which program's head shows: the program the pointer is anywhere on, its head's row or its box. */
 function headNear(x: number, y: number): string | null {
   const r = ui.areas.getBoundingClientRect();
   const px = x - r.left;
@@ -4854,7 +4867,7 @@ function headNear(x: number, y: number): string | null {
   if (stackGaps.some((g) => px >= g.x && px <= g.x + g.w && py >= g.y && py <= g.y + Math.max(8, g.h))) return null;
   for (const [k, b] of boxes) {
     const top = headTop(k, b);
-    if (px >= b.x && px <= b.x + b.w && py >= top - 4 && py <= top + HEADROOM + 14) return k;
+    if (px >= b.x && px <= b.x + b.w && py >= top && py <= b.y + b.h) return k;
   }
   return null;
 }
@@ -5011,7 +5024,9 @@ function alignEnds(): void {
   if (settings.line === "ends") {
     // the shape's own room, in its column or as the rail; with no shape drawn, the room a lone figure would have
     const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
-    const first = slot.top + SHAPE.inset;
+    // level with the shape's first cell, but never under the way down: the opening stands where the fade below it is half gone
+    const clear = (ui.crumb.hidden || narrow() ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8 - ui.scroll.offsetTop) + (h * settings.fade) / 2 / 100;
+    const first = Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear);
     for (let i = 0; i < 6; i++) {
       const k = (slot.height - 8) / (P + laneH + tail + B);
       P = Math.max(0, first / (1 - k) - off);
@@ -5169,11 +5184,11 @@ function placeCanvas(): void {
     ui.canvas.style.marginBottom = "0px";
     return;
   }
-  // the canvas clears its head, and the way down only where it stands over the canvas, the prose not standing
+  // the canvas fills its box, clearing the way down only where it stands over the canvas, the prose not standing
   const under = !fits().lane;
-  const top = Math.max(s.gap, HEADROOM + 4, ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10);
-  ui.canvas.style.marginTop = `${Math.round(top)}px`;
-  ui.canvas.style.marginBottom = `${footRoom()}px`;
+  const top = ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.offsetTop;
+  ui.canvas.style.marginTop = `${Math.max(0, Math.round(top))}px`;
+  ui.canvas.style.marginBottom = "0px";
 }
 
 /**
@@ -5214,7 +5229,7 @@ function placeCrumb(): void {
   // two read as one page and the reading keeps the room the clearance would have taken
   ui.scroll.style.setProperty(
     "--rim-crumb",
-    ui.crumb.hidden ? "0px" : `${narrow() ? Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight / 2) : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8}px`,
+    ui.crumb.hidden ? "0px" : `${narrow() ? Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight / 2) : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8 - ui.scroll.offsetTop}px`,
   );
 }
 
@@ -7136,9 +7151,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas > [hidden] { display: none; }
 #areas > :is(#scroll, #gscroll), #areas > :is(#canvas, #gcanvas), #areas > #dish { position: absolute; top: 0; bottom: 0; }
 #areas > .host { right: auto; }
+/* wide, a program starts just under its head, as the prose does, rather than centred in its box */
+#areas:not(.alone) > :is(.host, #dish) { align-items: flex-start; }
 #areas.alone > #seams, #areas.alone > #heads { display: none; }
 /* wide, the way down clears the heads that stand along the top edge */
-#areas:not(.alone) :is(#crumb, #gcrumb) { top: ${HEADROOM + 4}px; }
+#areas:not(.alone) :is(#crumb, #gcrumb) { top: calc(var(--frame-top) + 4px); }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
