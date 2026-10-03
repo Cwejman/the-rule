@@ -2832,20 +2832,10 @@ function fitsLaid(): Fit {
 }
 
 /** Where a program is dropped: as a column of its own at a place in the row, beside another, in another's stack, in its place, or on the dock. */
-type Zone = { kind: "col"; at: number } | { kind: "beside"; target: string; after: boolean } | { kind: "stack"; target: string; after: boolean } | { kind: "trade"; target: string } | { kind: "dock" };
+type Zone = { kind: "col"; at: number } | { kind: "beside"; target: string; after: boolean } | { kind: "stack"; target: string; after: boolean } | { kind: "dock" };
 
 /** The layout with a program taken out, and any column it leaves empty. */
 const without = (L: Column[], k: string): Column[] => L.map((c) => ({ ...c, items: c.items.filter((it) => it.k !== k) })).filter((c) => c.items.length > 0);
-
-/** Whether two programs can trade places: each must be able to stand where the other stands, and one that stands alone shares no stack. */
-function canTrade(k: string, t: string, L: Column[] = layoutNow()): boolean {
-  const a = whereIs(k, L);
-  const b = whereIs(t, L);
-  // only two programs that stand trade places; one from the dock lands beside or in a stack instead
-  if (!a || !b || k === t) return false;
-  const shared = (p: { c: number } | null) => !!p && L[p.c].items.length > 1;
-  return !(isAlone(k) && shared(b)) && !(isAlone(t) && shared(a));
-}
 
 /** The layout once a program is dropped in a zone. A program moved alone keeps the width its column was pulled to. */
 function dropped(L: Column[], k: string, z: Zone): Column[] {
@@ -2853,24 +2843,6 @@ function dropped(L: Column[], k: string, z: Zone): Column[] {
   const item: Item = { k };
   const kept = from && L[from.c].items.length === 1 ? L[from.c].w : undefined;
   const column = (it: Item): Column => (kept ? { w: kept, items: [it] } : { items: [it] });
-  if (z.kind === "trade") {
-    const t = whereIs(z.target, L);
-    if (!t || !canTrade(k, z.target, L)) return L;
-    const next = L.map((c) => ({ ...c, items: c.items.slice() }));
-    const theirs = next[t.c].items[t.i];
-    next[t.c].items[t.i] = { k, ...(theirs.h ? { h: theirs.h } : {}) };
-    if (from) next[from.c].items[from.i] = { k: theirs.k, ...(L[from.c].items[from.i].h ? { h: L[from.c].items[from.i].h } : {}) };
-    // a column holds the width it was pulled to for what stands alone in it, so two that trade columns trade widths
-    // and where only one of the two stands alone, its width goes with it and the figures' column is pulled to none
-    if (from && (isAlone(k) || isAlone(theirs.k))) {
-      const [mine, other] = [isAlone(k) ? L[from.c].w : undefined, isAlone(theirs.k) ? L[t.c].w : undefined];
-      next[t.c] = { ...next[t.c], w: mine };
-      next[from.c] = { ...next[from.c], w: other };
-      if (next[t.c].w === undefined) delete next[t.c].w;
-      if (next[from.c].w === undefined) delete next[from.c].w;
-    }
-    return next;
-  }
   const next = without(L, k);
   if (z.kind === "dock") return next;
   if (z.kind === "col") {
@@ -4535,7 +4507,7 @@ function commitHtml(b: Brief, c: Commit, after: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement; zone: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -4734,7 +4706,6 @@ function unlay(): void {
   all<HTMLElement>(".host", ui.areas).forEach((el) => (el.hidden = true));
   ui.seams.innerHTML = "";
   ui.heads.innerHTML = "";
-  ui.zone.hidden = true;
   boxes.clear();
   stackGaps = [];
 }
@@ -4907,63 +4878,60 @@ function programAt(x: number, y: number): string | null {
 }
 
 /**
- * Where a program dragged would land: the dock, which takes it away; the program under the pointer, by the zone of it the
- * pointer is in, its middle to trade places, its top or bottom half to stand in its stack, its left or right half to
- * stand beside it; and anywhere else a column of its own, at that place in the row.
+ * Where a program dragged would land, judged against the row as it stands, the program in its place: over its own place
+ * nothing changes, so the row never moves out from under a still pointer. Over the dock it is taken away. Over another
+ * column it goes beside it, at the side of the half the pointer is in; a figure over the middle of a column of figures
+ * goes into that stack, above or below the figure the pointer is on. In a gap it goes there, as a column of its own.
  */
-function zoneAt(x: number, y: number, k: string): Zone | null {
+function zoneAt(x: number, y: number, k: string): Zone | null | "stay" {
   const over = document.elementFromPoint(x, y) as HTMLElement | null;
   if (over?.closest(".dock")) return standing(k) && layoutNow().reduce((n, c) => n + c.items.length, 0) > 1 ? { kind: "dock" } : null;
   const r = ui.areas.getBoundingClientRect();
   const px = x - r.left;
   const py = y - r.top;
-  for (const [t, b] of boxes) {
-    if (t === k || px < b.x || px > b.x + b.w || py < b.y || py > b.y + b.h) continue;
-    const rx = (px - b.x) / b.w;
-    const ry = (py - b.y) / b.h;
-    if (Math.abs(rx - 0.5) < 0.2 && Math.abs(ry - 0.5) < 0.2 && canTrade(k, t)) return { kind: "trade", target: t };
-    // only programs that share a stack are offered its top and bottom, and the edge nearer the pointer decides,
-    // reckoned as a share of the program and not in pixels, since a figure is tall and narrow and its sides are near
-    if (!isAlone(k) && !isAlone(t) && Math.min(ry, 1 - ry) < Math.min(rx, 1 - rx)) return { kind: "stack", target: t, after: ry > 0.5 };
-    return { kind: "beside", target: t, after: rx > 0.5 };
+  if (px < 0 || py < 0 || px > r.width || py > r.height) return null;
+  const L = layoutNow();
+  const mine = whereIs(k, L);
+  const col = laid().cols.find((c) => px >= c.x && px <= c.x + c.w);
+  if (col) {
+    const items = L[col.c].items;
+    const rx = (px - col.x) / col.w;
+    const figures = !isAlone(k) && !items.some((it) => isAlone(it.k));
+    if (figures && rx > 0.25 && rx < 0.75) {
+      const on = items.find((it) => {
+        const b = boxes.get(it.k);
+        return b && py >= b.y - HEADROOM && py <= b.y + b.h;
+      });
+      if (!on || on.k === k) return "stay";
+      const b = boxes.get(on.k)!;
+      return { kind: "stack", target: on.k, after: py > b.y + b.h / 2 };
+    }
+    if (mine && mine.c === col.c && items.length === 1) return "stay";
+    return { kind: "col", at: col.c + (rx > 0.5 ? 1 : 0) };
   }
-  const cols = laid().cols;
-  const j = cols.findIndex((col) => px < col.x + col.w / 2);
+  const sp = laid().spaces.find((g) => px >= g.x && px <= g.x + g.w);
+  if (!sp) return "stay";
   // past the last column standing, a new one stands just after it, before any that gave way, which would otherwise
   // leave it the furthest out and the first to give way again
-  return { kind: "col", at: j < 0 ? (cols.length ? cols[cols.length - 1].c + 1 : layoutNow().length) : cols[j].c };
+  return { kind: "col", at: sp.right ?? (laid().cols.length ? laid().cols[laid().cols.length - 1].c + 1 : L.length) };
 }
 
-/** Shades the one zone a drop would land in, and nothing else moves until it is let go. */
-function drawZone(z: Zone | null): void {
+/**
+ * Lays the row with a program dragged where it would land, live: over the dock the row without it, nowhere the row as it
+ * stood before the drag, and anywhere else the program in its place, keeping the width it was pulled to.
+ */
+function showMove(k: string, z: Zone | null, from: Column[], w: number | undefined): boolean {
   ui.strips.querySelector(".dock")?.classList.toggle("taking", z?.kind === "dock");
-  if (!z || z.kind === "dock") return void (ui.zone.hidden = true);
-  let r: { x: number; y: number; w: number; h: number };
-  if (z.kind === "col") {
-    const sp = laid().spaces.find((x) => x.right === z.at) ?? laid().spaces[laid().spaces.length - 1];
-    r = { x: sp.x + sp.w / 2 - 3, y: 0, w: 6, h: ui.areas.clientHeight };
-  } else {
-    const b = boxes.get(z.target)!;
-    r = z.kind === "trade" ? b : z.kind === "beside" ? { ...b, x: z.after ? b.x + b.w / 2 : b.x, w: b.w / 2 } : { ...b, y: z.after ? b.y + b.h / 2 : b.y, h: b.h / 2 };
-  }
-  ui.zone.style.left = `${Math.round(r.x)}px`;
-  ui.zone.style.top = `${Math.round(r.y)}px`;
-  ui.zone.style.width = `${Math.round(r.w)}px`;
-  ui.zone.style.height = `${Math.round(r.h)}px`;
-  ui.zone.hidden = false;
-}
-
-/** Lands a program dragged in the zone it was let go in, remembering where it stood when the dock takes it. */
-function dropProgram(k: string, z: Zone): void {
-  if (z.kind === "dock") {
-    if (!standing(k) || layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return;
-    remember(k);
-  }
-  const next = dropped(layoutNow(), k, z);
-  if (next === layoutNow()) return;
+  const L = layoutNow();
+  let next = !z ? from : z.kind === "dock" ? without(L, k) : dropped(L, k, z);
+  const at = whereIs(k, next);
+  if (z && at && w && next[at.c].items.length === 1 && !next[at.c].w) next = next.map((c, i) => (i === at.c ? { ...c, w } : c));
+  if (JSON.stringify(next) === JSON.stringify(L)) return false;
   settings.layout = next;
-  saveSettings();
+  // the program held shows its head wherever it lands, so the reader sees which it is
+  nearHead = k;
   drawAll();
+  return true;
 }
 
 /**
@@ -5051,7 +5019,9 @@ function alignEnds(): void {
     const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
     // level with the shape's first cell, but never under the way down: the opening stands where the fade below it is half gone
     const clear = (ui.crumb.hidden || narrow() ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8 - ui.scroll.offsetTop) + (h * settings.fade) / 2 / 100;
-    const first = Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear);
+    // the shape is levelled with only where it heads its column, so a shape low in a stack never pushes the opening down
+    const heads = narrow() || slot.top <= ui.scroll.offsetTop;
+    const first = heads ? Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear) : clear;
     for (let i = 0; i < 6; i++) {
       const k = (slot.height - 8) / (P + laneH + tail + B);
       P = Math.max(0, first / (1 - k) - off);
@@ -6473,9 +6443,12 @@ let drag: {
   vx?: number;
   vy?: number;
   moved: boolean;
-  /** a program being moved, and the zone it would land in */
+  /** a program being moved, where it would land, the row before the drag, the width it was pulled to, and where the row last moved */
   k?: string;
   zone?: Zone | null;
+  from?: Column[];
+  w?: number;
+  still?: { x: number; y: number };
   /** a gap being pulled: the columns either side, or the stack and the figure above it, and what they stood at */
   sides?: [number | null, number | null];
   widths?: Map<number, number>;
@@ -6556,8 +6529,18 @@ const dragged = (e: PointerEvent): void => {
       document.body.classList.add(drag.kind === "move" ? "moving" : drag.kind === "seam" ? "pulling" : "pulling-v");
     }
     if (drag.kind === "move") {
-      drag.zone = zoneAt(e.clientX, e.clientY, drag.k!);
-      return void drawZone(drag.zone);
+      if (!drag.from) {
+        drag.from = layoutNow();
+        const at = whereIs(drag.k!);
+        drag.w = at && drag.from[at.c].items.length === 1 ? drag.from[at.c].w : undefined;
+      }
+      // once the row has moved, the pointer travels a little before it moves again, so two places never trade back and forth
+      if (drag.still && Math.hypot(e.clientX - drag.still.x, e.clientY - drag.still.y) < 12) return;
+      const z = zoneAt(e.clientX, e.clientY, drag.k!);
+      if (z === "stay") return;
+      drag.zone = z;
+      if (showMove(drag.k!, z, drag.from, drag.w)) drag.still = { x: e.clientX, y: e.clientY };
+      return;
     }
     if (drag.kind === "seam") pullSeam(drag.sides![0], drag.sides![1], e.clientX - drag.x, drag.widths!);
     else pullStack(drag.sides![0]!, drag.sides![1]!, e.clientY - drag.y, drag.heights!);
@@ -6616,13 +6599,16 @@ const release = () => runIn(drag?.world ?? "body", letGoOf);
 const letGoOf = () => {
   if (drag?.kind === "move" || drag?.kind === "seam" || drag?.kind === "vseam") {
     document.body.classList.remove("moving", "pulling", "pulling-v");
-    ui.zone.hidden = true;
     ui.strips.querySelector(".dock")?.classList.remove("taking");
-    const { kind, k, zone, moved } = drag;
+    const { kind, k, zone, moved, from } = drag;
     drag = null;
     setTimeout(() => (scrubbing = false), 0);
     if (!moved) return;
-    if (kind === "move") return void (zone && dropProgram(k!, zone));
+    // the row already stands as it will: taken to the dock, it remembers where it stood; let go nowhere, it goes back
+    if (kind === "move" && from) {
+      if (zone?.kind === "dock") remember(k!, from);
+      if (!zone) settings.layout = from;
+    }
     saveSettings();
     return void drawAll();
   }
@@ -6987,7 +6973,6 @@ async function start(): Promise<void> {
       <section id="dish" hidden></section>
       <div id="seams"></div>
       <div id="heads"></div>
-      <div id="zone" hidden></div>
       <div id="sheet" hidden></div>
       <div id="card" hidden></div>
       <div id="strips"></div>
@@ -6995,7 +6980,7 @@ async function start(): Promise<void> {
     <div id="tip" class="chrome" hidden></div>`;
   const $ = (sel: string) => document.querySelector<HTMLElement>(sel)!;
   // the page's own elements stand in both worlds' sets; each world has its own prose, way down, gauge, canvas and gutters
-  const page = { header: $("#header"), tip: $("#tip"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads"), zone: $("#zone") };
+  const page = { header: $("#header"), tip: $("#tip"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads") };
   const of = (scroll: HTMLElement, at: string): UI => ({
     ...page,
     scroll,
@@ -7224,8 +7209,6 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .gstatus .sel .name { color: var(--on); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 .gstatus .sel:hover .name, .gstatus .sel.lit .name { color: var(--lit); }
 .lane > .waiting { margin: 0; color: var(--faint); }
-/* the one zone a drop would land in, shaded; nothing else moves until it is let go */
-#zone { position: absolute; z-index: 7; border-radius: 10px; background: var(--veil); box-shadow: inset 0 0 0 1.5px var(--faint); pointer-events: none; }
 #dish { display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
 :is(#canvas, #gcanvas) { position: relative; overflow: hidden; min-width: 0; touch-action: none; user-select: none; cursor: grab; border-radius: 10px; }
 /* taking the page whole it keeps no rim and no corners, and fades at its ends as the prose does; its sides are cut by
