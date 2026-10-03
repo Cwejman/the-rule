@@ -4553,9 +4553,12 @@ const RIM = { top: 3, foot: 6 };
  */
 function boxFrame(h: number): { top: number; height: number } {
   const t = Math.round(settings.gap / 2);
-  const top = t + 2 * HEADROOM;
+  const top = WAY.top + WAY.height + t + HEADROOM;
   return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : FOOT + t)) };
 }
+
+/** The way down's row wide: near the page's top edge, since nothing stands above it, and half a gap clear of the heads. */
+const WAY = { top: 8, height: 18 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
@@ -4679,7 +4682,7 @@ function drawLaid(): void {
   const F = boxFrame(H);
   const inFrame = (el: HTMLElement) => ((el.style.top = `${F.top}px`), (el.style.height = `${F.height}px`));
   ui.areas.classList.remove("alone");
-  document.documentElement.style.setProperty("--way-top", `${F.top - 2 * HEADROOM}px`);
+  document.documentElement.style.setProperty("--way-top", `${WAY.top}px`);
   boxes.clear();
   // each world's prose and canvas, drawn in elements of its own
   (["body", "history"] as WorldName[]).forEach((w) => {
@@ -5168,6 +5171,8 @@ function drawCrumb(): void {
  * line is there to give, and then only at its end, where a commit's subject runs longer than the line has room for.
  */
 function trimPlace(): void {
+  // wide, each level is cut on its own where it is long, and none is taken away
+  if (!narrow()) return;
   const place = ui.crumb.querySelector<HTMLElement>(".place");
   if (!place) return;
   const cut = () => Array.from(place.querySelectorAll<HTMLElement>(".step:not(.more):not(.now)"));
@@ -7204,7 +7209,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas:not(.alone) > :is(.host, #dish) { align-items: flex-start; }
 #areas.alone > #seams, #areas.alone > #heads { display: none; }
 /* wide, the way down clears the heads that stand along the top edge */
-#areas:not(.alone) :is(#crumb, #gcrumb) { top: calc(var(--way-top) + 2px); }
+#areas:not(.alone) :is(#crumb, #gcrumb) { top: var(--way-top); height: ${WAY.height}px; }
+/* wide, a level is cut only where it is long, so a short name keeps its whole width and every level stays */
+#areas:not(.alone) :is(#crumb, #gcrumb) .step:not(.more) { flex: 0 0 auto; max-width: 16em; min-width: 0; }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
