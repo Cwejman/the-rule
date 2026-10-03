@@ -17,11 +17,13 @@ The stance on how a model and a harness should be offered comes first, since it 
 
 [Giving as a business](gaab.md)
 
+[A store with its requirements at the centre](store.md)
+
 [Tenants beyond prose](tenants.md)
 
 [How two holons drive each other](resonance.md)
 
-*The author's, marked so, and open; begun 2026-09-11.*
+*The author's, marked so, and open; begun 2026-09-11. The store, 2026-10-04, is open, and stands with the stance it is offered under.*
 
 ## 2. Letting go by contract
 
