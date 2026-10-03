@@ -2926,7 +2926,7 @@ function pressProgram(k: string): void {
       // no room even beside the body's prose alone: it stands at the far end of the row, the first to give way, so it
       // moves nothing else and the dock says it is out of sight
       if (order[0] === undefined) {
-        next = [...without(placed, k), { items: [{ k }] }];
+        next = [...without(placed, k), { items: [{ k }], ...(kept?.w ? { w: kept.w } : {}) }];
         away.length = 0;
         break;
       }
@@ -6615,7 +6615,12 @@ const release = () => runIn(drag?.world ?? "body", letGoOf);
 const cancelMove = (): void => {
   if (drag?.kind !== "move") return;
   if (drag.from) drag.zone = null;
-  else drag.moved = false;
+  else {
+    // cancelled before it moved, the release that follows is not a press either
+    drag.moved = false;
+    scrubbing = true;
+    document.addEventListener("pointerup", () => setTimeout(() => (scrubbing = false), 0), { once: true });
+  }
   letGoOf();
 };
 
@@ -6849,6 +6854,8 @@ function onHashChange(): void {
 }
 
 function onResize(): void {
+  // before the body is read there is nothing laid to keep in step
+  if (!bodyWorld.body) return;
   // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
   pointerOn = null;
   // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
