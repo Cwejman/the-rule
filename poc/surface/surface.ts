@@ -3566,12 +3566,10 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
 function drawDish(): void {
   if (ui.dish.hidden || !state.body) return;
   if (inPast()) return void onBody(drawDish);
-  // the plate fills its box, clearing the way down where it stands over the plate alone
-  const crumbed = !fits().lane && !fits().canvas;
-  const top = ui.crumb.hidden || !crumbed ? 0 : Math.max(0, Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight + 12 - ui.dish.offsetTop));
-  ui.dish.style.paddingTop = `${top}px`;
+  // the plate fills its box: the way down stands above every head
+  ui.dish.style.paddingTop = "0px";
   ui.dish.style.paddingBottom = "0px";
-  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight - top, Infinity);
+  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight, Infinity);
 }
 
 /** Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone. */
@@ -4549,13 +4547,13 @@ const RIM = { top: 3, foot: 6 };
  * does. It keeps at least one gap at the top, and the strip's room and a gap at the foot.
  */
 /**
- * The frame every program stands in wide, the prose as much as a figure: a head's row along the top, half a gap in from
- * the page's edge, and the box beneath it down to the foot's room, the dock's where it stands at the foot and half a gap
+ * The frame every program stands in wide, the prose as much as a figure: the way down's row across the top, half a gap in
+ * from the page's edge, a head's row beneath it, and the box beneath that down to the foot's room, the dock's where it stands at the foot and half a gap
  * where it stands down the left. This is the box's top and height.
  */
 function boxFrame(h: number): { top: number; height: number } {
   const t = Math.round(settings.gap / 2);
-  const top = t + HEADROOM;
+  const top = t + 2 * HEADROOM;
   return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : FOOT + t)) };
 }
 
@@ -4681,7 +4679,7 @@ function drawLaid(): void {
   const F = boxFrame(H);
   const inFrame = (el: HTMLElement) => ((el.style.top = `${F.top}px`), (el.style.height = `${F.height}px`));
   ui.areas.classList.remove("alone");
-  document.documentElement.style.setProperty("--frame-top", `${F.top}px`);
+  document.documentElement.style.setProperty("--way-top", `${F.top - 2 * HEADROOM}px`);
   boxes.clear();
   // each world's prose and canvas, drawn in elements of its own
   (["body", "history"] as WorldName[]).forEach((w) => {
@@ -4856,8 +4854,10 @@ function drawHeads(): void {
 /** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
 function headSettings(k: string): string {
   const w = PROGRAMS[k]?.world ?? "body";
+  // the depth a world is unfolded to is its own, so each of its prose and canvas carries it
+  const depth = k === "prose" || k === "gitProse" || k === "canvas" || k === "gitCanvas" ? (inNamed(w, () => (state.body ? depthHtml() : "")) ?? "") : "";
   // a canvas's acts are its world's, so what they say is reckoned there
-  if (k === "canvas" || k === "gitCanvas") return inNamed(w, () => badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true)) ?? "";
+  if (k === "canvas" || k === "gitCanvas") return depth + (inNamed(w, () => badgeHtml("face", undefined, false, true) + badgeHtml("trunk", undefined, false, true)) ?? "");
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
   return ([0, 1] as const)
@@ -4866,7 +4866,7 @@ function headSettings(k: string): string {
       const tip = `the links in the gutter at the ${side} — press to ${g[i] ? "take them away" : "stand them there"}`;
       return `<button class="pick gutter-pick${g[i] ? " on" : ""} side-${i ? "r" : "l"}" data-gutter="${w}:${i}" data-tip="${esc(tip)}">${icon("links")}</button>`;
     })
-    .join("");
+    .join("") + depth;
 }
 
 /** Which program's head shows: the program the pointer is anywhere on, its head's row or its box. */
@@ -5033,8 +5033,8 @@ function alignEnds(): void {
   if (settings.line === "ends") {
     // the shape's own room, in its column or as the rail; with no shape drawn, the room a lone figure would have
     const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
-    // level with the shape's first cell, but never under the way down: the opening stands where the fade below it is half gone
-    const clear = (ui.crumb.hidden || narrow() ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8 - ui.scroll.offsetTop) + (h * settings.fade) / 2 / 100;
+    // level with the shape's first cell, but never in the fade: the opening stands where the fade is half gone
+    const clear = (h * settings.fade) / 2 / 100;
     // the shape is levelled with only where it heads its column, so a shape low in a stack never pushes the opening down
     const heads = narrow() || slot.top <= ui.scroll.offsetTop;
     const first = heads ? Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear) : clear;
@@ -5115,21 +5115,23 @@ const said = (h: Hop): string => ({ go: "went to", in: "scoped into", out: "scop
  * only once a move has been made, so an unscoped lane with no trail has no way down at all.
  */
 function drawCrumb(): void {
+  // wide, git has no way down of its own, only its folding, which stands in its programs' heads
+  if (!narrow() && state === gitWorld) return void (ui.crumb.hidden = true);
   const S = state.scope;
   // the trail's cells are small targets, and every move a reader makes is already in the browser's history, so where
   // the lane stands alone the platform's own back gesture is the trail and a better one
   const trail = narrow() ? [] : state.trail.filter((h) => brief(h.to));
   // narrow, the depth leaves the line: its cells crowd the placement, and unfolding a scope six levels deep is not
   // something a phone wants offered
-  const depth = narrow() ? "" : depthHtml();
+  // wide, it is each world's own, and stands in the head of each of its prose and canvas
+  const depth = "";
   // undo has no home on a phone, where a reader takes the platform's own back gesture rather than looking for a button
   const back = narrow() ? "" : badgeHtml("undo", undefined, true);
   // the run of levels goes down to the brief in focus, not only to the scope: a reader scrolling into a brief has its
   // heading off the screen, and the address of where they stand is what the line is for
   const run = prefixesOf(state.focus);
-  // wide, a world with neither its prose nor its canvas on the page, nor the body's plate, has nothing to stand over
-  const over = narrow() || fits().lane || fits().canvas || fits().dish;
-  ui.crumb.hidden = !over || (run.length < 2 && S === "" && trail.length === 0 && depth === "" && back === "");
+  // wide, it stands across the page whatever stands in the row, since git's programs read the body's scope too
+  ui.crumb.hidden = run.length < 2 && S === "" && trail.length === 0 && back === "";
   // narrow, the whole run would cut every name to a letter, so it keeps the level above and stands for the rest with
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
@@ -5156,6 +5158,8 @@ function drawCrumb(): void {
   ui.crumb.innerHTML = `<span class="place">${place}${ends}</span>${depth}${way}${back}`;
   placeCrumb();
   trimPlace();
+  // the heads carry each world's depth, which a change of folds or scope moves
+  if (!narrow()) drawHeads();
 }
 
 /**
@@ -5195,10 +5199,8 @@ function placeCanvas(): void {
     ui.canvas.style.marginBottom = "0px";
     return;
   }
-  // the canvas fills its box, clearing the way down only where it stands over the canvas, the prose not standing
-  const under = !fits().lane;
-  const top = ui.crumb.hidden || !under ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.offsetTop;
-  ui.canvas.style.marginTop = `${Math.max(0, Math.round(top))}px`;
+  // the canvas fills its box: the way down stands above every head
+  ui.canvas.style.marginTop = "0px";
   ui.canvas.style.marginBottom = "0px";
 }
 
@@ -5210,12 +5212,16 @@ function placeCrumb(): void {
   // the bar stands flush with the prose's edges and with the canvas's rim, and with the rail's edge where one stands,
   // so the placement has the whole row to read in and the depth stands over the rail
   // wide, the way down stands over the prose, or over the canvas where the prose does not stand
-  const over = fits().lane ? ui.scroll : fits().canvas ? ui.canvas : fits().dish ? ui.dish : ui.scroll;
-  const edges = (narrow() ? [...panesShown(), ...(fits().rail ? [hostOf("shape")] : [])] : [over]).map((el) => {
-    const r = el.getBoundingClientRect();
-    return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
-  });
   const a0 = ui.areas.getBoundingClientRect();
+  // wide, it spans the row from its first column to its last
+  const cols = laid().cols;
+  const row = cols.length ? [{ left: a0.left + cols[0].x, right: a0.left + cols[cols.length - 1].x + cols[cols.length - 1].w }] : [{ left: a0.left + settings.gap, right: a0.right - settings.gap }];
+  const edges = narrow()
+    ? [...panesShown(), ...(fits().rail ? [hostOf("shape")] : [])].map((el) => {
+        const r = el.getBoundingClientRect();
+        return el === ui.scroll ? ui.lane.getBoundingClientRect() : { left: r.left, right: r.right };
+      })
+    : row;
   // the rail hugs the page's edge, but the way down is chrome and stands clear of it, so it keeps the same margin on
   // both sides rather than running into the left edge while the right one is a gap in from it
   const left = Math.max(Math.min(...edges.map((r) => r.left)), narrow() ? a0.left + settings.gap : -Infinity);
@@ -5233,14 +5239,14 @@ function placeCrumb(): void {
   const lane = ui.lane.getBoundingClientRect();
   ui.pull.style.left = `${Math.round(lane.left - a0.left)}px`;
   ui.pull.style.width = `${Math.round(lane.width)}px`;
-  ui.pull.style.top = `${ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4}px`;
+  ui.pull.style.top = `${narrow() ? (ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4) : ui.scroll.offsetTop + 4}px`;
   placeCanvas();
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   // narrow, the fade begins above the way down rather than below it: the prose is never clear behind the line, so the
   // two read as one page and the reading keeps the room the clearance would have taken
   ui.scroll.style.setProperty(
     "--rim-crumb",
-    ui.crumb.hidden ? "0px" : `${narrow() ? Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight / 2) : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8 - ui.scroll.offsetTop}px`,
+    ui.crumb.hidden || !narrow() ? "0px" : `${Math.round(ui.crumb.offsetTop + ui.crumb.offsetHeight / 2)}px`,
   );
 }
 
@@ -7198,7 +7204,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas:not(.alone) > :is(.host, #dish) { align-items: flex-start; }
 #areas.alone > #seams, #areas.alone > #heads { display: none; }
 /* wide, the way down clears the heads that stand along the top edge */
-#areas:not(.alone) :is(#crumb, #gcrumb) { top: calc(var(--frame-top) + 4px); }
+#areas:not(.alone) :is(#crumb, #gcrumb) { top: calc(var(--way-top) + 2px); }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
