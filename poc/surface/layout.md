@@ -112,9 +112,9 @@ A program's head is a thin row along its top edge: the grip at its left, and aft
 
 The grip is the program's icon, the one it has in the dock. On the prose the head stands in the fade the prose already has at its top, above the way down, so it covers nothing read. On a map it stands bare over the map's top, above its way down where one stands there, as the acts stand bare over its foot today, and on a figure over the room above it.
 
-It shows whenever the pointer is anywhere on the program, so the reader always sees what they are pointing at, and it covers nothing, since it stands in its own row above the box. Nothing else lights: the program's ground stays as it is. Leaving, it goes quiet before it goes, so a pointer on its way to it still finds it.
+It shows whenever the pointer is anywhere on the program, so the reader always sees what they are pointing at. On the prose and the figures it stands in its own row above the box, the prose's fade running on beneath it. A canvas, drawn in a rim of its own, holds its head inside the rim instead, its icons as far in from the rim as its nodes, so they stand balanced in it rather than on its line, and the rim is drawn above all the canvas holds. Pointing at the grip lights the program's space, as pointing at its icon in the dock does; otherwise its ground stays as it is. Leaving, it goes quiet before it goes, so a pointer on its way to it still finds it.
 
-*Preferred, the author's, 2026-10-03, that pointing at a program always shows its head with its icon, since nothing said what the pointer was on, and that its ground need not lighten. It supersedes the head showing only near the top edge, which was laid while the head stood over the prose's fade.*
+*Preferred, the author's, 2026-10-03, that pointing at a program always shows its head with its icon, since nothing said what the pointer was on, and that its ground need not lighten. It supersedes the head showing only near the top edge, which was laid while the head stood over the prose's fade. The author's, 2026-10-05, that a canvas holds its head inside its rim while a figure such as the shape keeps it above, that its rim stands above what leaves it, and that pointing at the grip lights the program; the insets are the session's.*
 
 What each head holds:
 

@@ -4706,7 +4706,13 @@ function drawLaid(): void {
     const c = laidAt(canvasKey(w));
     D.canvas.hidden = !c;
     D.canvas.classList.remove("bleed");
-    if (c) (put(D.canvas, c.x, c.w), inFrame(D.canvas), boxes.set(canvasKey(w), { x: c.x, y: F.top, w: c.w, h: F.height }));
+    // a canvas holds its head inside its rim, so its box reaches up over the heads' row
+    if (c) {
+      put(D.canvas, c.x, c.w);
+      D.canvas.style.top = `${F.top - HEADROOM}px`;
+      D.canvas.style.height = `${F.height + HEADROOM}px`;
+      boxes.set(canvasKey(w), { x: c.x, y: F.top - HEADROOM, w: c.w, h: F.height + HEADROOM });
+    }
     // a world with nothing standing keeps no way down
     if (!p && !c) D.crumb.hidden = true;
   });
@@ -4839,7 +4845,14 @@ function drawSeams(): void {
 let nearHead: string | null = null;
 
 /** Where a program's head stands: in its own row, just above its box. */
-const headTop = (_k: string, b: { y: number }): number => b.y - HEADROOM;
+/**
+ * The programs drawn in a rim of their own, the canvases, hold their head inside it, inset from the rim as their nodes
+ * are, so its icons stand balanced in the rim rather than on its line; the rest stand under a head above their box.
+ */
+const INSIDE = new Set(["canvas", "gitCanvas"]);
+const HEAD_INSET = { top: 4, side: 10 };
+const headTop = (k: string, b: { y: number }): number => (INSIDE.has(k) ? b.y + HEAD_INSET.top : b.y - HEADROOM);
+const headSide = (k: string): number => (INSIDE.has(k) ? HEAD_INSET.side : 0);
 
 /**
  * The heads: a thin row along each program's top edge, its grip at the left and the program's own settings after it.
@@ -4850,14 +4863,14 @@ function drawHeads(): void {
   const lit = ui.heads.querySelector<HTMLElement>(".lot.lit")?.dataset.lot;
   const lots = Array.from(boxes)
     .map(([k, b]) => {
-      const top = headTop(k, b);
-      return `<div class="lot${k === lit ? " lit" : ""}" data-lot="${esc(k)}" style="left:${Math.round(b.x)}px;top:${top}px;width:${Math.round(b.w)}px;height:${Math.round(b.y + b.h - top)}px"></div>`;
+      const top = INSIDE.has(k) ? b.y : headTop(k, b);
+      return `<div class="lot${INSIDE.has(k) ? " rim" : ""}${k === lit ? " lit" : ""}" data-lot="${esc(k)}" style="left:${Math.round(b.x)}px;top:${top}px;width:${Math.round(b.w)}px;height:${Math.round(b.y + b.h - top)}px"></div>`;
     })
     .join("");
   ui.heads.innerHTML = lots + Array.from(boxes)
     .map(
       ([k, b]) =>
-        `<div class="phead${k === nearHead ? " near" : ""}${PROGRAMS[k].world === "history" ? " git" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
+        `<div class="phead${k === nearHead ? " near" : ""}${PROGRAMS[k].world === "history" ? " git" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x + headSide(k))}px;top:${headTop(k, b)}px;width:${Math.round(b.w - 2 * headSide(k))}px">` +
         `<button class="grip" data-grip="${esc(k)}" data-tip="${esc(`${PROGRAMS[k].name} — drag to move it, or hold alt and drag anywhere on it`)}">${programIcon(k)}</button>` +
         `<span class="own">${headSettings(k)}</span>${headDepth(k)}</div>`,
     )
@@ -5220,7 +5233,7 @@ const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.scroll].filter((
 /** How far the nodes stand in from the canvas's rim. */
 const CANVAS_INSET = 24;
 /** How far in from the canvas's own top the nodes begin: past the way down where it stands over the canvas, since taking the page whole leaves no margin to stand it in. */
-const canvasTop = (): number => Math.max(CANVAS_INSET, ui.crumb.hidden || !ui.canvas.classList.contains("bleed") ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.getBoundingClientRect().top);
+const canvasTop = (): number => Math.max(CANVAS_INSET + (ui.areas.classList.contains("alone") ? 0 : HEADROOM), ui.crumb.hidden || !ui.canvas.classList.contains("bleed") ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.getBoundingClientRect().top);
 
 /** The canvas stands in the band the figures stand in: below the way down, above the strip's room at the foot. */
 function placeCanvas(): void {
@@ -6966,13 +6979,13 @@ function wire(): void {
   document.addEventListener("pointerup", release);
   document.addEventListener("pointercancel", () => (drag?.kind === "move" ? cancelMove() : release()));
   document.addEventListener("dblclick", onDoubleClick);
-  // pointing at an icon in the dock lights the space its program stands in, so the reader sees which it is before taking it
+  // pointing at an icon in the dock, or at a program's grip, lights the space it stands in, so the reader sees which it is before taking it
   const lightLot = (e: PointerEvent) => {
-    const k = (e.target as HTMLElement).closest<HTMLElement>(".dock [data-program]")?.dataset.program ?? null;
+    const t = e.type === "pointerout" ? null : (e.target as HTMLElement | null);
+    const k = t?.closest?.<HTMLElement>(".dock [data-program]")?.dataset.program ?? t?.closest?.<HTMLElement>(".phead [data-grip]")?.dataset.grip ?? null;
     all<HTMLElement>(".lot", ui.heads).forEach((el) => el.classList.toggle("lit", el.dataset.lot === k));
   };
-  ui.strips.addEventListener("pointerover", lightLot);
-  ui.strips.addEventListener("pointerout", lightLot);
+  [ui.strips, ui.heads].forEach((el) => (el.addEventListener("pointerover", lightLot), el.addEventListener("pointerout", lightLot)));
   document.addEventListener("wheel", onKnobWheel, { passive: false });
   document.addEventListener("wheel", onWheel, { passive: false });
   window.addEventListener("blur", () => (letGo(), cancelMove()));
@@ -7261,8 +7274,11 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 #heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 /* each program's space, from its head to the foot of its box: lit a little while a program is moved, so the places
    are seen, and where its icon in the dock is pointed at, so the reader sees which program it is */
-.lot { position: absolute; border-radius: 10px; background: var(--wash); opacity: 0; transition: opacity .15s ease; pointer-events: none; }
-body.moving .lot, .lot.lit { opacity: 1; }
+.lot { position: absolute; border-radius: 10px; background: transparent; transition: background-color .15s ease; pointer-events: none; }
+body.moving .lot, .lot.lit { background: var(--wash); }
+/* a canvas's rim is drawn here, above everything it holds, so nothing on its way out of the canvas crosses over it */
+.lot.rim { box-shadow: inset 0 0 0 1px var(--rim); }
+#areas:not(.alone) :is(#canvas, #gcanvas)::after { display: none; }
 .phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
 .phead > .grip, .phead > .own, .phead > .depth { opacity: 0; transition: opacity .3s ease .45s; }
 .phead.near > .grip, .phead.near > .own, .phead.near > .depth { pointer-events: auto; }
@@ -7271,8 +7287,9 @@ body.moving .lot, .lot.lit { opacity: 1; }
 .phead .depth .badge { padding: 0; gap: 0; border-radius: 5px; }
 /* a program of git's keeps its grip standing, so git's mark always stands at its top edge */
 .phead.git > .grip { opacity: .75; pointer-events: auto; }
-/* the grip's ink, not its box, stands on the program's edge, as the way down's text and the prose do */
+/* the ink at a head's ends, not the boxes it stands in, stands on the program's edge, as the way down's text and the prose do */
 .phead > .grip { margin-left: -7px; }
+.phead > .depth { margin-right: -6px; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
 .phead .grip:hover { background: var(--wash); color: var(--ink); }
 .phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -7399,6 +7416,8 @@ body.moving .lot, .lot.lit { opacity: 1; }
 /* the face of what is selected: one fixed place at the top right of the canvas, a thing standing over the map, so it
    keeps its own edge; pressing it reads what it shows */
 .pickface { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
+/* wide, the canvas holds its head inside its rim, so the face stands below the head */
+#areas:not(.alone) .pickface { top: ${12 + HEADROOM}px; }
 .pickface .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
 .pickface .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 .pickface h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
