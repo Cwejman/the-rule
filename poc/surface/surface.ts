@@ -1492,6 +1492,8 @@ type Settings = {
   follow: { body: boolean; history: boolean };
   /** whether the plate draws the body whole, or only the reading the reader is scoped to */
   plate: "whole" | "scope";
+  /** whether the plate draws a cell per brief where they can be seen, or a cell per file only */
+  plateGrain: "brief" | "file";
 };
 
 const DEFAULTS: Settings = {
@@ -1520,6 +1522,7 @@ const DEFAULTS: Settings = {
   dock: "foot",
   follow: { body: true, history: true },
   plate: "whole",
+  plateGrain: "brief",
 };
 
 /** The reader's settings: the page's own, and no reading's. */
@@ -2437,6 +2440,7 @@ const ICON: Record<string, string> = {
   none: `<path d="M5 5l6 6M11 5l-6 6"/>`,
   follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
   scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
+  files: `<path d="M4.5 2h4.5l2.5 2.5V14h-7z"/><path d="M9 2v2.5h2.5"/>`,
   shape: `<path d="M3 3h7M3 6h9M6 9h6M6 12h4"/>`,
   tree: `<path d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/>`,
   ahead: `<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>`,
@@ -3202,6 +3206,7 @@ function loadSettings(): void {
   const follow = (settings.follow ?? {}) as Partial<Settings["follow"]>;
   settings.follow = { body: follow.body !== false, history: follow.history !== false };
   if (settings.plate !== "scope") settings.plate = "whole";
+  if (settings.plateGrain !== "file") settings.plateGrain = "brief";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -3511,8 +3516,12 @@ const plateK = (S: number): number => (S / 2) * 0.98;
 /** How many px across a cell is at its narrowest, on a plate of side `S`. */
 const across = (c: Cell, S: number): number => plateK(S) * Math.min(c.r1 - c.r0, ((c.a1 - c.a0) * (c.r0 + c.r1)) / 2);
 
-/** The grain a plate of side `S` is drawn at: a cell per brief where the middling one can be seen, a cell per file where not. */
-const grainAt = (S: number): Grain => (middling(plateCells("brief").map((c) => across(c, S))) >= PLATE.least ? "brief" : "file");
+/** Whether a cell per brief can be seen on a plate of side `S`: the middling one is wide enough. */
+const briefsFit = (S: number): boolean => middling(plateCells("brief").map((c) => across(c, S))) >= PLATE.least;
+/** The grain a plate of side `S` is drawn at: a cell per file where the reader set it so or a cell per brief cannot be seen, else a cell per brief. */
+const grainAt = (S: number): Grain => (settings.plateGrain === "file" || !briefsFit(S) ? "file" : "brief");
+/** The side the plate was last drawn at, which says whether its head offers a cell per brief. */
+let plateDrawnAt = 0;
 
 /**
  * A cell as drawn: its sector with the room its kinship keeps cut from each side, then drawn a stroke smaller and given
@@ -3551,6 +3560,7 @@ const plateWidth = (): number => PLATE_SIDE;
 
 function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
   const S = plateScale(W, H, most);
+  plateDrawnAt = S;
   if (S < 80) return "";
   const k = plateK(S);
   const m = S / 2;
@@ -4938,7 +4948,12 @@ function headSettings(k: string): string {
   if (k === "plate") {
     const on = settings.plate === "scope";
     const tip = on ? "draws the reading you are scoped to — press to draw the body whole" : "draws the body whole — press to draw only the reading you are scoped to";
-    return `<button class="pick${on ? " on" : ""}" data-toggle="plate" data-tip="${esc(tip)}">${icon("scoped")}</button>`;
+    const scope = `<button class="pick${on ? " on" : ""}" data-toggle="plate" data-tip="${esc(tip)}">${icon("scoped")}</button>`;
+    // the grain is a choice only where a cell per brief can be seen at all; smaller, the plate is files alone
+    if (!onBody(() => plateDrawnAt >= 80 && briefsFit(plateDrawnAt))) return scope;
+    const files = settings.plateGrain === "file";
+    const gtip = files ? "a cell per file — press for a cell per brief" : "a cell per brief — press for a cell per file";
+    return scope + `<button class="pick${files ? " on" : ""}" data-toggle="grain" data-tip="${esc(gtip)}">${icon("files")}</button>`;
   }
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
@@ -6536,7 +6551,8 @@ const onClick = (e: MouseEvent): void => {
       settings.follow = { ...settings.follow, [w]: !settings.follow[w] };
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
-    } else settings.plate = settings.plate === "scope" ? "whole" : "scope";
+    } else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
+    else settings.plate = settings.plate === "scope" ? "whole" : "scope";
     saveSettings();
     return void drawAll();
   }
