@@ -44,15 +44,13 @@ A brief may raise several cards, each where its link stood, and the same part ma
 
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
 
-A step by the arrow keys stops on each card too, in the order the reading draws them, and at the foot of the lane the line reaches the last card as it reaches the last brief.
-
-*The author's, 2026-10-05, since the steps passed the cards over.*
-
 The line holds the last thing it has reached, and never falls back. A card stands inside the prose of the brief that places it, so a line asking what it is inside of answered the card while it crossed one and the brief again in the prose after it: an entry that places six parts bounced the address, the way down and the map's selection between the parent and one card after another, thirteen times in one scroll of this body's root, where the reading has seven places to stand. A reading is passed through in one direction, so where the reader stands moves in one direction too.
 
 A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which is read through; a card is looked at directly, and one too faint to read has failed at the one thing it is for. So the card the reading stands on takes full ink and its outline takes the branch's hue, and every other card stays quiet and legible. Pointing at a card holds the brief it sits in at full ink as well, since the brief's own fading would take the card down with it.
 
-*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed.*
+A step by the arrow keys stops on each card too, in the order the reading draws them, and at the foot of the lane the line reaches the last card as it reaches the last brief.
+
+*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed. The author's, 2026-10-05, that a step stops on each card, since the steps passed them over.*
 
 ## 2. Folded to its face, or whole
 
