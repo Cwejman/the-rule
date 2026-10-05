@@ -4561,6 +4561,14 @@ function boxFrame(h: number): { top: number; height: number } {
   return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : DOCK_FOOT + 24 + 10)) };
 }
 
+/**
+ * How far the prose's element reaches past its box wide, so its fades run on under the heads' icons above and the dock's
+ * below, rather than stopping at the box with a band of bare ground beside the icons that reads as a bar of its own.
+ * Its content is padded by the same, so the reading at rest stands in the box as before.
+ */
+const under = (): { top: number; foot: number } =>
+  narrow() ? { top: 0, foot: 0 } : { top: HEADROOM, foot: settings.dock === "left" ? 0 : 10 + 12 };
+
 /** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
 const WAY = { top: 17, height: 18 };
 
@@ -4698,7 +4706,8 @@ function drawLaid(): void {
     // the prose taken away is kept laid out of sight rather than hidden, since the shape and the reading line measure it
     D.scroll.classList.toggle("off", !p);
     put(D.scroll, p?.x ?? 0, p?.w ?? proseOwn(w));
-    inFrame(D.scroll);
+    D.scroll.style.top = `${F.top - under().top}px`;
+    D.scroll.style.height = `${F.height + under().top + under().foot}px`;
     if (p) boxes.set(proseKey(w), { x: p.x, y: F.top, w: p.w, h: F.height });
     D.parts.gutterL.hidden = !f.sides[0];
     D.parts.gutterR.hidden = !f.sides[1];
@@ -5027,6 +5036,8 @@ function drawLane(): void {
 
 /** How far the lane scrolls, as a share of its height, while the reading line eases between an end and the middle. */
 const EASE_RUN = 0.35;
+/** How far wide the opening stands below the top of its box, so its title has as much room above it as beneath. */
+const OPENING_ROOM = 16;
 
 
 /**
@@ -5055,11 +5066,13 @@ function alignEnds(): void {
     // the shape's own room, in its column or as the rail; with no shape drawn, the room a lone figure would have
     const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
     // level with the shape's first cell. Narrow, never in the fade: the opening stands where the fade is half gone.
-    // Wide, the way down stands above the box, and at the top the fade is lifted, so the opening stands at the box's top
-    const clear = narrow() ? (h * settings.fade) / 2 / 100 : 0;
+    // Wide, the fade is lifted at the top, so the opening stands just in the box: as far below the heads' icons as the
+    // prose stands below its title, so the title has as much room above as beneath
+    const clear = narrow() ? (h * settings.fade) / 2 / 100 : OPENING_ROOM;
     // the shape is levelled with only where it heads its column, so a shape low in a stack never pushes the opening down
-    const heads = narrow() || slot.top <= ui.scroll.offsetTop;
-    const first = heads ? Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear) : clear;
+    const boxTop = ui.scroll.offsetTop + under().top;
+    const heads = narrow() || slot.top <= boxTop;
+    const first = under().top + (heads ? Math.max(slot.top - boxTop + SHAPE.inset, clear) : clear);
     for (let i = 0; i < 6; i++) {
       const k = (slot.height - 8) / (P + laneH + tail + B);
       P = Math.max(0, first / (1 - k) - off);
@@ -5069,7 +5082,7 @@ function alignEnds(): void {
   // the browser anchors the scroll against a change of room above; a lane at its top stays at its top
   const atTop = ui.scroll.scrollTop === 0;
   ui.content.style.paddingTop = `${Math.round(P)}px`;
-  ui.content.style.paddingBottom = `${Math.round(B) + state.hang}px`;
+  ui.content.style.paddingBottom = `${Math.round(B) + under().foot + state.hang}px`;
   if (atTop) ui.scroll.scrollTop = 0;
   const sMax = Math.max(0, ui.scroll.scrollHeight - h);
   state.ends.top = Math.round(P) + off + 24;
@@ -5263,7 +5276,7 @@ function placeCrumb(): void {
   const lane = ui.lane.getBoundingClientRect();
   ui.pull.style.left = `${Math.round(lane.left - a0.left)}px`;
   ui.pull.style.width = `${Math.round(lane.width)}px`;
-  ui.pull.style.top = `${narrow() ? (ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4) : ui.scroll.offsetTop + 4}px`;
+  ui.pull.style.top = `${narrow() ? (ui.crumb.hidden ? 8 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 4) : ui.scroll.offsetTop + under().top + 4}px`;
   placeCanvas();
   // the prose is clear below the way down whatever the fade is doing, so no line reads under it
   // narrow, the fade begins above the way down rather than below it: the prose is never clear behind the line, so the
