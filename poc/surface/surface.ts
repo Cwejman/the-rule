@@ -2742,8 +2742,8 @@ type Laid = { cols: { c: number; x: number; w: number }[]; spaces: { x: number; 
 let laidNow: Laid | null = null;
 
 /**
- * Lays the row. Every column wants its own width. Where the page is too narrow, the body's prose keeps its width and
- * every other column shrinks to its least before any gives way; then they give way one at a time, the one furthest
+ * Lays the row. Every column wants its own width. Where the page is too narrow, every column shrinks toward its least,
+ * the body's prose with the rest, each by its share of the room it has to give, before any gives way; then they give way one at a time, the one furthest
  * from the body's prose first, and of two as far the one at the right. Once only one is left, it narrows with the page.
  * What the page leaves over is spread among the spaces, the edges among them, or stands at the two edges.
  */
@@ -2761,10 +2761,9 @@ function layRow(L: Column[] = settings.layout): Laid {
   const fit = (): boolean => {
     live.forEach((i) => widths.set(i, own[i]));
     if (need() <= W) return true;
-    const others = live.filter((i) => i !== proseAt);
-    const room = others.reduce((x, i) => x + own[i] - least[i], 0);
+    const room = live.reduce((x, i) => x + own[i] - least[i], 0);
     const over = need() - W;
-    if (room > 0) others.forEach((i) => widths.set(i, own[i] - (own[i] - least[i]) * Math.min(1, over / room)));
+    if (room > 0) live.forEach((i) => widths.set(i, own[i] - (own[i] - least[i]) * Math.min(1, over / room)));
     return need() <= W + 0.5;
   };
   const rank = (i: number): number => (proseAt >= 0 ? Math.abs(i - proseAt) * 2 + (i > proseAt ? 1 : 0) : i);
@@ -2887,9 +2886,33 @@ const shownNow = (k: string): boolean => {
 };
 
 /**
- * Closes a program that can be seen, or opens one that cannot: back where it stood, beside the nearest program that
- * still stands there, or where it first comes in. What has to give way for it is taken away as though it were pressed,
- * so an icon is lit exactly while its program can be seen, and a press never only moves what is hidden.
+ * The row with a program added where a press would put it: back where it stood, beside the nearest program that still
+ * stands there, or where it first comes in. Null where there is no room for it beside everything that can be seen now,
+ * since adding is never taking something else away.
+ */
+function added(k: string): Column[] | null {
+  const L = layoutNow();
+  const seen = L.flatMap((c, i) => (laid().gone.has(i) ? [] : c.items.map((it) => it.k))).filter((x) => x !== k);
+  const base = without(L, k);
+  const kept = leftAt.get(k);
+  // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
+  // stands alone comes in beside the body's prose, at its left, the side that gives way last
+  const shown = layRow(base).cols;
+  const end = shown.length ? shown[shown.length - 1].c + 1 : base.length;
+  const fresh: Zone = isAlone(k) && whereIs("prose", base) ? { kind: "beside", target: "prose", after: false } : { kind: "col", at: end };
+  const zone: Zone = kept && whereIs(kept.near, base) ? kept.zone : fresh;
+  let next = dropped(base, k, zone);
+  if (next === base) next = dropped(base, k, { kind: "col", at: base.length });
+  const at = whereIs(k, next);
+  if (at && kept?.w && next[at.c].items.length === 1) next[at.c] = { ...next[at.c], w: kept.w };
+  const r = layRow(next);
+  const visible = (x: string) => !r.gone.has(whereIs(x, next)!.c);
+  return visible(k) && seen.every(visible) ? next : null;
+}
+
+/**
+ * Closes a program that can be seen, or adds one that cannot, the others that can be resized shrinking to make room.
+ * Where there is no room for it, nothing changes: a press is the intent to add, never to swap one program for another.
  */
 function pressProgram(k: string): void {
   const L = layoutNow();
@@ -2898,49 +2921,14 @@ function pressProgram(k: string): void {
     remember(k);
     settings.layout = without(L, k);
   } else {
-    // what can be seen before the press, so only what gives way for this one is taken away
-    const seen = new Set(L.flatMap((c, i) => (laid().gone.has(i) ? [] : c.items.map((it) => it.k))));
-    const base = without(L, k);
-    const kept = leftAt.get(k);
-    // a figure that never stood comes in after the last column on the page, before any that gave way; a program that
-    // stands alone comes in beside the body's prose, at its left, the side that gives way last
-    const shown = layRow(base).cols;
-    const end = shown.length ? shown[shown.length - 1].c + 1 : base.length;
-    const fresh: Zone = isAlone(k) && whereIs("prose", base) ? { kind: "beside", target: "prose", after: false } : { kind: "col", at: end };
-    const zone: Zone = kept && whereIs(kept.near, base) ? kept.zone : fresh;
-    let next = dropped(base, k, zone);
-    if (next === base) next = dropped(base, k, { kind: "col", at: base.length });
-    const at = whereIs(k, next);
-    if (at && kept?.w && next[at.c].items.length === 1) next[at.c] = { ...next[at.c], w: kept.w };
-    // where there is no room for it, the column furthest from the body's prose goes, as the row gives way, a world's
-    // canvas before its prose, until it can be seen; where even that leaves it no room, nothing is taken away for it
-    const placed = next;
-    const away: string[] = [];
-    for (;;) {
-      const r = layRow(next);
-      const mine = whereIs(k, next)!.c;
-      if (!r.gone.has(mine)) break;
-      const prose = whereIs("prose", next)?.c ?? -1;
-      const rank = (i: number): number => (prose >= 0 ? Math.abs(i - prose) * 2 + (i > prose ? 1 : 0) : i);
-      const order = r.cols.map((col) => col.c).filter((i) => i !== mine && i !== prose).sort((a, b) => rank(b) - rank(a));
-      const [p, c] = [order.indexOf(whereIs("gitProse", next)?.c ?? -1), order.indexOf(whereIs("gitCanvas", next)?.c ?? -1)];
-      if (p >= 0 && c > p) order.splice(p, 0, ...order.splice(c, 1));
-      // no room even beside the body's prose alone: it stands at the far end of the row, the first to give way, so it
-      // moves nothing else and the dock says it is out of sight
-      if (order[0] === undefined) {
-        next = [...without(placed, k), { items: [{ k }], ...(kept?.w ? { w: kept.w } : {}) }];
-        away.length = 0;
-        break;
-      }
-      away.push(...next[order[0]].items.map((it) => it.k));
-      next = next.filter((_, i) => i !== order[0]);
+    const next = added(k);
+    if (!next) {
+      const b = ui.strips.querySelector<HTMLElement>(`.dock [data-program="${cssEsc(k)}"]`);
+      b?.classList.remove("refused");
+      void b?.offsetWidth;
+      b?.classList.add("refused");
+      return;
     }
-    if (away.length) away.forEach((x) => remember(x, placed));
-    // and what gave way for it is taken away, rather than left standing out of sight
-    const r = layRow(next);
-    const room = !r.gone.has(whereIs(k, next)!.c);
-    const gave = room ? next.flatMap((c, i) => (r.gone.has(i) ? c.items.map((it) => it.k).filter((x) => x !== k && seen.has(x)) : [])) : [];
-    gave.forEach((x) => (remember(x, next), (next = without(next, x))));
     settings.layout = next;
   }
   saveSettings();
@@ -2951,8 +2939,9 @@ function pressProgram(k: string): void {
 function dockTip(k: string): string {
   const at = whereIs(k);
   const name = PROGRAMS[k].name;
-  if (!at) return `${name} — press to bring it back, or drag it where you want it`;
-  if (laid().gone.has(at.c)) return `${name} — out of sight, with no room for it at this width — press to make room for it where there can be`;
+  const room = !shownNow(k) && added(k) !== null;
+  if (!at) return room ? `${name} — press to add it, or drag it where you want it` : `${name} — no room for it beside what stands — take something away, or narrow what stands, to add it`;
+  if (laid().gone.has(at.c)) return `${name} — out of sight, with no room for it at this width${room ? " — press to bring it in" : ""}`;
   if (layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1) return `${name} — the last program cannot be taken away`;
   return `${name} — press to take it away, or drag it where you want it`;
 }
@@ -4858,7 +4847,14 @@ const headTop = (_k: string, b: { y: number }): number => b.y - HEADROOM;
  * read under it the whole time.
  */
 function drawHeads(): void {
-  ui.heads.innerHTML = Array.from(boxes)
+  const lit = ui.heads.querySelector<HTMLElement>(".lot.lit")?.dataset.lot;
+  const lots = Array.from(boxes)
+    .map(([k, b]) => {
+      const top = headTop(k, b);
+      return `<div class="lot${k === lit ? " lit" : ""}" data-lot="${esc(k)}" style="left:${Math.round(b.x)}px;top:${top}px;width:${Math.round(b.w)}px;height:${Math.round(b.y + b.h - top)}px"></div>`;
+    })
+    .join("");
+  ui.heads.innerHTML = lots + Array.from(boxes)
     .map(
       ([k, b]) =>
         `<div class="phead${k === nearHead ? " near" : ""}${PROGRAMS[k].world === "history" ? " git" : ""}" data-head="${esc(k)}" style="left:${Math.round(b.x)}px;top:${headTop(k, b)}px;width:${Math.round(b.w)}px">` +
@@ -5468,7 +5464,9 @@ function drawChooser(): void {
     const fixed = at && layoutNow().reduce((n, c) => n + c.items.length, 0) <= 1 ? " fixed" : "";
     // a program of git's that stands while the history is first read breathes, as the switch did
     const busy = at && PROGRAMS[k].world === "history" && past.status === "loading" && !gitReady() ? " busy" : "";
-    return `<button class="pick${at ? " on" : ""}${denied}${fixed}${busy}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
+    // what cannot be seen and has no room to be added says so before it is pressed
+    const full = !shownNow(k) && added(k) === null ? " full" : "";
+    return `<button class="pick${at ? " on" : ""}${denied}${fixed}${busy}${full}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
   };
   const groups = DOCK.map((g) => `<span class="group">${g.map(pick).join("")}</span>`).join("");
   ui.strips.innerHTML = `<div class="strip dock ${settings.dock}">${groups}</div>`;
@@ -6968,6 +6966,13 @@ function wire(): void {
   document.addEventListener("pointerup", release);
   document.addEventListener("pointercancel", () => (drag?.kind === "move" ? cancelMove() : release()));
   document.addEventListener("dblclick", onDoubleClick);
+  // pointing at an icon in the dock lights the space its program stands in, so the reader sees which it is before taking it
+  const lightLot = (e: PointerEvent) => {
+    const k = (e.target as HTMLElement).closest<HTMLElement>(".dock [data-program]")?.dataset.program ?? null;
+    all<HTMLElement>(".lot", ui.heads).forEach((el) => el.classList.toggle("lit", el.dataset.lot === k));
+  };
+  ui.strips.addEventListener("pointerover", lightLot);
+  ui.strips.addEventListener("pointerout", lightLot);
   document.addEventListener("wheel", onKnobWheel, { passive: false });
   document.addEventListener("wheel", onWheel, { passive: false });
   window.addEventListener("blur", () => (letGo(), cancelMove()));
@@ -7254,6 +7259,10 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 /* a head: the grip and the program's own settings along its top edge, quiet until the pointer comes near; leaving, it
    lingers a moment and fades, so a pointer on its way to it still finds it */
 #heads { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+/* each program's space, from its head to the foot of its box: lit a little while a program is moved, so the places
+   are seen, and where its icon in the dock is pointed at, so the reader sees which program it is */
+.lot { position: absolute; border-radius: 10px; background: var(--wash); opacity: 0; transition: opacity .15s ease; pointer-events: none; }
+body.moving .lot, .lot.lit { opacity: 1; }
 .phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
 .phead > .grip, .phead > .own, .phead > .depth { opacity: 0; transition: opacity .3s ease .45s; }
 .phead.near > .grip, .phead.near > .own, .phead.near > .depth { pointer-events: auto; }
@@ -7421,6 +7430,10 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .strip .pick.on, .strip:hover .pick.on { opacity: .9; color: var(--muted); }
 /* asked for, but the width denies it: it stands between what is in use and what is not */
 .strip .pick.on.denied, .strip:hover .pick.on.denied { opacity: .45; }
+/* no room to add it: quieter than the rest, and a press says no with a small shake rather than taking anything away */
+.strip .pick.full, .strip:hover .pick.full { opacity: .1; cursor: default; }
+.strip .pick.refused { animation: refused .32s ease; }
+@keyframes refused { 20%, 60% { transform: translateX(-2px); } 40%, 80% { transform: translateX(2px); } }
 .strip .pick.on:hover { color: var(--ink); }
 .strip .pick.fixed { cursor: default; }
 /* the switch has no side and carries no dot; while the history is read it stands darkest, and while it is read in it breathes */
