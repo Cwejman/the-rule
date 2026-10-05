@@ -4533,6 +4533,8 @@ const GUTTER = { want: 210, least: 132 };
 const STRIP = 34;
 /** The room the foot keeps clear: the strip's icons with as much above them as below. */
 const FOOT = STRIP + 10;
+/** How far the dock stands from the foot wide; the boxes end a little above it, so their fades go under the icons. */
+const DOCK_FOOT = 14;
 /**
  * The room the foot keeps clear of the prose. Wide, it is the strip's own room, since the row of icons spans the page
  * and would otherwise sit on the text. Narrow, it is one gap: the mark is a single round thing over the middle of the
@@ -4556,7 +4558,7 @@ const RIM = { top: 3, foot: 6 };
 function boxFrame(h: number): { top: number; height: number } {
   const t = Math.round(settings.gap / 2);
   const top = WAY.top + WAY.height + 2 + HEADROOM;
-  return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : FOOT + t)) };
+  return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : DOCK_FOOT + 24 + 10)) };
 }
 
 /** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
@@ -7247,6 +7249,8 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 .phead .depth .badge { padding: 0; gap: 0; border-radius: 5px; }
 /* a program of git's keeps its grip standing, so git's mark always stands at its top edge */
 .phead.git > .grip { opacity: .75; pointer-events: auto; }
+/* the grip's ink, not its box, stands on the program's edge, as the way down's text and the prose do */
+.phead > .grip { margin-left: -7px; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
 .phead .grip:hover { background: var(--wash); color: var(--ink); }
 .phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -7706,7 +7710,7 @@ body.touch .knob.turning .hint { opacity: 1; }
 #strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
 /* the foot is one row: what stands in it follows what the reader has chosen */
 .strip.foot { bottom: 22px; gap: 8px; }
-.strip.dock.foot { bottom: 14px; }
+.strip.dock.foot { bottom: ${DOCK_FOOT}px; }
 .glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8); }
 .strip .pill { display: flex; align-items: center; border-radius: 26px; padding: 3px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
 @keyframes pill-in { from { opacity: 0; transform: translateY(10px) scale(.92); } }
