@@ -7289,7 +7289,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a canvas's rim is drawn here, above everything it holds, so nothing on its way out of the canvas crosses over it */
 .lot.rim { box-shadow: inset 0 0 0 1px var(--rim); }
 #areas:not(.alone) :is(#canvas, #gcanvas)::after { display: none; }
-.phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 6px; pointer-events: none; font-family: var(--sans); font-size: 12px; }
+/* the rim is a faint line, and what passes under a faint line shows through it, so what a canvas holds stops inside it */
+#areas:not(.alone) :is(#canvas, #gcanvas) { clip-path: inset(1px round 9px); }
+.phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 0; pointer-events: none; font-family: var(--sans); font-size: 12px; }
 .phead > .grip, .phead > .own, .phead > .depth { opacity: 0; transition: opacity .3s ease .45s; }
 .phead.near > .grip, .phead.near > .own, .phead.near > .depth { pointer-events: auto; }
 .phead.near > .grip, .phead.near > .own, .phead.near > .depth { opacity: 1; transition: opacity .12s ease 0s; }
@@ -7302,7 +7304,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .phead > .depth { margin-right: -6px; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
 .phead .grip:hover { color: var(--ink); }
-.phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; }
+/* the room between a head's icons is the head's own, so a pointer crossing them keeps one cursor rather than flickering
+   to whatever lies beneath */
+.phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; padding-left: 6px; cursor: pointer; }
 .phead .pick { position: relative; width: 26px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--ink); opacity: .4; transition: opacity .15s; cursor: pointer; }
 .phead .pick .icon { width: 14px; height: 14px; }
 .phead .pick.deed { opacity: .7; color: var(--muted); }
