@@ -5052,8 +5052,9 @@ function alignEnds(): void {
   if (settings.line === "ends") {
     // the shape's own room, in its column or as the rail; with no shape drawn, the room a lone figure would have
     const slot = slots.get(narrow() ? "rail" : "fig:shape") ?? band(h);
-    // level with the shape's first cell, but never in the fade: the opening stands where the fade is half gone
-    const clear = (h * settings.fade) / 2 / 100;
+    // level with the shape's first cell. Narrow, never in the fade: the opening stands where the fade is half gone.
+    // Wide, the way down stands above the box, and at the top the fade is lifted, so the opening stands at the box's top
+    const clear = narrow() ? (h * settings.fade) / 2 / 100 : 0;
     // the shape is levelled with only where it heads its column, so a shape low in a stack never pushes the opening down
     const heads = narrow() || slot.top <= ui.scroll.offsetTop;
     const first = heads ? Math.max(slot.top - ui.scroll.offsetTop + SHAPE.inset, clear) : clear;
