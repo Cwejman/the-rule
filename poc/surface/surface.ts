@@ -4560,7 +4560,7 @@ function boxFrame(h: number): { top: number; height: number } {
 }
 
 /** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
-const WAY = { top: 9, height: 18 };
+const WAY = { top: 17, height: 18 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
