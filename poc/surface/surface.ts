@@ -4546,7 +4546,7 @@ const RIM = { top: 3, foot: 6 };
  */
 function boxFrame(h: number): { top: number; height: number } {
   const t = Math.round(settings.gap / 2);
-  const top = WAY.top + WAY.height + 2 + HEADROOM;
+  const top = WAY.top + WAY.height + WAY.below + HEADROOM;
   return { top, height: Math.max(0, h - top - (settings.dock === "left" ? t : DOCK_FOOT + 24 + 10)) };
 }
 
@@ -4559,7 +4559,7 @@ const under = (): { top: number; foot: number } =>
   narrow() ? { top: 0, foot: 0 } : { top: HEADROOM, foot: settings.dock === "left" ? 0 : 10 + 12 };
 
 /** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
-const WAY = { top: 17, height: 18 };
+const WAY = { top: 17, height: 18, below: 12 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
@@ -4706,11 +4706,11 @@ function drawLaid(): void {
     const c = laidAt(canvasKey(w));
     D.canvas.hidden = !c;
     D.canvas.classList.remove("bleed");
-    // a canvas holds its head inside its rim, so its box reaches up over the heads' row
+    // a canvas holds its head inside its rim, and its rim is its space, as far past its column as any program's reaches
     if (c) {
-      put(D.canvas, c.x, c.w);
-      D.canvas.style.top = `${F.top - HEADROOM}px`;
-      D.canvas.style.height = `${F.height + HEADROOM}px`;
+      put(D.canvas, c.x - LOT_PAD.x, c.w + 2 * LOT_PAD.x);
+      D.canvas.style.top = `${F.top - HEADROOM - LOT_PAD.y}px`;
+      D.canvas.style.height = `${F.height + HEADROOM + 2 * LOT_PAD.y}px`;
       boxes.set(canvasKey(w), { x: c.x, y: F.top - HEADROOM, w: c.w, h: F.height + HEADROOM });
     }
     // a world with nothing standing keeps no way down
@@ -4850,9 +4850,12 @@ let nearHead: string | null = null;
  * are, so its icons stand balanced in the rim rather than on its line; the rest stand under a head above their box.
  */
 const INSIDE = new Set(["canvas", "gitCanvas"]);
-const HEAD_INSET = { top: 4, side: 10 };
-const headTop = (k: string, b: { y: number }): number => (INSIDE.has(k) ? b.y + HEAD_INSET.top : b.y - HEADROOM);
-const headSide = (k: string): number => (INSIDE.has(k) ? HEAD_INSET.side : 0);
+/** How far a lit space, and a canvas's rim, reaches past a program's head and box, so the head's icons stand inside it. */
+const LOT_PAD = { x: 8, y: 6 };
+/** How far in from a canvas's rim its head's icons stand, at the sides and the top alike. */
+const HEAD_INSET = 10;
+const headTop = (k: string, b: { y: number }): number => (INSIDE.has(k) ? b.y - LOT_PAD.y + HEAD_INSET - 6 : b.y - HEADROOM);
+const headSide = (k: string): number => (INSIDE.has(k) ? HEAD_INSET - LOT_PAD.x : 0);
 
 /**
  * The heads: a thin row along each program's top edge, its grip at the left and the program's own settings after it.
@@ -4863,8 +4866,10 @@ function drawHeads(): void {
   const lit = ui.heads.querySelector<HTMLElement>(".lot.lit")?.dataset.lot;
   const lots = Array.from(boxes)
     .map(([k, b]) => {
-      const top = INSIDE.has(k) ? b.y : headTop(k, b);
-      return `<div class="lot${INSIDE.has(k) ? " rim" : ""}${k === lit ? " lit" : ""}" data-lot="${esc(k)}" style="left:${Math.round(b.x)}px;top:${top}px;width:${Math.round(b.w)}px;height:${Math.round(b.y + b.h - top)}px"></div>`;
+      // every program's space reaches a little past its head and box, so its icons stand inside it; a canvas's is its rim
+      const p = LOT_PAD;
+      const top = (INSIDE.has(k) ? b.y : headTop(k, b)) - p.y;
+      return `<div class="lot${INSIDE.has(k) ? " rim" : ""}${k === lit ? " lit" : ""}" data-lot="${esc(k)}" style="left:${Math.round(b.x - p.x)}px;top:${top}px;width:${Math.round(b.w + 2 * p.x)}px;height:${Math.round(b.y + b.h + p.y - top)}px"></div>`;
     })
     .join("");
   ui.heads.innerHTML = lots + Array.from(boxes)
@@ -5233,7 +5238,7 @@ const panesShown = (): HTMLElement[] => [ui.canvas, ui.dish, ui.scroll].filter((
 /** How far the nodes stand in from the canvas's rim. */
 const CANVAS_INSET = 24;
 /** How far in from the canvas's own top the nodes begin: past the way down where it stands over the canvas, since taking the page whole leaves no margin to stand it in. */
-const canvasTop = (): number => Math.max(CANVAS_INSET + (ui.areas.classList.contains("alone") ? 0 : HEADROOM), ui.crumb.hidden || !ui.canvas.classList.contains("bleed") ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.getBoundingClientRect().top);
+const canvasTop = (): number => Math.max(CANVAS_INSET + (ui.areas.classList.contains("alone") ? 0 : HEADROOM + LOT_PAD.y), ui.crumb.hidden || !ui.canvas.classList.contains("bleed") ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 10 - ui.canvas.getBoundingClientRect().top);
 
 /** The canvas stands in the band the figures stand in: below the way down, above the strip's room at the foot. */
 function placeCanvas(): void {
@@ -7291,7 +7296,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .phead > .grip { margin-left: -7px; }
 .phead > .depth { margin-right: -6px; }
 .phead .grip { flex: none; width: 24px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: grab; }
-.phead .grip:hover { background: var(--wash); color: var(--ink); }
+.phead .grip:hover { color: var(--ink); }
 .phead .own { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .phead .pick { position: relative; width: 26px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--ink); opacity: .4; transition: opacity .15s; cursor: pointer; }
 .phead .pick .icon { width: 14px; height: 14px; }
@@ -7417,7 +7422,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
    keeps its own edge; pressing it reads what it shows */
 .pickface { position: absolute; top: 12px; right: 12px; z-index: 4; width: 264px; max-height: 42%; overflow: hidden; padding: 12px 14px; border-radius: 10px; background: var(--ground); box-shadow: inset 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .08); font-family: var(--sans); cursor: pointer; }
 /* wide, the canvas holds its head inside its rim, so the face stands below the head */
-#areas:not(.alone) .pickface { top: ${12 + HEADROOM}px; }
+#areas:not(.alone) .pickface { top: ${12 + HEADROOM + LOT_PAD.y}px; }
 .pickface .path { display: block; margin-bottom: 3px; font-size: 11px; color: var(--faint); }
 .pickface .path svg { width: 9px; height: 9px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 .pickface h3 { margin: 0 0 4px; font-family: var(--head-face); font-size: calc(var(--body) * .95); font-weight: calc(600 - var(--thin)); line-height: 1.25; color: var(--on); }
