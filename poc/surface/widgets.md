@@ -88,7 +88,9 @@ Each brief in the lane stands as its blocks, a heading a short bar and a paragra
 
 Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), nesting a step tighter and giving its marks whatever room each row has left.
 
-*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16.*
+It is as wide as it draws: its rows as the lane lays them and the marks of each folded brief, so it takes no room it leaves bare, and it widens and narrows as the lane is scoped and folded. The ghost of what an unfolded brief would hide, drawn only under the pointer, reaches out over the gap beside it rather than keeping room of its own.
+
+*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16. The author's, 2026-10-05, that it takes only the width its drawing uses; the ghosts reaching over the gap are the session's.*
 
 ### 3.1 A folded brief tells what it hides
 

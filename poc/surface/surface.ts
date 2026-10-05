@@ -3259,8 +3259,43 @@ const keysHtml = (): string =>
 
 const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4, railIndent: 5, railBar: 28 };
 
-/** The width the shape stands in: its deepest possible row, whatever the lane is scoped to, with the marks beside it. */
-const shapeWidth = (): number => SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
+/**
+ * The width the shape stands in: as far right as it draws, its rows as the lane lays them and the marks of each folded
+ * brief beside them, so it takes no room it leaves bare. An unfolded brief's marks are ghosts drawn only under the
+ * pointer, and they reach out over the gap beside the shape rather than keeping room for themselves. Before the lane is
+ * laid, its deepest possible row.
+ */
+function shapeWidth(): number {
+  const rows = all<HTMLElement>(".brief", ui.lane);
+  const ix = state.index;
+  if (!rows.length || !ix) return SHAPE.pad * 2 + 4 + (ix?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
+  // as shapeSvg draws them: the levels above to the left of the rows, then each row at its depth, its bar and its marks
+  const anc = prefixesOf(state.scope).slice(0, -1);
+  const L = anc.length ? anc.length * 8 + 4 : 0;
+  let right = SHAPE.pad + L;
+  for (const el of rows) {
+    const a = el.dataset.a!;
+    const b = brief(a);
+    const x = SHAPE.pad + L + depthIn(a) * SHAPE.indent;
+    let end = x + SHAPE.bar;
+    if (b && foldOf(a) === "face") {
+      const beyond = blocksOf(b).slice(1);
+      const t0 = x + SHAPE.bar + 4;
+      let tx = t0;
+      for (const t of beyond) {
+        const image = t.type === "image";
+        if (tx - t0 + (image ? 5 : 2) > 24) continue;
+        tx += image ? 7 : 3;
+      }
+      tx += beyond.length ? 2 : 0;
+      const hidden = !isCard(b) && level(a).length > 0 ? ix.branch.get(a)! - ix.own.get(a)! : 0;
+      const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, SHAPE.tail) : 0;
+      if (beyond.length || hidden) end = tx + tailW;
+    }
+    right = Math.max(right, end);
+  }
+  return Math.ceil(right + SHAPE.pad);
+}
 /**
  * The rail: where the lane stands alone the shape keeps standing beside it, narrow, since it does not need much width
  * to make itself clear. What it gives up at that width is the room for its marks and its tail, so it is its rows and
@@ -4643,6 +4678,7 @@ function drawLayout(): void {
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
   laidNow = null;
+  shapedAt = onBody(shapeWidth);
   if (!narrow()) return drawLaid();
   // where the lane stands alone it reads one world, so its one pane is laid in that world and the other's stand nowhere
   if (worldNow() !== narrowShown()) return void inNamed(narrowShown(), drawLayout);
@@ -5050,7 +5086,12 @@ function drawLane(): void {
   drawAdjuncts();
   drawCanvas();
   rememberLane();
+  // the shape is as wide as it draws, which the lane's rows and folds decide, so where they changed it the row is laid again
+  if (!narrow() && state === bodyWorld && shapeWidth() !== shapedAt) drawLayout();
 }
+
+/** The shape's width the row was last laid with. */
+let shapedAt = 0;
 
 /** How far the lane scrolls, as a share of its height, while the reading line eases between an end and the middle. */
 const EASE_RUN = 0.35;
@@ -7714,7 +7755,9 @@ body.touch svg.shape .cursor { fill: var(--wash); stroke: var(--track); stroke-w
 body.touch.scrubbing svg.shape .cursor { fill: var(--track); }
 /* a scrub drags across the prose, and a drag over text is a selection unless the page says otherwise */
 body.scrubbing, body.scrubbing :is(#lane, #glane) { user-select: none; -webkit-user-select: none; }
-svg.shape { cursor: grab; }
+svg.shape { cursor: grab; overflow: visible; }
+/* the shape draws its own height and never scrolls, so an unfolded brief's ghosts may reach out of it over the gap beside it */
+.host:has(> svg.shape) { overflow: visible; }
 
 /* a droplet is filled and stroked in one colour, the stroke giving back the size its round corners took. The plate's
    tones stand close together in the vivid register rather than across the range from grey to vivid, so every branch
