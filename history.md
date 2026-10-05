@@ -17,9 +17,39 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-10-04 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-10-05 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On the last day the author stepped back from the page to ask what the project is for.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the next day went back to tightening it.
+
+### The page is tightened as the author points
+
+On 2026-10-05 the author used the page and pointed at what was off, one thing at a time, and two sessions mended it in turn: first the page's edges, measured by the ink, then the way down's room, the canvas's rim and switches, and the figures' widths.
+
+*Reasoned on 2026-10-05 by the second of those sessions, from the commits and the files they wrote.*
+
+#### Each figure takes its own room and its own switches
+
+The shape is as wide as it draws, its rows as laid and the marks of its folded briefs, so it widens and narrows as the lane is scoped and folded. A canvas follows where the reader is or keeps its view, set in its head; as built it had not always followed. The plate draws the body whole or only the scope, and where it has the room for a cell per brief, a cell per brief or per file only; smaller, it is files alone. A card carries no figure, since its overview helped little and its fixed height left a short card standing tall, and a step by the arrow keys stops on each card, which it had passed over.
+
+[Each figure takes its own room and its own switches](git:7d22743..5281a72)
+
+#### The way down is set clear and the canvas closed in its rim
+
+The way down keeps as much clear beneath it, to a program's lit space, as above it, the prose's fade reaching a little into that clear, and it spans the row: the place at its left, the trail and undo at its right. What a canvas holds stops inside its rim, since a faint line shows what passes under it, and the room between a head's icons is the head's own, so a pointer crossing them keeps one cursor.
+
+[The way down is set clear and the canvas closed in its rim](git:cf9d53e..9405676)
+
+#### The page's edges are measured by the ink
+
+The way down stands as far from the page's top as the dock's icons from its foot, about twenty-one pixels each by the ink. The prose's opening stands at its box's top, its element reaching under the heads' icons and the dock so its fades go out beneath them. A press in the dock adds and never swaps, the columns shrinking to make room. A canvas holds its head inside its rim, and every program's space reaches a little past its head and box, so its icons stand inside it when it lights.
+
+[The page's edges are measured by the ink](git:4b3584a..ae3d420)
+
+#### The history catches up
+
+The history told 2026-10-03 and 2026-10-04, and the author's own placed the thinking of those two days, which had stood unplaced.
+
+[The history catches up](git:2381112..7637226)
 
 ### The author asks what the project is for
 
