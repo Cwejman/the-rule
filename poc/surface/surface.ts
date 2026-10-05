@@ -1488,6 +1488,10 @@ type Settings = {
   room: "spread" | "centred";
   /** the edge the dock stands along */
   dock: "foot" | "left";
+  /** whether each canvas brings where the reader is into view as they move, or keeps the view they left it at */
+  follow: { body: boolean; history: boolean };
+  /** whether the plate draws the body whole, or only the reading the reader is scoped to */
+  plate: "whole" | "scope";
 };
 
 const DEFAULTS: Settings = {
@@ -1514,6 +1518,8 @@ const DEFAULTS: Settings = {
   gutters: { body: [null, "links"], history: [null, "links"] },
   room: "spread",
   dock: "foot",
+  follow: { body: true, history: true },
+  plate: "whole",
 };
 
 /** The reader's settings: the page's own, and no reading's. */
@@ -2336,33 +2342,6 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
  * since that is what decides whether to enter. Unfolded it gives the whole of that brief, and past that the only act is
  * to open it, which changes the reading.
  */
-/**
- * The overview a card carries at its right: the reading beyond the boundary drawn small, a row per brief, indented by
- * its depth and as long as that brief's own prose. It is the shape's reading of a branch the lane will never lay, so a
- * reader sees how much waits and in what shape before spending the opening on it.
- */
-const CARDMAP = { w: 62, pitch: 4, bar: 2, indent: 5, tall: 132 };
-function cardMap(a: string): string {
-  const kin = state.body!.briefs.filter((b) => b.address.startsWith(a + "/"));
-  if (kin.length === 0) return "";
-  // the rows keep their pitch while they fit, and scale together once the branch is taller than the room
-  const pitch = Math.min(CARDMAP.pitch, CARDMAP.tall / kin.length);
-  const bar = Math.max(1, Math.min(CARDMAP.bar, pitch - 1));
-  const base = depthOf(a);
-  const own = (x: string) => state.index!.own.get(x) ?? 0;
-  const most = Math.max(1, ...kin.map((b) => own(b.address)));
-  const rows = kin
-    .map((b, i) => {
-      const x = Math.min(CARDMAP.w - 8, (depthOf(b.address) - base - 1) * CARDMAP.indent);
-      const w = clamp((own(b.address) / most) * (CARDMAP.w - x), 3, CARDMAP.w - x);
-      const kind = isCard(b) ? "away" : level(b.address).length > 0 ? "head" : "para";
-      return `<rect class="${kind}" x="${x}" y="${(i * pitch).toFixed(1)}" width="${w.toFixed(1)}" height="${bar.toFixed(1)}" rx="${(bar / 2).toFixed(1)}"/>`;
-    })
-    .join("");
-  const h = Math.ceil(kin.length * pitch);
-  return `<svg class="fig cardmap" width="${CARDMAP.w}" height="${h}" viewBox="0 0 ${CARDMAP.w} ${h}">${rows}</svg>`;
-}
-
 /** The line of acts beneath a brief or a card: what unfolding it would show, how much lies beneath, and its badges. */
 const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; beneath: number; unfold: boolean }): string =>
   `<div class="act ${kind} chrome"${o.fold ? ` data-fold="${esc(a)}"` : ""}>` +
@@ -2390,7 +2369,6 @@ function cardHtml(a: string): string {
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
-    `<div class="card-map">${cardMap(a)}</div>` +
     line +
     `</div>`
   );
@@ -2457,6 +2435,8 @@ type Widget = Adjunct | Figure | Pane;
 
 const ICON: Record<string, string> = {
   none: `<path d="M5 5l6 6M11 5l-6 6"/>`,
+  follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
+  scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
   shape: `<path d="M3 3h7M3 6h9M6 9h6M6 12h4"/>`,
   tree: `<path d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/>`,
   ahead: `<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>`,
@@ -3219,6 +3199,9 @@ function loadSettings(): void {
   const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
   const trunk = (settings.trunk ?? {}) as Partial<Settings["trunk"]>;
   settings.trunk = { body: runs(trunk.body, DEFAULTS.trunk.body), history: runs(trunk.history, DEFAULTS.trunk.history) };
+  const follow = (settings.follow ?? {}) as Partial<Settings["follow"]>;
+  settings.follow = { body: follow.body !== false, history: follow.history !== false };
+  if (settings.plate !== "scope") settings.plate = "whole";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -3464,14 +3447,17 @@ type Cell = { a: string; r0: number; r1: number; a0: number; a1: number; before:
 /** Whether a brief is a cell at a grain: every brief, or the root and each file's own brief. */
 const isCell = (b: Brief, grain: Grain): boolean => grain === "brief" || b.address === "" || isCard(b);
 
+/** The brief the plate stands on: the body's root, or where the reader is scoped where the plate is set to the scope. */
+const plateRoot = (): string => (settings.plate === "scope" && brief(state.scope) ? state.scope : "");
+
 /** The cells standing directly on a cell: its level, or at the grain of files the nearest files beneath it. */
 const cellsOn = (a: string, grain: Grain): Brief[] => level(a).flatMap((k) => (isCell(k, grain) ? [k] : cellsOn(k.address, grain)));
 
 /** The middle of a row of numbers. */
 const middling = (xs: number[]): number => [...xs].sort((x, y) => x - y)[xs.length >> 1] ?? 0;
 
-/** Lays the body's cells at a grain: each parent's edge shared by how many stand beneath, and each ring's area by how many it holds. */
-function layPlate(grain: Grain): Cell[] {
+/** Lays the cells beneath a root at a grain: each parent's edge shared by how many stand beneath, and each ring's area by how many it holds. */
+function layPlate(grain: Grain, top: string): Cell[] {
   const count = new Map<string, number>();
   const many = (a: string): number => {
     if (!count.has(a)) count.set(a, 1 + cellsOn(a, grain).reduce((n, k) => n + many(k.address), 0));
@@ -3482,7 +3468,7 @@ function layPlate(grain: Grain): Cell[] {
     const kids = cellsOn(up.address, grain);
     const total = kids.reduce((n, k) => n + many(k.address), 0);
     // the room between two cells is their kinship's, and at the ends of a level it is whatever bounds the parent
-    const between = (x: Brief, y: Brief) => (up.address === "" ? PLATE.apart : x.file !== y.file ? PLATE.file : PLATE.kin);
+    const between = (x: Brief, y: Brief) => (up.address === top ? PLATE.apart : x.file !== y.file ? PLATE.file : PLATE.kin);
     const starts = offsets(
       kids.map((k) => ((a1 - a0) * many(k.address)) / total),
       0,
@@ -3490,31 +3476,32 @@ function layPlate(grain: Grain): Cell[] {
     kids.forEach((k, i) => {
       const s0 = a0 + starts[i];
       const s1 = i === kids.length - 1 ? a1 : a0 + starts[i + 1];
-      const b0 = i > 0 ? between(kids[i - 1], k) : up.address === "" ? PLATE.apart : before;
-      const b1 = i < kids.length - 1 ? between(k, kids[i + 1]) : up.address === "" ? PLATE.apart : after;
+      const b0 = i > 0 ? between(kids[i - 1], k) : up.address === top ? PLATE.apart : before;
+      const b1 = i < kids.length - 1 ? between(k, kids[i + 1]) : up.address === top ? PLATE.apart : after;
       spans.push({ b: k, d, a0: s0, a1: s1, leaf: cellsOn(k.address, grain).length === 0, before: b0, after: b1, inside: k.file !== up.file ? PLATE.file : PLATE.kin });
       share(k, s0, s1, d + 1, b0, b1);
     });
   };
-  share(brief("")!, -Math.PI / 2, 1.5 * Math.PI, 1, 0, 0);
+  share(brief(top)!, -Math.PI / 2, 1.5 * Math.PI, 1, 0, 0);
   const D = Math.max(1, ...spans.map((s) => s.d));
   // each ring's area follows how many cells it holds, so a level of many is given the room it needs and a level of few
   // is not drawn as a band of wide slabs
   const held = Array.from({ length: D }, (_, i) => spans.filter((s) => s.d === i + 1).length ** PLATE.share);
   const all = held.reduce((x, y) => x + y, 0);
   const edges = [PLATE.hub, ...held.map((_, i) => Math.sqrt(PLATE.hub ** 2 + ((1 - PLATE.hub ** 2) * held.slice(0, i + 1).reduce((x, y) => x + y, 0)) / all))];
-  const root: Cell = { a: "", r0: 0, r1: PLATE.hub, a0: 0, a1: 2 * Math.PI, before: 0, after: 0, inside: 0, outside: PLATE.kin, label: state.body!.title };
+  const root: Cell = { a: top, r0: 0, r1: PLATE.hub, a0: 0, a1: 2 * Math.PI, before: 0, after: 0, inside: 0, outside: PLATE.kin, label: top === "" ? state.body!.title : brief(top)!.title };
   return [
     root,
     ...spans.map((s) => ({ a: s.b.address, r0: edges[s.d - 1], r1: edges[s.leaf ? Math.min(D, s.d + PLATE.reach) : s.d], a0: s.a0, a1: s.a1, before: s.before, after: s.after, inside: s.inside, outside: s.leaf && s.d + PLATE.reach >= D ? 0 : PLATE.kin, label: s.b.title })),
   ];
 }
 
-/** The cells of the body in view at each grain, laid once for each index. */
-let plateLaid: { index: Index; cells: Map<Grain, Cell[]> } | null = null;
+/** The cells of the plate at each grain, laid once for each index and root. */
+let plateLaid: { index: Index; top: string; cells: Map<Grain, Cell[]> } | null = null;
 const plateCells = (grain: Grain): Cell[] => {
-  if (plateLaid?.index !== state.index) plateLaid = { index: state.index!, cells: new Map() };
-  if (!plateLaid.cells.has(grain)) plateLaid.cells.set(grain, layPlate(grain));
+  const top = plateRoot();
+  if (plateLaid?.index !== state.index || plateLaid.top !== top) plateLaid = { index: state.index!, top, cells: new Map() };
+  if (!plateLaid.cells.has(grain)) plateLaid.cells.set(grain, layPlate(grain, top));
   return plateLaid.cells.get(grain)!;
 };
 
@@ -3570,10 +3557,11 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
   const cells = plateCells(grainAt(S));
   const drawn = new Set(cells.map((c) => c.a));
   const onPath = new Set(prefixesOf(state.focus).filter((a) => drawn.has(a)));
-  const here = prefixesOf(state.focus).findLast((a) => drawn.has(a)) ?? "";
+  const top = plateRoot();
+  const here = prefixesOf(state.focus).findLast((a) => drawn.has(a)) ?? top;
   // the way to what is pointed at is drawn as well as lit, so a plate drawn again while the pointer rests keeps it
   const trail = new Set(state.pointed === null ? [] : prefixesOf(state.pointed));
-  const cls = (c: Cell) => `${c.a === "" ? " centre" : ""}${onPath.has(c.a) ? " on" : ""}${c.a === here ? " here" : ""}${trail.has(c.a) ? " trail" : ""}${c.a === "" || inLane(c.a) ? "" : " away"}`;
+  const cls = (c: Cell) => `${c.a === top ? " centre" : ""}${onPath.has(c.a) ? " on" : ""}${c.a === here ? " here" : ""}${trail.has(c.a) ? " trail" : ""}${c.a === top || inLane(c.a) ? "" : " away"}`;
   const shapes = cells.map((c) => {
     const { d, round } = cellPath(c, S);
     const mid = ((c.r0 + c.r1) / 2) * k;
@@ -4176,8 +4164,9 @@ function fitCanvas(): void {
 
 /** Brings the brief in focus into view when it is not, easing there; a focus already in view moves nothing. */
 function followFocus(): void {
-  // a reader who went looking elsewhere keeps the view they went looking with, until they ask for the way here
-  if (astray() || state.followed === state.focus) return;
+  // a canvas set to keep its view never moves for the reading; one set to follow always does, even after the reader
+  // went looking elsewhere on it
+  if (!settings.follow[inPast() ? "history" : "body"] || state.followed === state.focus) return;
   state.followed = state.focus;
   bringIntoView(state.focus, headFor(state.focus));
 }
@@ -4941,7 +4930,16 @@ function headDepth(k: string): string {
 function headSettings(k: string): string {
   const w = PROGRAMS[k]?.world ?? "body";
   // a canvas's acts are its world's, so what they say is reckoned there
-  if (k === "canvas" || k === "gitCanvas") return inNamed(w, () => headAct("face") + headAct("trunk")) ?? "";
+  if (k === "canvas" || k === "gitCanvas") {
+    const on = settings.follow[w];
+    const tip = on ? "follows where you are as you move — press to keep the view where you leave it" : "keeps the view where you leave it — press to follow where you are as you move";
+    return (inNamed(w, () => headAct("face") + headAct("trunk")) ?? "") + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
+  }
+  if (k === "plate") {
+    const on = settings.plate === "scope";
+    const tip = on ? "draws the reading you are scoped to — press to draw the body whole" : "draws the body whole — press to draw only the reading you are scoped to";
+    return `<button class="pick${on ? " on" : ""}" data-toggle="plate" data-tip="${esc(tip)}">${icon("scoped")}</button>`;
+  }
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
   return ([0, 1] as const)
@@ -6525,6 +6523,18 @@ const onClick = (e: MouseEvent): void => {
     saveSettings();
     return void drawAll();
   }
+  // a canvas's following and the plate's reach are settings of their own, set in their heads
+  const toggle = t.closest<HTMLElement>("[data-toggle]")?.dataset.toggle;
+  if (toggle) {
+    const [what, w] = toggle.split(":") as [string, "body" | "history"];
+    if (what === "follow") {
+      settings.follow = { ...settings.follow, [w]: !settings.follow[w] };
+      // turned on, it takes the reader's place up again at once
+      if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
+    } else settings.plate = settings.plate === "scope" ? "whole" : "scope";
+    saveSettings();
+    return void drawAll();
+  }
   const set = t.closest<HTMLElement>("[data-set]");
   if (set) {
     const v = set.dataset.value!;
@@ -7329,7 +7339,8 @@ body.moving, body.moving * { cursor: grabbing !important; user-select: none; }
 body.moving .lot, .lot.lit { background: var(--wash); }
 /* a canvas's rim is drawn here, above everything it holds, so nothing on its way out of the canvas crosses over it */
 .lot.rim { box-shadow: inset 0 0 0 1px var(--rim); }
-#areas:not(.alone) :is(#canvas, #gcanvas)::after { display: none; }
+/* wide, the rim is drawn with the heads, and the canvas's top fades behind its head's icons as its foot does behind its acts */
+#areas:not(.alone) :is(#canvas, #gcanvas)::after { inset: 1px 1px auto 1px; height: 48px; border-radius: 10px 10px 0 0; box-shadow: none; background: linear-gradient(to top, transparent, var(--ground) 62%); }
 /* the rim is a faint line, and what passes under a faint line shows through it, so what a canvas holds stops inside it */
 #areas:not(.alone) :is(#canvas, #gcanvas) { clip-path: inset(1px round 9px); }
 .phead { position: absolute; height: ${HEAD_ROW}px; display: flex; align-items: center; gap: 0; pointer-events: none; font-family: var(--sans); font-size: 12px; }
@@ -7548,17 +7559,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
    reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
 .brief .card .acts [data-act="scope"] { display: none; }
 .brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
-.brief .card { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
-.brief .card-top, .brief .card-act { grid-column: 1 / -1; }
-.brief .card-body { grid-column: 1; min-width: 0; }
-/* the overview stands at the card's right, top-aligned with the prose it belongs to, and gives way where the lane is narrow */
-.brief .card-map { grid-column: 2; }
-.brief .card-map svg { display: block; }
-svg.cardmap .para { fill: var(--rest); }
-svg.cardmap .head { fill: var(--door); }
-svg.cardmap .away { fill: none; stroke: var(--door); stroke-width: .8; }
-.brief .card.lit svg.cardmap .para, .brief .card.here svg.cardmap .para { fill: var(--door); }
-.brief .card.lit svg.cardmap .head, .brief .card.here svg.cardmap .head { fill: var(--lit); }
+.brief .card-body { min-width: 0; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h3); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
 .brief .card .stamp { flex: none; white-space: nowrap; }

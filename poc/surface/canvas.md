@@ -266,6 +266,12 @@ Coming back is an act, and it is one they already have: the full stop returns th
 
 *The author's, 2026-09-20, given as the map detaching once you go elsewhere, with syncing as an act; as built the same day. Being astray is read from where the selection stands rather than remembered, so nothing can say the map is following while it is not.*
 
+### 6.3 Following is the reader's setting
+
+Whether a map follows is a setting in its head. Following, it brings where the reader is into view whenever that moves, even after they went looking elsewhere on it. Not following, it keeps the view where they left it, and the full stop still brings them back. Turned on, it takes the reader's place up at once.
+
+*The author's, 2026-10-05, since as built the map did not always follow. That following overrides being astray, and that it is on unless turned off, are the session's.*
+
 ## 7. What the substrate gives the canvas
 
 Three things in the markdown carry a flow, and nothing new is written for the canvas.

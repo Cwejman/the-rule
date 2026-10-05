@@ -200,9 +200,11 @@ The plate is a wing widget: the body whole in one round figure, the root at its 
 
 Pressing a cell goes there, and pressing with the modifier key held, command or control, folds or unfolds it in place. It does not stand on a phone, where [no finger can land on a cell that small](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger).
 
+It draws the body whole, or, set in its head, only the reading the reader is scoped to, that reading's own brief at the centre.
+
 At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough. The author's, 2026-10-05, that it may follow the scope or stand global.*
 
 ### 7.1 A cell's room is how many stand beneath it
 

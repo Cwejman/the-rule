@@ -36,6 +36,10 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
+A card carries no figure of what lies beyond it. The overview it once drew at its right was little help, and its fixed height left a card of a line or two standing tall in a wide lane; how much waits is said by the count beneath it.
+
+*The author's, 2026-10-05.*
+
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
