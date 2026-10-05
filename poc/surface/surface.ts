@@ -5113,7 +5113,9 @@ function alignEnds(): void {
   const last = articles.at(-1);
   const blocks = last ? all<HTMLElement>(":scope > *:not(.surface):not(.act), :scope > .surface > *:not(.act)", last) : [];
   const off = opening ? opening.getBoundingClientRect().top - c0 - P0 : 0; // the heading's margin collapses through the opening
-  const lastTop = last ? last.getBoundingClientRect().top - c0 - P0 : 0;
+  // the line reaches the last thing of the reading at the bottom, a card as much as a brief, since a step stops on it
+  const reached = all<HTMLElement>(".brief, .card", ui.lane).at(-1);
+  const lastTop = reached ? reached.getBoundingClientRect().top - c0 - P0 : 0;
   const lane = (blocks.at(-1) ?? last)?.getBoundingClientRect().bottom ?? c0;
   const laneH = lane - c0 - P0;
   const tail = ui.lane.getBoundingClientRect().bottom - lane;
@@ -6168,7 +6170,9 @@ function cycle(a: string): void {
 
 /** Moves the focus to an address that is in the lane, without changing any fold. */
 function moveTo(a: string): void {
-  if (a === state.focus || !(a === "" || inLane(a))) return;
+  // a card stands in the lane where its holder's prose draws it
+  const drawn = isCard(brief(a)) && ui.lane.querySelector(`.card[data-a="${cssEsc(a)}"]`) !== null;
+  if (a === state.focus || !(a === "" || inLane(a) || drawn)) return;
   state.focus = a;
   followHistory(hashFor(a));
   scrollToFocus(true);
@@ -6237,10 +6241,11 @@ function foldAll(): void {
 
 /** The previous or the next brief in the lane's order. */
 function step(delta: number): void {
-  const order = [brief(state.scope)!, ...laneOrder(state.scope)];
-  const i = order.findIndex((b) => b.address === state.focus);
+  // the reading as it is drawn, a card where its link stood, so a step stops on each card as the reading line does
+  const order = all<HTMLElement>(".brief, .card", ui.lane).map((el) => el.dataset.a!);
+  const i = order.indexOf(state.focus);
   const j = clamp(i + delta, 0, order.length - 1);
-  moveTo(i < 0 ? order[0]?.address ?? "" : order[j].address);
+  moveTo(i < 0 ? order[0] ?? "" : order[j]);
 }
 
 // ### 3.14.1 Pull past the top
