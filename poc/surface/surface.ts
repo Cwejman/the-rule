@@ -4553,13 +4553,17 @@ function boxFrame(h: number): { top: number; height: number } {
 /**
  * How far the prose's element reaches past its box wide, so its fades run on under the heads' icons above and the dock's
  * below, rather than stopping at the box with a band of bare ground beside the icons that reads as a bar of its own.
+ * At the top it reaches a little past its lit space too, into the clear under the way down, as it does past the dock.
  * Its content is padded by the same, so the reading at rest stands in the box as before.
  */
 const under = (): { top: number; foot: number } =>
-  narrow() ? { top: 0, foot: 0 } : { top: HEADROOM, foot: settings.dock === "left" ? 0 : 10 + 12 };
+  narrow() ? { top: 0, foot: 0 } : { top: HEADROOM + 6 + 8, foot: settings.dock === "left" ? 0 : 10 + 12 };
 
-/** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
-const WAY = { top: 17, height: 18, below: 12 };
+/**
+ * The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath, and
+ * as much clear under it, to the top of a program's lit space, as above it.
+ */
+const WAY = { top: 17, height: 18, below: 17 + 6 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
@@ -5284,7 +5288,8 @@ function placeCrumb(): void {
   const span = Math.round(Math.min(right, narrow() ? a0.right - gap : Infinity) - left);
   ui.crumb.style.left = `${Math.round(left - a0.left)}px`;
   ui.crumb.style.width = "max-content";
-  ui.crumb.style.minWidth = narrow() ? `${span}px` : "0px";
+  // it spans the row at least, so the placement stands at its left and the trail and undo at its right
+  ui.crumb.style.minWidth = `${span}px`;
   ui.crumb.style.maxWidth = `${Math.max(span, Math.round(a0.width - (left - a0.left) - gap))}px`;
   // the pull's gauge lies over the top of the prose, just under the way down
   const lane = ui.lane.getBoundingClientRect();
