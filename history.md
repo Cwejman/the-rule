@@ -7,30 +7,88 @@ kind: record
 
 How this repository came to be what it is, told over its commits. It is told in four periods of its life, newest first, each period by the days, sittings or labs in it, and each of those by the runs of work it held, with the commits standing beneath as leaves. Newest stands first at every level, so a story above another is later.
 
-The stories name a few things often. The law is [the rule](rule.md), called the code until 2026-09-17. The arc is this repository's knowledge, begun inside OpenLight, the author's larger project, and cut out as this repository on 2026-09-14. The study is the ten labs that found the law, each running under an edition, a version of the law, and the sweep is the research of August they read. The practice says how the law is kept in markdown and git, and the skill what a session does with it.
+The stories name a few things often. The law is [the rule](rule.md), called the code until 2026-09-17. The arc is this repository's knowledge, begun inside OpenLight, the author's larger project, and cut out as this repository on 2026-09-14. The study is the ten labs that found the law, each running under an edition, a version of the law, and the sweep is the research of August they read. The practice says how the law is kept in markdown and git, and the skill what a session does with it. The author's thinking is their dictation, held as said a day to a file, and the ideas are the threads held open beside the law. The pilot is the first working form of the author's aim as OpenLight lays it, and as it stands it reads and cannot yet write or run anything.
 
 Knowledge under the law is made of briefs, each a heading with its prose, whose face is the heading and the first paragraph, and the substrate is the law's word for such knowledge as a medium, of which the arc is one. A file is one reading, and a paragraph that is nothing but a link, a lone link, places another file there as a part of it, shown as a card; crossing into it crosses a boundary. The body is the part of the arc a page reads, everything its root file reaches that way, and a scope is the part of the body a reader has narrowed to.
 
-The surface is the page the body is read on. Before it, on 2026-09-11, a monitor built to watch a lab became a first surface, and a program called the reader program took its place; both were retired on 2026-09-12. The surface's lane holds the prose, and the brief under its reading line, a line across the lane, is where the reader stands. The shape is a small drawing of the lane standing beside it. The canvas draws the same as a map of nodes, and the plate draws the body whole as one round figure, which grown to a pane is the dish. The middle is where the panes stand, and an act is anything a reader can do there, by a key or a press. [The surface's own brief](poc/surface/README.md) has the rest, and [its brief on history](poc/surface/history.md) how it reads this file. A fresh head is a session that reads a draft cold, and a cold review does the same to code. History itself means three things here: git's record of commits, this file's stories over it, and the surface's way of reading them.
+The surface is the page the body is read on. Before it, on 2026-09-11, a monitor built to watch a lab became a first surface, and a program called the reader program took its place; both were retired on 2026-09-12. The surface's lane holds the prose, and the brief under its reading line, a line across the lane, is where the reader stands. The shape is a small drawing of the lane standing beside it. The canvas draws the same as a map of nodes, and the plate draws the body whole as one round figure, which grown to a pane is the dish. The middle is where the panes stand, and an act is anything a reader can do there, by a key or a press. Since 2026-10-01 the page is laid by hand: a row of columns, each a stack of programs, each program under a head of its own, brought in and taken away from a dock, with the way down, the line of levels a reader has come down, saying where they stand. A world is what a program reads, the body's or git's. [The surface's own brief](poc/surface/README.md) has the rest, and [its brief on history](poc/surface/history.md) how it reads this file. A fresh head is a session that reads a draft cold, and a cold review does the same to code. History itself means three things here: git's record of commits, this file's stories over it, and the surface's way of reading them.
 
-*Begun 2026-09-27. A story's confidence holds for everything beneath it unless one says otherwise, and where none says, a story was reasoned on 2026-09-29 by a later session from the commits and the briefs they wrote, the messages carried as written and not checked against the files. Two days say otherwise at their heads, 2026-09-27, told by the session that did the work, and 2026-09-21, told by a later session on 2026-09-27; a few stories carry a note of their own.*
+*Begun 2026-09-27. A story's confidence holds for everything beneath it unless one says otherwise, and where none says, a story was reasoned on 2026-09-29 by a later session from the commits and the briefs they wrote, the messages carried as written and not checked against the files. A day that says otherwise says so at its head, and a few stories carry a note of their own.*
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-10-02 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
-On the last day the surface's program was assembled again without changing what it does.
+From 2026-09-21 to 2026-10-04 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On the last day the author stepped back from the page to ask what the project is for.
+
+### The author asks what the project is for
+
+On 2026-10-04 the author dictated an interview with themself: whether the harness should come in now, whether work done with a model could stand around what it is about as comments stand around a post, whether a data layer of our own could lock no one in or out, and why the pilot is stuck reading. It ended in asking for the real pilot.
+
+*Reasoned by a later session on 2026-10-05 from the commits and the files they wrote.*
+
+#### The real pilot, a point to orbit
+
+The author asked for a real pilot: not the pilot as the steps taken so far, but one purpose to orient them. They named what it holds: space in three dimensions made from simple, naked functions of geometry, each place drawn from a seed of its own as OpenLight's first proof of concept coloured each dimension from its name, AI's use and its cost made transparent, typed data in place of what programs are, holons as files, and a foundation the audience owns.
+
+[The real pilot, a point to orbit](git:5213b97)
+
+#### The thread beyond read-only is held as one holon
+
+What would take the pilot past reading is held in one open file in the ideas' folder, placed by no link yet. The session first set it in two places, a store among the ideas and the aspects of a reading under the surface, and took both back out within twenty minutes, since the surface is not touched until it is asked for.
+
+[The thread beyond read-only is held as one holon](git:11651c2..745f156)
+
+#### The day's thinking is held
+
+The author's prompts were held as said, among them answers to the session along the way: that the cycles don't stop, in the author's words a crucial note on the work's time; big type, with the aspects of a reading coming in from the edge; and that with compute needed anyway, git and folders are not kept for their own sake, the requirements are the centre and a simple store will do.
+
+[The day's thinking is held](git:f60423b..8558357)
+
+### The page laid by hand is first lived in
+
+On 2026-10-03 the author used the page laid by hand for the first time. It gave no sign of what the pointer was on, shared the page's height unevenly, cycled the programs where a press should open or close one, and offered places to drop that did not match the row.
+
+The session wrote what the author found into the brief, built it, and reviewed the build cold twice. Then the way down was taken off the prose into a row of its own across the page.
+
+*Reasoned by a later session on 2026-10-05 from the commits and the files they wrote.*
+
+#### The plate is drawn once, the way down takes a row of its own, and the heads are tidied
+
+The author saw the plate drawn twice, alone and again as a figure in the stacks, and it is drawn once now.
+
+The way down could not stand on the prose, so the author chose a row of its own across the top of the page, above every head: the body's place, trail and undo, git's programs having no way down of their own. Folding is each program's, so the depth a world is unfolded to went into the head of each of its prose and canvas. Then the row was set clear of the heads, and the heads were tidied: the depth in compact parts at a head's right end, the canvas's settings as glyphs, the switches reading as switches.
+
+[The plate is drawn once, the way down takes a row of its own, and the heads are tidied](git:a61c17e..04990d2)
+
+#### Two cold reviews of the frame, the press and the move
+
+The first review found the dock flickering between taking a program away and putting it back, a press with no room still taking programs away, and a move cancelled by the browser or by escape leaving the row as it was dragged. The second found a program at the far end losing the width it was pulled to, a cancelled drag pressing its icon, and a resize before the body was read laying the page. All were mended.
+
+[Two cold reviews of the frame, the press and the move](git:81fe804..6c7e452)
+
+#### What the author found is written and built
+
+Every program stands in one frame, its head in a row along the top and its box beneath, and the head shows wherever the pointer rests; the dock at the left gives the foot back. A press in the dock opens a program that cannot be seen and closes one that can, so an icon is lit exactly while its program is seen. A dragged program is only ever put between others, and the row moves under the hand: the author wanted live moving unless it was a problem, and the session measured laying the row again at 13 to 31 milliseconds and found none.
+
+[What the author found is written and built](git:b158f7b..63abad8)
+
+#### The author's thinking of 2026-10-03 is held
+
+The author's findings were held as said: pointing at a program shows its head, the room is shared alike, a press opens or closes, dropping matches the row and moves things live, and the dock on the left releases the foot.
+
+[The author's thinking of 2026-10-03 is held](git:dbc2439)
 ### The surface is assembled again
 
 On 2026-10-02 the author found the surface's program grown to more than three times the first one, and asked that it be assembled again by what it is really for, as prose is, on the lore of building programs that the sister project's principles hold, without changing what it does. The session wrote the assembly as an open brief, read it cold until a reading changed only words, and built it a move at a time. A harness drove the page as it was and the page as built side by side through fourteen scenarios, a phone and the two worlds among them. It recorded the pictures, the storage, the scrolls, the text and the marks of each step, and a cold review read each move before it was committed. The program went from 7,945 lines to 7,676. Most of what is left is what the program does, and the comments that say why. The author let the size stand once making it smaller would no longer serve the same function, and the heavier cut of the comments that was offered waits on them.
 
-*Told by the session that made these commits, as its debrief, 2026-10-02; the commit that tells it stands untold above it.*
+*Told by the session that made these commits, as its debrief, 2026-10-02; the commit that told it is placed in its run since a later day was told above it.*
 
 #### The comments say why, and the lane alone is laid by the row's placing
 
 The comments were cut to the reasons they guard, since how the code came to be is held by the briefs and this file. Asked what of the lane alone must be kept, the author kept the phone's foot, which appears when the reader scrolls up, and let the rest go to common sense. So where the lane stands alone the page is one pane, the prose or the map, placed as the row places its stacks. The shape stands as a rail at the edge the reader chose. The five areas, their grid, the wings and their slots are gone. A phone's pictures are the same as before; what changed is only in the markup, and a narrow window showing the map no longer keeps the rail beside it.
 
-[The comments say why, and the lane alone is laid by the row's placing](git:938ac02..9259c06)
+[The comments say why, and the lane alone is laid by the row's placing](git:938ac02..8d66eaf)
 
 #### Each thing once, a world as a value, an act's other hand, and the gestures as functions
 
