@@ -4560,7 +4560,7 @@ function boxFrame(h: number): { top: number; height: number } {
 }
 
 /** The way down's row wide: near the page's top edge, since nothing stands above it, with the heads just beneath. */
-const WAY = { top: 6, height: 18 };
+const WAY = { top: 9, height: 18 };
 
 /** Where the prose is clear of the top edge: a share of the height, or below the way down to the scope when it stands. */
 const rimTop = (h: number): number => Math.max((h * RIM.top) / 100, ui.crumb.hidden ? 0 : ui.crumb.offsetTop + ui.crumb.offsetHeight + 8);
@@ -7705,6 +7705,7 @@ body.touch .knob.turning .hint { opacity: 1; }
 #strips.away { transform: translateY(150%) scale(.92); opacity: 0; }
 /* the foot is one row: what stands in it follows what the reader has chosen */
 .strip.foot { bottom: 22px; gap: 8px; }
+.strip.dock.foot { bottom: 14px; }
 .glass { background: var(--glass); border: 1px solid var(--bezel); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8); }
 .strip .pill { display: flex; align-items: center; border-radius: 26px; padding: 3px; gap: 2px; animation: pill-in .26s cubic-bezier(.2,.9,.3,1); }
 @keyframes pill-in { from { opacity: 0; transform: translateY(10px) scale(.92); } }
