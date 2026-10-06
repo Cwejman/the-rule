@@ -2711,9 +2711,8 @@ function proseIn(W: number, w: "body" | "history"): { measure: number; gutter: n
   if (n) {
     const each = Math.min(GUTTER.want, Math.floor((W - s.measure) / n - s.gap));
     if (each >= GUTTER.least) return { measure: W - n * (each + s.gap), gutter: each, sides };
-    // the gutters gone, the measure keeps its own and stands in the middle of the room they left, rather than taking
-    // that room and growing wider under a hand that was pulling the prose narrower
-    return { measure: Math.min(W, s.measure), gutter: 0, sides: [false, false] };
+    // the gutters gone, the prose takes the room they left, so it always fills the width its column is given
+    return { measure: W, gutter: 0, sides: [false, false] };
   }
   return { measure: W, gutter: 0, sides: [false, false] };
 }

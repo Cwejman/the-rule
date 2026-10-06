@@ -84,7 +84,7 @@ The gap setting stays what it is, the least room between two programs. A width p
 
 A figure keeps the width it declares, as [it does today](framework.md#21-widths), so a column of figures is as wide as its widest figure and is not pulled; a gap beside it sizes only the column on its other side. A program standing alone has a least width and a width of its own, and no greatest: the prose a least of 440, its measure alone, and its default measure with both gutters as its own, as the measure's least and default are today; the canvas 360 and 720, as its floor and greatest width are today; and the plate 160, and the plate figure's 260 as its own, so it comes in as the plate and is pulled wider to be the dish.
 
-The prose's column holds the prose and its gutters. A gutter takes the width an adjunct reads best in, and the measure takes what the gutters leave. As the column is pulled narrower the gutters narrow first, then go as a pair, before the measure narrows, as [they give way](framework.md#28-giving-way) today.
+The prose's column holds the prose and its gutters. A gutter takes the width an adjunct reads best in, and the measure takes what the gutters leave. As the column is pulled narrower the gutters narrow first, then go as a pair, before the measure narrows, as [they give way](framework.md#28-giving-way) today. Once they have gone the prose takes the room they left, so it always fills the width its column is given; on 2026-10-06 the author found it standing at its default measure in the middle of a wider column, which it no longer does.
 
 A gap double-pressed gives its programs back their own widths: the prose its default measure with its gutters, the canvas 720, and the plate 260.
 
