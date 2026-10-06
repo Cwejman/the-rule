@@ -17,9 +17,19 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-10-05 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-10-06 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the next day went back to tightening it.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it.
+
+### The prose fills its column
+
+On 2026-10-06 the author found the prose standing at its default measure in the middle of a column wider than it. Where the column was too narrow for the gutter of links, the gutter went and the prose kept its own width rather than the room the gutter left, which had been laid so that a hand pulling the prose narrower never saw it grow. The prose now takes that room, so it always fills its column, and grows a little as the gutter goes.
+
+*Reasoned on 2026-10-06 by the session that mended it, from the commit and the brief it wrote.*
+
+#### Once its gutters have gone the prose takes the room they left
+
+[Once its gutters have gone the prose takes the room they left](git:48bf044)
 
 ### The page is tightened as the author points
 
@@ -32,6 +42,12 @@ On 2026-10-05 the author used the page and pointed at what was off, one thing at
 The shape is as wide as it draws, its rows as laid and the marks of its folded briefs, so it widens and narrows as the lane is scoped and folded. A canvas follows where the reader is or keeps its view, set in its head; as built it had not always followed. The plate draws the body whole or only the scope, and where it has the room for a cell per brief, a cell per brief or per file only; smaller, it is files alone. A card carries no figure, since its overview helped little and its fixed height left a short card standing tall, and a step by the arrow keys stops on each card, which it had passed over.
 
 [Each figure takes its own room and its own switches](git:7d22743..5281a72)
+
+#### The history tells the day
+
+The history told the day as the session that worked last in it saw it, and named what it left out: a conversation of ten voices on the common goal of the real pilot, which wrote nothing into the repository and which the author let go.
+
+[The history tells the day](git:eab4176)
 
 #### The way down is set clear and the canvas closed in its rim
 
