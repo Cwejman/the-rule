@@ -25,7 +25,13 @@ Near the end the surface's code was assembled again without changing what it doe
 
 On 2026-10-06 the author found the prose standing at its default measure in the middle of a column wider than it. Where the column was too narrow for the gutter of links, the gutter went and the prose kept its own width rather than the room the gutter left, which had been laid so that a hand pulling the prose narrower never saw it grow. The prose now takes that room, so it always fills its column, and grows a little as the gutter goes.
 
+That did not mend what the author saw. Asked where, the author pointed at a reading of code blocks in another repository that holds this one, and there the gutter stood bare, since nothing in the reading links anywhere. A gutter now stands only where the lane holds something for it.
+
 *Reasoned on 2026-10-06 by the session that mended it, from the commit and the brief it wrote.*
+
+#### A bare gutter gives its room to the prose
+
+[A bare gutter gives its room to the prose](git:779af9b)
 
 #### Once its gutters have gone the prose takes the room they left
 
