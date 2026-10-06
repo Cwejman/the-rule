@@ -21,13 +21,19 @@ From 2026-09-21 to 2026-10-06 the surface took git up again, four days after [th
 
 Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it.
 
-### The prose fills its column
+### The prose fills its column, and git is opted into
 
 On 2026-10-06 the author found the prose standing at its default measure in the middle of a column wider than it. Where the column was too narrow for the gutter of links, the gutter went and the prose kept its own width rather than the room the gutter left, which had been laid so that a hand pulling the prose narrower never saw it grow. The prose now takes that room, so it always fills its column, and grows a little as the gutter goes.
 
 That did not mend what the author saw. Asked where, the author pointed at a reading of code blocks in another repository that holds this one, and there the gutter stood bare, since nothing in the reading links anywhere. A gutter now stands only where the lane holds something for it.
 
+Then the author made git's history something a reader turns on in the settings, its programs gone from the dock until then, and set what a reader starts with: the sans on the prose and the lines a little closer, at 1.45 of the type.
+
 *Reasoned on 2026-10-06 by the session that mended it, from the commit and the brief it wrote.*
+
+#### Git's history is opted into, and the prose starts in the sans
+
+[Git's history is opted into, and the prose starts in the sans](git:d5ddc3b)
 
 #### A bare gutter gives its room to the prose
 
