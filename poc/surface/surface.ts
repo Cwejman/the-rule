@@ -1494,6 +1494,8 @@ type Settings = {
   plate: "whole" | "scope";
   /** whether the plate draws a cell per brief where they can be seen, or a cell per file only */
   plateGrain: "brief" | "file";
+  /** whether git's programs are offered at all: off until a reader turns them on */
+  git: "off" | "on";
 };
 
 const DEFAULTS: Settings = {
@@ -1503,7 +1505,7 @@ const DEFAULTS: Settings = {
   gap: 24,
   dim: 0.4,
   fade: 12,
-  leading: 1.6,
+  leading: 1.45,
   canvas: 720,
   line: "ends",
   weight: "cost",
@@ -1511,7 +1513,7 @@ const DEFAULTS: Settings = {
   flick: 1,
   theme: "system",
   headings: "serif",
-  prose: "serif",
+  prose: "sans",
   tree: "spine",
   face: "shown",
   trunk: { body: "down", history: "across" },
@@ -1523,6 +1525,7 @@ const DEFAULTS: Settings = {
   follow: { body: true, history: true },
   plate: "whole",
   plateGrain: "brief",
+  git: "off",
 };
 
 /** The reader's settings: the page's own, and no reading's. */
@@ -2644,6 +2647,10 @@ const DOCK: string[][] = [
 ];
 
 const isAlone = (k: string): boolean => PROGRAMS[k]?.alone === true;
+/** Whether a program is offered: git's only where the reader has turned git's history on in the settings. */
+const offered = (k: string): boolean => PROGRAMS[k]?.world !== "history" || settings.git === "on";
+/** The layout without what is not offered, so turning git off takes its programs off the page too. */
+const offeredLayout = (L: Column[]): Column[] => keptLayout(L.map((c) => ({ ...c, items: c.items.filter((it) => offered(it.k)) })));
 const layoutNow = (): Column[] => settings.layout;
 
 /** Where a program stands: its column and its place in the stack, or null where it stands nowhere. */
@@ -3171,7 +3178,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3184,6 +3191,7 @@ const SWITCHES: Switch[] = [
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
   { key: "room", name: "room left over", values: ["spread", "centred"] },
   { key: "dock", name: "the dock", values: ["foot", "left"] },
+  { key: "git", name: "git's history", values: ["off", "on"] },
 ];
 
 /** Turns one meter to its setting's value in place, so a drag never redraws the figure under the pointer. */
@@ -3208,6 +3216,8 @@ function loadSettings(): void {
   } catch {}
   settings.layout = keptLayout(settings.layout);
   settings.gutters = keptGutters(settings.gutters);
+  if (settings.git !== "on") settings.git = "off";
+  settings.layout = offeredLayout(settings.layout);
   const alone = (settings.alone ?? {}) as Partial<Settings["alone"]>;
   settings.alone = {
     pane: alone.pane === "canvas" ? "canvas" : "lane",
@@ -5556,7 +5566,7 @@ function drawChooser(): void {
     // the foot is one row and it is always drawn: the choices stand in it, and the acts of what is chosen stand beside
     // them, so nothing hides anything else and nothing is two presses away
     const acts = actingOnCanvas() ? `<div class="pill glass">${FOOT_ACTS.map((id) => footBadge(id, card.a!)).join("")}</div>` : "";
-    ui.strips.innerHTML = `<div class="strip foot">${acts}<div class="pill glass">${switchHtml()}${narrowChoices().map(pickNarrowHtml).join("")}</div></div>`;
+    ui.strips.innerHTML = `<div class="strip foot">${acts}<div class="pill glass">${settings.git === "on" ? switchHtml() : ""}${narrowChoices().map(pickNarrowHtml).join("")}</div></div>`;
     return;
   }
   // widened, the dock comes back whole and nothing stands open over the reading
@@ -5572,7 +5582,7 @@ function drawChooser(): void {
     const full = !shownNow(k) && added(k) === null ? " full" : "";
     return `<button class="pick${at ? " on" : ""}${denied}${fixed}${busy}${full}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
   };
-  const groups = DOCK.map((g) => `<span class="group">${g.map(pick).join("")}</span>`).join("");
+  const groups = DOCK.filter((g) => g.some(offered)).map((g) => `<span class="group">${g.filter(offered).map(pick).join("")}</span>`).join("");
   ui.strips.innerHTML = `<div class="strip dock ${settings.dock}">${groups}</div>`;
 }
 
@@ -6591,6 +6601,10 @@ const onClick = (e: MouseEvent): void => {
       onBody(() => (state.index = indexBody(state.body!)));
       inGit(() => (state.index = indexBody(state.body!)));
     }
+    if (key === "git") {
+      settings.layout = offeredLayout(settings.layout);
+      if (settings.git === "off") narrowWorld = "body";
+    }
     saveSettings();
     return void drawAll();
   }
@@ -7287,7 +7301,7 @@ const CSS = `
   --mono: "Source Code Pro", ui-monospace, "SF Mono", Menlo, monospace;
   --body: 17px; --t: 33px; --h1: 26.5px; --h2: 21px; --h3: 19px; --h4: 17px;
   --prose-face: var(--serif); --head-face: var(--serif); --head-tight: 1; --small: 13px;
-  --leading: 27.2px;
+  --leading: 24.65px;
   --gap: 24px; --rim-top: 3%; --rim-foot: 6%; --measure: 600px; --dim: .4; --edge: 8%;
   --thin: 0;
   --h: 60;

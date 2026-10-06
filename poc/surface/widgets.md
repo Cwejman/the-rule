@@ -184,11 +184,15 @@ Each switch is a setting's name and its few values, a row apiece. The theme is l
 
 The ahead answers for a brief that hides something, or always, for any highlighted brief with anything beneath it, so a reader may preview every level as they move. The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure.
 
-*Reasoned, the author's asks of 2026-09-13 and 2026-09-14.*
+Git's history is off or on, and off until a reader turns it on: off, git's programs are not in the dock and none stands on the page, and on a phone the switch to the history is gone too. Turned off, whatever of git's stood is taken away.
+
+*Reasoned, the author's asks of 2026-09-13 and 2026-09-14. Git's history as a choice the reader opts into is the author's, 2026-10-06.*
 
 ### 6.3 The faces
 
-Two of the switches set a face for the headings and one for the prose, each serif, sans or mono, so a reader who wants the prose quieter can keep the serif on the headings alone.
+Two of the switches set a face for the headings and one for the prose, each serif, sans or mono, so a reader who wants the prose quieter can keep the serif on the headings alone. A reader starts with the serif on the headings and the sans on the prose, and with the lines at 1.45 of the type's size, the headings keeping their ratio.
+
+*The author's, 2026-10-06, of the faces and the line height a reader starts with.*
 
 A face is sized to the serif's x-height, the height of its small letters, and the sans a step past it, since its narrower, lighter letters still read smaller; the lines keep the serif's spacing whichever face is set. So changing a face never changes how large the text reads or how far apart its lines stand.
 
