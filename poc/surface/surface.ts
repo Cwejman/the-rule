@@ -2696,6 +2696,21 @@ function keptGutters(g: unknown): Settings["gutters"] {
 
 /** The gutters a prose holds, at the left and at the right. */
 const gutterSides = (w: "body" | "history"): boolean[] => settings.gutters[w].map((x) => x !== null);
+/** Each world's gutters that would hold nothing beside the lane as it is laid, so the prose takes their room. */
+const gutterEmpty: Record<"body" | "history", [boolean, boolean]> = { body: [false, false], history: [false, false] };
+
+/** Whether each of the world's gutters would hold nothing for every brief the lane lays now, read from the lane itself. */
+function gutterBare(w: "body" | "history"): [boolean, boolean] {
+  const articles = all<HTMLElement>(".brief", ui.lane);
+  return [0, 1].map((i) => {
+    const widget = WIDGETS[settings.gutters[w][i] ?? ""];
+    if (widget?.kind !== "adjunct") return false;
+    return !articles.some((el) => {
+      const b = brief(el.dataset.a!);
+      return b !== undefined && widget.of(b, el).length > 0;
+    });
+  }) as [boolean, boolean];
+}
 
 /** The prose's own width: its measure, and beside it each gutter it holds at the width an adjunct reads best in. */
 const proseOwn = (w: "body" | "history"): number => settings.measure + gutterSides(w).filter(Boolean).length * (GUTTER.want + settings.gap);
@@ -2706,7 +2721,8 @@ const proseOwn = (w: "body" | "history"): number => settings.measure + gutterSid
  */
 function proseIn(W: number, w: "body" | "history"): { measure: number; gutter: number; sides: boolean[] } {
   const s = settings;
-  const sides = gutterSides(w);
+  // a gutter with nothing to hold in the whole lane gives the prose its room, the column keeping its own width
+  const sides = gutterSides(w).map((x, i) => x && !gutterEmpty[w][i]);
   const n = sides.filter(Boolean).length;
   if (n) {
     const each = Math.min(GUTTER.want, Math.floor((W - s.measure) / n - s.gap));
@@ -5098,8 +5114,18 @@ function drawLane(): void {
   drawAdjuncts();
   drawCanvas();
   rememberLane();
-  // the shape is as wide as it draws, which the lane's rows and folds decide, so where they changed it the row is laid again
-  if (!narrow() && state === bodyWorld && shapeWidth() !== shapedAt) drawLayout();
+  if (narrow()) return;
+  // the shape is as wide as it draws, and a gutter stands only where it holds something; both are decided by the lane's
+  // rows and folds, so where those changed either the row is laid again, and the gutters drawn in it
+  const w = inPast() ? "history" : "body";
+  const empty = gutterBare(w);
+  const gutters = empty.some((x, i) => x !== gutterEmpty[w][i]);
+  if (gutters) gutterEmpty[w] = empty;
+  if (gutters || (state === bodyWorld && shapeWidth() !== shapedAt)) {
+    drawLayout();
+    alignEnds();
+    drawAdjuncts();
+  }
 }
 
 /** The shape's width the row was last laid with. */
