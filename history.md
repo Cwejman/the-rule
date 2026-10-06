@@ -45,7 +45,7 @@ The shape is as wide as it draws, its rows as laid and the marks of its folded b
 
 #### The history tells the day
 
-The history told the day as the session that worked last in it saw it, and named what it left out: a conversation of ten voices on the common goal of the real pilot, which wrote nothing into the repository and which the author let go.
+The history told the day as the session that worked last in it saw it.
 
 [The history tells the day](git:eab4176)
 
