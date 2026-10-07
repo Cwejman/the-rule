@@ -8,7 +8,7 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7-the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#8-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
+It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7-the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
@@ -196,7 +196,75 @@ As built it is a figure of fixed size. It tells how far the history is read, how
 
 *Preferred, the author's, 2026-10-01: the selection in git's status; the rest left open by the author. What it shows as built, and what counts as selected, are the session's.*
 
-## 8. What is built, and what is not
+## 8. Layouts kept by number
+
+A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or from an overview the dock opens: the layouts as cards in a grid, each the page it lays drawn small, with a plus that adds one. A layout is how the page is laid, never where the reader stands in it.
+
+*Preferred, the author's, 2026-10-07: nine layouts, one icon added to the dock, cards floating centred in a grid as pinching out in Safari shows its tabs, a plus to add, nine at most, and 1 to 9 as their keys. Not yet built.*
+
+### 8.1 What a layout holds
+
+A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-every-program-has-a-head): the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate its reach and its grain.
+
+What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters, the dock's edge, the room left over, and whether git's history is offered at all. A layout holding git's programs while git is off lays without them, as the page does today, and stands with them again once it is on.
+
+Where the reader stands is in no layout: the focus, the scope and the folds are the world's, and every layout reads the same place. Keeping places is something else, bookmarks, and not included.
+
+*Preferred, the author's, 2026-10-07, that a layout is agnostic of where the reader stands, and that keeping places is bookmarks and not this. Which settings travel with a layout is the session's, and the author let it stand.*
+
+### 8.2 The one in use is live
+
+The reader is always in one of the layouts, and whatever they lay by hand is laid in it, so there is nothing to save. Before a second is added, the page as laid is the first. The layouts are kept in the browser's storage with the settings.
+
+*Preferred, the author's, 2026-10-07.*
+
+### 8.3 The overview
+
+The dock carries one icon more, in a group of its own at its end, and a press on it raises the overview over the page: the layouts as cards on a glass, centred, the page still faintly seen beneath. A card stands at the shape of the page, carries its number as a key's cap, and the one in use stands in the darkest ink, as an icon in use does in the dock.
+
+A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, or the icon again, lets it go and changes nothing.
+
+*Preferred, the author's, 2026-10-07, of the cards, the grid and the icon; the glass, the cap, the ink of the one in use and how the overview is let go are the session's, and the author let them stand.*
+
+### 8.4 A slot keeps its number
+
+The grid is nine slots and not a flow: slot n stands at place n, row by row, three to a row, and a layout keeps its slot for as long as it is kept. Taken away, it leaves its slot empty, so a key once learned stays true.
+
+No other layout's number moves when one goes. The grid stands only as many slots wide as the last it shows needs, up to three, so one layout and its plus stand two abreast in the middle of the page rather than at the left of an empty grid.
+
+Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the nearest kept one, by number, the lower first; the last layout cannot be taken away, as the last program cannot.
+
+*Preferred, the author's, 2026-10-07, that a slot keeps its number and a grid of slots is fine. The cross, the one in use taken away and the width of the grid are the session's.*
+
+### 8.5 The plus adds a copy
+
+The plus stands in the first empty slot, and adds a copy of the layout in use there, which becomes the one in use. So adding a layout and duplicating one are one act: a new arrangement is had by changing the copy. The overview stays, so the reader sees the copy stand. With nine kept, no plus stands.
+
+*Preferred, the author's, 2026-10-07: "always copy of current". That the copy becomes the one in use and the overview stays are the session's.*
+
+### 8.6 A card draws the page small
+
+A card is laid by the same function that lays the page, at the page's own size, and drawn smaller, each program by its own drawing where it has one, so the cards do not all look the same.
+
+The prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
+
+Since no layout holds a place, every card shows the same reading, laid differently, which is what the reader chooses between. The cards are drawn when the overview is raised and never on the page's own draws, so nothing a reader does otherwise pays for them.
+
+*Preferred, the author's, 2026-10-07, that a card is a projection of the content in low fidelity rather than a full render or one look for all. Drawing the canvas and git's programs as their icon is the session's first step, agreed by the author; drawing them is a step of its own if the cards read bare beside the rest.*
+
+### 8.7 The keys
+
+A digit from 1 to 9 lays the layout in its slot from anywhere on the page, the overview raised or not, and an empty slot's digit does nothing. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
+
+*Preferred, the author's, 2026-10-07, of the digits; the group in the keys is the session's.*
+
+### 8.8 Not on a phone
+
+Where the lane stands alone there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. A phone keeps [its own reading](touch.md).
+
+*Reasoned, the session's, 2026-10-07.*
+
+## 9. What is built, and what is not
 
 Everything above is built wide, on 2026-10-01, but the meeting of the two worlds. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
 
@@ -204,9 +272,9 @@ Where the lane stands alone a phone keeps its reading as it was: one pane, the r
 
 *Seen, as built and looked at on the page, 2026-10-01, the session's.*
 
-## 9. What this leaves open
+## 10. What this leaves open
 
-Whether anything should say which world holds the keys, now that nothing does. Layouts kept by number and called by a key wait, the author's word of 2026-10-01. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
+Whether anything should say which world holds the keys, now that nothing does. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried. Where the layout is kept is assumed to be the browser's storage, as the settings are.
 
 A phone keeps [its own reading](touch.md) and none of this; whether a head or a drag has any place there is not asked yet.
 
