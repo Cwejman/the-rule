@@ -208,7 +208,7 @@ A layout holds the row: its columns, what each stacks, and every width and heigh
 
 Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate whether it draws the body whole or the scope, a cell per brief or per file. A layout holds them for every program, standing or not, so a program added to it takes what it holds.
 
-What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters, the dock's edge, whether the room left over is spread or centred, and whether git's history is offered at all. Turning git's history off takes its programs out of every layout, as it takes them off the page today, and turning it on again does not put them back. A layout left with nothing lays the row the page opens with.
+What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters of the type and the page, the measure, the dock's edge, whether the room left over is spread or centred, and whether git's history is offered at all. Turning git's history off takes its programs out of every layout, as it takes them off the page today, and turning it on again does not put them back. A layout left with nothing takes the row the page opens with as its own.
 
 Where the reader stands is in no layout: the focus, the scope, the folds and the depth a world is unfolded to are the world's, and every layout reads the same place. Keeping places is something else, bookmarks, and not included.
 
@@ -226,7 +226,7 @@ A screen narrowing changes nothing of it: what [gives way](#32-giving-way) gives
 
 The dock carries one icon more, in a group of its own at its end, and a press on it raises the overview over the page: the layouts as cards on a glass, centred, the page still faintly seen beneath. A card stands at the shape of the page, carries its number as a key's cap, and the one in use stands in the darkest ink, as a lit icon does in the dock.
 
-A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, the icon again or a press on the glass between the cards lets it go and changes nothing.
+The overview's own icon stands lit while it is raised. A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, the icon again or a press on the glass between the cards lets it go and changes nothing.
 
 It is not [the overlay refused](refused.md#j-an-overlay-at-all), which was raised by pointing and repeated what stood in view: this is raised by a press and shows what the page cannot, the layouts not in use.
 
@@ -238,7 +238,7 @@ The grid is nine slots and not a flow: slot n stands at place n, row by row, thr
 
 No other layout's number moves when one goes, and an empty slot before a kept one is left as bare ground, unless the plus stands in it. The grid is three slots wide only once a third slot is shown, so one layout and its plus stand two abreast in the middle of the page rather than at the left of an empty grid.
 
-Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the kept one whose number is nearest, the lower of two as near; the last layout cannot be taken away, as the last program cannot.
+Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the kept one whose number is nearest, the lower of two as near; the last layout cannot be taken away, as the last program cannot. The overview stays raised after either.
 
 *Preferred, the author's, 2026-10-07, that a slot keeps its number and a grid of slots is fine. The cross, the one in use taken away and the width of the grid are the session's.*
 
@@ -250,7 +250,7 @@ The plus stands in the first empty slot, and adds a copy of the layout in use th
 
 ### 8.6 A card draws the page small
 
-A card is the page its layout lays, at the page's own shape and drawn smaller, each program by its own drawing where it has one, so the cards do not all look the same.
+A card is the page its layout lays on this screen, with its own settings, at the page's shape and drawn smaller, each program by its own drawing where it has one, so the cards do not all look the same.
 
 The body's prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
 
@@ -266,7 +266,7 @@ A digit from 1 to 9, which named no act before, lays the layout in its slot from
 
 ### 8.8 Not on a phone
 
-Where the page is too narrow for anything to stand beside the body's prose at its measure, whatever the layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-what-is-built-and-what-is-not) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
+Where the page is too narrow for anything to stand beside the body's prose at the page's measure, which no layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-what-is-built-and-what-is-not) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
 
 *Reasoned, the session's, 2026-10-07.*
 
