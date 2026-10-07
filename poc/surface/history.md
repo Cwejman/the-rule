@@ -100,7 +100,9 @@ A stretch of work ends with [its debrief](../../rule.md#55-the-debrief): the con
 
 So the history is told as the work is done, not afterwards, and what [many small commits](../practice.md#13-a-commit-is-one-purpose) cost is answered here.
 
-*Preferred, the session's proposal taken by the author, 2026-09-21; that bloat is solved by something else is [his](../../author/ideas-2026-09-21.md#8-bloat-is-valuable-information-and-is-solved-by-something-else).*
+The story carries as well what the work cost the author, his writing and his reading, [as the skill counts it](../skill.md#8-count-the-authors-effort), so a story over others sums what the days beneath it cost, from 2026-10-07 on.
+
+*Preferred, the session's proposal taken by the author, 2026-09-21; that bloat is solved by something else is [his](../../author/ideas-2026-09-21.md#8-bloat-is-valuable-information-and-is-solved-by-something-else). The author's effort in the story is [his tradition of 2026-10-07](../../author/ideas-2026-10-07.md#1-a-tradition-of-effort).*
 
 ### 2.6 It is handed over flat, as the body is
 
