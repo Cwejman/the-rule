@@ -123,8 +123,8 @@ What each head holds:
 | Program | Its head |
 |---|---|
 | prose, the body's or git's | the depth its world is unfolded to, and the gutter at its left and at its right, each holding nothing, the links or another adjunct |
-| canvas, the body's or git's | the depth its world is unfolded to, whether the face of what is selected stands beside it, and which way its root's level runs |
-| plate | nothing yet |
+| canvas, the body's or git's | the depth its world is unfolded to, whether the face of what is selected stands beside it, which way its root's level runs, and whether it follows where the reader is |
+| plate | whether it draws the body whole or the scope, and a cell per brief or per file |
 | figures | nothing yet |
 | git's status | open |
 
