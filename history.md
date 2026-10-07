@@ -19,7 +19,15 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 From 2026-09-21 to 2026-10-07 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number, and the author's effort began to be counted.
+
+### The author's effort is counted
+
+Later on 2026-10-07 the author asked for a tradition: every session ends by counting what the work cost him, not per commit but in its story, so the count sums upward for as long as it is kept. It is two numbers, read from the session's transcript and kept raw: his prompts and their words, timed at speaking pace; and the words the session wrote back, of which only those his next prompt evidently used count as read. The change itself, which he may read in its diffs, is not counted. The skill now says so, and this session is the first to keep it.
+
+*Reasoned on 2026-10-07 by the session that wrote it. The author's effort over the whole session, the layouts beneath included: 9 prompts, 691 words written, about 5 minutes at speaking pace; 4,170 words written back before this story, 1,603 of them evidently read, about 7 minutes.*
+
+[The author's effort is counted](git:22fa222..cbc9f5e)
 
 ### Layouts are kept by number
 
