@@ -17,9 +17,29 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 ## History is laid, and the middle makes room for it
 
-From 2026-09-21 to 2026-10-06 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
+From 2026-09-21 to 2026-10-07 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number.
+
+### Layouts are kept by number
+
+On 2026-10-07 the author asked for layouts to be kept: nine at most, one icon more in the dock raising them as cards floating in a grid, as pinching out in Safari shows its tabs, a plus to add one, and the digits 1 to 9 to lay each. It was talked through before anything was written. The one in use is live, the plus adds a copy of it, a slot keeps its number when another goes, and a card draws the page small, each program by its own drawing. A layout is how the page is laid and never where the reader stands; keeping places, bookmarks, was named and left out.
+
+The brief was written first, at its own level, and a fresh head found four states it left unsettled, among them a narrowed window and a layout emptied by turning git off. Once it was built, a cold review found seven faults, the worst a digit pressed in the middle of a drag writing a half-made row into two layouts, and each was mended before the build was committed. Three more fresh heads read the brief against the build, each settling states the one before had not seen, until the fourth asked for words alone.
+
+*Reasoned on 2026-10-07 by the session that built it, from the talk, the commits and the reviews.*
+
+#### The brief is read again until it holds
+
+[The brief is read again until it holds](git:26440a2..1245bff)
+
+#### The layouts are built
+
+[The layouts are built](git:eb4673c..9ac1452)
+
+#### The layouts are laid in their brief
+
+[The layouts are laid in their brief](git:6596ccf..d158e4c)
 
 ### The prose fills its column, and git is opted into
 
