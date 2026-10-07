@@ -131,7 +131,9 @@ The author speaks his prompts as often as he types them, and all of them are tim
 
 A reply counts as read only where the author's next prompt evidently uses it: answers its question, or takes up its words or what it proposed. Anything else is unread, since he reads perhaps a fifth of what is written, and judging what was plausibly read would be inference no one could check. What is read is timed at 240 words a minute.
 
-*Preferred, the author's, 2026-10-07, that only what is evidently used is read; the pace is the session's.*
+Only the session's replies are counted, not the change it made. The author may read the change in its diffs, but what of a diff he read is harder still to tell with confidence. Two counts stand open as possibilities, and neither is taken until there is honest data for it: the reading of the change, and a judgment of what was plausibly read.
+
+*Preferred, the author's, 2026-10-07, that only what is evidently used is read and [that the change is not counted](../author/ideas-2026-10-07.md#6-the-changes-are-not-counted-as-read); the pace is the session's.*
 
 ### 8.4 One sentence in the story
 
