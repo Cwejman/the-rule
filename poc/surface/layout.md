@@ -200,7 +200,7 @@ As built it is a figure of fixed size. It tells how far the history is read, how
 
 A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or from an overview the dock opens: the layouts as cards in a grid, each the page it lays drawn small, with a plus that adds one. A layout is how the page is laid, never where the reader stands in it.
 
-*Preferred, the author's, 2026-10-07: nine layouts, one icon added to the dock, cards floating centred in a grid as pinching out in Safari shows its tabs, a plus to add, nine at most, and 1 to 9 as their keys. Not yet built.*
+*Preferred, the author's, 2026-10-07: nine layouts, one icon added to the dock, cards floating centred in a grid as pinching out in Safari shows its tabs, a plus to add, nine at most, and 1 to 9 as their keys. Built the same day, as laid beneath; nine cards are raised in about twenty milliseconds, measured on the page.*
 
 ### 8.1 What a layout holds
 
@@ -222,7 +222,9 @@ The reader is always in one of the layouts, and whatever they lay by hand is lai
 
 The dock carries one icon more, in a group of its own at its end, and a press on it raises the overview over the page: the layouts as cards on a glass, centred, the page still faintly seen beneath. A card stands at the shape of the page, carries its number as a key's cap, and the one in use stands in the darkest ink, as an icon in use does in the dock.
 
-A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, or the icon again, lets it go and changes nothing.
+A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, the icon again or a press on the glass between the cards lets it go and changes nothing.
+
+It is not [the overlay refused](refused.md#j-an-overlay-at-all): that one was raised by pointing, beside a thing, and repeated what stood in view, where this is raised by a press, takes the whole page while the reader chooses, and shows what the page cannot, the layouts not in use.
 
 *Preferred, the author's, 2026-10-07, of the cards, the grid and the icon; the glass, the cap, the ink of the one in use and how the overview is let go are the session's, and the author let them stand.*
 
@@ -266,7 +268,7 @@ Where the page is too narrow for a row, on a phone or in a window narrowed as fa
 
 ## 9. What is built, and what is not
 
-Everything above is built wide, on 2026-10-01, but the meeting of the two worlds. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
+Everything above is built wide, on 2026-10-01, but the meeting of the two worlds, and [the layouts](#8-layouts-kept-by-number) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
 
 Where the lane stands alone a phone keeps its reading as it was: one pane, the rail, and a switch at the foot that turns the pane to the history and back, which is the mode kept for a phone. The way down stands a head's room lower wide, so the heads have the top edge to themselves.
 
