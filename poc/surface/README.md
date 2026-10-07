@@ -12,7 +12,7 @@ Knowledge under the rule stands in a shape, and neither of those lets a reader m
 
 So the surface reads a body in one lane of prose, each brief folded or unfolded as the reader chooses, and it orients from the sides: where the reader came from, what lies beneath, what a brief points at, as headings and shape rather than as more text. It stands on the markdown and the directories rather than replacing them, and a session's own work is read the same way once it is written down there.
 
-*The author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use.*
+*The author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use. What here pertains to AI rather than to a reader moves to the skill in [what comes next](../../repository.md#7-what-comes-next).*
 
 ## 1. One interface, and what refusing more buys
 
