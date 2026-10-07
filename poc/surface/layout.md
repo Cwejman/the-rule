@@ -206,11 +206,11 @@ A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or 
 
 A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-every-program-has-a-head): the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate its reach and its grain.
 
-What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters, the dock's edge, the room left over, and whether git's history is offered at all. A layout holding git's programs while git is off lays without them, as the page does today, and stands with them again once it is on.
+What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters, the dock's edge, whether the room left over is spread or centred, and whether git's history is offered at all. Turning git's history off takes its programs out of every layout, as it takes them off the page today, and a layout left with nothing lays the row the page opens with.
 
-Where the reader stands is in no layout: the focus, the scope and the folds are the world's, and every layout reads the same place. Keeping places is something else, bookmarks, and not included.
+Where the reader stands is in no layout: the focus, the scope, the folds and the depth a world is unfolded to are the world's, and every layout reads the same place. Keeping places is something else, bookmarks, and not included.
 
-*Preferred, the author's, 2026-10-07, that a layout is agnostic of where the reader stands, and that keeping places is bookmarks and not this. Which settings travel with a layout is the session's, and the author let it stand.*
+*Preferred, the author's, 2026-10-07. Which settings travel with a layout is the session's, and the author let it stand.*
 
 ### 8.2 The one in use is live
 
@@ -230,7 +230,7 @@ A press on a card, or its number, lays the page as it holds and lets the overvie
 
 The grid is nine slots and not a flow: slot n stands at place n, row by row, three to a row, and a layout keeps its slot for as long as it is kept. Taken away, it leaves its slot empty, so a key once learned stays true.
 
-No other layout's number moves when one goes. The grid stands only as many slots wide as the last it shows needs, up to three, so one layout and its plus stand two abreast in the middle of the page rather than at the left of an empty grid.
+No other layout's number moves when one goes, and an empty slot before a kept one is left as bare ground. The grid is three slots wide only once a third slot is shown, so one layout and its plus stand two abreast in the middle of the page rather than at the left of an empty grid.
 
 Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the nearest kept one, by number, the lower first; the last layout cannot be taken away, as the last program cannot.
 
@@ -248,19 +248,19 @@ A card is laid by the same function that lays the page, at the page's own size, 
 
 The prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
 
-Since no layout holds a place, every card shows the same reading, laid differently, which is what the reader chooses between. The cards are drawn when the overview is raised and never on the page's own draws, so nothing a reader does otherwise pays for them.
+Since no layout holds a place, what the cards differ in is only how they lay the one reading, which is what the reader chooses between. The cards are drawn when the overview is raised and never on the page's own draws.
 
 *Preferred, the author's, 2026-10-07, that a card is a projection of the content in low fidelity rather than a full render or one look for all. Drawing the canvas and git's programs as their icon is the session's first step, agreed by the author; drawing them is a step of its own if the cards read bare beside the rest.*
 
 ### 8.7 The keys
 
-A digit from 1 to 9 lays the layout in its slot from anywhere on the page, the overview raised or not, and an empty slot's digit does nothing. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
+A digit from 1 to 9 lays the layout in its slot from anywhere on the page, whichever world holds the keys and the overview raised or not, and an empty slot's digit does nothing. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
 
 *Preferred, the author's, 2026-10-07, of the digits; the group in the keys is the session's.*
 
 ### 8.8 Not on a phone
 
-Where the lane stands alone there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. A phone keeps [its own reading](touch.md).
+Where the page is too narrow for a row, on a phone or in a window narrowed as far, the prose stands alone and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
 
 *Reasoned, the session's, 2026-10-07.*
 
