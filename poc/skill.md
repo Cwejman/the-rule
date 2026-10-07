@@ -105,7 +105,41 @@ When the work is committed, the raw the run produced, its transcripts and snapsh
 
 *Reasoned; lived in the labs.*
 
-## 8. Amending in place is not drawn
+## 8. Count the author's effort
+
+A session ends by counting what the work cost the author: the time spent writing to it, and the time spent reading what it wrote back. The count is written in the story the session tells [as its debrief](surface/history.md#25-a-session-writes-the-story-as-its-debrief), never per commit, so a story over others sums those beneath it, and the effort aggregates for as long as sessions keep it.
+
+Work before 2026-10-07 is not counted, since it cannot be counted truthfully.
+
+*The author's tradition, asked 2026-10-07, [in his words](../author/ideas-2026-10-07.md#1-a-tradition-of-effort).*
+
+### 8.1 The raw counts are kept
+
+Four counts are read from the session's transcript: the author's own prompts, the words in them, the words the session wrote back for him to read, and of those the words evidently read. The times are derived from the counts, so a rate can be changed later and every count converted again.
+
+A prompt is the author's own when he wrote or spoke it: not a task's notification, a wakeup the session scheduled for itself, a command or a reminder. A prompt stored twice, the second carrying the first, is counted once, as the longer. The words written back are the session's own text, not its tools' calls or what they returned.
+
+*Preferred, the author's, 2026-10-07, that the raw counts are kept; what counts as his prompt is the session's, read from the transcript.*
+
+### 8.2 Writing is timed as speaking
+
+The author speaks his prompts as often as he types them, and all of them are timed at speaking pace, 150 words a minute. The words kept say how much was said, for whoever converts them by how each was made.
+
+*Preferred, the author's, 2026-10-07; the pace is the session's.*
+
+### 8.3 Read only where it is evidently used
+
+A reply counts as read only where the author's next prompt evidently uses it: answers its question, or takes up its words or what it proposed. Anything else is unread, since he reads perhaps a fifth of what is written, and judging what was plausibly read would be inference no one could check. What is read is timed at 240 words a minute.
+
+*Preferred, the author's, 2026-10-07, that only what is evidently used is read; the pace is the session's.*
+
+### 8.4 One sentence in the story
+
+The count stands in the confidence line of the session's story, in one sentence: the prompts and the words written, with the minutes at speaking pace; the words written back, how many of them were evidently read, with the minutes at reading pace. A story over stories that carry a count sums them.
+
+*Preferred, the session's, 2026-10-07.*
+
+## 9. Amending in place is not drawn
 
 [The rule draws the line](../rule.md#53-the-rounds) at a word: every brief a change reaches is written whole, unless the fix is a word. Where the line falls between a word and the whole, when a change is smaller than the brief and larger than a word, is not drawn; the rounds so far wrote whole where the understanding changed and amended where it did not.
 
