@@ -148,7 +148,9 @@ The rule is written again as this repository's root entry, once the author has c
 
 OpenLight's root README becomes substrate. It mounts the rule, and declares the existing spec tree a legacy artefact, to be written again under the rule.
 
-*In force as the author's direction, 2026-09-14; not begun.*
+The rule is not tended alone. The practice and the skill are tended with it, all three long overdue, and the skill takes from the surface whatever there pertains to AI rather than to a reader's experience, so the harness side is said in one place.
+
+*In force as the author's direction, 2026-09-14; not begun. The practice and the skill tended with the rule, and the skill taking what is AI's, are [the author's of 2026-10-07](author/ideas-2026-10-07.md#2-the-skill-holds-what-is-ais).*
 
 ## 8. What is not answered
 
