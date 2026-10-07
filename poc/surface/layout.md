@@ -206,7 +206,7 @@ A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or 
 
 A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-every-program-has-a-head) but the depth.
 
-Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate whether it draws the body whole or the scope, a cell per brief or per file.
+Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate whether it draws the body whole or the scope, a cell per brief or per file. A layout holds them for every program, standing or not, so a program added to it takes what it holds.
 
 What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters, the dock's edge, whether the room left over is spread or centred, and whether git's history is offered at all. Turning git's history off takes its programs out of every layout, as it takes them off the page today, and turning it on again does not put them back. A layout left with nothing lays the row the page opens with.
 
@@ -216,13 +216,15 @@ Where the reader stands is in no layout: the focus, the scope, the folds and the
 
 ### 8.2 The one in use is live
 
-The reader is always in one of the layouts, and whatever changes the row changes it, so there is nothing to save: what they lay by hand, and what the page lays for them, a prose brought in by going or programs narrowed to make room for one added. Before a second is added, the page as laid is the first. The layouts are kept in the browser's storage with the settings.
+The reader is always in one of the layouts, and whatever changes the row changes it, so there is nothing to save: what they lay by hand, and what the page lays for them, a prose brought in by going or programs narrowed to make room for one added.
 
-*Preferred, the author's, 2026-10-07.*
+A screen narrowing changes nothing of it: what [gives way](#32-giving-way) gives way on that screen, and stands again as it widens. Where a program taken away last stood, which a press on its icon puts it back to, is remembered of the one in use alone, and let go when another is laid. Before a second is added, the page as laid is the first. The layouts are kept in the browser's storage with the settings.
+
+*Preferred, the author's, 2026-10-07. What the page lays for the reader, a screen narrowing and where a program returns are the session's, read from the build.*
 
 ### 8.3 The overview
 
-The dock carries one icon more, in a group of its own at its end, and a press on it raises the overview over the page: the layouts as cards on a glass, centred, the page still faintly seen beneath. A card stands at the shape of the page, carries its number as a key's cap, and the one in use stands in the darkest ink, as an icon in use does in the dock.
+The dock carries one icon more, in a group of its own at its end, and a press on it raises the overview over the page: the layouts as cards on a glass, centred, the page still faintly seen beneath. A card stands at the shape of the page, carries its number as a key's cap, and the one in use stands in the darkest ink, as a lit icon does in the dock.
 
 A press on a card, or its number, lays the page as it holds and lets the overview go. Escape, the icon again or a press on the glass between the cards lets it go and changes nothing.
 
@@ -236,7 +238,7 @@ The grid is nine slots and not a flow: slot n stands at place n, row by row, thr
 
 No other layout's number moves when one goes, and an empty slot before a kept one is left as bare ground, unless the plus stands in it. The grid is three slots wide only once a third slot is shown, so one layout and its plus stand two abreast in the middle of the page rather than at the left of an empty grid.
 
-Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the nearest kept one, by number, the lower first; the last layout cannot be taken away, as the last program cannot.
+Pointing at a card shows a cross that takes it away. The one in use can be taken away too, and the page then lays the kept one whose number is nearest, the lower of two as near; the last layout cannot be taken away, as the last program cannot.
 
 *Preferred, the author's, 2026-10-07, that a slot keeps its number and a grid of slots is fine. The cross, the one in use taken away and the width of the grid are the session's.*
 
@@ -250,21 +252,21 @@ The plus stands in the first empty slot, and adds a copy of the layout in use th
 
 A card is the page its layout lays, at the page's own shape and drawn smaller, each program by its own drawing where it has one, so the cards do not all look the same.
 
-The prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
+The body's prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
 
-Since no layout holds a place, what the cards differ in is only how they lay the one reading, which is what the reader chooses between. The cards are drawn only while the overview is raised.
+Since no layout holds a place, what the cards differ in is only how they lay the one reading, which is what the reader chooses between.
 
 *Preferred, the author's, 2026-10-07, that a card is a projection of the content in low fidelity rather than a full render or one look for all. Drawing the canvas and git's programs as their icon is the session's first step, agreed by the author; drawing them is a step of its own if the cards read bare beside the rest.*
 
 ### 8.7 The digits
 
-A digit from 1 to 9, which named no act before, lays the layout in its slot from anywhere on the page, whichever world holds the keys and the overview raised or not, and an empty slot's digit does nothing. Held with a modifier it is the browser's, and does nothing here. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
+A digit from 1 to 9, which named no act before, lays the layout in its slot from anywhere on the page, whether the body's world or git's is the one keys act in, the overview raised or not, and an empty slot's digit does nothing. Held with a modifier it is the browser's, and does nothing here. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
 
 *Preferred, the author's, 2026-10-07, of the digits; the group in the keys is the session's.*
 
 ### 8.8 Not on a phone
 
-Where the page is too narrow for anything to stand beside the prose, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-what-is-built-and-what-is-not) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
+Where the page is too narrow for anything to stand beside the body's prose at its measure, whatever the layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-what-is-built-and-what-is-not) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
 
 *Reasoned, the session's, 2026-10-07.*
 
