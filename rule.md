@@ -8,7 +8,7 @@ ratified: the author
 
 The rule is the law, and the place to start. It turns written knowledge into a medium, one that joins us to what we know and to each other, so that keeping it in order stops being a job of its own: you take part in it, and you add to it. It gives what knowledge is made of, the gradient it is laid by, and the few principles that follow, and one reading of it leaves you able to write under it.
 
-*That one reading suffices was seen in the labs; this opening moved here from the entry above and was ratified in its new place, 2026-09-18.*
+*That one reading suffices was seen in the labs. The text was last written whole on 2026-09-12; since then only its name changed, 2026-09-17, and this opening, moved here from the entry above and ratified in its new place, 2026-09-18. It is stale: much has been done under it since, by the author, by sessions and by others in the projects that hold it, and a good deal of that is owed back to it. It is written again in [what comes next](repository.md#7-what-comes-next), the practice and the skill tended with it, and most of what their tending finds will reach back up to the rule.*
 
 ## 1. Why there is a rule
 
