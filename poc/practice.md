@@ -9,7 +9,7 @@ The practice is how the rule is run in markdown and git. It answers what the rul
 
 It is a first cut, reasoned from the studies and lived in the labs and in this arc so far. Each rule says how strongly it holds, as a claim does, and the ones marked open are being found out by observation.
 
-*Reasoned, the author's; lived since 2026-09-11.*
+*Reasoned, the author's; lived since 2026-09-11. Overdue for tending, with the skill and the rule, in [what comes next](../repository.md#7-what-comes-next).*
 
 ## 1. Files, folders and commits
 
