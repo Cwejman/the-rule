@@ -9,7 +9,7 @@ The skill is the harness side. It says what a session does with files under the 
 
 Nothing in it need be kept as code: the substrate is prose, and a script is a sentence made exact for a minute.
 
-*Reasoned, the author's; seen in the labs.*
+*Reasoned, the author's; seen in the labs. Overdue for tending, with the practice and the rule, and to take from the surface what is AI's, in [what comes next](../repository.md#7-what-comes-next).*
 
 ## 1. Read by depth
 
