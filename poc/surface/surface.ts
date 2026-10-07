@@ -1496,6 +1496,10 @@ type Settings = {
   plateGrain: "brief" | "file";
   /** whether git's programs are offered at all: off until a reader turns them on */
   git: "off" | "on";
+  /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
+  layouts: (Held | null)[];
+  /** the slot of the layout in use */
+  slot: number;
 };
 
 const DEFAULTS: Settings = {
@@ -1526,6 +1530,8 @@ const DEFAULTS: Settings = {
   plate: "whole",
   plateGrain: "brief",
   git: "off",
+  layouts: Array.from({ length: 9 }, () => null),
+  slot: 0,
 };
 
 /** The reader's settings: the page's own, and no reading's. */
@@ -2003,6 +2009,20 @@ const ACTS: Record<string, Action> = {
       if (canvasOn()) pickNode(state.focus, null, headFor(state.focus));
     },
   },
+  // a digit lays the layout kept in its slot, from anywhere and whichever world holds the keys
+  ...Object.fromEntries(
+    Array.from({ length: 9 }, (_, i): [string, Action] => [
+      `layout${i + 1}`,
+      {
+        label: () => `layout ${i + 1}`,
+        keys: [{ key: String(i + 1) }],
+        help: () => (i === settings.slot ? `Layout ${i + 1}, the one in use.` : `Lays the page as layout ${i + 1} holds it: its programs, where each stands and how wide, and the settings in their heads.`),
+        also: "Its card, among the layouts the dock raises.",
+        can: () => !narrow() && (i === settings.slot || !!settings.layouts[i]),
+        run: () => (layIn(i), raiseOverview(false)),
+      },
+    ]),
+  ),
   undo: {
     label: () => "undo",
     keys: [{ key: "Escape" }],
@@ -2070,6 +2090,10 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   ArrowLeft: { glyph: `<path d="M12.2 8H4.3M7.3 11 4.3 8l3-3"/>`, name: "left" },
   ArrowRight: { glyph: `<path d="M3.8 8h7.9M8.7 11l3-3-3-3"/>`, name: "right" },
   Backspace: { glyph: `<path d="M13.2 4.7H6.7L3.4 8l3.3 3.3h6.5z"/><path d="m8.9 6.7 2.7 2.6M11.6 6.7 8.9 9.3"/>`, name: "backspace" },
+  // a digit is the one key whose glyph is its character, so it is set in type, filled as the full stop is
+  ...Object.fromEntries(
+    Array.from({ length: 9 }, (_, i) => [String(i + 1), { glyph: `<text x="8" y="11.6" text-anchor="middle" font-size="10.5" font-family="var(--sans)" fill="currentColor" stroke="none">${i + 1}</text>`, name: String(i + 1) }]),
+  ),
   // the full stop is a dot, and a dot drawn at its own weight would read as an empty cap, so it is filled
   ".": { glyph: `<circle cx="8" cy="9.8" r="1.9" fill="currentColor" stroke="none"/>`, name: "the full stop" },
 };
@@ -2448,6 +2472,7 @@ const ICON: Record<string, string> = {
   tree: `<path d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/>`,
   ahead: `<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>`,
   plate: `<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/>`,
+  layouts: `<rect x="2" y="2.5" width="5" height="4.5" rx="1"/><rect x="9" y="2.5" width="5" height="4.5" rx="1"/><rect x="2" y="9" width="5" height="4.5" rx="1"/><rect x="9" y="9" width="5" height="4.5" rx="1"/>`,
   settings: `<path d="M4 11.5a5.5 5.5 0 1 1 8 0"/><path d="M8 8v-3"/>`,
   keys: `<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h1M7.5 6.5h1M11 6.5h1M5 9.5h6"/>`,
   links: `<path d="M6 10 10 6M4.5 8.5 3 10a2.1 2.1 0 0 0 3 3l1.5-1.5M11.5 7.5 13 6a2.1 2.1 0 0 0-3-3L8.5 4.5"/>`,
@@ -2952,6 +2977,218 @@ function dockTip(k: string): string {
   return `${name} — press to take it away, or drag it where you want it`;
 }
 
+// ### 3.4.3 Layouts kept by number
+//
+// A reader keeps up to nine layouts, each how the page is laid and never where
+// they stand in it, and lays one by its digit or from the overview the dock
+// raises. The one in use is the page's own settings, so it has one home: its
+// slot stands empty among the kept, and a layout is written into its slot only
+// as the page leaves it. A card draws the page a layout lays, small, each
+// program by its own drawing where it has one.
+
+/** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "plate", "plateGrain"] as const;
+type Held = Pick<Settings, (typeof HELD)[number]>;
+const SLOTS = 9;
+
+const heldNow = (): Held => structuredClone(Object.fromEntries(HELD.map((k) => [k, settings[k]]))) as Held;
+/** Only what a layout holds, of whatever was kept as one, so nothing of the page's own rides in with it. */
+const heldOf = (h: Partial<Held>): Partial<Held> => structuredClone(Object.fromEntries(HELD.filter((k) => k in h).map((k) => [k, h[k]])));
+/** Runs with the page's settings as a layout holds them, made whole, and puts the page's own back after. */
+function withHeld<T>(h: Partial<Held>, fn: () => T): T {
+  const was = heldNow();
+  Object.assign(settings, heldOf(h));
+  settleHeld();
+  try {
+    return fn();
+  } finally {
+    Object.assign(settings, was);
+  }
+}
+/** Each slot's layout, the one in use as the page holds it now, and null where a slot stands empty. */
+const slotsNow = (): (Held | null)[] => Array.from({ length: SLOTS }, (_, i) => (i === settings.slot ? heldNow() : (settings.layouts[i] ?? null)));
+
+/** Lays the page as a slot holds, writing the one in use into the slot it leaves. */
+function layIn(i: number): void {
+  const next = settings.layouts[i];
+  // a drag holds the row it began on, so the page is never laid again beneath one
+  if (i === settings.slot || !next || drag) return;
+  const layouts = settings.layouts.slice();
+  layouts[settings.slot] = heldNow();
+  layouts[i] = null;
+  Object.assign(settings, heldOf(next));
+  settleHeld();
+  settings.layouts = layouts;
+  settings.slot = i;
+  // where a program stood before it was taken away was in the layout left
+  leftAt.clear();
+  saveSettings();
+  drawAll();
+}
+
+/** Adds a copy of the one in use in the first empty slot, and makes it the one in use. */
+function addLayout(): void {
+  const i = slotsNow().findIndex((h) => h === null);
+  if (i < 0) return;
+  const layouts = settings.layouts.slice();
+  layouts[settings.slot] = heldNow();
+  settings.layouts = layouts;
+  settings.slot = i;
+  saveSettings();
+  drawOverview();
+  drawChooser();
+}
+
+/** Takes a layout away, its slot left empty; taking the one in use lays the nearest kept, the lower first. The last stays. */
+function dropLayout(i: number): void {
+  const kept = slotsNow().flatMap((h, j) => (h && j !== i ? [j] : []));
+  if (!kept.length) return;
+  if (i === settings.slot) layIn(kept.sort((a, b) => Math.abs(a - i) - Math.abs(b - i) || a - b)[0]);
+  settings.layouts = settings.layouts.map((h, j) => (j === i ? null : h));
+  saveSettings();
+  drawOverview();
+}
+
+/** Whether the overview of the layouts stands over the page. */
+let overview = false;
+/** Until when the clicks that follow a press letting the overview go are let go, since they land on the page beneath. */
+let overviewQuiet = 0;
+const raiseOverview = (on: boolean): void => void ((overview = on && !narrow()), drawOverview(), drawChooser());
+
+/** The room an icon stands in on a card: the program's own, centred in the room it takes. */
+const cardIcon = (k: string): string => `<div class="lmark">${programIcon(k)}</div>`;
+
+/**
+ * The prose as it stands now, in a box of a width: the briefs the body's lane shows, laid again at that width from where
+ * the first of them stands, so the card reads the place the reader is at.
+ */
+function cardProse(W: number, H: number): string {
+  const box = bodyWorld.ui.scroll;
+  const top = box.getBoundingClientRect().top + under().top;
+  const shown = all<HTMLElement>(":scope > .brief", bodyWorld.ui.lane).filter((el) => {
+    const r = el.getBoundingClientRect();
+    return r.bottom > top && r.top < top + H;
+  });
+  if (!shown.length) return "";
+  const from = shown[0].getBoundingClientRect().top - top;
+  const html = shown.map((el) => el.outerHTML).join("").replace(/\sid="[^"]*"/g, "");
+  return `<div class="lane" style="width:${Math.round(W)}px;transform:translateY(${Math.round(from)}px)">${html}</div>`;
+}
+
+/** A program's box on a card, with what it is drawn as inside. */
+const cardBox = (k: string, x: number, y: number, w: number, h: number, inner: string): string =>
+  `<div class="lbox${inner.startsWith('<div class="lmark') ? " bare" : ""}" data-k="${esc(k)}" style="left:${Math.round(x)}px;top:${Math.round(y)}px;width:${Math.round(w)}px;height:${Math.round(h)}px">${inner}</div>`;
+
+/** The page a layout lays, at the page's own size: each program in its box, the figures of a stack drawn once their room is known. */
+function cardPage(h: Held, el: HTMLElement): void {
+  // what a card draws is drawn as the layout holds it, and leaves the page's own drawing state as it found it
+  // the row the page laid is set aside, since a figure asks it of the row the card lays
+  const kept = { plate: plateDrawnAt, ahead: aheadRoot, laid: laidNow };
+  laidNow = null;
+  try {
+    withHeld(h, () => layCard(el));
+  } finally {
+    plateDrawnAt = kept.plate;
+    aheadRoot = kept.ahead;
+    laidNow = kept.laid;
+  }
+}
+
+function layCard(el: HTMLElement): void {
+  const H = ui.areas.clientHeight;
+  const F = boxFrame(H);
+  const s = settings;
+  const stacks: { x: number; w: number; items: Item[] }[] = [];
+  const html = layRow(settings.layout).cols.flatMap((col) => {
+      const items = settings.layout[col.c].items;
+      const k = aloneIn(settings.layout[col.c]);
+      if (!k) {
+        stacks.push({ x: col.x, w: col.w, items });
+        return [];
+      }
+      if (k === "prose") {
+        const f = proseIn(col.w, "body");
+        return [cardBox(k, col.x + (f.sides[0] ? f.gutter + s.gap : 0), F.top, f.measure, F.height, cardProse(f.measure, F.height))];
+      }
+      if (k === "plate") return [cardBox(k, col.x, F.top, col.w, F.height, onBody(() => plateSvg(col.w, F.height, Infinity)))];
+      return [cardBox(k, col.x, F.top, col.w, F.height, cardIcon(k))];
+    });
+  el.innerHTML = html.join("");
+  // a stack lays as the page's does: those of fixed size take what they need, and the growing share what is left
+  stacks.forEach((st) => {
+    const W = Math.round(st.w);
+    const fixed = (k: string) => (WIDGETS[k] as Figure).grow === false && PROGRAMS[k].world !== "history";
+    const need = new Map<string, { html: string; h: number }>();
+    st.items.filter((it) => fixed(it.k)).forEach((it) => {
+      const probe = document.createElement("div");
+      probe.className = "lbox";
+      probe.style.width = `${W}px`;
+      probe.innerHTML = onBody(() => (WIDGETS[it.k] as Figure).draw(W, F.height));
+      el.append(probe);
+      need.set(it.k, { html: probe.innerHTML, h: Math.min(F.height, probe.scrollHeight) });
+      probe.remove();
+    });
+    const sized = st.items.map((it) => need.get(it.k)?.h ?? (PROGRAMS[it.k].world === "history" ? 96 : 0));
+    const left = Math.max(0, F.height - sized.reduce((n, x) => n + x, 0) - (s.gap + HEADROOM) * (st.items.length - 1));
+    const growing = st.items.filter((it, i) => !sized[i]);
+    const total = growing.reduce((n, it) => n + (it.h ?? 1), 0);
+    let y = F.top;
+    st.items.forEach((it, i) => {
+      const height = st.items.length === 1 && !need.has(it.k) ? F.height : sized[i] || (total ? (left * (it.h ?? 1)) / total : 0);
+      const inner = need.get(it.k)?.html ?? (PROGRAMS[it.k].world === "history" ? cardIcon(it.k) : height >= FIGURE_FLOOR ? onBody(() => (WIDGETS[it.k] as Figure).draw(W, height)) : "");
+      el.insertAdjacentHTML("beforeend", cardBox(it.k, st.x, y, st.w, height, inner));
+      y += height + s.gap + HEADROOM;
+    });
+  });
+}
+
+/** What a card's cap shows: its slot's digit. */
+const slotCap = (i: number): string => cap(KEY[String(i + 1)].glyph);
+
+/**
+ * The overview: the layouts as cards on a glass over the page, slot n at place n, three to a row once a third is shown,
+ * the plus in the first empty slot. A card stands at the shape of the page, scaled to what the grid has room for.
+ */
+function drawOverview(): void {
+  const el = document.getElementById("layouts")!;
+  if (!overview || narrow()) {
+    overview = false;
+    el.hidden = true;
+    el.innerHTML = "";
+    return;
+  }
+  const slots = slotsNow();
+  const plus = slots.findIndex((h) => h === null);
+  const last = Math.max(plus, slots.findLastIndex((h) => h !== null));
+  const n = Math.min(3, last + 1);
+  const rows = Math.ceil((last + 1) / n);
+  const Wp = ui.areas.clientWidth;
+  const Hp = ui.areas.clientHeight;
+  const gap = 32;
+  const room = { w: Wp - dockRoom() - 2 * 56, h: Hp - (settings.dock === "foot" ? FOOT + DOCK_FOOT : 0) - 2 * 56 - rows * 28 };
+  const cw = Math.floor(Math.max(80, Math.min(360, (room.w - (n - 1) * gap) / n, ((room.h - (rows - 1) * gap) / rows) * (Wp / Hp))));
+  const ch = Math.round((cw * Hp) / Wp);
+  const many = slots.filter(Boolean).length > 1;
+  const cell = (h: Held | null, i: number): string => {
+    if (i > last) return "";
+    if (i === plus)
+      return `<div class="lslot"><button class="lcard lplus" data-addlayout style="width:${cw}px;height:${ch}px" data-tip="a copy of the layout in use, in slot ${i + 1}"><svg class="icon" viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></svg></button><span class="lfoot"></span></div>`;
+    if (!h) return `<div class="lslot empty"></div>`;
+    const on = i === settings.slot;
+    const drop = many ? `<button class="ldrop" data-droplayout="${i}" data-tip="take layout ${i + 1} away">${icon("none")}</button>` : "";
+    return (
+      `<div class="lslot"><button class="lcard${on ? " on" : ""}" data-layin="${i}" style="width:${cw}px;height:${ch}px" data-tip="${on ? `layout ${i + 1}, in use` : `layout ${i + 1} — press, or ${i + 1}, to lay it`}">` +
+      `<div class="lpage" data-page="${i}" style="width:${Wp}px;height:${Hp}px;transform:scale(${cw / Wp})"></div></button>${drop}<span class="lfoot">${slotCap(i)}</span></div>`
+    );
+  };
+  el.hidden = false;
+  el.innerHTML = `<div class="lgrid" style="grid-template-columns:repeat(${n},${cw}px);column-gap:${gap}px;row-gap:${gap - 8}px;margin-left:${dockRoom()}px">${slots.map(cell).join("")}</div>`;
+  slots.forEach((h, i) => {
+    const page = el.querySelector<HTMLElement>(`[data-page="${i}"]`);
+    if (h && page) cardPage(h, page);
+  });
+}
+
 // ## 3.5 The tree: the lane as an outline
 //
 // The lane's briefs as a file tree: a row per brief in the lane, nested under
@@ -3214,10 +3451,7 @@ function loadSettings(): void {
     // only what a setting is now is kept, so a name the page no longer knows is let go
     if (saved) settings = { ...DEFAULTS, ...Object.fromEntries(Object.entries(saved).filter(([k]) => k in DEFAULTS)) } as Settings;
   } catch {}
-  settings.layout = keptLayout(settings.layout);
-  settings.gutters = keptGutters(settings.gutters);
   if (settings.git !== "on") settings.git = "off";
-  settings.layout = offeredLayout(settings.layout);
   const alone = (settings.alone ?? {}) as Partial<Settings["alone"]>;
   settings.alone = {
     pane: alone.pane === "canvas" ? "canvas" : "lane",
@@ -3225,6 +3459,17 @@ function loadSettings(): void {
   };
   // a setting a switch turns holds one of the values the switch offers, and anything else is its default
   SWITCHES.forEach((w) => w.values.includes(settings[w.key]) || ((settings as Record<string, unknown>)[w.key] = DEFAULTS[w.key]));
+  settleHeld();
+  settings.slot = Number.isInteger(settings.slot) && settings.slot >= 0 && settings.slot < SLOTS ? settings.slot : 0;
+  const kept = Array.isArray(settings.layouts) ? settings.layouts : [];
+  settings.layouts = Array.from({ length: SLOTS }, (_, i) => (i !== settings.slot && kept[i] && typeof kept[i] === "object" ? withHeld(kept[i]!, heldNow) : null));
+}
+
+/** Makes what a layout holds whole, each value one its setting offers and anything else its default. */
+function settleHeld(): void {
+  settings.layout = offeredLayout(keptLayout(settings.layout));
+  settings.gutters = keptGutters(settings.gutters);
+  if (settings.face !== "hidden") settings.face = "shown";
   const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
   const trunk = (settings.trunk ?? {}) as Partial<Settings["trunk"]>;
   settings.trunk = { body: runs(trunk.body, DEFAULTS.trunk.body), history: runs(trunk.history, DEFAULTS.trunk.history) };
@@ -3253,16 +3498,17 @@ const saveSettings = (): void =>
 // the rest on hover. It answers for the focus, so what the space bar would do
 // now is what it says.
 
-const KEY_GROUPS: { of: string; acts: string[] }[] = [
+const KEY_GROUPS: { of: string; acts: string[]; tight?: boolean }[] = [
   { of: "the brief", acts: ["unfold", "foldUp", "scope"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "out"] },
   { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
   { of: "the map", acts: ["wayHere", "onlyHere"] },
   { of: "the lane", acts: ["undo", "redo"] },
+  { of: "the layouts", acts: Array.from({ length: 9 }, (_, i) => `layout${i + 1}`), tight: true },
 ];
 
 const keysHtml = (): string =>
-  `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
+  `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.tight ? `<span class="row">${g.acts.map((id) => badgeHtml(id, undefined, true)).join("")}</span>` : g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
 
 // ## 3.9 The shape: the lane as laid
 //
@@ -5583,7 +5829,11 @@ function drawChooser(): void {
     return `<button class="pick${at ? " on" : ""}${denied}${fixed}${busy}${full}" data-program="${esc(k)}" data-tip="${esc(dockTip(k))}">${programIcon(k)}</button>`;
   };
   const groups = DOCK.filter((g) => g.some(offered)).map((g) => `<span class="group">${g.filter(offered).map(pick).join("")}</span>`).join("");
-  ui.strips.innerHTML = `<div class="strip dock ${settings.dock}">${groups}</div>`;
+  // the layouts stand in a group of their own at the dock's end, since they are not a program but every arrangement of them
+  const n = slotsNow().filter(Boolean).length;
+  const said = overview ? "the layouts — press, or escape, to go back to the page" : `the layouts — ${n} kept; press to see them all, or lay one by its digit`;
+  const layouts = `<span class="group"><button class="pick${overview ? " on" : ""}" data-overview data-tip="${esc(said)}">${icon("layouts")}</button></span>`;
+  ui.strips.innerHTML = `<div class="strip dock ${settings.dock}">${groups}${layouts}</div>`;
 }
 
 // ### 3.12.1 The card at the foot
@@ -5678,6 +5928,8 @@ function drawAll(): void {
   drawCard();
   onBody(light);
   inGit(light);
+  // the dock stands above the overview and still lays the page, so the cards are drawn again with it
+  if (overview) drawOverview();
 }
 
 // ## 3.13 One brief lit, wherever it is drawn
@@ -6464,6 +6716,8 @@ const relayRow = (): void => {
 };
 
 function onPointerMove(e: PointerEvent): void {
+  // over the overview of the layouts nothing beneath answers, and only the tooltip follows
+  if ((e.target as Element).closest?.("#layouts")) return tip(e);
   // after a scroll, a pointer lights a brief only once it has travelled a little: a scroll that comes to rest under a
   // still pointer makes the browser send a move of its own, which would light whatever the scroll left beneath it.
   // Otherwise every move counts, so the highlight never lags behind the region the pointer is in
@@ -6524,6 +6778,19 @@ const onClick = (e: MouseEvent): void => {
   if (inner && (inPast() || !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey))) {
     e.preventDefault();
     return void follow(inner.dataset.link ?? decodeURIComponent(inner.getAttribute("href")!.slice(2)));
+  }
+  // the overview answers its own presses before anything of the page, a selection left in the prose included, and a press
+  // on its ground lets it go; the clicks that follow a press that let it go land on the page beneath, so they are let go
+  if (performance.now() < overviewQuiet) return;
+  if (t.closest(".dock [data-overview]")) return void raiseOverview(!overview);
+  if (t.closest("#layouts")) {
+    const drop = t.closest<HTMLElement>("[data-droplayout]");
+    if (drop) return void dropLayout(Number(drop.dataset.droplayout));
+    if (t.closest("[data-addlayout]")) return void addLayout();
+    const card = t.closest<HTMLElement>("[data-layin]");
+    if (card) layIn(Number(card.dataset.layin));
+    overviewQuiet = performance.now() + 400;
+    return void raiseOverview(false);
   }
   // a selection left in the prose swallowed every press elsewhere, and the canvas selects nothing of its own
   if (t.closest("a[href]") || (!t.closest(".canvas") && window.getSelection()?.toString())) return;
@@ -6603,6 +6870,7 @@ const onClick = (e: MouseEvent): void => {
     }
     if (key === "git") {
       settings.layout = offeredLayout(settings.layout);
+      settings.layouts = settings.layouts.map((h) => h && withHeld(h, heldNow));
       if (settings.git === "off") narrowWorld = "body";
     }
     saveSettings();
@@ -6840,6 +7108,7 @@ const letGoOf = () => {
 
 // a gap pressed twice gives the programs either side their own widths back, and a stack its even shares
 function onDoubleClick(e: MouseEvent): void {
+  if (overview || performance.now() < overviewQuiet) return;
   const t = e.target as HTMLElement;
   const seam = t.closest<HTMLElement>("[data-seam]");
   const vseam = t.closest<HTMLElement>("[data-vseam]");
@@ -6965,6 +7234,7 @@ function onKeyUp(e: KeyboardEvent): void {
 function onKeyDown(e: KeyboardEvent): void {
   if ((e.target as HTMLElement).closest("input, textarea")) return;
   if (e.key === "Escape" && drag?.kind === "move") return void (e.preventDefault(), cancelMove());
+  if (e.key === "Escape" && overview) return void (e.preventDefault(), raiseOverview(false));
   if (e.key === " ") {
     e.preventDefault();
     if (space) return;
@@ -6973,6 +7243,8 @@ function onKeyDown(e: KeyboardEvent): void {
     space = hold;
     return;
   }
+  // a digit held with a modifier is the browser's, its tabs among them, and never lays a layout
+  if (e.code.startsWith("Digit") && (e.metaKey || e.ctrlKey || e.altKey)) return;
   // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
   const said: Chord = { key: e.key, shift: e.shiftKey };
   const chord = actionFor(said) ? said : { key: pressed(e), shift: e.shiftKey };
@@ -7032,6 +7304,8 @@ function onHashChange(): void {
 function onResize(): void {
   // before the body is read there is nothing laid to keep in step
   if (!bodyWorld.body) return;
+  // the overview lays its cards at the page's shape, so it is laid again once the page is
+  if (overview) requestAnimationFrame(() => (drawOverview(), drawChooser()));
   // what stands under a still pointer may have changed, so the keys go back to the prose until it moves
   pointerOn = null;
   // where the lane stands alone or stood so a moment ago, the one pane is drawn again whole, since which world shows
@@ -7061,7 +7335,7 @@ function onKnobWheel(e: WheelEvent): void {
 function onWheel(e: WheelEvent): void {
   holding = null;
   const t = e.target as HTMLElement;
-  if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas")) return;
+  if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas") || t.closest("#layouts")) return;
   // from anywhere else the wheel scrolls the body's prose, so the reader never has to reach for it, or the
   // history's where it is the only prose standing
   const into: WorldName | null = narrow() ? narrowShown() : laidAt("prose") ? "body" : laidAt("gitProse") && gitReady() ? "history" : null;
@@ -7092,6 +7366,8 @@ function wire(): void {
   document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
   // a drag acts in the world it began in, to its end
   document.addEventListener("pointerdown", (e) => {
+    // nothing beneath the overview of the layouts is taken hold of through it
+    if ((e.target as Element).closest?.("#layouts")) return;
     const w = worldOfEl(e.target as Element);
     runIn(w, () => pointerDown(e));
     if (drag) drag.world = w;
@@ -7190,6 +7466,7 @@ async function start(): Promise<void> {
       <div id="heads"></div>
       <div id="sheet" hidden></div>
       <div id="card" hidden></div>
+      <div id="layouts" hidden></div>
       <div id="strips"></div>
     </main>
     <div id="tip" class="chrome" hidden></div>`;
@@ -7644,6 +7921,31 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .badge .chord { display: inline-flex; gap: 2px; }
 /* the acts stand together at the right of the line, so the figures of every line begin at one edge */
 .act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
+/* the overview of the layouts: cards on a glass over the page, each the page a layout lays, drawn small */
+#layouts { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; background: color-mix(in srgb, var(--ground) 62%, transparent); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
+.lgrid { display: grid; justify-content: center; align-content: center; }
+.lslot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.lcard { position: relative; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: var(--ground); color: var(--ink); box-shadow: 0 0 0 1px var(--rim), 0 1px 2px rgb(0 0 0 / .05), 0 10px 28px rgb(0 0 0 / .12); cursor: pointer; transition: box-shadow .15s; }
+.lcard:hover { box-shadow: 0 0 0 1px var(--faint), 0 1px 2px rgb(0 0 0 / .06), 0 14px 34px rgb(0 0 0 / .16); }
+.lcard.on, .lcard.on:hover { box-shadow: 0 0 0 2px var(--muted), 0 1px 2px rgb(0 0 0 / .06), 0 14px 34px rgb(0 0 0 / .16); }
+.lpage { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; text-align: left; }
+.lbox { position: absolute; overflow: hidden; }
+.lbox.bare { border-radius: 24px; background: var(--wash); }
+.lbox > .lane { line-height: var(--leading); }
+.lmark { position: absolute; inset: 0; display: grid; place-items: center; color: var(--faint); }
+.lmark .icon, .lmark .gicon { width: 96px; height: 96px; }
+.lmark .gicon .icon { width: 100%; height: 100%; }
+.lplus { display: grid; place-items: center; background: transparent; color: var(--faint); box-shadow: inset 0 0 0 1px var(--rim); }
+.lplus:hover { color: var(--muted); box-shadow: inset 0 0 0 1px var(--faint); }
+.lplus .icon { width: 28px; height: 28px; }
+.ldrop { position: absolute; top: -9px; right: -9px; width: 22px; height: 22px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: var(--ground); color: var(--muted); box-shadow: 0 0 0 1px var(--rim), 0 2px 6px rgb(0 0 0 / .12); cursor: pointer; opacity: 0; transition: opacity .15s; }
+.ldrop .icon { width: 12px; height: 12px; }
+.lslot:hover .ldrop { opacity: 1; }
+.ldrop:hover { color: var(--ink); }
+.lfoot { height: 16px; }
+/* the layouts are a row of their digits, the first standing where every other key nearest its word stands */
+.keys .row { display: flex; gap: 3px; padding-left: 22px; }
+.keys .row .badge .chord { width: auto; }
 .cap { width: 18px; height: 16px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); color: var(--muted); transition: background .15s, color .15s; }
 .cap svg { width: 12px; height: 12px; transform: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .badge .label { color: var(--ink); }
