@@ -88,6 +88,16 @@ Whether a slice is shared among every brief or among files alone is [a switch](#
 
 *The author's, 2026-10-12, looked at on a page of variants drawn from the body: that colour work through the branches and the levels, that a branch be drawn as the gradient of what stands beneath it, that all of it share the wheel, each place its own slice, by the branching and not by size, and that files or sections be a setting. Until then each part of the root took one hue, stepped around the wheel by the golden angle so that neighbours stood far apart. That ink takes the middle and a wide fill the run, that the wheel begins at the first part's old hue, and that the switch stands apart from the plate's, are the session's, until the author has looked. As built the same day: a cell of the plate shows its run where its slice spans three degrees and the cell twelve pixels along, in wedges of two degrees.*
 
+#### 1.8.1 A trial: colour from the scope
+
+The wheel can be laid from the scope instead of from the root. Then the scope's brief is the whole wheel, the briefs beneath it share it as the root's would, and everything outside the scope is drawn in grey, its tones kept and its hue taken away: the levels above it where the way down or a map drawn from the root shows them, and every branch beside it.
+
+So colour says where a thing sits within what the reader is in, at the most difference the wheel can give there, and says only that everything else is elsewhere. It goes with [a map drawn from the scope](canvas.md#64-a-map-may-be-drawn-from-the-scope-as-the-plate-may) and the plate drawn the same way, where nothing outside the scope stands at all.
+
+It is [a switch](#62-the-switches), off unless a reader turns it on, and a trial: what a body should be coloured by is the question [dimensions](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions) will answer, and this is a way to look at one answer before they do. Git's history is laid from git's own scope, and a reading a commit touched is coloured from the body's.
+
+*The author's ask, 2026-10-12, as an opt-in trial to explore while dimensions with their visuals are further off. That everything outside the scope is grey and not only the levels above it, and that the tones are kept with the hue alone taken away, are the session's. Open: not yet built.*
+
 ## 2. The tree
 
 The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
