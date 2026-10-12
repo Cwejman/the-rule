@@ -4325,7 +4325,15 @@ function drawCanvas(): void {
   // held where it stood on the screen, and nothing the reader is looking at moves
   const held = stage()?.classList.contains("text") ? stage()!.querySelector<HTMLElement>(".crow.picked") : null;
   const heldAt = held ? `.crow[data-a="${cssEsc(held.dataset.a ?? "")}"]${held.dataset.head ? "[data-head]" : ":not([data-head])"}` : null;
-  const was = held?.getBoundingClientRect();
+  // measured where the view means it to stand rather than where an ease still running has painted it, so a redraw in
+  // the middle of an ease neither freezes it nor undoes it
+  const was = held
+    ? (() => {
+        const r = held.getBoundingClientRect();
+        const m = new DOMMatrixReadOnly(getComputedStyle(stage()!).transform);
+        return { left: r.left - m.e + state.view.x, top: r.top - m.f + state.view.y };
+      })()
+    : undefined;
   ui.canvas.innerHTML = `${stageHtml()}${faceHtml()}${fieldHtml()}`;
   // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
   // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
