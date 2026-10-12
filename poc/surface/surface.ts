@@ -4007,7 +4007,25 @@ function drawDish(): void {
   // the plate fills its box: the way down stands above every head
   ui.dish.style.paddingTop = "0px";
   ui.dish.style.paddingBottom = "0px";
-  ui.dish.innerHTML = plateSvg(ui.dish.clientWidth, ui.dish.clientHeight, Infinity);
+  setPlate(ui.dish, plateSvg(ui.dish.clientWidth, ui.dish.clientHeight, Infinity));
+}
+
+/**
+ * Sets a plate drawn again where one stands. Where it lays the same cells as the one standing, only their marks are
+ * taken over, so what changes with the focus, as a scroll moves it, changes in place and eases as a light does.
+ */
+function setPlate(el: HTMLElement, html: string): void {
+  const was = el.querySelector<SVGSVGElement>(":scope > svg.plate");
+  const t = document.createElement("template");
+  t.innerHTML = html;
+  const now = t.content.firstElementChild?.matches("svg.plate") ? (t.content.firstElementChild as SVGSVGElement) : null;
+  const laid = (svg: SVGSVGElement): string => `${svg.getAttribute("viewBox")}\n${Array.from(svg.children, (g) => `${g.getAttribute("data-a")} ${g.firstElementChild?.getAttribute("d")}`).join("\n")}`;
+  if (!was || !now || t.content.childNodes.length !== 1 || laid(was) !== laid(now)) return void (el.innerHTML = html);
+  Array.from(now.children).forEach((g, i) => {
+    const old = was.children[i];
+    if (old.getAttribute("class") !== g.getAttribute("class")) old.setAttribute("class", g.getAttribute("class") ?? "");
+    if (old.getAttribute("style") !== g.getAttribute("style")) old.setAttribute("style", g.getAttribute("style") ?? "");
+  });
 }
 
 /** Pointing at a cell lights the way to it from the root, cell by cell, where the other figures light the one alone. */
@@ -5435,7 +5453,11 @@ function drawStacks(): void {
       el.style.width = `${W}px`;
       el.style.top = `${top}px`;
       el.style.height = "";
-      if (!f.grow) el.innerHTML = f.draw(W, items.length === 1 ? room : (room - s.gap - HEADROOM) / 2);
+      if (!f.grow) {
+        const html = f.draw(W, items.length === 1 ? room : (room - s.gap - HEADROOM) / 2);
+        if (it.k === "plate") setPlate(el, html);
+        else el.innerHTML = html;
+      }
       return { it, el, f, height: f.grow ? 0 : Math.min(room, el.scrollHeight) };
     });
     const growing = slotted.filter((x) => x.f.grow);
@@ -5468,7 +5490,8 @@ function drawHosted(k: string): void {
   const f = WIDGETS[k];
   const col = laidAt(k);
   if (el.hidden || !at || !col || f?.kind !== "figure") return;
-  el.innerHTML = f.draw(Math.round(col.w), at.height);
+  if (k === "plate") setPlate(el, f.draw(Math.round(col.w), at.height));
+  else el.innerHTML = f.draw(Math.round(col.w), at.height);
   // a figure of fixed size takes the height it needs, so one that now needs another lays its stack again
   if (!f.grow) {
     el.style.height = "";
@@ -8550,7 +8573,8 @@ svg.plate .cell, svg.plate .run path {
   --p-halo: light-dark(oklch(70% calc(0.119 * var(--hk, 1)) var(--h)), var(--c));
   --c: var(--p-rest);
 }
-svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; transition: fill .16s, stroke .16s, filter .16s; }
+svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; transition: fill .16s, stroke .16s; }
+/* the glow comes and goes at once: eased from nothing, a shadow passes through black before it takes its hue */
 /* a cell's run is drawn in the tone its state takes, each wedge in its own hue, and never stands in the pointer's way */
 svg.plate .run { pointer-events: none; }
 svg.plate .run path { fill: var(--c); transition: fill .16s; }
