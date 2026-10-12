@@ -46,18 +46,6 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 *The author's decision, 2026-09-18, as built the same day; the whole map is his own of 2026-09-15, held for later.*
 
-### 3.1 It may stand at the scope, as the plate may
-
-A reader scoped into one reading may want the map of that reading alone, without the body's root and everything opened on the way to it. So the canvas draws from the body's root, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may.
-
-Drawn from the scope, the scope's own brief stands at the head of the first column, where the root stands otherwise, and everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, each opening beside the row that named it, numbered from the scope as the lane numbers it. Nothing outside the scope is drawn, and what stands open outside it stays open for when the map is drawn whole again.
-
-The map is fitted again whenever where it is drawn from changes: turning the setting, or, drawn from the scope, scoping in or out.
-
-Each canvas keeps its own, as it keeps [whether its nodes are text](#4116-each-canvas-keeps-its-own), and git's canvas draws from git's own scope. A canvas starts drawn from the root.
-
-*The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map starts its first column at the scope's brief, keeps what is open outside it, is fitted again at every change of scope, and that each canvas keeps its own and starts from the root, are the session's. Open: not yet built.*
-
 ## 4. Down is the reading, across is each opening
 
 The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's level runs across.
@@ -369,6 +357,22 @@ Coming back is an act, and it is one they already have: the full stop returns th
 Whether a map follows is a setting in its head. Following, it brings where the reader is into view whenever that moves, even after they went looking elsewhere on it. Not following, it keeps the view where they left it, and the full stop still brings them back. Turned on, it takes the reader's place up at once.
 
 *The author's, 2026-10-05, since as built the map did not always follow. That following overrides being astray, and that it is on unless turned off, are the session's.*
+
+### 6.4 A map may be drawn from the scope, as the plate may
+
+A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may.
+
+Drawn from the scope, the scope's brief is the head of the first column, where the root stands otherwise, whether the scope is a file or a brief inside one. Everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, and each opening beside the row that named it. Its rows are numbered from the scope, so its first level reads 1, as the lane's headings do once scoped.
+
+The scope's brief is a place to stand as the root's head is. A step out of it goes nowhere, as from the root, since what lies above is past where the map is drawn from; going out of the scope is the way down's, and the map is drawn again from wherever the scope then stands. [The way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit from the scope's brief, which takes its branch's ink where the root takes none.
+
+Nothing outside the scope is drawn. The way down above the map says what lies above it, and what stands open outside the scope stays open for when the map is drawn from the root again.
+
+The map is fitted again whenever where it is drawn from changes: the setting turned, or, drawn from the scope, the scope moved in or out.
+
+Each canvas keeps its own, as it keeps [whether its nodes are text](#4116-each-canvas-keeps-its-own): a layout holds it, and a phone, which has no heads, draws as it was last set. Git's canvas draws from git's own root or git's own scope. A canvas starts drawn from the root.
+
+*The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map stands at the scope's brief whether a file or a brief, keeps what is open outside it, steps out nowhere, is fitted again at every change of scope, and that each canvas keeps its own and starts from the root, are the session's. As built the same day.*
 
 ## 7. What the substrate gives the canvas
 
