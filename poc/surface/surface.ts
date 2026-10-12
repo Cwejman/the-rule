@@ -4021,18 +4021,23 @@ const colRootOf = (a: string, head: boolean): string =>
 const columnRows = (root: string, col = root): Brief[] =>
   level(root).flatMap((b) => [b, ...(showsKids(b) && !zoomFolds(b.address, col, zoomDepth()) ? columnRows(b.address, col) : [])]);
 
+/**
+ * What each world's text map was last laid with: the depth its zoom folds past, and the places whose way it keeps whole.
+ * The ways are only ever added to while the zoom stands, so a selection or a focus moving off a branch never folds it
+ * back under the reader; a zoom that folds again lays them afresh.
+ */
+const textKept = new Map<World, { depth: number; ways: string[] }>();
 /** The depth the text map standing is laid to, past which its zoom folds levels away; boxes fold nothing for the zoom. */
-const zoomDepth = (): number => {
-  const st = stage();
-  return st?.classList.contains("text") ? Number(st.dataset.depth ?? "Infinity") : Infinity;
-};
+const zoomDepth = (): number => (stage()?.classList.contains("text") ? (textKept.get(state)?.depth ?? Infinity) : Infinity);
+/** The places a text map is to keep the way to now: every reading that stands open, where the reader stands and what is selected. */
+const waysNow = (): string[] => [...state.opened, state.focus, ...(state.picked === null ? [] : [state.picked])];
 /**
  * Whether a text map's zoom folds away the level beneath a row. It never folds the way to a reading that stands open,
  * to where the reader stands or to what is selected, so none of them leaves the map as it shrinks: on that way the
  * level stays whole, and the folding is taken everywhere else.
  */
 const zoomFolds = (a: string, col: string, depth: number): boolean =>
-  depthBeneath(a, col) >= depth && ![...state.opened, state.focus, state.picked].some((x) => x !== null && x.startsWith(a + "/"));
+  depthBeneath(a, col) >= depth && !(textKept.get(state)?.ways ?? []).some((x) => x.startsWith(a + "/"));
 
 /** The column a node stands in, head first, as the map lays it: the order down and up walk. */
 const columnOf = (a: string, head: boolean): { a: string; head: boolean }[] => {
@@ -4310,6 +4315,8 @@ function settleMap(): void {
 function stageHtml(): string {
   if (nodesAs() !== "text") return `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
   textLaid.depth = textAt(state.view.k).depth;
+  const kept = textKept.get(state);
+  textKept.set(state, { depth: textLaid.depth, ways: [...new Set([...(kept?.depth === textLaid.depth ? kept.ways : []), ...waysNow()])] });
   return `<div class="stage text" data-depth="${textLaid.depth}"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
 }
 
@@ -5917,7 +5924,10 @@ function drawFocusMarks(): void {
     const onRow = !el.classList.contains("crow") || (el.dataset.head === "1") === headFor(state.focus);
     el.classList.toggle("here", (el.dataset.a === state.focus && onRow) || (el.classList.contains("brief") && el.dataset.a === holder));
   });
-  if (canvasOn()) (followFocus(), drawEdges());
+  // a text map whose zoom has folded away the way to where the reader now stands is laid again to keep it, and follows
+  const kept = canvasOn() && stage()?.classList.contains("text") ? textKept.get(state) : undefined;
+  if (kept && kept.depth !== Infinity && !kept.ways.includes(state.focus) && !stage()!.querySelector(`.crow[data-a="${cssEsc(state.focus)}"]`)) ((state.followed = null), drawCanvas());
+  else if (canvasOn()) (followFocus(), drawEdges());
   // the plate marks its own, since a cell of it may be a whole file and the focus stand anywhere inside it
   all<HTMLElement>("svg.fig:not(.plate) [data-a]", ui.areas).filter(ours).forEach((el) => {
     el.classList.toggle("on", onPath.has(el.dataset.a!));
