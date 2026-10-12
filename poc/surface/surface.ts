@@ -4021,11 +4021,7 @@ const colRootOf = (a: string, head: boolean): string =>
 const columnRows = (root: string, col = root): Brief[] =>
   level(root).flatMap((b) => [b, ...(showsKids(b) && !zoomFolds(b.address, col, zoomDepth()) ? columnRows(b.address, col) : [])]);
 
-/**
- * What each world's text map was last laid with: the depth its zoom folds past, and the places whose way it keeps whole.
- * The ways are only ever added to while the zoom stands, so a selection or a focus moving off a branch never folds it
- * back under the reader; a zoom that folds again lays them afresh.
- */
+/** What each world's text map was last laid with: the depth its zoom folds past, and the places whose way it keeps whole. */
 const textKept = new Map<World, { depth: number; ways: string[] }>();
 /** The depth the text map standing is laid to, past which its zoom folds levels away; boxes fold nothing for the zoom. */
 const zoomDepth = (): number => (stage()?.classList.contains("text") ? (textKept.get(state)?.depth ?? Infinity) : Infinity);
@@ -4315,8 +4311,7 @@ function settleMap(): void {
 function stageHtml(): string {
   if (nodesAs() !== "text") return `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
   textLaid.depth = textAt(state.view.k).depth;
-  const kept = textKept.get(state);
-  textKept.set(state, { depth: textLaid.depth, ways: [...new Set([...(kept?.depth === textLaid.depth ? kept.ways : []), ...waysNow()])] });
+  textKept.set(state, { depth: textLaid.depth, ways: waysNow() });
   return `<div class="stage text" data-depth="${textLaid.depth}"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
 }
 
@@ -4326,13 +4321,19 @@ function drawCanvas(): void {
   settleMap();
   // which column each row stands in is a measure of what is drawn, so it is taken again as the map is drawn
   state.colOf.clear();
+  // a text map laid again may fold a branch back or open one above what was selected, so the row that was selected is
+  // held where it stood on the screen, and nothing the reader is looking at moves
+  const held = stage()?.classList.contains("text") ? stage()!.querySelector<HTMLElement>(".crow.picked") : null;
+  const heldAt = held ? `.crow[data-a="${cssEsc(held.dataset.a ?? "")}"]${held.dataset.head ? "[data-head]" : ":not([data-head])"}` : null;
+  const was = held?.getBoundingClientRect();
   ui.canvas.innerHTML = `${stageHtml()}${faceHtml()}${fieldHtml()}`;
   // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
   // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
   // neither read nor reach
   const field = ui.canvas.querySelector<HTMLElement>(".field");
   if (field) field.classList.toggle("tight", field.offsetWidth > ui.canvas.clientWidth - 2 * CANVAS_INSET);
-  if (state.fitted !== state.body.root || (!state.panned && state.fittedWidth !== ui.canvas.clientWidth)) {
+  const refit = state.fitted !== state.body.root || (!state.panned && state.fittedWidth !== ui.canvas.clientWidth);
+  if (refit) {
     fitCanvas();
     state.fitted = state.body.root;
     state.fittedWidth = ui.canvas.clientWidth;
@@ -4341,6 +4342,12 @@ function drawCanvas(): void {
     refollow();
   }
   applyView(false);
+  const now = was && heldAt && !refit ? stage()?.querySelector<HTMLElement>(heldAt)?.getBoundingClientRect() : undefined;
+  if (was && now && (was.left !== now.left || was.top !== now.top)) {
+    state.view.x += was.left - now.left;
+    state.view.y += was.top - now.top;
+    applyView(false);
+  }
   // the map is wider than the pane, so the reading's own place is brought into view when it moves; a draw that only
   // opened something leaves the view to the opening, which brings its own column in
   followFocus();
