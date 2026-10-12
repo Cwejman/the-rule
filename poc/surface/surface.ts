@@ -4174,7 +4174,7 @@ const TYPE_HOLD = 2;
 const TEXT = { gap: 4, indent: 16, across: 32 };
 /**
  * In text the nesting is a file tree's whatever the setting, a line dropping from beneath the first letter of the name
- * that holds the level, with a tick into each row: a row of one line has no middle for a thread to pass through.
+ * that holds the level, with a tick into each row: a thread runs through the rows, hidden by a box's ground, and a name has none.
  */
 const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false }, text: { indent: TEXT.indent, x: 6, tick: true } };
 const treeForm = () => (nodesAs() === "text" ? TREE.text : (TREE[settings.tree] ?? TREE.spine));
