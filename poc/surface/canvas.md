@@ -70,9 +70,9 @@ A file's own levels do not step right; they go down in the one column, since the
 
 Every file now opens with a brief of its own, so the edge from the opening lands on that brief, and the nesting hangs beneath it as a file tree draws one: a line dropping from the brief, each level's rows hanging into it, the line standing in from the left rather than centred so the indent draws itself.
 
-Two forms of that line stand against each other and are not decided. The line may pass through each nearest child in turn, which threads more and more lines through the rows as the nesting deepens; or one line may drop from the far left of the file's own brief and run the whole way, every row hanging into its side, which is what a file tree does. They are to be built and looked at side by side rather than argued.
+Two forms of that line stand against each other and are not decided. The line may pass through each nearest child in turn, which threads more and more lines through the rows as the nesting deepens; or a line may drop down the left from beneath each brief that holds a level, every row of the level hanging into its side by a tick, which is what a file tree does. They are to be built and looked at side by side rather than argued.
 
-*The author's direction, 2026-09-18; both lines are built and a switch in the settings, `nesting`, stands them side by side, so the choice is open and his to make by looking.*
+*The author's direction, 2026-09-18; both lines are built and a switch in the settings, `nesting`, stands them side by side, so the choice is open and his to make by looking. The second was first written as one line for the whole file, and is said as built, a line for each level, 2026-10-12.*
 
 ### 4.3 A file opens whole, and folding comes after
 
