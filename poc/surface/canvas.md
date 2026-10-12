@@ -170,7 +170,7 @@ As built, one line runs along beneath the root's row and drops into the head of 
 
 ### 4.11 A node may be one line of text, joined as a file tree is
 
-A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a foot beneath the name for its figure. So a canvas may be turned to text, where a node is one line, its name with its number before it and its figure after: the lines that join the rows carry the structure, and what a box's rim and ground said is said on the name itself.
+A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a foot beneath the name for its figure. So a canvas may be turned to text, where a node is one line, its name with its heading's number before it and its figure after: the lines that join the rows carry the structure, and what a box's rim and ground said is said by the name's type or close around it.
 
 It is another way of drawing the same map, not a second map. The same rows stand in the same order in the same columns, and every act on the map does the same thing in text.
 
@@ -182,9 +182,9 @@ A row in text is as wide as its name and no wider, and a long name is cut at a w
 
 Where the row stands in its reading, its heading's number, which a box carries in its foot, stands faint before the name.
 
-The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language, at half its length, and stands after the name on the same line.
+The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language, at about half its length, and stands after the name on the same line.
 
-The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps the columns apart by itself; a column of names ends ragged, so it needs more room.
+The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps each branch apart by itself; a branch of names ends ragged, its longest name reaching toward the next, so it needs more room.
 
 *The author's ask, 2026-10-12, of the face. The measures and the figure at half its length are the session's, looked at on the page.*
 
@@ -208,7 +208,7 @@ Each mark a box makes has its counterpart in text, by the name's type or close a
 
 - What is selected takes the wash a selected box takes, and not its rim, drawn close behind its name.
 
-- The row the reading stands on is ringed close around its name in the branch's ink, as that box is ringed; a row pointed at is ringed in the ink that lights a thing pointed at, as a box is, so the two are told apart by their ink.
+- The row the reading stands on is ringed close around its name in the branch's ink, as that box is ringed; a row under the pointer is ringed in the ink that lights a thing pointed at, as a box is, so the two are told apart by their ink.
 
 - The rows on [the way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) take the branch's ink in their names, as they do in a box.
 
@@ -218,7 +218,7 @@ Every other row is its name plainly, as a brief of this file keeps the quiet rim
 
 #### 4.11.4 The type is not held against the view
 
-Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole as far as the reader zooms it; only when the map is fitted to its pane does it stop where its names still read.
+Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole as far as the reader zooms it; only when the map is fitted to its pane, as it is on arriving or when the pane changes width, does it stop where its names still read.
 
 *The session's, 2026-10-12, measured on the page: shrunk whole, the map at a quarter of life size still shows its shape though its names no longer read, which is what an overview wants, and a fit stops before that.*
 
