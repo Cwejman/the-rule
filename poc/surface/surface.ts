@@ -1480,6 +1480,8 @@ type Settings = {
   trunk: { body: "down" | "across"; history: "down" | "across" };
   /** whether each canvas draws a node as a box, or as its name alone on the lines of a file tree; both start in boxes */
   nodes: { body: "boxes" | "text"; history: "boxes" | "text" };
+  /** whether each canvas draws from the root of its world, or from the scope as the plate may; both start from the root */
+  mapFrom: { body: "whole" | "scope"; history: "whole" | "scope" };
   /** where the lane stands alone: the one pane it shows, and the edge the rail stands at beside the prose, if anywhere */
   alone: { pane: "lane" | "canvas"; rail: "left" | "right" | null };
   /** wide, the page laid by hand: a row of columns, each a stack of programs, the left first */
@@ -1526,6 +1528,7 @@ const DEFAULTS: Settings = {
   face: "shown",
   trunk: { body: "down", history: "across" },
   nodes: { body: "boxes", history: "boxes" },
+  mapFrom: { body: "whole", history: "whole" },
   alone: { pane: "lane", rail: "left" },
   layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "ahead" }] }],
   gutters: { body: [null, "links"], history: [null, "links"] },
@@ -2070,10 +2073,11 @@ const ACTS: Record<string, Action> = {
     mark: () => ICON.fold,
     keys: [{ key: ".", shift: true }],
     help: () => "Leaves only where the reader is: everything off the way to it folded, and every other reading closed on the map.",
-    can: () => state.opened.some((p) => !wayHere().includes(p)) || laneOrder(state.scope).some((b) => !onWayHere(b.address) && foldOf(b.address) === "whole"),
+    // a map drawn from the scope closes only what it draws, and what stands open outside it is kept for the whole map
+    can: () => state.opened.some((p) => within(p, mapRoot()) && !wayHere().includes(p)) || laneOrder(state.scope).some((b) => !onWayHere(b.address) && foldOf(b.address) === "whole"),
     run: () => {
       attach();
-      state.opened = wayHere();
+      state.opened = [...new Set([...state.opened.filter((p) => !within(p, mapRoot())), ...wayHere()])];
       refold(() =>
         state.body!.briefs.forEach(
           (b) => b.address !== state.scope && within(b.address, state.scope) && unfolds(b) && setFold(b.address, onWayHere(b.address) ? "whole" : "face"),
@@ -3062,7 +3066,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "plate", "plateGrain"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3557,6 +3561,9 @@ function settleHeld(): void {
   const as = (x: unknown) => (x === "text" ? "text" : "boxes");
   const nodes = (settings.nodes ?? {}) as Partial<Settings["nodes"]>;
   settings.nodes = { body: as(nodes.body), history: as(nodes.history) };
+  const from = (x: unknown) => (x === "scope" ? "scope" : "whole");
+  const mapFrom = (settings.mapFrom ?? {}) as Partial<Settings["mapFrom"]>;
+  settings.mapFrom = { body: from(mapFrom.body), history: from(mapFrom.history) };
   const follow = (settings.follow ?? {}) as Partial<Settings["follow"]>;
   settings.follow = { body: follow.body !== false, history: follow.history !== false };
   if (settings.plate !== "scope") settings.plate = "whole";
@@ -4015,6 +4022,10 @@ function attach(): void {
 const rootRuns = (): "down" | "across" => settings.trunk[inPast() ? "history" : "body"];
 /** Whether the canvas at hand draws its nodes as boxes or as text, each canvas its own. */
 const nodesAs = (): "boxes" | "text" => settings.nodes[inPast() ? "history" : "body"];
+/** Where the canvas at hand is drawn from: the root of its world, or its scope where the reader has set it so, as the plate may be. */
+const mapRoot = (): string => (settings.mapFrom[inPast() ? "history" : "body"] === "scope" && brief(state.scope) ? state.scope : "");
+/** What the canvas at hand was fitted for: its body and where it is drawn from, so a change of either fits it again. */
+const fitKey = (): string => `${state.body?.root ?? ""}\n${mapRoot()}`;
 
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
@@ -4090,11 +4101,13 @@ const showsKids = (b: Brief): boolean => !isCard(b) && foldOf(b.address) !== "fa
  * the card where it is not. Going into a placed file scopes the lane to it, so the reader lands at its head; coming
  * back out leaves them on its card, beside the reading rather than in it. The root is only ever drawn as a head.
  */
-const headFor = (a: string): boolean => a === "" || fileRootOf(state.scope) === a;
+const headFor = (a: string): boolean => a === mapRoot() || fileRootOf(state.scope) === a;
 
-/** The root of the column a node stands in: its own address at a head, else the nearest reading opened above it. */
-const colRootOf = (a: string, head: boolean): string =>
-  head ? a : (prefixesOf(a).filter((p) => p !== a).findLast((p) => isCard(brief(p))) ?? "");
+/** The root of the column a node stands in: its own address at a head, else the nearest reading opened above it beneath where the map is drawn from. */
+const colRootOf = (a: string, head: boolean): string => {
+  const M = mapRoot();
+  return head ? a : (prefixesOf(a).filter((p) => p !== a && p !== M && within(p, M)).findLast((p) => isCard(brief(p))) ?? M);
+};
 
 /** The rows a column draws beneath its head, in the order they are drawn: one file read top to bottom, less what a text map's zoom has folded away. */
 const columnRows = (root: string, col = root): Brief[] =>
@@ -4122,7 +4135,7 @@ const columnOf = (a: string, head: boolean): { a: string; head: boolean }[] => {
 
 /** Where a step out lands: the head steps out to its card, a row at the top of a column onto that head, any other row onto the row it hangs beneath. */
 const outOf = (a: string, head: boolean): { a: string; head: boolean } | null => {
-  if (head) return a === "" ? null : { a, head: false };
+  if (head) return a === mapRoot() ? null : { a, head: false };
   const root = colRootOf(a, false);
   const p = parentOf(a);
   return p === root ? { a: root, head: true } : { a: p, head: false };
@@ -4137,7 +4150,7 @@ const closable = (): string => {
   if (state.picked === null) return "";
   if (!state.onHead && state.opened.includes(state.picked)) return state.picked;
   const r = colRootOf(state.picked, state.onHead);
-  return r !== "" && state.opened.includes(r) ? r : "";
+  return r !== mapRoot() && state.opened.includes(r) ? r : "";
 };
 
 /**
@@ -4251,7 +4264,7 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   const row = rowHtml(b, root, col, { head, opens, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
   // the root's level may run across as a trunk, each of its rows with its own level hanging down beneath it
-  const across = head && a === "" && rootRuns() === "across" ? " across" : "";
+  const across = head && a === mapRoot() && rootRuns() === "across" ? " across" : "";
   const beneath = kids.length ? `<div class="ckids${across}">${kids.map((k) => nodeHtml(k, root, col)).join("")}</div>` : "";
   return `<div class="cnode">${row}${beneath}</div>`;
 }
@@ -4320,13 +4333,13 @@ function deepestDrawn(root: string): number {
 function textAt(k: number): { tz: number; cut: number; depth: number; gap: number; indent: number; across: number; branch: number } {
   const floor = textFloor();
   const past = k < floor ? Math.log2(floor / k) : 0;
-  const folds = Math.min(Math.max(0, deepestDrawn("") - 1), Math.ceil(past - 1e-9));
+  const folds = Math.min(Math.max(0, deepestDrawn(mapRoot()) - 1), Math.ceil(past - 1e-9));
   const tz = k >= floor ? Math.min(k, TEXT_ZOOM.most) : floor * 2 ** -Math.max(0, past - folds);
   // the room the type holds against the zoom is taken from a long name's length, though never below what still names it
   const cut = clamp(k / tz, 0.55, 1);
   const shrunk = tz / Math.min(1, Math.max(floor, tz));
   const room = (life: number, least: number) => Math.max(least * shrunk, life * k);
-  return { tz, cut, depth: folds ? Math.max(1, deepestDrawn("") - folds) : Infinity, gap: room(4, 1), indent: room(16, 9), across: room(32, 16), branch: room(12, 5) };
+  return { tz, cut, depth: folds ? Math.max(1, deepestDrawn(mapRoot()) - folds) : Infinity, gap: room(4, 1), indent: room(16, 9), across: room(32, 16), branch: room(12, 5) };
 }
 
 /** The scale the stage is drawn under: text is laid at its zoom and drawn under none, boxes are drawn under the view's. */
@@ -4380,18 +4393,19 @@ function settleMap(): void {
     state.waysLaidFor = held;
     cardPathOf(held).forEach((p) => state.opened.includes(p) || state.opened.push(p));
   }
-  if (state.picked === null || !brief(state.picked)) ((state.picked = state.focus), (state.onHead = headFor(state.focus)));
-  // the root is only ever drawn as a head, and a head whose reading has been closed is a card again
-  if (state.picked === "") state.onHead = true;
+  // what is selected stands on the map, and a map drawn from the scope draws nothing outside it
+  if (state.picked === null || !brief(state.picked) || !within(state.picked, mapRoot())) ((state.picked = state.focus), (state.onHead = headFor(state.focus)));
+  // where the map is drawn from is only ever drawn as a head, and a head whose reading has been closed is a card again
+  if (state.picked === mapRoot()) state.onHead = true;
   else if (state.onHead && !state.opened.includes(state.picked)) state.onHead = false;
 }
 
 /** The stage: the root's column with what stands open opened through it, and the lines behind; text is laid to the depth its zoom keeps. */
 function stageHtml(): string {
-  if (nodesAs() !== "text") return `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
+  if (nodesAs() !== "text") return `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml(mapRoot(), 0)}</div>`;
   textLaid.depth = textAt(state.view.k).depth;
   textKept.set(state, { depth: textLaid.depth, ways: waysNow() });
-  return `<div class="stage text" data-depth="${textLaid.depth}"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
+  return `<div class="stage text" data-depth="${textLaid.depth}"><svg class="edges"></svg>${columnHtml(mapRoot(), 0)}</div>`;
 }
 
 /** Draws the canvas whole from the state: the root's column with what stands open opened through it, then the lines between. */
@@ -4419,10 +4433,10 @@ function drawCanvas(): void {
   // neither read nor reach
   const field = ui.canvas.querySelector<HTMLElement>(".field");
   if (field) field.classList.toggle("tight", field.offsetWidth > ui.canvas.clientWidth - 2 * CANVAS_INSET);
-  const refit = state.fitted !== state.body.root || (!state.panned && state.fittedWidth !== ui.canvas.clientWidth);
+  const refit = state.fitted !== fitKey() || (!state.panned && state.fittedWidth !== ui.canvas.clientWidth);
   if (refit) {
     fitCanvas();
-    state.fitted = state.body.root;
+    state.fitted = fitKey();
     state.fittedWidth = ui.canvas.clientWidth;
     // a map fitted again stands at its top, so the reader's place is brought back into view once the width has
     // settled, rather than left behind, and rather than eased back between every step of a resize or a turned knob
@@ -4842,7 +4856,7 @@ function recallView(): void {
     const kept = JSON.parse(localStorage.getItem(viewKey()) ?? "null");
     if (kept && typeof kept.k === "number") {
       Object.assign(state.view, { x: kept.x, y: kept.y, k: kept.k });
-      state.fitted = state.body?.root ?? null;
+      state.fitted = fitKey();
       // the view was kept at a width, and a pane given another since is fitted again
       state.fittedWidth = typeof kept.w === "number" ? kept.w : 0;
       if (Array.isArray(kept.opened)) state.opened = kept.opened.filter((a: string) => brief(a));
@@ -5514,6 +5528,13 @@ function headDepth(k: string): string {
   return inNamed(PROGRAMS[k].world ?? "body", () => (state.body ? depthHtml() : "")) ?? "";
 }
 
+/** The act in a canvas's head that sets where it is drawn from, the root of its world or its scope, as the plate's does. */
+function mapFromAct(w: "body" | "history"): string {
+  const on = settings.mapFrom[w] === "scope";
+  const tip = on ? "draws the reading you are scoped to — press to draw from the root" : "draws from the root — press to draw only the reading you are scoped to";
+  return `<button class="pick${on ? " on" : ""}" data-toggle="from:${w}" data-tip="${esc(tip)}">${icon("scoped")}</button>`;
+}
+
 /** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
 function headSettings(k: string): string {
   const w = PROGRAMS[k]?.world ?? "body";
@@ -5521,7 +5542,7 @@ function headSettings(k: string): string {
   if (k === "canvas" || k === "gitCanvas") {
     const on = settings.follow[w];
     const tip = on ? "follows where you are as you move — press to keep the view where you leave it" : "keeps the view where you leave it — press to follow where you are as you move";
-    return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
+    return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + mapFromAct(w) + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
   }
   if (k === "plate") {
     const on = settings.plate === "scope";
@@ -7163,7 +7184,8 @@ const onClick = (e: MouseEvent): void => {
       settings.follow = { ...settings.follow, [w]: !settings.follow[w] };
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
-    } else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
+    } else if (what === "from") settings.mapFrom = { ...settings.mapFrom, [w]: settings.mapFrom[w] === "scope" ? "whole" : "scope" };
+    else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
     else settings.plate = settings.plate === "scope" ? "whole" : "scope";
     saveSettings();
     return void drawAll();
