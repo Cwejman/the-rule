@@ -1960,11 +1960,15 @@ const ACTS: Record<string, Action> = {
     can: () => state.scope !== "",
     run: () => popUp(),
     map: {
-      help: () => "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes.",
-      can: () => closable() !== "",
+      help: () =>
+        closable() !== ""
+          ? "Closes the reading you are in and takes the prose out to the brief that placed it, which is what going in with return undoes."
+          : "Goes out of the scope the map is drawn from, so the map is drawn again from the brief above it.",
+      // a map drawn from the scope has nothing above its head to close into, so there out goes out of the scope itself
+      can: () => closable() !== "" || atScopeHead(),
       run: () => {
         const r = closable();
-        if (!r) return;
+        if (!r) return void (atScopeHead() && popUp());
         // the prose is taken out first: the map holds the reading the lane holds, so a close made before the going
         // would be laid again by the very next draw
         const holder = parentOf(r);
@@ -5527,6 +5531,9 @@ function headDepth(k: string): string {
   if (!["prose", "gitProse", "canvas", "gitCanvas"].includes(k)) return "";
   return inNamed(PROGRAMS[k].world ?? "body", () => (state.body ? depthHtml() : "")) ?? "";
 }
+
+/** Whether what is selected is the head of a map drawn from the scope, where out goes out of the scope itself. */
+const atScopeHead = (): boolean => mapRoot() !== "" && state.picked === mapRoot() && state.onHead;
 
 /** The act in a canvas's head that sets where it is drawn from, the root of its world or its scope, as the plate's does. */
 function mapFromAct(w: "body" | "history"): string {
