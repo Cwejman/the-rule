@@ -19,7 +19,17 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 From 2026-09-21 to 2026-10-07 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number, and the author's effort began to be counted.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number, and the author's effort began to be counted. On 2026-10-12 the canvas was given a second way of drawing, as text.
+
+### The canvas is turned to text
+
+On 2026-10-12 the author, back from a few days away, first moved the work on dimensions and the bearings, done alone while he was gone, onto a branch of its own, to be read for what it teaches. Then he asked for the canvas to drop its boxes and draw each node as text joined by lines, as an overview of a file structure is drawn in characters, so the map makes the most of its room.
+
+An outline was talked through first, and he answered only that the type is the prose's face. The brief was written at the canvas's own level, then built: a switch in each canvas's head turns it to text, a row its name on one line with its number before it and its figure after, joined by a file tree's lines. In the same pane it shows about 24 rows where boxes showed 9. Six fresh heads read the brief, and a cold review read the build twice. The worst they found was the brief naming the canvas's two lines in the wrong order, and a layout laying the map in text without fitting it again. The sixth fresh head changed only words. The built page grew by 3.6 kilobytes, and the body still answers in about a second.
+
+*Reasoned on 2026-10-12 by the session that built it. The author's effort over the whole session, the move of the bearings to their branch included: 4 prompts, 193 words written, about 1 minute at speaking pace; 1,495 words written back before this story, 773 of them evidently read, about 3 minutes.*
+
+[The canvas is turned to text](git:4bb8ccf..de5f63d)
 
 ### The author's effort is counted
 
