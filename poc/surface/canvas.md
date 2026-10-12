@@ -170,41 +170,57 @@ As built, one line runs along beneath the root's row and drops into the head of 
 
 ### 4.11 A node may be its name alone, on the lines of a file tree
 
-A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a second line for a figure. So a canvas may be turned to text, where a node is its name alone on one line and the lines that join the nodes do the work the boxes did, as an overview of a file structure is drawn in characters.
+A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a second line for a figure. So a canvas may be turned to text, where a node is its name alone on one line: the lines that join the names carry the structure, and the type of each name says what its rim and ground said.
 
-It is a mode of the map and not a second map. The same rows stand in the same places of the same columns, and everything a reader does on the map does the same thing in text.
+It is another way of drawing the same map, not a second map. The same rows stand in the same places of the same columns, and every act on the map does the same thing in text.
 
 *The author's ask of 2026-10-12, as an overview of a file structure in characters would be, to make the most of the room, in the face set for the prose. Laid by the session the same day, from an outline the author let stand.*
 
 #### 4.11.1 A row is one line of its name
 
-A row in text is as wide as its name and no wider, so a short name takes little room and a long one is cut at a width of its own rather than wrapping, since a second line is the room text was turned to for. Its number stands before it, faint, as a heading's does. The type is the face set for the prose, at the size a node's name has.
+A row in text is as wide as its name and no wider, so a short name takes little room. A long one is cut at a width of its own rather than wrapping, since saving the second line is what text is for. Its number, which a box carries in its foot, stands faint before the name, as a heading's does. The type is the face set for the prose, at the size a node's name has.
 
-The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language and stands after the name on the same line.
+The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language, at half its length, and stands after the name on the same line.
 
-Rows stand a third as far apart as nodes do, and a level steps in by two thirds as far, since nothing around a name needs the room a box did.
+Rows stand 4 apart where nodes stand 12, a level steps in by 16 where a node steps in by 24, and a reading stands 32 from the name that opened it where it stands 48 from a box, all still on the grid of four.
 
-*The author's ask, 2026-10-12, of the face. The measures are the session's.*
+*The author's ask, 2026-10-12, of the face. The measures and the figure at half its length are the session's, looked at on the page.*
 
 #### 4.11.2 The lines are a file tree's
 
-Within a file one line drops from beneath the name that holds a level, and a short tick runs from it into each row of the level, ending at the last, which is how a tree of files is drawn. That is the line [a file's nesting](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) already draws down the left, and in text it is the only one, since a row that is one line has no middle for a thread to pass through. An opening runs from the end of the name that named it to the head of the reading it opened, nearer than between boxes.
+Within a file one line drops from beneath the name that holds a level, and a short tick runs from it into each row of the level, ending at the last, which is how a tree of files is drawn.
 
-The lines keep the weight they have and [the way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit in them as it is between boxes. They are drawn rather than set as characters, so they meet exactly whatever the face and stay one weight at every zoom.
+It is the first of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree), the one dropping down the left, and in text it is the only one whatever the switch says, since a row of one line has no middle for a thread to pass through. So the choice still open there is open for boxes alone. An opening runs from the end of the row that named it to the head of the reading it opened.
 
-*The author's, 2026-10-12, of the lines; drawing them rather than setting them as characters is the session's.*
+The lines keep the weight they have, and [the way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit in them as it is between boxes. They are drawn rather than set as characters, so they meet exactly whatever the face and keep one weight at every zoom.
 
-#### 4.11.3 What the box said, the type says
+Where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand as far apart as a reading stands from the name that opened it, since each carries a level of its own beneath it and its width is that level's.
 
-A box said four things by its rim and its ground, and in text the name says them. The head of a reading stands in bold, as it does in a box. A row that leads to a reading of its own is underlined in its branch's hue, as [the way down](lane.md#75-the-way-down-stands-over-the-lane) marks a name that opens onto one. What is selected takes the wash a selected box takes, drawn close behind its name. The way to where the reader stands takes the branch's ink in its names, as it does in a box, and the row the reading stands on is ringed in that ink.
+*The author's, 2026-10-12, of the lines; drawing them rather than setting them as characters, and the trunk's spacing, are the session's.*
 
-Pointing at a row lights it as a box is lit, a ring close around its name.
+#### 4.11.3 What the rim and the ground said, the type says
+
+Each mark a box makes has its counterpart in text, and every other row is its name plainly, as a brief of this file keeps the quiet rim:
+
+- The head of a reading, whose rim takes the branch's hue, stands in bold, as it does in a box.
+
+- A row that leads to a reading of its own, whose rim takes the branch's hue, is underlined in that hue, as [the way down](lane.md#75-the-way-down-stands-over-the-lane) marks a name that opens onto one. It is not [the chevron refused](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it), a second thing beside the name that never lined up: the mark is on the name, as a link's is.
+
+- What is selected takes the wash a selected box takes, drawn close behind its name.
+
+- The row the reading stands on is ringed in the branch's ink, close around its name, and pointing at a row rings it as a box is lit.
 
 *The session's, 2026-10-12.*
 
-#### 4.11.4 Each canvas keeps its own
+#### 4.11.4 The type is not held against the view
 
-Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and git's each keep their own, as each keeps which way its root runs. A canvas starts in boxes. The map is laid anew when it is turned, so it is fitted anew, with the reader's place brought into it.
+Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) while the box shrinks, which a box can afford since it keeps its width. A row in text is nothing but its type, so a type held against the view would grow every row and with them the map, and zooming out would give back what it took. So in text the map shrinks whole, names and all; the overview it gives is already denser than the boxes' at life size.
+
+*The session's, 2026-10-12, measured on the page: at a quarter of life size the names no longer read, and the shape of the map does.*
+
+#### 4.11.5 Each canvas keeps its own
+
+Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and git's each keep their own, as each keeps which way its root runs; a layout holds it with the rest of the head. A canvas starts in boxes. Turned, the map is laid anew, the view fitted to it again and the reader's place brought into it.
 
 *The session's, 2026-10-12, that each canvas keeps its own and starts in boxes, until the author has looked.*
 
@@ -364,7 +380,7 @@ Pinching on a phone behaves strangely, and that is not mended. The gesture arriv
 
 ## 10. What this leaves open
 
-Which of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) draws a file's nesting, which the author settles by looking.
+Which of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) draws a file's nesting between boxes, which the author settles by looking; [text](#4112-the-lines-are-a-file-trees) draws the first.
 
 What becomes of the page's own strip on a desktop while the canvas stands, since the acts have a field of their own inside the frame.
 
