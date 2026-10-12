@@ -214,7 +214,7 @@ The first row sets the type: the zoom, the heading ratio, the line height and th
 
 Each switch is a setting's name and its few values, a row apiece. The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides). The reading line stands [at the middle or easing to the ends](lane.md#41-where-the-reading-line-stands). [The flick](lane.md#66-the-flick-a-trial) is on or off.
 
-The ahead answers for a brief that hides something, or always, for any highlighted brief with anything beneath it, so a reader may preview every level as they move. The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure. The colour is every brief or files: whether [a brief's slice of the colour wheel](#18-a-brief-is-its-slice-of-the-colour-wheel) is shared among the briefs directly beneath it or among the files placed in it, and a reader starts with every brief. The colour from is the root or the scope: where the wheel is laid from, [the scope a trial](#181-a-trial-colour-from-the-scope) that greys all outside it, whichever way the colour is shared, and a reader starts from the root.
+The ahead answers for a brief that hides something, or always, for any highlighted brief with anything beneath it, so a reader may preview every level as they move. The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure. The colour is every brief or files: whether [a brief's slice of the colour wheel](#18-a-brief-is-its-slice-of-the-colour-wheel) is shared among the briefs directly beneath it or among the files placed in it, and a reader starts with every brief. The colour from is the root or the scope: where the wheel is laid from, [the scope a trial](#181-a-trial-colour-from-the-scope) that greys all outside it and works with either way the colour is shared; a reader starts from the root.
 
 Git's history is off or on, and off until a reader turns it on: off, git's programs are not in the dock and none stands on the page, and on a phone the switch to the history is gone too. Turned off, whatever of git's stood is taken away.
 
@@ -266,7 +266,7 @@ A cell may be a whole file, so the plate marks its own focus: the deepest cell d
 
 ### 7.4 Every branch reads by its hue in every state
 
-The plate is mostly colour, so its tones stand close together, each just under what the weakest hue on the wheel holds at its lightness: no branch goes dull where another stays vivid, whether a cell is marked, pale or lit.
+The plate is mostly colour, so its tones stand close together, each just under what the weakest hue on the wheel holds at its lightness: no branch the colour gives a hue goes dull where another stays vivid, whether a cell is marked, pale or lit.
 
 *As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register.*
 
