@@ -188,7 +188,7 @@ The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) 
 
 The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48.
 
-A branch stands apart from the rows beside it: a row whose level is shown, or whose reading stands open beside it, stands 12 from the row before it, and the row after it stands 12 from it and from whatever hangs beneath it, where rows stand 4 apart. So where a level ends and the next row of the level above begins is seen, rather than read from the lines alone.
+A branch stands apart from the rows beside it: a row whose level is shown, or whose reading stands open beside it, stands 12 from the row before it in its level, and the row after it stands 12 from it and from whatever hangs beneath it, where rows stand 4 apart. So where a level ends and the next row of the level above begins is seen, rather than read from the lines alone.
 
 Every measure here is at life size, and [the zoom](#4114-text-is-laid-at-its-zoom) sets them. One measure is larger than a box's: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps each branch apart by itself; a branch of names ends ragged, its longest name reaching toward the next, so it needs more room.
 
@@ -232,7 +232,7 @@ Zooming out, everything follows the zoom alike down to the floor where a name st
 
 Crossing the floor folds the deepest level shown into the figure of the row that holds it, which already says what waits there, and so does each halving of the zoom past it, though a column always keeps the level beneath its head. The folds are the zoom's alone: nothing is folded in the reading, and zooming back in brings every level back.
 
-The zoom never folds the way to a reading that stands open, to where the reader stands or to what is selected: on that way each level stays whole, so nothing the reader has opened or is standing on leaves the map, and the keys walk only the rows it draws.
+The zoom never folds the way to a reading that stands open, to where the reader stands or to what is selected: on that way each level stays whole, so nothing the reader has opened or is standing on leaves the map, and the keys walk only the rows it draws. A way it has kept stays kept until the zoom folds again, so a selection or a reading moving on never folds a branch back under the reader; where the reading moves under a branch the zoom has folded, the map opens the way to it.
 
 Once nothing is left to fold, the map shrinks whole, names and all, and what it gives is its shape, as [a box's type yields past its hold](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) so that an overview can be had at all. Zooming in, the type grows with everything else, to twice its size.
 
