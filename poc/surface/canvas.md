@@ -168,9 +168,9 @@ As built, one line runs along beneath the root's row and drops into the head of 
 
 *The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history; as built the same day. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
-### 4.11 A node may be its name alone, on the lines of a file tree
+### 4.11 A node may be one line of text, joined as a file tree is
 
-A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a foot beneath the name for its figure. So a canvas may be turned to text, where a node is its name alone on one line: the lines that join the names carry the structure, and what a box's rim and ground said is said on the name itself.
+A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a foot beneath the name for its figure. So a canvas may be turned to text, where a node is one line, its name with its number before it and its figure after: the lines that join the rows carry the structure, and what a box's rim and ground said is said on the name itself.
 
 It is another way of drawing the same map, not a second map. The same rows stand in the same order in the same columns, and every act on the map does the same thing in text.
 
@@ -178,13 +178,13 @@ It is another way of drawing the same map, not a second map. The same rows stand
 
 #### 4.11.1 A row is one line of its name
 
-A row in text is as wide as its name and no wider, and a long name is cut at a width of its own rather than wrapping, since saving the second line is what text is for. The type is the face set for the prose, at the size a node's name has.
+A row in text is as wide as its name and no wider, and a long name is cut at a width of its own rather than wrapping, since saving the second line is what text is for. The type is the face set for the prose, at the size a node's name has at life size.
 
 Where the row stands in its reading, its heading's number, which a box carries in its foot, stands faint before the name.
 
 The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language, at half its length, and stands after the name on the same line.
 
-The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand two of their gaps apart, since a box's fixed width keeps the columns apart, and a column of names ends ragged at its longest.
+The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps the columns apart by itself; a column of names ends ragged, so it needs more room.
 
 *The author's ask, 2026-10-12, of the face. The measures and the figure at half its length are the session's, looked at on the page.*
 
@@ -192,7 +192,7 @@ The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a 
 
 Within a file one line drops from beneath the name that holds a level, and a short tick runs from it into each row of the level, ending at the last, which is how a tree of files is drawn.
 
-Of the [two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) boxes may be drawn with, this is the second, the spine, and in text it is the only one, whatever the switch says. The other threads through the rows, hidden by each box's ground and seen between them; a name has no ground, so the thread would run through the names.
+Of the [two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) boxes may be drawn with, this is the second, the line down the left with a tick into each row, and in text it is the only one, whatever the switch says. The other threads through the rows, hidden by each box's ground and seen between them; a name has no ground, so the thread would run through the names.
 
 An opening runs from the end of the row that named it to the head of the reading it opened, and a root laid across draws its line along beneath the root's row as it does between boxes. The lines keep the weight they have, and [the way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit in them as it is between boxes. They are drawn rather than set as characters, so they meet exactly whatever the face and keep one weight at every zoom.
 
@@ -218,13 +218,13 @@ Every other row is its name plainly, as a brief of this file keeps the quiet rim
 
 #### 4.11.4 The type is not held against the view
 
-Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole, names and all, and when it is fitted to its pane it is never shrunk past where its names still read.
+Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole as far as the reader zooms it; only when the map is fitted to its pane does it stop where its names still read.
 
 *The session's, 2026-10-12, measured on the page: shrunk whole, the map at a quarter of life size still shows its shape though its names no longer read, which is what an overview wants, and a fit stops before that.*
 
 #### 4.11.5 Each canvas keeps its own
 
-Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and git's each keep their own, as each keeps which way its root runs; [a layout](layout.md#81-what-a-layout-holds) holds it with the rest of the head. A canvas starts in boxes.
+Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and the history's each keep their own, as each keeps which way its root runs; [a layout](layout.md#81-what-a-layout-holds) holds it with the rest of the head. A canvas starts in boxes.
 
 A phone has no heads, so its canvas draws as it was last set and cannot be turned there, as the way its root runs cannot; text reads on a phone as it does wide, the map cut at the screen's edge as any map is.
 
@@ -394,7 +394,7 @@ Whether a placed part may be exploded in place rather than entered, which is the
 
 The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
-Modes of the node. A node is a name and a figure, or [its name alone](#411-a-node-may-be-its-name-alone-on-the-lines-of-a-file-tree); the author wants the same map read at other grains as well, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all of them.
+Modes of the node. A node is a name and a figure, or [one line of text](#411-a-node-may-be-one-line-of-text-joined-as-a-file-tree-is); the author wants the same map read at other grains as well, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all of them.
 
 The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
 
