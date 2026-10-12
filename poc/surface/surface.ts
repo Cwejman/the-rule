@@ -4017,8 +4017,22 @@ const headFor = (a: string): boolean => a === "" || fileRootOf(state.scope) === 
 const colRootOf = (a: string, head: boolean): string =>
   head ? a : (prefixesOf(a).filter((p) => p !== a).findLast((p) => isCard(brief(p))) ?? "");
 
-/** The rows a column draws beneath its head, in the order they are drawn: one file read top to bottom. */
-const columnRows = (root: string): Brief[] => level(root).flatMap((b) => [b, ...(showsKids(b) ? columnRows(b.address) : [])]);
+/** The rows a column draws beneath its head, in the order they are drawn: one file read top to bottom, less what a text map's zoom has folded away. */
+const columnRows = (root: string, col = root): Brief[] =>
+  level(root).flatMap((b) => [b, ...(showsKids(b) && !zoomFolds(b.address, col, zoomDepth()) ? columnRows(b.address, col) : [])]);
+
+/** The depth the text map standing is laid to, past which its zoom folds levels away; boxes fold nothing for the zoom. */
+const zoomDepth = (): number => {
+  const st = stage();
+  return st?.classList.contains("text") ? Number(st.dataset.depth ?? "Infinity") : Infinity;
+};
+/**
+ * Whether a text map's zoom folds away the level beneath a row. It never folds the way to a reading that stands open,
+ * to where the reader stands or to what is selected, so none of them leaves the map as it shrinks: on that way the
+ * level stays whole, and the folding is taken everywhere else.
+ */
+const zoomFolds = (a: string, col: string, depth: number): boolean =>
+  depthBeneath(a, col) >= depth && ![...state.opened, state.focus, state.picked].some((x) => x !== null && x.startsWith(a + "/"));
 
 /** The column a node stands in, head first, as the map lays it: the order down and up walk. */
 const columnOf = (a: string, head: boolean): { a: string; head: boolean }[] => {
@@ -4152,7 +4166,7 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   const open = !head && state.opened.includes(a);
   // in text, a map zoomed past where its names read shows less rather than shrinking through them: the deepest levels
   // fold into the figure of the row that holds them, which already says what waits there
-  const cut = nodesAs() === "text" && depthBeneath(a, root) >= textLaid.depth;
+  const cut = nodesAs() === "text" && zoomFolds(a, root, textLaid.depth);
   const kids = open || opens || cut ? [] : head || showsKids(b) ? level(a) : [];
   const row = rowHtml(b, root, col, { head, opens, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
@@ -4543,6 +4557,7 @@ function applyView(ease: boolean): void {
 function layText(st: HTMLElement, ease: boolean): void {
   const t = textAt(state.view.k);
   if (String(t.depth) !== st.dataset.depth) {
+    state.colOf.clear();
     st.outerHTML = stageHtml();
     st = stage()!;
   }
