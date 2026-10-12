@@ -218,7 +218,7 @@ Every other row is its name plainly, as a brief of this file keeps the quiet rim
 
 #### 4.11.4 The type is not held against the view
 
-Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole, names and all.
+Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. A row in text is nothing but its type, so a type held against the view would cost width and height at every step, every row would grow, and the map with them. So in text the map shrinks whole, names and all, and when it is fitted to its pane it is never shrunk past where its names still read.
 
 *The session's, 2026-10-12, measured on the page: at a quarter of life size the names no longer read, and the shape of the map does.*
 
