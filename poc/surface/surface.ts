@@ -7895,11 +7895,11 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   track: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .13)"],
   meter: ["oklch(62% 0.19 28)", "oklch(70% 0.14 28)"],
   rim: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .1)"],
-  rest: ["oklch(88% calc(0.045 * var(--hk)) var(--h))", "oklch(35% calc(0.04 * var(--hk)) var(--h))"],
-  door: ["oklch(74% calc(0.085 * var(--hk)) var(--h))", "oklch(54% calc(0.07 * var(--hk)) var(--h))"],
-  on: ["oklch(42% calc(0.072 * var(--hk)) var(--h))", "oklch(84% calc(0.055 * var(--hk)) var(--h))"],
-  lit: ["oklch(60% calc(0.12 * var(--hk)) var(--h))", "oklch(74% calc(0.1 * var(--hk)) var(--h))"],
-  glow: ["oklch(80% calc(0.08 * var(--hk)) var(--h))", "oklch(47% calc(0.06 * var(--hk)) var(--h))"],
+  rest: ["oklch(88% calc(0.045 * var(--hk, 1)) var(--h))", "oklch(35% calc(0.04 * var(--hk, 1)) var(--h))"],
+  door: ["oklch(74% calc(0.085 * var(--hk, 1)) var(--h))", "oklch(54% calc(0.07 * var(--hk, 1)) var(--h))"],
+  on: ["oklch(42% calc(0.072 * var(--hk, 1)) var(--h))", "oklch(84% calc(0.055 * var(--hk, 1)) var(--h))"],
+  lit: ["oklch(60% calc(0.12 * var(--hk, 1)) var(--h))", "oklch(74% calc(0.1 * var(--hk, 1)) var(--h))"],
+  glow: ["oklch(80% calc(0.08 * var(--hk, 1)) var(--h))", "oklch(47% calc(0.06 * var(--hk, 1)) var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
   glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
@@ -8510,11 +8510,11 @@ svg.shape { cursor: grab; overflow: visible; }
    side, from the paled to the focus: 84% 0.075, 79% 0.1, 70% 0.115, 64% 0.11, 50% 0.085; the dark side mirrors them
    against its own ground */
 svg.plate .cell, svg.plate .run path {
-  --p-away: light-dark(oklch(84% calc(0.075 * var(--hk)) var(--h)), oklch(40% calc(0.066 * var(--hk)) var(--h)));
-  --p-rest: light-dark(oklch(79% calc(0.1 * var(--hk)) var(--h)), oklch(47% calc(0.08 * var(--hk)) var(--h)));
-  --p-on: light-dark(oklch(70% calc(0.115 * var(--hk)) var(--h)), oklch(56% calc(0.095 * var(--hk)) var(--h)));
-  --p-lit: light-dark(oklch(64% calc(0.11 * var(--hk)) var(--h)), oklch(65% calc(0.105 * var(--hk)) var(--h)));
-  --p-here: light-dark(oklch(50% calc(0.085 * var(--hk)) var(--h)), oklch(82% calc(0.09 * var(--hk)) var(--h)));
+  --p-away: light-dark(oklch(84% calc(0.075 * var(--hk, 1)) var(--h)), oklch(40% calc(0.066 * var(--hk, 1)) var(--h)));
+  --p-rest: light-dark(oklch(79% calc(0.1 * var(--hk, 1)) var(--h)), oklch(47% calc(0.08 * var(--hk, 1)) var(--h)));
+  --p-on: light-dark(oklch(70% calc(0.115 * var(--hk, 1)) var(--h)), oklch(56% calc(0.095 * var(--hk, 1)) var(--h)));
+  --p-lit: light-dark(oklch(64% calc(0.11 * var(--hk, 1)) var(--h)), oklch(65% calc(0.105 * var(--hk, 1)) var(--h)));
+  --p-here: light-dark(oklch(50% calc(0.085 * var(--hk, 1)) var(--h)), oklch(82% calc(0.09 * var(--hk, 1)) var(--h)));
   --c: var(--p-rest);
 }
 svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
