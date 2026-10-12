@@ -44,7 +44,7 @@ Every widget draws the same briefs from the same sizes, so the brief highlighted
 
 ### 1.5 Ink is spent only where a reader has asked
 
-No widget repeats what is in view, and a mark is spent in proportion to how live the fact behind it is, which is [the design language's measure](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#the-graduated-scale--one-mark-per-live-fact). Colour says only where in the body a thing sits, by the branch it stands under.
+No widget repeats what is in view, and a mark is spent in proportion to how live the fact behind it is, which is [the design language's measure](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#the-graduated-scale--one-mark-per-live-fact). Colour says only where in the body a thing sits, by [its slice of the colour wheel](#18-a-brief-is-its-slice-of-the-colour-wheel).
 
 *Reasoned, 2026-09-13.*
 
@@ -252,7 +252,7 @@ A cell may be a whole file, so the plate marks its own focus: the deepest cell d
 
 ### 7.4 Every branch reads by its hue in every state
 
-The plate is mostly colour, so its tones stand close together, each just under what the weakest branch hue holds at its lightness: no branch goes dull where another stays vivid, whether a cell is marked, pale or lit.
+The plate is mostly colour, so its tones stand close together, each just under what the weakest hue on the wheel holds at its lightness: no branch goes dull where another stays vivid, whether a cell is marked, pale or lit.
 
 *As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register.*
 
