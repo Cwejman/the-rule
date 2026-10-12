@@ -90,13 +90,13 @@ Whether a slice is shared among every brief or among files alone is [a switch](#
 
 #### 1.8.1 A trial: colour from the scope
 
-The wheel can be laid from the scope instead of from the root. Then the scope's brief is the whole wheel and takes its ink as the root does, and the briefs beneath it share it as the root's would. At the root it changes nothing.
+As a trial a reader turns on, the wheel can be laid from the scope instead of from the root. Then the scope's brief is the whole wheel and takes its ink as the root does, and the briefs beneath it share it as the root's would. At the root it changes nothing.
 
-Everything outside the scope is drawn in grey, its lightness kept and its hue taken away: the levels above it where the way down, a map drawn from the root or a plate drawn whole shows them, and every branch beside it.
+Everything outside the scope is drawn in grey, its lightness kept and its hue taken away: the levels above it, wherever the way down, a map drawn from the root or a plate drawn whole shows them, and every branch off the way to it.
 
-So colour says where a thing sits within what the reader is in, at the most difference the wheel can give there, and says only that everything else is elsewhere. It goes with [a map drawn from the scope](canvas.md#64-a-map-may-be-drawn-from-the-scope-as-the-plate-may) and the plate drawn the same way, where little or nothing outside the scope stands.
+So colour says where a thing sits within the scope, at the most difference the wheel can give there, and says only that everything else is elsewhere. It suits [a map drawn from the scope](canvas.md#64-a-map-may-be-drawn-from-the-scope-as-the-plate-may) and the plate drawn the same way, where little or nothing outside the scope stands, and neither sets the other.
 
-Among files, a scope that places no files is shared among every brief beneath it, as a root that places none is. Git's history is laid from git's own scope where it has one, and a reading a commit touched takes the colour it has in the body, grey where it lies outside the body's scope.
+Among files, a scope that places no files is shared among every brief beneath it, as a root that places none is. Git's history is laid from git's own scope where a reader has scoped it, and from its root where not, and a reading a commit touched takes the colour it has in the body, grey where it lies outside the body's scope.
 
 It is [a switch](#62-the-switches), off unless a reader turns it on, and a trial: what a body should be coloured by is the question [dimensions](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions) will answer, and this is a way to look at one answer before they do.
 
