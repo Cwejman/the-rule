@@ -272,7 +272,9 @@ A cell may be a whole file, so the plate marks its own focus: the deepest cell d
 
 The plate is mostly colour, so its tones stand close together, each just under what the weakest hue on the wheel holds at its lightness: no branch the colour gives a hue goes dull where another stays vivid, whether a cell is marked, pale or lit.
 
-*As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register.*
+A cell marked or lit lights up as a coloured lamp does, and never darkens: on a light ground each step toward where the reader stands is lighter than the cell at rest, its colour carried by a halo of its hue around it, the widest around the cell they stand on; on a dark ground each step is brighter, as it always was. Lighter, a cell holds less colour, since the weakest hue holds less there, which is why the halo carries it.
+
+*As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register. The lamp the author's, 2026-10-12, on seeing a lit cell darken on a light ground; its tones the session's, until the author has looked.*
 
 ## 8. The keys
 
