@@ -224,7 +224,9 @@ Every other row is its name plainly, as a brief of this file keeps the quiet rim
 
 #### 4.11.4 Text is laid at its zoom
 
-Boxes are drawn under the view's scale, their type held against it in steps. Text is drawn under none, and laid again at every step of the zoom: the type, the room between rows, the step in, the figures and how long a name runs are reckoned from the zoom, and the lines are drawn again at the screen's own pixels. So nothing is a picture blown up or shrunk, and what a zoom shows is the map as it would be laid at that size.
+Boxes are drawn under the view's scale, their type held against it in steps. Text is drawn under none, and laid again at every step of the zoom.
+
+The type, the room between rows, the step in, the figures and how long a name runs are reckoned from the zoom, and the lines are drawn again at the screen's own pixels. So nothing is a picture blown up or shrunk, and what a zoom shows is the map as it would be laid at that size.
 
 Zooming out, everything follows the zoom alike down to the floor where a name still reads, the floor [a box's type is held at](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it). Past it the type holds, and the map shows less rather than shrink its names through it, as [every figure does](widgets.md#11-nothing-is-drawn-too-small-to-read); the room between rows goes on following the zoom.
 
