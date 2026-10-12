@@ -40,7 +40,9 @@ Wherever a figure draws a brief's blocks it draws an image as a frame, where a p
 
 Every widget draws the same briefs from the same sizes, so the brief highlighted, [the focus or the one under the pointer](lane.md#4-where-you-are-is-the-brief-in-focus), lights in all of them at once. Where a figure has merged past the brief being pointed at, the cell holding it is lit instead.
 
-*Reasoned, 2026-09-13.*
+A light eases in and out rather than snapping, so the eye follows where it went: a cell of [the plate](#7-the-plate) and its glow, a card's rim and ink, and a box on the canvas over about a sixth of a second. In prose, a lit title, number or link takes a tenth, since a reader moving the pointer across words should not see a trail of fading ink behind it. A widget drawn again from new, as the plate may be when the focus moves, shows its new marks at once; only what changes in place eases.
+
+*Reasoned, 2026-09-13. The easing the author's ask, 2026-10-12, quick on prose; its times the session's, until the author has looked.*
 
 ### 1.5 Ink is spent only where a reader has asked
 
