@@ -360,19 +360,21 @@ Whether a map follows is a setting in its head. Following, it brings where the r
 
 ### 6.4 A map may be drawn from the scope, as the plate may
 
-A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may.
+A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may draw with the scope's brief at its centre.
 
 Drawn from the scope, the scope's brief is the head of the first column, where the root stands otherwise, whether the scope is a file or a brief inside one. Everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, and each opening beside the row that named it. Its rows are numbered from the scope, so its first level reads 1, as the lane's headings do once scoped.
 
-The scope's brief is a place to stand as the root's head is. A step out of it goes nowhere, as from the root, since what lies above is past where the map is drawn from; going out of the scope is the way down's, and the map is drawn again from wherever the scope then stands. [The way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit from the scope's brief, which takes its branch's ink where the root takes none.
+The scope's brief is a place to stand as the root's head is. Left from it goes nowhere and backspace there is quiet, since what lies above is past where the map is drawn from. Shift with return goes out of the scope, which at any other head closes the reading and takes the prose out to the brief that placed it; here there is nothing above to close into, so the scope itself steps out. [The way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit from the scope's brief, which takes the ink of the branch it stands in, where the root takes none.
+
+The map follows the scope wherever it moves. Going on the map into a row of the same reading leaves the scope as it is; going into another reading scopes the lane to it, as [going does](#5-one-press-selects-two-presses-go), and the map is drawn again from there, the column it came from gone. Scoping by the way down or by the lane does the same.
 
 Nothing outside the scope is drawn. The way down above the map says what lies above it, and what stands open outside the scope stays open for when the map is drawn from the root again.
 
-The map is fitted again whenever where it is drawn from changes: the setting turned, or, drawn from the scope, the scope moved in or out.
+The map is fitted again whenever where it is drawn from changes: the setting turned, or the scope moved. That holds whether it follows or is astray, since it is another map rather than another place on the same one.
 
 Each canvas keeps its own, as it keeps [whether its nodes are text](#4116-each-canvas-keeps-its-own): a layout holds it, and a phone, which has no heads, draws as it was last set. Git's canvas draws from git's own root or git's own scope. A canvas starts drawn from the root.
 
-*The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map stands at the scope's brief whether a file or a brief, keeps what is open outside it, steps out nowhere, is fitted again at every change of scope, and that each canvas keeps its own and starts from the root, are the session's. As built the same day.*
+*The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map stands at the scope's brief whether a file or a brief, keeps what is open outside it, is drawn again and fitted at every change of scope, that shift with return steps out of the scope at its head, and that each canvas keeps its own and starts from the root, are the session's. As built the same day.*
 
 ## 7. What the substrate gives the canvas
 
