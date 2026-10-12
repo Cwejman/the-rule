@@ -46,6 +46,18 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 *The author's decision, 2026-09-18, as built the same day; the whole map is his own of 2026-09-15, held for later.*
 
+### 3.1 It may stand at the scope, as the plate may
+
+A reader scoped into one reading may want the map of that reading alone, without the body's root and everything opened on the way to it. So the canvas draws from the body's root, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may.
+
+Drawn from the scope, the scope's own brief stands at the head of the first column, where the root stands otherwise, and everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, each opening beside the row that named it, numbered from the scope as the lane numbers it. Nothing outside the scope is drawn, and what stands open outside it stays open for when the map is drawn whole again.
+
+The map is fitted again whenever where it is drawn from changes: turning the setting, or, drawn from the scope, scoping in or out.
+
+Each canvas keeps its own, as it keeps [whether its nodes are text](#4116-each-canvas-keeps-its-own), and git's canvas draws from git's own scope. A canvas starts drawn from the root.
+
+*The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map starts its first column at the scope's brief, keeps what is open outside it, is fitted again at every change of scope, and that each canvas keeps its own and starts from the root, are the session's. Open: not yet built.*
+
 ## 4. Down is the reading, across is each opening
 
 The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's level runs across.
