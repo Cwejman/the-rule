@@ -1776,6 +1776,12 @@ const hueVarsIn = (w: World, address: string): string => {
 };
 const hueVars = (address: string): string => hueVarsIn(state, address);
 const hued = (address: string): string => `style="${hueVars(address)}"`;
+/** A brief's slice whole, as a rim drawn around a card runs it from its left edge to its right; set only where one is drawn. */
+const runVars = (address: string): string => {
+  const s = sliceIn(state, address);
+  return s ? `;--h0:${Math.round(s.from * 10) / 10};--h1:${Math.round(s.to * 10) / 10}` : "";
+};
+const huedRun = (address: string): string => `style="${hueVars(address)}${runVars(address)}"`;
 
 // ### 3.1.1 The actions
 //
@@ -2493,7 +2499,7 @@ function cardHtml(a: string): string {
   const stamp = stampOf(b);
   const line = actLine("card-act", a, { fold: foldable, figure: hidden.length ? actFigure(b, hidden, []) : "", beneath, unfold: foldable });
   return (
-    `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${hued(a)}>` +
+    `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${huedRun(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
@@ -4265,7 +4271,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
   // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
   // width and a name that wraps needs no hanging indent
-  const attrs = `class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}`;
+  const attrs = `class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${huedRun(a)}`;
   // in text a row is one line: the number before the name, as a heading carries it, and the figure after it
   if (nodesAs() === "text") return `<div ${attrs}>${n ? num : ""}${say}${marksHtml(b, o.hides)}</div>`;
   return `<div ${attrs}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
@@ -7914,6 +7920,19 @@ const paletteCss = (hued: boolean): string =>
     .map(([role, [light, dark]]) => `--${role}: light-dark(${light}, ${dark});`)
     .join("\n  ");
 
+/**
+ * A hued role as a run across a slice rather than at its middle: the role's own light and dark values at the slice's
+ * edges, --h0 and --h1, and at its middle, so no half sweeps past half the wheel. Where no slice is set it is the
+ * role's one hue.
+ */
+const roleRun = (role: string): string => {
+  const [light, dark] = PALETTE[role];
+  const h0 = "var(--h0, var(--h))";
+  const h1 = "var(--h1, var(--h))";
+  const at = (h: string): string => `light-dark(${light.replaceAll("var(--h)", h)}, ${dark.replaceAll("var(--h)", h)})`;
+  return `linear-gradient(90deg in oklch increasing hue, ${at(h0)}, ${at(`calc((${h0} + ${h1}) / 2)`)}, ${at(h1)})`;
+};
+
 const CSS = `
 /*
  * Two themes, one palette: every colour is a light and a dark value side by side, and the theme picks the side.
@@ -8141,6 +8160,11 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .crow.picked { background: var(--wash); box-shadow: inset 0 0 0 var(--hair-on) var(--door); }
 .crow.picked.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 var(--hair-on) var(--lit); }
+/* a rim that takes the branch's hue runs its slice across the box, drawn over the rim it covers */
+.crow:is(.opens, .head, .picked, .here, .lit, :hover)::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: var(--hair); pointer-events: none; background: ${roleRun("door")}; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.crow:is(.picked, .here, .lit, :hover)::before { padding: var(--hair-on); }
+.crow.here::before { background: ${roleRun("on")}; }
+.crow:is(.lit, :hover)::before { background: ${roleRun("lit")}; }
 /* in text a row is its name alone on one line, in the face set for the prose: no rim, no ground and no width of its
    own, so a short name takes little room, and a long one is cut rather than wrapping, since one line is what text is for */
 /* text is laid at its zoom, z, its type following it to a floor and held there, tz, and a long name cut shorter, cut,
@@ -8159,6 +8183,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* what the box said by its rim and ground the name says: a reading of its own is underlined in its hue, as the way down marks one */
 .stage.text .crow.opens .title { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
 .stage.text .crow.head { box-shadow: none; }
+.stage.text .crow::before { content: none; }
 .stage.text .crow.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
 .stage.text .crow.picked { background: var(--wash); box-shadow: none; }
 .stage.text .crow.picked.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
@@ -8273,6 +8298,10 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* the card the reading stands on takes full ink and its outline takes the branch's hue; the others stay legible and
    quiet, which is what a thing meant to be scanned should do rather than fade */
 .brief .card.here, .brief .card.lit { color: var(--ink); outline-color: var(--lit); }
+/* that outline runs the card's slice across it, over the outline it covers, and comes and goes as the outline's hue does */
+.brief .card { position: relative; }
+.brief .card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; background: ${roleRun("lit")}; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); opacity: 0; transition: opacity .15s; }
+.brief .card.here::before, .brief .card.lit::before { opacity: 1; }
 /* opening is the act a press on the card already does, so its badge stands only where a key reaches it: on the card the
    reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
 .brief .card .acts [data-act="scope"] { display: none; }
