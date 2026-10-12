@@ -186,9 +186,11 @@ Where the row stands in its reading, its heading's number, which a box carries i
 
 The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language, at about half its length, and stands after the name on the same line.
 
-The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps each branch apart by itself; a branch of names ends ragged, its longest name reaching toward the next, so it needs more room.
+The measures shrink as the box goes. Rows stand 4 apart where nodes stand 12, a level steps in by 16 where it steps in by 24, and a reading stands 32 from the row that opened it where it stands 48. Those are at life size, and [the zoom](#4114-text-is-laid-at-its-zoom) sets them.
 
-*The author's ask, 2026-10-12, of the face. The measures and the figure at about half its length are the session's, looked at on the page.*
+A branch stands apart from the rows beside it: a row whose level is shown, or whose reading stands open beside it, has 12 above it and 12 after its level, where rows stand 4 apart. So where a level ends and the next row of the level above begins is seen, rather than read from the lines alone. One grows: where the root's level [runs across](#410-the-roots-level-runs-down-or-across), its rows stand 32 apart where boxes stand 24. A box's fixed width keeps each branch apart by itself; a branch of names ends ragged, its longest name reaching toward the next, so it needs more room.
+
+*The author's ask, 2026-10-12, of the face, and his finding the same day that the room between branches was as tight as between rows. The measures and the figure at about half its length are the session's, looked at on the page.*
 
 #### 4.11.2 The lines are a file tree's
 
@@ -218,15 +220,27 @@ Every other row is its name plainly, as a brief of this file keeps the quiet rim
 
 *The session's, 2026-10-12, read from the boxes as built.*
 
-#### 4.11.4 The type is not held against the view
+#### 4.11.4 Text is laid at its zoom
 
-A row in text is nothing but its type, so the type is not held against the view as a box's is: zooming out, the map shrinks whole, as far as the reader zooms it.
+Boxes are laid once, and zooming scales the picture of them. Text is laid again at every step of the zoom: the type, the room between rows, the step in, the figures and how long a name runs are reckoned from the zoom, and the lines are drawn again at the screen's own pixels. So nothing is a picture blown up or shrunk, and what a zoom shows is the map as it would be laid at that size.
 
-[A box's type is held](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) up to twice its size while the box shrinks. Held in text, it would cost width and height at every step, every row would grow, and the map with them. Only when the map is fitted to its pane, as it is on arriving or when the pane changes width, does it stop where its names still read.
+Zooming out, everything follows the zoom alike down to the floor where a name still reads, the floor [a box's type is held at](#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it). Past it the type holds, and the map shows less rather than shrinking through it, as [every figure does](widgets.md#11-nothing-is-drawn-too-small-to-read).
 
-*The session's, 2026-10-12, measured on the page: shrunk whole, the map at a quarter of life size still shows its shape though its names no longer read, which is what an overview wants, and a fit stops before that.*
+Each halving of the zoom past the floor folds the deepest level shown into the figure of the row that holds it, which already says what waits there, though a column always keeps the level beneath its head. A long name is cut shorter as the room shrinks, never below about half its length at life size. The folds are the zoom's alone: nothing is folded in the reading, and zooming back in brings every level back.
 
-#### 4.11.5 Each canvas keeps its own
+Once nothing is left to fold, the map shrinks whole, names and all, and what it gives is its shape. Zooming in, the type grows with everything else, to twice its size.
+
+*The author's ask, 2026-10-12, on finding the zoom static, as if a picture were rasterised and zoomed on: that zooming be dynamic. How it is laid is the session's, looked at on the page step by step: the floor is reached at about four fifths of life size, and a map three levels deep folds twice before it shrinks whole.*
+
+#### 4.11.5 What is under the pointer stays under it
+
+A map laid again is not where a scale would put it, so the zoom holds the row nearest the pointer instead: the same letter of it stays under the pointer, its distance from the row's edge growing and shrinking as its type does. Where the zoom folds that row away, the row that held it is held in its place. Zooming out and back in again returns the map to where it stood.
+
+A map fitted to its pane, as it is on arriving or when the pane changes width, is fitted no smaller than where its names still read.
+
+*The session's, 2026-10-12, measured on the page: a row zoomed from an eighth of life size to life and back stood where it began, and the steps of a wheel are laid once a frame, in about 15 milliseconds for git's map.*
+
+#### 4.11.6 Each canvas keeps its own
 
 Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and the history's each keep their own, as each keeps which way its root runs; [a layout](layout.md#81-what-a-layout-holds) holds it with the rest of the head. A canvas starts in boxes.
 
