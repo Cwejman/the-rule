@@ -1478,6 +1478,8 @@ type Settings = {
   face: "shown" | "hidden";
   /** which way each canvas lays its root's level: down, as a file's levels go, or across as a trunk; the body's runs down and the history's across unless turned */
   trunk: { body: "down" | "across"; history: "down" | "across" };
+  /** whether each canvas draws a node as a box, or as its name alone on the lines of a file tree; both start in boxes */
+  nodes: { body: "boxes" | "text"; history: "boxes" | "text" };
   /** where the lane stands alone: the one pane it shows, and the edge the rail stands at beside the prose, if anywhere */
   alone: { pane: "lane" | "canvas"; rail: "left" | "right" | null };
   /** wide, the page laid by hand: a row of columns, each a stack of programs, the left first */
@@ -1521,6 +1523,7 @@ const DEFAULTS: Settings = {
   tree: "spine",
   face: "shown",
   trunk: { body: "down", history: "across" },
+  nodes: { body: "boxes", history: "boxes" },
   alone: { pane: "lane", rail: "left" },
   layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "ahead" }] }],
   gutters: { body: [null, "links"], history: [null, "links"] },
@@ -1835,6 +1838,23 @@ const ACTS: Record<string, Action> = {
     // showing is a going, though its address is the very one the reading line carries
     can: (a) => onMap(a) && !!brief(acts(a)) && (scopeFor(acts(a)) !== state.scope || acts(a) !== state.focus),
     run: (a) => readOn(acts(a)),
+  },
+  nodes: {
+    label: () => (nodesAs() === "text" ? "boxes" : "text"),
+    mark: () => (nodesAs() === "text" ? ICON.boxes : ICON.text),
+    keys: [],
+    help: () => (nodesAs() === "text" ? "Draws each node as a box again, its name with the figure of what it hides beneath." : "Draws each node as its name alone on one line, the lines of a file tree joining them, to make the most of the room."),
+    also: "Each canvas keeps its own, and both start in boxes.",
+    can: () => canvasOn(),
+    run: () => {
+      const which = inPast() ? "history" : "body";
+      settings.nodes = { ...settings.nodes, [which]: nodesAs() === "text" ? "boxes" : "text" };
+      saveSettings();
+      // the map is laid anew, so it is fitted anew, and the reader's place brought back into it
+      state.fitted = null;
+      state.followed = null;
+      drawCanvas();
+    },
   },
   trunk: {
     label: () => (rootRuns() === "across" ? "root down" : "root across"),
@@ -2482,6 +2502,8 @@ const ICON: Record<string, string> = {
   fold: `<path d="M5.4 4.4 8 7l2.6-2.6M5.4 11.6 8 9l2.6 2.6"/>`,
   open: `<path d="M9.6 3.5h3v3M6.4 12.5h-3v-3M12.5 3.5 9 7M3.5 12.5 7 9"/>`,
   chooser: `<rect x="1.8" y="3.2" width="12.4" height="9.6" rx="2.2"/><path d="M6.1 3.2v9.6"/><path d="M3.4 6.1h1.4M3.4 8h1.4M3.4 9.9h1.4"/>`,
+  text: `<path d="M3.5 2.5v10M3.5 5h2.5M3.5 12.5h2.5M7.5 5h5.5M7.5 12.5h4M3.5 8.75h2.5M7.5 8.75h3.5"/>`,
+  boxes: `<rect x="2.5" y="2.5" width="11" height="4.5" rx="1.2"/><rect x="2.5" y="9" width="11" height="4.5" rx="1.2"/>`,
   openRight: `<path d="M3.5 8h6M7 5.5 9.5 8 7 10.5M12.5 3.5v9"/>`,
   closeRight: `<path d="M9.5 8h-6M6 5.5 3.5 8 6 10.5M12.5 3.5v9"/>`,
   dish: `<circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="1.2"/>`,
@@ -2987,7 +3009,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "plate", "plateGrain"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "plate", "plateGrain"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3473,6 +3495,9 @@ function settleHeld(): void {
   const runs = (x: unknown, d: "down" | "across") => (x === "down" || x === "across" ? x : d);
   const trunk = (settings.trunk ?? {}) as Partial<Settings["trunk"]>;
   settings.trunk = { body: runs(trunk.body, DEFAULTS.trunk.body), history: runs(trunk.history, DEFAULTS.trunk.history) };
+  const as = (x: unknown) => (x === "text" ? "text" : "boxes");
+  const nodes = (settings.nodes ?? {}) as Partial<Settings["nodes"]>;
+  settings.nodes = { body: as(nodes.body), history: as(nodes.history) };
   const follow = (settings.follow ?? {}) as Partial<Settings["follow"]>;
   settings.follow = { body: follow.body !== false, history: follow.history !== false };
   if (settings.plate !== "scope") settings.plate = "whole";
@@ -3904,6 +3929,8 @@ function attach(): void {
 
 /** Which way the root's level runs on the canvas being drawn: the history's and the body's are each their own. */
 const rootRuns = (): "down" | "across" => settings.trunk[inPast() ? "history" : "body"];
+/** Whether the canvas at hand draws its nodes as boxes or as text, each canvas its own. */
+const nodesAs = (): "boxes" | "text" => settings.nodes[inPast() ? "history" : "body"];
 
 
 const canvasOn = (): boolean => !ui.canvas.hidden;
@@ -4104,7 +4131,10 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
   // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
   // width and a name that wraps needs no hanging indent
-  return `<div class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
+  const attrs = `class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}`;
+  // in text a row is one line: the number before the name, as a heading carries it, and the figure after it
+  if (nodesAs() === "text") return `<div ${attrs}>${num}${say}${marksHtml(b, o.hides)}</div>`;
+  return `<div ${attrs}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
 }
 
 /** One node: its row, then its level beneath it, or, where it is the opening that stands open, the reading beside it. */
@@ -4140,8 +4170,14 @@ const TYPE_FLOOR = 10.5;
  * and zooming out would give back what it took. Past this the map shrinks whole, which is what an overview is.
  */
 const TYPE_HOLD = 2;
-const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false } };
-const treeForm = () => TREE[settings.tree] ?? TREE.spine;
+/** The map's measures in text, where nothing around a name needs the room a box did: a third the room between rows, two thirds the step in, and a reading nearer the name that named it. */
+const TEXT = { gap: 4, indent: 16, across: 32 };
+/**
+ * In text the nesting is a file tree's whatever the setting, a line dropping from beneath the first letter of the name
+ * that holds the level, with a tick into each row: a row of one line has no middle for a thread to pass through.
+ */
+const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false }, text: { indent: TEXT.indent, x: 6, tick: true } };
+const treeForm = () => (nodesAs() === "text" ? TREE.text : (TREE[settings.tree] ?? TREE.spine));
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
 const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere"];
@@ -4203,7 +4239,8 @@ function drawCanvas(): void {
   settleMap();
   // which column each row stands in is a measure of what is drawn, so it is taken again as the map is drawn
   state.colOf.clear();
-  ui.canvas.innerHTML = `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  const m = nodesAs() === "text" ? { ...NODE, ...TEXT } : NODE;
+  ui.canvas.innerHTML = `<div class="stage${nodesAs() === "text" ? " text" : ""}" style="--node:${m.w}px;--ngap:${m.gap}px;--across:${m.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
   // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
   // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
   // neither read nor reach
@@ -4414,7 +4451,9 @@ function applyView(ease: boolean): void {
   if (row) {
     const kzNow = Number(st.style.getPropertyValue("--kz") || 1);
     const base = parseFloat(getComputedStyle(row).fontSize) / (kzNow || 1);
-    const want = clamp(TYPE_FLOOR / (base * state.view.k), 1, TYPE_HOLD);
+    // in text a row is its type, so a type held against the view would grow every row and with them the map, and zooming
+    // out would give back what it took: the map shrinks whole instead
+    const want = st.classList.contains("text") ? 1 : clamp(TYPE_FLOOR / (base * state.view.k), 1, TYPE_HOLD);
     const kz = (Math.round(want * 20) / 20).toFixed(2);
     if (st.style.getPropertyValue("--kz") !== kz) {
       st.style.setProperty("--kz", kz);
@@ -5214,7 +5253,7 @@ function headSettings(k: string): string {
   if (k === "canvas" || k === "gitCanvas") {
     const on = settings.follow[w];
     const tip = on ? "follows where you are as you move — press to keep the view where you leave it" : "keeps the view where you leave it — press to follow where you are as you move";
-    return (inNamed(w, () => headAct("face") + headAct("trunk")) ?? "") + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
+    return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
   }
   if (k === "plate") {
     const on = settings.plate === "scope";
@@ -7784,6 +7823,25 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .crow.picked { background: var(--wash); box-shadow: inset 0 0 0 var(--hair-on) var(--door); }
 .crow.picked.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 var(--hair-on) var(--lit); }
+/* in text a row is its name alone on one line, in the face set for the prose: no rim, no ground and no width of its
+   own, so a short name takes little room, and a long one is cut rather than wrapping, since one line is what text is for */
+.stage.text .crow { flex-direction: row; align-items: center; gap: 6px; width: auto; max-width: none; padding: 1px 6px; border-radius: 4px; background: none; box-shadow: none; font-family: var(--prose-face); line-height: 1.3; }
+.stage.text .crow .say { display: block; max-width: 22em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage.text .crow .num { font-size: .78em; line-height: inherit; }
+/* the figure keeps its language at half its length, so it says what waits without taking the room text was turned to for */
+.stage.text .crow .marks { flex: none; gap: 2px; }
+.stage.text .crow .marks i { width: 4px; }
+.stage.text .crow .marks i.image { width: 5px; height: 5px; }
+.stage.text .crow .marks .brief { width: calc(var(--w) / 2); }
+/* what the box said by its rim and ground the name says: a reading of its own is underlined in its hue, as the way down marks one */
+.stage.text .crow.opens .title { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.stage.text .crow.head { box-shadow: none; }
+.stage.text .crow.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
+.stage.text .crow.picked { background: var(--wash); box-shadow: none; }
+.stage.text .crow.picked.here { box-shadow: inset 0 0 0 var(--hair-on) var(--on); }
+.stage.text .crow.lit, .stage.text .crow:hover { box-shadow: inset 0 0 0 var(--hair-on) var(--lit); }
+/* a trunk in text stands its rows as far apart as a reading stands from the name that named it, since each carries a level of its own width */
+.stage.text .ckids.across { gap: var(--across); margin-top: calc(3 * var(--ngap)); }
 /* the figure: a bar per paragraph, a frame per image, and a tail as long as what waits beneath is heavy, on its own
    line and beginning at the row's own edge, so a level's figures read against each other */
 .crow .marks { display: flex; align-items: center; gap: 3px; height: 6px; min-width: 0; overflow: hidden; }
