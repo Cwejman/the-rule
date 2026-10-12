@@ -222,6 +222,8 @@ Zooming out, [the type of a box is held](#45-a-row-keeps-its-edge-and-says-what-
 
 Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and git's each keep their own, as each keeps which way its root runs; a layout holds it with the rest of the head. A canvas starts in boxes. Turned, the map is laid anew, the view fitted to it again and the reader's place brought into it.
 
+A phone has no heads, so its canvas draws as it was last set and cannot be turned there, as the way its root runs cannot; text reads on a phone as it does wide, the map cut at the screen's edge as any map is.
+
 *The session's, 2026-10-12, that each canvas keeps its own and starts in boxes, until the author has looked.*
 
 ## 5. One press selects, two presses go
