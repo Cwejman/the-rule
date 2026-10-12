@@ -70,6 +70,24 @@ Where there is no key to draw, the badge carries the word alone, which is [its t
 
 *The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
 
+### 1.8 A brief is its slice of the colour wheel
+
+Colour says where in the body a thing sits. Until now it said only which part of the root a brief stands under, so a part holding hundreds of briefs was one colour throughout. So colour is laid by the branching instead: every brief is a slice of the colour wheel, and its colour is that slice.
+
+The root is the whole wheel. A level shares its parent's slice equally among the briefs in it: where the root has seven parts each takes a seventh, and a part with six sections gives each a sixth of its own. The share follows the branching and never the size, since how much a branch holds says nothing of how much it matters. The slices of a level meet edge to edge and fill their parent's, so no two branches share a hue.
+
+So a brief's colour narrows as the reader goes down. A part of the root spans a wide run of the wheel, a section of it a few degrees, and a brief a few levels deeper a sliver that reads as one hue. Below where a difference can be seen there is none, and that is the gradient met in colour: the most difference at the top, where it says the most.
+
+A fill large enough to show a run of colour, as a cell of [the plate](#7-the-plate) is, takes its slice whole, as a gradient across it. Everything else, a name's ink, a line, an underline or a mark, takes the middle of its slice, since a run of colour across a word or a hairline reads as noise rather than as place.
+
+The wheel begins where the first part of the root has always stood, its middle at the hue it had. The parts after it now stand beside it on the wheel, where they were stepped as far apart as could be so that neighbours differed; a place is told by its run of colour now, rather than by each hue standing apart.
+
+Whether a slice is shared among every brief or among files alone is [a switch](#62-the-switches). Among files, a file's slice is shared among the files placed in it, and every section takes the slice of its file.
+
+Git's history is laid on a wheel of its own, from its own root, and a reading a commit touched keeps the colour it has in the body.
+
+*The author's, 2026-10-12, looked at on a page of variants drawn from the body: that colour work through the branches and the levels, that a branch be drawn as the gradient of what stands beneath it, that all of it share the wheel, each place its own slice, by the branching and not by size, and that files or sections be a setting. That ink takes the middle and a cell of the plate the run, and that the wheel begins at the first part's old hue, are the session's, until the author has looked. Open: not yet built.*
+
 ## 2. The tree
 
 The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
