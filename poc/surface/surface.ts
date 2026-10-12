@@ -7956,12 +7956,13 @@ const CSS = `
   --leading: 24.65px;
   --gap: 24px; --rim-top: 3%; --rim-foot: 6%; --measure: 600px; --dim: .4; --edge: 8%;
   --thin: 0;
+  --lamp: 6px;
   --h: 60;
   --hk: 1;
 }
 :root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; --thin: 30; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --thin: 30; } }
+:root[data-theme="dark"] { color-scheme: dark; --thin: 30; --lamp: 3px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --thin: 30; --lamp: 3px; } }
 *, ::before, ::after {
   ${paletteCss(true)}
 }
@@ -7974,6 +7975,8 @@ a { color: inherit; text-decoration: underline; text-decoration-color: var(--doo
 a:hover, a.lit { text-decoration-color: var(--lit); }
 /* a link pointed at is lit as its target is, wherever the target is drawn, and the brief it sits in keeps its ink */
 :is(#lane, #glane) a.lit { color: var(--on); }
+/* a light in prose eases quickly, so a pointer passing over words leaves no trail of fading ink behind it */
+:is(#lane, #glane) a, .head .title, .head .num { transition: color .1s, text-decoration-color .1s; }
 a.web { text-decoration-style: dotted; }
 a.owed { text-decoration-style: dashed; color: var(--muted); cursor: help; }
 a.outside { text-decoration-style: dotted; color: var(--muted); cursor: help; }
@@ -8138,7 +8141,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .crow .say { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--lines, 2); line-clamp: var(--lines, 2); overflow: hidden; }
 /* the foot of a node: where it stands in its reading, and what waits beneath it */
 .crow .foot { display: flex; align-items: center; gap: 6px; height: 6px; }
-.crow .title { color: var(--ink); }
+.crow .title { color: var(--ink); transition: color .16s; }
 /* a placement leads to a reading of its own, and says so as the lane's card does: its outline takes the branch's hue */
 .crow.opens { box-shadow: inset 0 0 0 var(--hair) var(--door); }
 /* the head of a column is the brief the file opens with, and it says so by its weight */
@@ -8149,7 +8152,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .depth .dc { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; background: var(--wash); }
 .depth .dc.on { background: var(--track); color: var(--ink); }
 .depth .dc:hover { background: var(--muted); color: var(--ground); }
-.crow .num { flex: none; font-size: .8em; line-height: 1; color: var(--faint); }
+.crow .num { flex: none; font-size: .8em; line-height: 1; color: var(--faint); transition: color .16s; }
 /* a row on the way from the root to where the reader stands says so in its own name, as the line that reaches it does */
 .crow.on .num, .crow.on .title { color: var(--on); }
 /* the root stands under no branch, so it takes no branch's ink, though the way to anywhere begins at it */
@@ -8294,7 +8297,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a card is for looking at directly, not for reading through, so it never dims: the prose around it carries the
    reading's ink and the card carries its own. What says which card the reading stands on is its outline taking the
    branch's hue, which is as much as a thing meant to be scanned should ever change */
-.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; color: var(--muted); transition: outline-color .15s, color .2s; }
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; color: var(--muted); transition: outline-color .16s, color .16s; }
 /* the card the reading stands on takes full ink and its outline takes the branch's hue; the others stay legible and
    quiet, which is what a thing meant to be scanned should do rather than fade */
 .brief .card.here, .brief .card.lit { color: var(--ink); outline-color: var(--lit); }
@@ -8539,17 +8542,18 @@ svg.shape { cursor: grab; overflow: visible; }
    side, from the paled to the focus: 84% 0.075, 79% 0.1, 70% 0.115, 64% 0.11, 50% 0.085; the dark side mirrors them
    against its own ground */
 svg.plate .cell, svg.plate .run path {
-  --p-away: light-dark(oklch(84% calc(0.075 * var(--hk, 1)) var(--h)), oklch(40% calc(0.066 * var(--hk, 1)) var(--h)));
-  --p-rest: light-dark(oklch(79% calc(0.1 * var(--hk, 1)) var(--h)), oklch(47% calc(0.08 * var(--hk, 1)) var(--h)));
-  --p-on: light-dark(oklch(70% calc(0.115 * var(--hk, 1)) var(--h)), oklch(56% calc(0.095 * var(--hk, 1)) var(--h)));
-  --p-lit: light-dark(oklch(64% calc(0.11 * var(--hk, 1)) var(--h)), oklch(65% calc(0.105 * var(--hk, 1)) var(--h)));
-  --p-here: light-dark(oklch(50% calc(0.085 * var(--hk, 1)) var(--h)), oklch(82% calc(0.09 * var(--hk, 1)) var(--h)));
+  --p-away: light-dark(oklch(86% calc(0.06 * var(--hk, 1)) var(--h)), oklch(40% calc(0.066 * var(--hk, 1)) var(--h)));
+  --p-rest: light-dark(oklch(78% calc(0.095 * var(--hk, 1)) var(--h)), oklch(47% calc(0.08 * var(--hk, 1)) var(--h)));
+  --p-on: light-dark(oklch(80% calc(0.1 * var(--hk, 1)) var(--h)), oklch(56% calc(0.095 * var(--hk, 1)) var(--h)));
+  --p-lit: light-dark(oklch(84% calc(0.079 * var(--hk, 1)) var(--h)), oklch(65% calc(0.105 * var(--hk, 1)) var(--h)));
+  --p-here: light-dark(oklch(88% calc(0.065 * var(--hk, 1)) var(--h)), oklch(82% calc(0.09 * var(--hk, 1)) var(--h)));
+  --p-halo: light-dark(oklch(70% calc(0.119 * var(--hk, 1)) var(--h)), var(--c));
   --c: var(--p-rest);
 }
-svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
+svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; transition: fill .16s, stroke .16s, filter .16s; }
 /* a cell's run is drawn in the tone its state takes, each wedge in its own hue, and never stands in the pointer's way */
 svg.plate .run { pointer-events: none; }
-svg.plate .run path { fill: var(--c); }
+svg.plate .run path { fill: var(--c); transition: fill .16s; }
 svg.plate .cell.centre { --c: var(--hub); }
 /* what is not in the lane is a step paler, and still its branch's hue */
 svg.plate .cell.away, svg.plate .cell.away .run path { --c: var(--p-away); }
@@ -8558,9 +8562,10 @@ svg.plate .cell.on, svg.plate .cell.on .run path { --c: var(--p-on); }
 svg.plate .cell.here, svg.plate .cell.here .run path { --c: var(--p-here); }
 svg.plate .cell.trail, svg.plate .cell.lit, svg.plate .cell.trail .run path, svg.plate .cell.lit .run path { --c: var(--p-lit); }
 /* what the reader stands on and what they point at glow, so a droplet too small to read is still one the eye finds */
-svg.plate .cell.here > path, svg.plate .cell.lit > path { filter: drop-shadow(0 0 3px var(--c)); }
+svg.plate .cell.here > path, svg.plate .cell.lit > path { filter: drop-shadow(0 0 3px var(--p-halo)); }
+svg.plate .cell.here > path { filter: drop-shadow(0 0 var(--lamp) var(--p-halo)); }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
-svg.plate .cell.here .label { fill: var(--ground); }
+svg.plate .cell.here .label { fill: light-dark(var(--ink), var(--ground)); }
 
 .settings { width: 216px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .knobs { display: flex; gap: 12px; justify-content: center; }
