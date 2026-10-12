@@ -19,7 +19,29 @@ The surface is the page the body is read on. Before it, on 2026-09-11, a monitor
 
 From 2026-09-21 to 2026-10-07 the surface took git up again, four days after [the first attempt](ideas/history.md) came out: its data first, then stories told over its commits, then a pane, then a mode. Between, the plate was laid again and the dish made a third pane, which is why the middle took two sides.
 
-Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number, and the author's effort began to be counted. On 2026-10-12 the canvas was given a second way of drawing, as text.
+Near the end the surface's code was assembled again without changing what it does, and the page laid by hand was first lived in. On 2026-10-04 the author stepped back from the page to ask what the project is for, and the days after went back to tightening it. On 2026-10-07 the page was given layouts kept by number, and the author's effort began to be counted. On 2026-10-12 the canvas was given a second way of drawing, as text, and the same day colour was laid on the colour wheel by branching and the canvas could be drawn from the scope.
+
+### Colour is laid on the wheel by branching
+
+Later on 2026-10-12 the author asked for something primitive in colour while the holarchy has no dimensions yet: hue that works through the branches and levels, where before each part of the root took one hue and everything under it the same. A scratch page drawn from the real body showed variants to look at. The first ones were not seen, and measuring said why: siblings one level down stood about 0.01 to 0.02 apart, under what an eye picks up. The author then settled the design by looking and talking. Every place is its own slice of the colour wheel, and the root is the whole wheel. Siblings share their parent's slice equally, by branching and never by size, since size does not give importance. A branch is shown as the gradient of its slice. At depth the difference fades to nothing, and that is fine. Whether files or sections share the wheel is a setting.
+
+The brief was written at the widgets' level, then built: ink takes the slice's middle, and a wide cell on the plate is drawn as the run of its slice. Then the author asked for the canvas to be scoped as the plate is, drawn from the root or from the scope, set in its head and held by a layout. Last came a trial a reader turns on, colour laid from the scope: the scope's brief is the whole wheel and everything outside it grey, its lightness kept, while the work toward founded dimensions goes on. Each brief was read by fresh heads until a round changed only words, and each build by a cold review. The worst they found were the git history going one hue when shared by files, a scoped map's zoom and its closing of readings still reckoned from the root, the step out of a scoped map's head left quiet, and a sketch stamped outside the page losing its hues. Each was mended and looked at on the page. The built page grew by about 28 kilobytes, most of it the longer briefs, and the body still answers in about a second.
+
+The author's look is still owed on the session's own choices: ink at the slice's middle with only the plate drawing runs, the wheel beginning at 30°, and the root's and the scope's ink at 0°.
+
+*Reasoned on 2026-10-12 by the session that built it. The author's effort over the whole session: 11 prompts, 523 words written, about 3 minutes at speaking pace; 4,340 words written back before this story, 2,087 of them evidently read, about 9 minutes.*
+
+#### A brief is its slice of the colour wheel
+
+[A brief is its slice of the colour wheel](git:e92095e..f219adf)
+
+#### A canvas is drawn from the root or the scope
+
+[A canvas is drawn from the root or the scope](git:2709f46..c95549a)
+
+#### Colour from the scope, a trial
+
+[Colour from the scope, a trial](git:df68d9b..2eded5e)
 
 ### The canvas is turned to text
 
