@@ -4150,7 +4150,10 @@ function nodeHtml(b: Brief, root: string, col: number, head = false): string {
   // out to the right only where the reader has asked for it by the act
   const opens = isCard(b) && !head;
   const open = !head && state.opened.includes(a);
-  const kids = open || opens ? [] : head || showsKids(b) ? level(a) : [];
+  // in text, a map zoomed past where its names read shows less rather than shrinking through them: the deepest levels
+  // fold into the figure of the row that holds them, which already says what waits there
+  const cut = nodesAs() === "text" && depthBeneath(a, root) >= textLaid.depth;
+  const kids = open || opens || cut ? [] : head || showsKids(b) ? level(a) : [];
   const row = rowHtml(b, root, col, { head, opens, hides: kids.length === 0 && (opens || level(a).length > 0) });
   if (open) return `<div class="cnode open">${row}<div class="cbeside">${columnHtml(a, col + 1)}</div></div>`;
   // the root's level may run across as a trunk, each of its rows with its own level hanging down beneath it
@@ -4176,14 +4179,64 @@ const TYPE_FLOOR = 10.5;
  * and zooming out would give back what it took. Past this the map shrinks whole, which is what an overview is.
  */
 const TYPE_HOLD = 2;
-/** The map's measures in text, where nothing around a name needs the room a box did: a third the room between rows, two thirds the step in, and a reading nearer the name that named it. */
-const TEXT = { gap: 4, indent: 16, across: 32 };
 /**
  * In text the nesting is a file tree's whatever the setting, a line dropping from beneath the first letter of the name
  * that holds the level, with a tick into each row: a thread runs through the rows, hidden by a box's ground, and a name has none.
  */
-const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false }, text: { indent: TEXT.indent, x: 6, tick: true } };
+const TREE = { spine: { indent: NODE.indent, x: 12, tick: true }, thread: { indent: 16, x: 24, tick: false }, text: { indent: 16, x: 6, tick: true } };
 const treeForm = () => (nodesAs() === "text" ? TREE.text : (TREE[settings.tree] ?? TREE.spine));
+
+// ### 3.11.1 Text is laid at its zoom
+//
+// Boxes are laid once and the view scales the picture. Text is laid again at every zoom: the type, the room between
+// rows, the step in, the figures and the cut of a long name are reckoned from the zoom, and the lines are drawn at the
+// screen's own pixels, so nothing is a picture blown up or shrunk. The type follows the zoom down to the floor where a
+// name still reads, and holds there; past that the map shows less rather than shrinking through it, each halving of
+// the zoom folding the deepest level shown into the figure of the row that holds it, as every figure does.
+
+/** How far a text map may be zoomed out, where three levels have folded away, and in. */
+const TEXT_ZOOM = { least: 0.125, most: 2 };
+/** The depth the text map being drawn is laid to: levels deeper fold into their parent's figure. Each stage keeps its own as it was laid. */
+const textLaid = { depth: Infinity };
+/** How deep an address stands beneath the head of the column it is drawn in. */
+const depthBeneath = (a: string, root: string): number => (a === root ? 0 : a.split("/").length - (root === "" ? 0 : root.split("/").length));
+/** A row's type at life size, which the floor is reckoned against. */
+const textBase = (): number => (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--body")) || 16) * 0.78;
+/** The zoom at which a name stands at the floor of what reads. */
+const textFloor = (): number => Math.min(1, TYPE_FLOOR / textBase());
+
+/** The deepest level the map draws, each column counted from its own head, as it stands with nothing folded away for the zoom. */
+function deepestDrawn(root: string): number {
+  const walk = (b: Brief, d: number, head: boolean): number => {
+    const a = b.address;
+    if (!head && state.opened.includes(a)) return Math.max(d, deepestDrawn(a));
+    if (!head && isCard(b)) return d;
+    return (head || showsKids(b) ? level(a) : []).reduce((m, k) => Math.max(m, walk(k, d + 1, false)), d);
+  };
+  const b = brief(root);
+  return b ? walk(b, 0, true) : 0;
+}
+
+/**
+ * What a text map is laid at for a zoom. Above the floor everything follows the zoom alike. Past it the type holds, and
+ * each halving folds away the deepest level shown, though a column always keeps the level beneath its head; once
+ * nothing is left to fold, the map shrinks whole, names and all, and what it gives then is its shape. The room the
+ * rows take follows the zoom with the type, never less than what keeps the tree's lines apart at the type drawn.
+ */
+function textAt(k: number): { tz: number; cut: number; depth: number; gap: number; indent: number; across: number; branch: number } {
+  const floor = textFloor();
+  const past = k < floor ? Math.log2(floor / k) : 0;
+  const folds = Math.min(Math.max(0, deepestDrawn("") - 1), Math.ceil(past - 1e-9));
+  const tz = k >= floor ? Math.min(k, TEXT_ZOOM.most) : floor * 2 ** -Math.max(0, past - folds);
+  // the room the type holds against the zoom is taken from a long name's length, though never below what still names it
+  const cut = clamp(k / tz, 0.55, 1);
+  const shrunk = tz / Math.min(1, Math.max(floor, tz));
+  const room = (life: number, least: number) => Math.max(least * shrunk, life * k);
+  return { tz, cut, depth: folds ? Math.max(1, deepestDrawn("") - folds) : Infinity, gap: room(4, 1), indent: room(16, 9), across: room(32, 16), branch: room(12, 5) };
+}
+
+/** The scale the stage is drawn under: text is laid at its zoom and drawn under none, boxes are drawn under the view's. */
+const drawnScale = (): number => (stage()?.classList.contains("text") ? 1 : state.view.k);
 
 /** The acts that stand in the canvas's own field, on whatever is selected there. */
 const FIELD_ACTS = ["openNode", "foldUp", "read", "unfold", "wayHere", "onlyHere"];
@@ -4239,14 +4292,20 @@ function settleMap(): void {
   else if (state.onHead && !state.opened.includes(state.picked)) state.onHead = false;
 }
 
+/** The stage: the root's column with what stands open opened through it, and the lines behind; text is laid to the depth its zoom keeps. */
+function stageHtml(): string {
+  if (nodesAs() !== "text") return `<div class="stage" style="--node:${NODE.w}px;--ngap:${NODE.gap}px;--across:${NODE.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
+  textLaid.depth = textAt(state.view.k).depth;
+  return `<div class="stage text" data-depth="${textLaid.depth}"><svg class="edges"></svg>${columnHtml("", 0)}</div>`;
+}
+
 /** Draws the canvas whole from the state: the root's column with what stands open opened through it, then the lines between. */
 function drawCanvas(): void {
   if (!canvasOn() || !state.body) return;
   settleMap();
   // which column each row stands in is a measure of what is drawn, so it is taken again as the map is drawn
   state.colOf.clear();
-  const m = nodesAs() === "text" ? { ...NODE, ...TEXT } : NODE;
-  ui.canvas.innerHTML = `<div class="stage${nodesAs() === "text" ? " text" : ""}" style="--node:${m.w}px;--ngap:${m.gap}px;--across:${m.across}px;--indent:${treeForm().indent}px"><svg class="edges"></svg>${columnHtml("", 0)}</div>${faceHtml()}${fieldHtml()}`;
+  ui.canvas.innerHTML = `${stageHtml()}${faceHtml()}${fieldHtml()}`;
   // the field stands within the frame, so where the frame is too narrow for the words the badges fall back to their
   // keys alone, as a badge does anywhere the room is tight. Cut at both ends instead, it named acts a reader could
   // neither read nor reach
@@ -4280,7 +4339,7 @@ function drawEdges(): void {
   const st = stage();
   const svg = st?.querySelector<SVGSVGElement>(".edges");
   if (!st || !svg) return;
-  const k = state.view.k;
+  const k = drawnScale();
   const s0 = st.getBoundingClientRect();
   const at = (el: Element) => {
     const r = el.getBoundingClientRect();
@@ -4290,6 +4349,9 @@ function drawEdges(): void {
   /** The rows a level holds, its own and none of theirs. */
   const rowsOf = (kids: HTMLElement): HTMLElement[] => Array.from(kids.children).flatMap((n) => n.querySelector<HTMLElement>(":scope > .crow") ?? []);
   const form = treeForm();
+  // in text the line drops from beneath the first letter of the name, wherever the zoom has laid it
+  const text = st.classList.contains("text");
+  const inset = (row: Element): number => (text ? parseFloat(getComputedStyle(row).paddingLeft) || form.x : form.x);
   const paths: string[] = [];
   // the way from the root down to where the reader stands, drawn over the rest in the branch's own ink: a line a reader
   // can follow back is what says where they are, where a map of one grey weight leaves them to work it out
@@ -4302,9 +4364,9 @@ function drawEdges(): void {
     const rows = rowsOf(kids);
     if (!row || !rows.length) return;
     const p = at(row);
-    const x0 = p.left + form.x;
+    const x0 = p.left + inset(row);
     const y = (p.bottom + at(rows[0]).top) / 2;
-    const xOf = (r: HTMLElement) => at(r).left + form.x;
+    const xOf = (r: HTMLElement) => at(r).left + inset(r);
     paths.push(`<path class="nest" d="M${x0.toFixed(1)} ${p.bottom.toFixed(1)}L${x0.toFixed(1)} ${y.toFixed(1)}L${xOf(rows[rows.length - 1]).toFixed(1)} ${y.toFixed(1)}"/>`);
     rows.forEach((r) => paths.push(`<path class="nest" d="M${xOf(r).toFixed(1)} ${y.toFixed(1)}L${xOf(r).toFixed(1)} ${at(r).top.toFixed(1)}"/>`));
     const on = rows.find((r) => way.has(r.dataset.a ?? "\u0000"));
@@ -4317,7 +4379,7 @@ function drawEdges(): void {
     const rows = rowsOf(kids);
     if (!row || !rows.length) return;
     const p = at(row);
-    const x = p.left + form.x;
+    const x = p.left + inset(row);
     const last = mid(at(rows[rows.length - 1]));
     paths.push(`<path class="nest" d="M${x.toFixed(1)} ${p.bottom.toFixed(1)}L${x.toFixed(1)} ${last.toFixed(1)}"/>`);
     if (form.tick)
@@ -4445,6 +4507,7 @@ function unfoldTo(n: number): void {
 function applyView(ease: boolean): void {
   const st = stage();
   if (!st) return;
+  if (st.classList.contains("text")) return layText(st, ease);
   st.classList.toggle("easing", ease);
   st.style.transform = `translate(${state.view.x.toFixed(1)}px, ${state.view.y.toFixed(1)}px) scale(${state.view.k.toFixed(3)})`;
   // every line on the map keeps one weight, whatever the view: a rim divided by the scale is drawn at the width it was
@@ -4472,19 +4535,52 @@ function applyView(ease: boolean): void {
   rememberView();
 }
 
+/**
+ * Lays a text map at the view's zoom and moves it to the view's place. What the zoom sets is handed to the style as a
+ * few values, so the browser lays the rows again; a zoom that folds a level away or brings one back draws the stage
+ * anew, and the lines are drawn again over whatever was laid.
+ */
+function layText(st: HTMLElement, ease: boolean): void {
+  const t = textAt(state.view.k);
+  if (String(t.depth) !== st.dataset.depth) {
+    st.outerHTML = stageHtml();
+    st = stage()!;
+  }
+  st.classList.toggle("easing", ease);
+  st.style.transform = `translate(${Math.round(state.view.x)}px, ${Math.round(state.view.y)}px)`;
+  st.style.setProperty("--z", state.view.k.toFixed(4));
+  st.style.setProperty("--tz", t.tz.toFixed(4));
+  st.style.setProperty("--cut", t.cut.toFixed(4));
+  st.style.setProperty("--ngap", `${t.gap.toFixed(2)}px`);
+  st.style.setProperty("--indent", `${t.indent.toFixed(2)}px`);
+  st.style.setProperty("--across", `${t.across.toFixed(2)}px`);
+  st.style.setProperty("--branch", `${t.branch.toFixed(2)}px`);
+  // the lines are drawn again only where the rows have moved, not for a pan
+  if (st.dataset.k !== String(state.view.k)) {
+    st.dataset.k = String(state.view.k);
+    drawEdges();
+  }
+  rememberView();
+}
+
 /** Fits the scope to the canvas's width, never larger than life and never smaller than reads, and stands it at the top. */
 function fitCanvas(): void {
   const st = stage();
   if (!st) return;
   const W = ui.canvas.clientWidth;
-  const w = st.scrollWidth || 1;
+  // text is laid at its zoom, so it is measured at life size, where everything above the floor grows with the zoom alike
+  if (st.classList.contains("text")) {
+    state.view.k = 1;
+    layText(st, false);
+  }
+  const w = stage()!.scrollWidth || 1;
   // a body laid across is wider than any pane, and shrinking it until it fits would make a picture nobody can read. So
   // the canvas fits only while what that costs is still legible, and past that it stays at its own size and lets the
   // reader move in it, which is what a map is for. Where it does not fit, the focus is what brings the view to place.
   const fit = (W - 2 * CANVAS_INSET) / w;
   // a name in text is not held against the view, so the least a fit may shrink it to is what its type can bear
   const row = st.querySelector<HTMLElement>(".crow");
-  const least = st.classList.contains("text") && row ? Math.max(0.6, TYPE_FLOOR / parseFloat(getComputedStyle(row).fontSize)) : 0.6;
+  const least = st.classList.contains("text") && row ? Math.max(0.6, textFloor()) : 0.6;
   const fits = fit >= least;
   state.view.k = fits ? Math.min(fit, 1) : 1;
   state.view.x = fits ? Math.max(CANVAS_INSET, (W - w * state.view.k) / 2) : CANVAS_INSET;
@@ -4530,24 +4626,26 @@ function bringInto(el: HTMLElement, leftAt: number): void {
   // where it stands on the stage itself, free of whatever the transform is doing at this moment
   const lx = (r.left - c.left - m.e) / kx;
   const ly = (r.top - c.top - m.f) / ky;
-  const w = (r.width / kx) * state.view.k;
-  const h = (r.height / ky) * state.view.k;
+  const sk = drawnScale();
+  const w = (r.width / kx) * sk;
+  const h = (r.height / ky) * sk;
   // the face and the acts stand over the map, so what is brought in is brought into what is left clear of them
   const right = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".pickface")?.offsetWidth ?? 0);
   const foot = CANVAS_INSET + (ui.canvas.querySelector<HTMLElement>(".field") ? 44 : 0);
   const top = canvasTop();
-  const x = state.view.x + lx * state.view.k;
-  const y = state.view.y + ly * state.view.k;
+  const x = state.view.x + lx * sk;
+  const y = state.view.y + ly * sk;
   const fitsX = x >= CANVAS_INSET && x + w <= c.width - right;
   const fitsY = y >= top && y + h <= c.height - foot;
   if (fitsX && fitsY) return;
-  if (!fitsX) state.view.x = Math.round(clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - w - right)) - lx * state.view.k);
-  if (!fitsY) state.view.y = Math.round(clamp(c.height / 3, top, Math.max(top, c.height - h - foot)) - ly * state.view.k);
+  if (!fitsX) state.view.x = Math.round(clamp(c.width * leftAt, CANVAS_INSET, Math.max(CANVAS_INSET, c.width - w - right)) - lx * sk);
+  if (!fitsY) state.view.y = Math.round(clamp(c.height / 3, top, Math.max(top, c.height - h - foot)) - ly * sk);
   applyView(true);
 }
 
 /** Zooms about a point of the canvas, so what is under the pointer stays under it. */
 function zoomAt(px: number, py: number, factor: number): void {
+  if (stage()?.classList.contains("text")) return zoomTextAt(px, py, factor);
   const k = clamp(state.view.k * factor, 0.25, 2);
   const c = ui.canvas.getBoundingClientRect();
   const x = px - c.left;
@@ -4555,6 +4653,51 @@ function zoomAt(px: number, py: number, factor: number): void {
   state.view.x = x - (x - state.view.x) * (k / state.view.k);
   state.view.y = y - (y - state.view.y) * (k / state.view.k);
   state.view.k = k;
+  applyView(false);
+}
+
+/**
+ * Zooms a text map about a point. The map is laid again at the new zoom, so what is under the pointer is not where a
+ * scale would put it: the row nearest the pointer is held instead, its place under the pointer kept in proportion to
+ * how its type grew or shrank. Where the zoom folds that row away, the row that holds it now is held in its place.
+ */
+function zoomTextAt(px: number, py: number, factor: number): void {
+  // a wheel sends many steps a frame, and each lays the map again, so they are gathered and laid once a frame
+  const w = state;
+  const held = zooming.get(w);
+  if (held) return void ((held.factor *= factor), (held.px = px), (held.py = py));
+  zooming.set(w, { px, py, factor });
+  requestAnimationFrame(() => {
+    const z = zooming.get(w)!;
+    zooming.delete(w);
+    inWorld(w, () => layZoom(z.px, z.py, z.factor));
+  });
+}
+/** The zoom gathered for each world's text map, waiting for the next frame. */
+const zooming = new Map<World, { px: number; py: number; factor: number }>();
+
+function layZoom(px: number, py: number, factor: number): void {
+  const st = stage();
+  if (!st) return;
+  const k = clamp(state.view.k * factor, TEXT_ZOOM.least, TEXT_ZOOM.most);
+  if (k === state.view.k) return;
+  const dist = (r: DOMRect) => Math.hypot(Math.max(r.left - px, 0, px - r.right), Math.max(r.top - py, 0, py - r.bottom));
+  const rows = all<HTMLElement>(".crow", st);
+  const near = rows.reduce<HTMLElement | null>((m, r) => (!m || dist(r.getBoundingClientRect()) < dist(m.getBoundingClientRect()) ? r : m), null);
+  if (!near) return void ((state.view.k = k), applyView(false));
+  const key = (r: HTMLElement) => `${r.dataset.a}|${r.dataset.head ?? ""}`;
+  // the row and every row it hangs beneath, as they stand now, so whichever of them is still drawn can be held
+  const before = new Map(rows.filter((r) => r === near || prefixesOf(near.dataset.a ?? "").includes(r.dataset.a ?? "\u0000")).map((r) => [key(r), r.getBoundingClientRect()]));
+  state.view.k = k;
+  applyView(false);
+  const now = stage()!;
+  const held = [key(near), ...[...before.keys()].reverse()].map((kk) => ({ kk, el: all<HTMLElement>(".crow", now).find((r) => key(r) === kk) })).find((h) => h.el);
+  if (!held?.el) return;
+  const r0 = before.get(held.kk)!;
+  const r1 = held.el.getBoundingClientRect();
+  const s = r1.height / (r0.height || 1);
+  state.view.x += px - (px - r0.left) * s - r1.left;
+  state.view.y += py - (py - r0.top) * s - r1.top;
   applyView(false);
 }
 
@@ -7834,14 +7977,19 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .crow.lit, .crow:hover { box-shadow: inset 0 0 0 var(--hair-on) var(--lit); }
 /* in text a row is its name alone on one line, in the face set for the prose: no rim, no ground and no width of its
    own, so a short name takes little room, and a long one is cut rather than wrapping, since one line is what text is for */
-.stage.text .crow { flex-direction: row; align-items: center; gap: 6px; width: auto; max-width: none; padding: 1px 6px; border-radius: 4px; background: none; box-shadow: none; font-family: var(--prose-face); line-height: 1.3; }
-.stage.text .crow .say { display: block; max-width: 22em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* text is laid at its zoom, z, its type following it to a floor and held there, tz, and a long name cut shorter, cut,
+   as the map shrinks; nothing is scaled as a picture, so it is laid without a layer of its own */
+.stage.text { will-change: auto; --ngap: 4px; --indent: 16px; --across: 32px; --branch: 12px; }
+.stage.text .crow { flex-direction: row; align-items: center; gap: .45em; width: auto; max-width: none; padding: .08em .45em; border-radius: .3em; background: none; box-shadow: none; font-family: var(--prose-face); font-size: calc(var(--body) * .78 * var(--tz, 1)); line-height: 1.3; }
+.stage.text .crow .say { display: block; max-width: calc(22em * var(--cut, 1)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* a branch stands apart from the rows beside it, so where one level ends and the next row of the level above begins is seen */
+.stage.text .ckids:not(.across) > .cnode:is(:has(> .ckids), .open):not(:first-child), .stage.text .ckids:not(.across) > .cnode:is(:has(> .ckids), .open) + .cnode { margin-top: var(--branch); }
 .stage.text .crow .num { font-size: .78em; line-height: inherit; }
 /* the figure keeps its language at half its length, so it says what waits without taking the room text was turned to for */
-.stage.text .crow .marks { flex: none; gap: 2px; }
-.stage.text .crow .marks i { width: 4px; }
-.stage.text .crow .marks i.image { width: 5px; height: 5px; }
-.stage.text .crow .marks .brief { width: calc(var(--w) / 2); }
+.stage.text .crow .marks { flex: none; gap: calc(2px * var(--tz, 1)); height: calc(6px * var(--tz, 1)); }
+.stage.text .crow .marks i { width: calc(4px * var(--tz, 1)); height: calc(3px * var(--tz, 1)); }
+.stage.text .crow .marks i.image { width: calc(5px * var(--tz, 1)); height: calc(5px * var(--tz, 1)); }
+.stage.text .crow .marks .brief { width: calc(var(--w) / 2 * var(--tz, 1)); height: calc(3px * var(--tz, 1)); }
 /* what the box said by its rim and ground the name says: a reading of its own is underlined in its hue, as the way down marks one */
 .stage.text .crow.opens .title { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
 .stage.text .crow.head { box-shadow: none; }
