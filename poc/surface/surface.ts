@@ -1498,6 +1498,8 @@ type Settings = {
   plateGrain: "brief" | "file";
   /** whether git's programs are offered at all: off until a reader turns them on */
   git: "off" | "on";
+  /** whether a brief's slice of the colour wheel is shared among every brief beneath it, or among the files placed in it */
+  colour: "brief" | "file";
   /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
   layouts: (Held | null)[];
   /** the slot of the layout in use */
@@ -1533,6 +1535,7 @@ const DEFAULTS: Settings = {
   plate: "whole",
   plateGrain: "brief",
   git: "off",
+  colour: "brief",
   layouts: Array.from({ length: 9 }, () => null),
   slot: 0,
 };
@@ -1694,15 +1697,65 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 /** Where each of a row of widths starts, laid end to end with a gap between. */
 const offsets = (widths: number[], gap: number): number[] => widths.map((_, i) => widths.slice(0, i).reduce((x, w) => x + w + gap, 0));
 
+/** A brief's slice of the colour wheel, in degrees from where it begins to where it ends. */
+type Slice = { from: number; to: number };
+
 /**
- * The hue of a branch: every brief carries the hue of the root-level brief it stands under, so colour says
- * where in the body a thing sits and nothing else. Hues step by the golden angle, so neighbours differ.
+ * Every brief's slice of the colour wheel, so colour says where in the body a thing sits and nothing else. The root is
+ * the whole wheel, and each brief shares its slice equally among the briefs directly beneath it, by the branching and
+ * never by the size, so siblings meet edge to edge. Among files, a file's slice is shared among the files placed in it,
+ * and a section takes its file's; a root that places no files, as git's history, is shared among every brief whatever
+ * the setting, since among files it would be one hue throughout. The wheel begins with the first part's middle at 30,
+ * the hue it has always taken.
  */
-const hueAmong = (roots: Brief[], address: string): number => {
-  const i = roots.findIndex((b) => b.address === address.split("/")[0]);
-  return i < 0 ? 0 : Math.round((30 + i * 137.508) % 360);
+function wheelOf(index: Index, sharingFiles: boolean): Map<string, Slice> {
+  const slices = new Map<string, Slice>();
+  const under = (a: string): Brief[] => index.children.get(a) ?? [];
+  const placedIn = (a: string): Brief[] => {
+    const own = index.by.get(a)?.file;
+    const placed: Brief[] = [];
+    const walk = (x: string): void => under(x).forEach((k) => (k.file !== own ? placed.push(k) : walk(k.address)));
+    walk(a);
+    return placed;
+  };
+  const files = sharingFiles && placedIn("").length > 0;
+  const sharers = (a: string): Brief[] => (files ? placedIn(a) : under(a));
+  const fill = (a: string, s: Slice): void =>
+    under(a).forEach((k) => {
+      if (slices.has(k.address)) return;
+      slices.set(k.address, s);
+      fill(k.address, s);
+    });
+  const lay = (a: string, s: Slice): void => {
+    slices.set(a, s);
+    const ks = sharers(a);
+    const w = (s.to - s.from) / Math.max(1, ks.length);
+    ks.forEach((k, i) => lay(k.address, { from: s.from + i * w, to: s.from + (i + 1) * w }));
+    if (files) fill(a, s);
+  };
+  const n = Math.max(1, sharers("").length);
+  lay("", { from: 30 - 180 / n, to: 390 - 180 / n });
+  return slices;
+}
+
+/** Each index's wheel, laid once for each way of sharing it. */
+const wheels = new WeakMap<Index, { files: boolean; slices: Map<string, Slice> }>();
+/** A brief's slice in an index's wheel, or the nearest above it that has one. */
+const sliceIn = (index: Index, address: string): Slice | undefined => {
+  const files = settings.colour === "file";
+  let w = wheels.get(index);
+  if (!w || w.files !== files) wheels.set(index, (w = { files, slices: wheelOf(index, files) }));
+  for (let a = address; ; a = parentOf(a)) {
+    const s = w.slices.get(a);
+    if (s || a === "") return s;
+  }
 };
-const hueOf = (address: string): number => hueAmong(level(""), address);
+/** The middle of a brief's slice, which is its hue wherever it is drawn as ink; the root, the whole wheel, has none and keeps 0. */
+const hueIn = (index: Index, address: string): number => {
+  const s = address === "" ? undefined : sliceIn(index, address);
+  return s ? Math.round((((((s.from + s.to) / 2) % 360) + 360) % 360) * 10) / 10 : 0;
+};
+const hueOf = (address: string): number => (state.index ? hueIn(state.index, address) : 0);
 const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
 
 // ### 3.1.1 The actions
@@ -3442,13 +3495,14 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
   { key: "prose", name: "prose", values: FACES },
   { key: "line", name: "reading line", values: ["middle", "ends"] },
   { key: "weight", name: "weight", values: ["cost", "experience"] },
+  { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
@@ -3853,6 +3907,31 @@ function cellPath(c: Cell, S: number): { d: string; round: number } {
   };
 }
 
+/** How wide a slice and a cell must be for a cell to show its slice as a run: degrees of the wheel, and px along the cell. */
+const RUN = { slice: 3, wide: 12, step: 2 };
+let runs = 0;
+
+/**
+ * A cell wide enough shows its slice whole, as a run of colour across it: thin wedges from the middle, each a step of
+ * the slice in its own hue, seen only through the cell's own outline, its round corners included.
+ */
+function runOf(c: Cell, d: string, round: number, S: number): string {
+  const s = c.r0 === 0 || !state.index ? undefined : sliceIn(state.index, c.a);
+  if (!s || s.to - s.from < RUN.slice || (c.a1 - c.a0) * c.r1 * plateK(S) < RUN.wide) return "";
+  const m = S / 2;
+  const R = c.r1 * plateK(S) + 2;
+  const P = (a: number) => `${(m + R * Math.cos(a)).toFixed(2)} ${(m + R * Math.sin(a)).toFixed(2)}`;
+  const n = Math.max(2, Math.ceil((s.to - s.from) / RUN.step));
+  const step = (c.a1 - c.a0) / n;
+  // each wedge reaches a little into the next, so no seam of the ground shows between them
+  const wedges = Array.from({ length: n }, (_, i) => {
+    const h = (((s.from + ((s.to - s.from) * (i + 0.5)) / n) % 360) + 360) % 360;
+    return `<path style="--h:${h.toFixed(1)}" d="M ${m} ${m} L ${P(c.a0 + i * step)} A ${R.toFixed(2)} ${R.toFixed(2)} 0 ${step * 1.1 > Math.PI ? 1 : 0} 1 ${P(c.a0 + (i + 1) * step + step * 0.1)} Z"/>`;
+  }).join("");
+  const id = `run${runs++}`;
+  return `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${S}" height="${S}"><path d="${d}" stroke-width="${(2 * round).toFixed(2)}" fill="#fff" stroke="#fff" stroke-linejoin="round"/></mask><g class="run" mask="url(#${id})">${wedges}</g>`;
+}
+
 /** The side of the square a plate is laid in for a room, no larger than `most`: a column's side, or in the dish the room itself. */
 const plateScale = (W: number, H: number, most = PLATE_SIDE): number => Math.floor(Math.min(W, H, most));
 
@@ -3879,7 +3958,7 @@ function plateSvg(W: number, H: number, most = PLATE_SIDE): string {
     const angle = (c.a0 + c.a1) / 2;
     const wide = c.r0 === 0 ? 2 * c.r1 * k : Math.min((c.a1 - c.a0) * mid, 2 * mid);
     const label = wide >= 40 && (c.r1 - c.r0) * k >= 14 ? `<text class="label" x="${(m + (c.r0 === 0 ? 0 : mid * Math.cos(angle))).toFixed(1)}" y="${(m + (c.r0 === 0 ? 0 : mid * Math.sin(angle))).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(trim(c.label, Math.floor((wide - 8) / 5.6)))}</text>` : "";
-    return `<g class="cell${cls(c)}" data-a="${esc(c.a)}" ${hued(c.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${label}</g>`;
+    return `<g class="cell${cls(c)}" data-a="${esc(c.a)}" ${hued(c.a)}><path d="${d}" stroke-width="${(2 * round).toFixed(2)}"/>${runOf(c, d, round, S)}${label}</g>`;
   });
   return `<svg class="fig plate" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${shapes.join("")}</svg>`;
 }
@@ -5010,8 +5089,8 @@ function touchedBy(c: Commit): { readings: Brief[]; other: number } {
   return { readings, other };
 }
 
-/** The hue a reading takes in the body, by the root-level brief it stands under, whichever world the state holds. */
-const bodyHue = (a: string): number => hueAmong(bodyWorld.index?.children.get("") ?? [], a);
+/** The hue a reading takes in the body, the middle of its slice of the body's wheel, whichever world the state holds. */
+const bodyHue = (a: string): number => (bodyWorld.index ? hueIn(bodyWorld.index, a) : 0);
 
 /** When a commit was made, as the page writes it. */
 const whenOf = (c: Commit): string => new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -8383,7 +8462,7 @@ svg.shape { cursor: grab; overflow: visible; }
    lightness, which is the blue at the darker tones and the red at the lighter, so no branch shouts over another. Light
    side, from the paled to the focus: 84% 0.075, 79% 0.1, 70% 0.115, 64% 0.11, 50% 0.085; the dark side mirrors them
    against its own ground */
-svg.plate .cell {
+svg.plate .cell, svg.plate .run path {
   --p-away: light-dark(oklch(84% 0.075 var(--h)), oklch(40% 0.066 var(--h)));
   --p-rest: light-dark(oklch(79% 0.1 var(--h)), oklch(47% 0.08 var(--h)));
   --p-on: light-dark(oklch(70% 0.115 var(--h)), oklch(56% 0.095 var(--h)));
@@ -8391,16 +8470,19 @@ svg.plate .cell {
   --p-here: light-dark(oklch(50% 0.085 var(--h)), oklch(82% 0.09 var(--h)));
   --c: var(--p-rest);
 }
-svg.plate .cell path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
+svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
+/* a cell's run is drawn in the tone its state takes, each wedge in its own hue, and never stands in the pointer's way */
+svg.plate .run { pointer-events: none; }
+svg.plate .run path { fill: var(--c); }
 svg.plate .cell.centre { --c: var(--hub); }
 /* what is not in the lane is a step paler, and still its branch's hue */
-svg.plate .cell.away { --c: var(--p-away); }
+svg.plate .cell.away, svg.plate .cell.away .run path { --c: var(--p-away); }
 /* the way to where the reader stands is marked cell by cell, and the way to what they point at lights, over the paling */
-svg.plate .cell.on { --c: var(--p-on); }
-svg.plate .cell.here { --c: var(--p-here); }
-svg.plate .cell.trail, svg.plate .cell.lit { --c: var(--p-lit); }
+svg.plate .cell.on, svg.plate .cell.on .run path { --c: var(--p-on); }
+svg.plate .cell.here, svg.plate .cell.here .run path { --c: var(--p-here); }
+svg.plate .cell.trail, svg.plate .cell.lit, svg.plate .cell.trail .run path, svg.plate .cell.lit .run path { --c: var(--p-lit); }
 /* what the reader stands on and what they point at glow, so a droplet too small to read is still one the eye finds */
-svg.plate .cell.here path, svg.plate .cell.lit path { filter: drop-shadow(0 0 3px var(--c)); }
+svg.plate .cell.here > path, svg.plate .cell.lit > path { filter: drop-shadow(0 0 3px var(--c)); }
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
 svg.plate .cell.here .label { fill: var(--ground); }
 
