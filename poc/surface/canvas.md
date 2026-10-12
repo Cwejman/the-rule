@@ -168,6 +168,46 @@ As built, one line runs along beneath the root's row and drops into the head of 
 
 *The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history; as built the same day. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
+### 4.11 A node may be its name alone, on the lines of a file tree
+
+A box costs the map room it does not read in: a rim, a ground, a fixed width that a short name leaves half empty, and a second line for a figure. So a canvas may be turned to text, where a node is its name alone on one line and the lines that join the nodes do the work the boxes did, as an overview of a file structure is drawn in characters.
+
+It is a mode of the map and not a second map. The same rows stand in the same places of the same columns, and everything a reader does on the map does the same thing in text.
+
+*The author's ask of 2026-10-12, as an overview of a file structure in characters would be, to make the most of the room, in the face set for the prose. Laid by the session the same day, from an outline the author let stand.*
+
+#### 4.11.1 A row is one line of its name
+
+A row in text is as wide as its name and no wider, so a short name takes little room and a long one is cut at a width of its own rather than wrapping, since a second line is the room text was turned to for. Its number stands before it, faint, as a heading's does. The type is the face set for the prose, at the size a node's name has.
+
+The figure of [what a folded node hides](#46-a-folded-node-says-how-deep-it-is) keeps its language and stands after the name on the same line.
+
+Rows stand a third as far apart as nodes do, and a level steps in by two thirds as far, since nothing around a name needs the room a box did.
+
+*The author's ask, 2026-10-12, of the face. The measures are the session's.*
+
+#### 4.11.2 The lines are a file tree's
+
+Within a file one line drops from beneath the name that holds a level, and a short tick runs from it into each row of the level, ending at the last, which is how a tree of files is drawn. That is the line [a file's nesting](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) already draws down the left, and in text it is the only one, since a row that is one line has no middle for a thread to pass through. An opening runs from the end of the name that named it to the head of the reading it opened, nearer than between boxes.
+
+The lines keep the weight they have and [the way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit in them as it is between boxes. They are drawn rather than set as characters, so they meet exactly whatever the face and stay one weight at every zoom.
+
+*The author's, 2026-10-12, of the lines; drawing them rather than setting them as characters is the session's.*
+
+#### 4.11.3 What the box said, the type says
+
+A box said four things by its rim and its ground, and in text the name says them. The head of a reading stands in bold, as it does in a box. A row that leads to a reading of its own is underlined in its branch's hue, as [the way down](lane.md#75-the-way-down-stands-over-the-lane) marks a name that opens onto one. What is selected takes the wash a selected box takes, drawn close behind its name. The way to where the reader stands takes the branch's ink in its names, as it does in a box, and the row the reading stands on is ringed in that ink.
+
+Pointing at a row lights it as a box is lit, a ring close around its name.
+
+*The session's, 2026-10-12.*
+
+#### 4.11.4 Each canvas keeps its own
+
+Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-every-program-has-a-head), and the body's canvas and git's each keep their own, as each keeps which way its root runs. A canvas starts in boxes. The map is laid anew when it is turned, so it is fitted anew, with the reader's place brought into it.
+
+*The session's, 2026-10-12, that each canvas keeps its own and starts in boxes, until the author has looked.*
+
 ## 5. One press selects, two presses go
 
 Three things a reader wants of a node, and they are not one act. To know what it is. To go there and read it. To see what it holds without leaving where they are.
@@ -332,7 +372,7 @@ Whether a placed part may be exploded in place rather than entered, which is the
 
 The whole body laid out at once, and with it the cycles that opening a link makes possible, and which of several places leading to one part the reader came through.
 
-Modes of the node. A node is a name and a figure now; the author wants the same map read at other grains, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all three.
+Modes of the node. A node is a name and a figure, or [its name alone](#411-a-node-may-be-its-name-alone-on-the-lines-of-a-file-tree); the author wants the same map read at other grains as well, as small circles for the shape of a whole body, and as nodes carrying the face's own words where a reader is reading rather than finding. They are modes to choose, not one node trying to be all of them.
 
 The look. The canvas is nodes on a flat ground today, and what the author asked for on 2026-09-16 is expression: [a space declared](../../author/ideas-2026-09-16.md#12-a-space-is-declared), [layers with glow and the smallest data that gives the most](../../author/ideas-2026-09-16.md#10-the-smallest-data-the-most-expression), [a holarchy styled by characteristic](../../author/ideas-2026-09-16.md#2-a-holarchy-is-styled-by-characteristic). None of that is designed, and the structure above is what it would be expressed upon.
 

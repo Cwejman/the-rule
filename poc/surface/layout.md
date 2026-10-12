@@ -123,7 +123,7 @@ What each head holds:
 | Program | Its head |
 |---|---|
 | prose, the body's or git's | the depth its world is unfolded to, and the gutter at its left and at its right, each holding nothing, the links or another adjunct |
-| canvas, the body's or git's | the depth its world is unfolded to, whether the face of what is selected stands beside it, which way its root's level runs, and whether it follows where the reader is |
+| canvas, the body's or git's | the depth its world is unfolded to, whether the face of what is selected stands beside it, which way its root's level runs, whether its nodes are boxes or [text](canvas.md#411-a-node-may-be-its-name-alone-on-the-lines-of-a-file-tree), and whether it follows where the reader is |
 | plate | whether it draws the body whole or the scope, and a cell per brief or per file |
 | figures | nothing yet |
 | git's status | open |
@@ -206,7 +206,7 @@ A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or 
 
 A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-every-program-has-a-head) but the depth.
 
-Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it and which way its root's level runs, and of the plate whether it draws the body whole or the scope, a cell per brief or per file. A layout holds them for every program, standing or not, so a program added to it takes what it holds.
+Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it, which way its root's level runs and whether it draws boxes or text, and of the plate whether it draws the body whole or the scope, a cell per brief or per file. A layout holds them for every program, standing or not, so a program added to it takes what it holds.
 
 What belongs to the whole page stays the page's, the same in every layout: the theme, the faces, the meters of the type and the page, the measure, the dock's edge, whether the room left over is spread or centred, and whether git's history is offered at all. Turning git's history off takes its programs out of every layout, as it takes them off the page today, and turning it on again does not put them back. A layout left with nothing takes the row the page opens with as its own.
 
