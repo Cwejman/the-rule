@@ -3038,8 +3038,11 @@ function layIn(i: number): void {
   const layouts = settings.layouts.slice();
   layouts[settings.slot] = heldNow();
   layouts[i] = null;
+  const laid = JSON.stringify([settings.nodes, settings.trunk]);
   Object.assign(settings, heldOf(next));
   settleHeld();
+  // a map laid another way is another size, so each is fitted anew and the reader's place brought into it, as turning it from its head does
+  if (JSON.stringify([settings.nodes, settings.trunk]) !== laid) [onBody, inGit].forEach((at) => at(() => ((state.fitted = null), (state.followed = null))));
   settings.layouts = layouts;
   settings.slot = i;
   // where a program stood before it was taken away was in the layout left
@@ -4133,7 +4136,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   // width and a name that wraps needs no hanging indent
   const attrs = `class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${hued(a)}`;
   // in text a row is one line: the number before the name, as a heading carries it, and the figure after it
-  if (nodesAs() === "text") return `<div ${attrs}>${num}${say}${marksHtml(b, o.hides)}</div>`;
+  if (nodesAs() === "text") return `<div ${attrs}>${n ? num : ""}${say}${marksHtml(b, o.hides)}</div>`;
   return `<div ${attrs}>${say}<span class="foot">${num}${marksHtml(b, o.hides)}</span></div>`;
 }
 
@@ -4476,7 +4479,10 @@ function fitCanvas(): void {
   // the canvas fits only while what that costs is still legible, and past that it stays at its own size and lets the
   // reader move in it, which is what a map is for. Where it does not fit, the focus is what brings the view to place.
   const fit = (W - 2 * CANVAS_INSET) / w;
-  const fits = fit >= 0.6;
+  // a name in text is not held against the view, so the least a fit may shrink it to is what its type can bear
+  const row = st.querySelector<HTMLElement>(".crow");
+  const least = st.classList.contains("text") && row ? Math.max(0.6, TYPE_FLOOR / parseFloat(getComputedStyle(row).fontSize)) : 0.6;
+  const fits = fit >= least;
   state.view.k = fits ? Math.min(fit, 1) : 1;
   state.view.x = fits ? Math.max(CANVAS_INSET, (W - w * state.view.k) / 2) : CANVAS_INSET;
   state.view.y = canvasTop();
