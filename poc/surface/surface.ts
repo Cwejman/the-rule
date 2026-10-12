@@ -3038,11 +3038,13 @@ function layIn(i: number): void {
   const layouts = settings.layouts.slice();
   layouts[settings.slot] = heldNow();
   layouts[i] = null;
-  const laid = JSON.stringify([settings.nodes, settings.trunk]);
+  const laid = { nodes: settings.nodes, trunk: settings.trunk };
   Object.assign(settings, heldOf(next));
   settleHeld();
   // a map laid another way is another size, so each is fitted anew and the reader's place brought into it, as turning it from its head does
-  if (JSON.stringify([settings.nodes, settings.trunk]) !== laid) [onBody, inGit].forEach((at) => at(() => ((state.fitted = null), (state.followed = null))));
+  const moved = (w: "body" | "history") => settings.nodes[w] !== laid.nodes[w] || settings.trunk[w] !== laid.trunk[w];
+  if (moved("body")) onBody(() => ((state.fitted = null), (state.followed = null)));
+  if (moved("history")) inGit(() => ((state.fitted = null), (state.followed = null)));
   settings.layouts = layouts;
   settings.slot = i;
   // where a program stood before it was taken away was in the layout left
@@ -4126,7 +4128,8 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const cls = ["crow", o.head ? "head" : "", o.opens ? "opens" : "", a === state.picked && o.head === state.onHead ? "picked" : "", a === state.focus && o.head === headFor(a) ? "here" : "", prefixesOf(state.focus).includes(a) ? "on" : ""]
     .filter(Boolean)
     .join(" ");
-  // the number keeps its room whether or not the row has one, so every title of a level begins at one edge
+  // in a box the number keeps its room in the foot whether or not the row has one, so every title of a level begins at
+  // one edge; in text it stands before the name, and a row without one gives it no room
   const n = o.head ? "" : numberIn(b, root);
   const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
   // a node carries its name and what waits beneath it, and nothing else: the width is set so that a name fills it
