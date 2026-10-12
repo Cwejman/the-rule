@@ -1502,6 +1502,8 @@ type Settings = {
   git: "off" | "on";
   /** whether a brief's slice of the colour wheel is shared among every brief beneath it, or among the files placed in it */
   colour: "brief" | "file";
+  /** where the colour wheel is laid from: the root, or, as a trial, the scope, all outside it grey */
+  colourFrom: "root" | "scope";
   /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
   layouts: (Held | null)[];
   /** the slot of the layout in use */
@@ -1539,6 +1541,7 @@ const DEFAULTS: Settings = {
   plateGrain: "brief",
   git: "off",
   colour: "brief",
+  colourFrom: "root",
   layouts: Array.from({ length: 9 }, () => null),
   slot: 0,
 };
@@ -1707,11 +1710,12 @@ type Slice = { from: number; to: number };
  * Every brief's slice of the colour wheel, so colour says where in the body a thing sits and nothing else. The root is
  * the whole wheel, and each brief shares its slice equally among the briefs directly beneath it, by the branching and
  * never by the size, so siblings meet edge to edge. Among files, a file's slice is shared among the files placed in it,
- * and a section takes its file's; a root that places no files, as git's history, is shared among every brief whatever
+ * and a section takes its file's; a wheel whose top places no files, as git's history, is shared among every brief whatever
  * the setting, since among files it would be one hue throughout. The wheel begins with the first part's middle at 30,
- * the hue it has always taken.
+ * the hue it has always taken. Laid from the scope, as a trial, the scope's brief is the whole wheel and nothing outside
+ * it has a slice.
  */
-function wheelOf(index: Index, sharingFiles: boolean): Map<string, Slice> {
+function wheelOf(index: Index, sharingFiles: boolean, top: string): Map<string, Slice> {
   const slices = new Map<string, Slice>();
   const under = (a: string): Brief[] => index.children.get(a) ?? [];
   const placedIn = (a: string): Brief[] => {
@@ -1721,7 +1725,7 @@ function wheelOf(index: Index, sharingFiles: boolean): Map<string, Slice> {
     walk(a);
     return placed;
   };
-  const files = sharingFiles && placedIn("").length > 0;
+  const files = sharingFiles && placedIn(top).length > 0;
   const sharers = (a: string): Brief[] => (files ? placedIn(a) : under(a));
   const fill = (a: string, s: Slice): void =>
     under(a).forEach((k) => {
@@ -1736,30 +1740,42 @@ function wheelOf(index: Index, sharingFiles: boolean): Map<string, Slice> {
     ks.forEach((k, i) => lay(k.address, { from: s.from + i * w, to: s.from + (i + 1) * w }));
     if (files) fill(a, s);
   };
-  const n = Math.max(1, sharers("").length);
-  lay("", { from: 30 - 180 / n, to: 390 - 180 / n });
+  const n = Math.max(1, sharers(top).length);
+  lay(top, { from: 30 - 180 / n, to: 390 - 180 / n });
   return slices;
 }
 
-/** Each index's wheel, laid once for each way of sharing it. */
-const wheels = new WeakMap<Index, { files: boolean; slices: Map<string, Slice> }>();
-/** A brief's slice in an index's wheel, or the nearest above it that has one. */
-const sliceIn = (index: Index, address: string): Slice | undefined => {
+/** Each index's wheel, laid once for each way of sharing it and each brief it is laid from. */
+const wheels = new WeakMap<Index, { files: boolean; top: string; slices: Map<string, Slice> }>();
+/** Where a world's wheel is laid from: the root, or, as a trial the reader turns on, the world's scope. */
+const wheelTop = (w: World): string => (settings.colourFrom === "scope" && w.index?.by.has(w.scope) ? w.scope : "");
+/** A brief's slice in a world's wheel, or the nearest above it that has one; nothing outside where the wheel is laid from has one. */
+const sliceIn = (w: World, address: string): Slice | undefined => {
+  const index = w.index;
+  if (!index) return undefined;
   const files = settings.colour === "file";
-  let w = wheels.get(index);
-  if (!w || w.files !== files) wheels.set(index, (w = { files, slices: wheelOf(index, files) }));
+  const top = wheelTop(w);
+  let laid = wheels.get(index);
+  if (!laid || laid.files !== files || laid.top !== top) wheels.set(index, (laid = { files, top, slices: wheelOf(index, files, top) }));
   for (let a = address; ; a = parentOf(a)) {
-    const s = w.slices.get(a);
+    const s = laid.slices.get(a);
     if (s || a === "") return s;
   }
 };
-/** The middle of a brief's slice, which is its hue wherever it is drawn as ink; the root, the whole wheel, has none and keeps 0. */
-const hueIn = (index: Index, address: string): number => {
-  const s = address === "" ? undefined : sliceIn(index, address);
-  return s ? Math.round((((((s.from + s.to) / 2) % 360) + 360) % 360) * 10) / 10 : 0;
+/**
+ * A brief's colour as the style a drawing sets on it: the middle of its slice, which is its hue wherever it is drawn as
+ * ink, where the root, the whole wheel, has none and keeps 0. Outside where the wheel is laid from it is grey, its hue
+ * taken away by --hk; that is said on every brief while the wheel is laid from the scope, since a brief inherits it.
+ */
+const hueVarsIn = (w: World, address: string): string => {
+  const top = wheelTop(w);
+  const s = address === top ? undefined : sliceIn(w, address);
+  const h = s ? Math.round((((((s.from + s.to) / 2) % 360) + 360) % 360) * 10) / 10 : 0;
+  if (top === "" && settings.colourFrom !== "scope") return `--h:${h}`;
+  return `--h:${h};--hk:${s || address === top ? 1 : 0}`;
 };
-const hueOf = (address: string): number => (state.index ? hueIn(state.index, address) : 0);
-const hued = (address: string): string => `style="--h:${hueOf(address)}"`;
+const hueVars = (address: string): string => hueVarsIn(state, address);
+const hued = (address: string): string => `style="${hueVars(address)}"`;
 
 // ### 3.1.1 The actions
 //
@@ -2500,7 +2516,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
   // a whole brief folds from a line at its foot
   const less = g === "whole" && hasActs ? actLine("less", b.address, { fold: true, figure: "", beneath: 0, unfold: true }) : "";
   return (
-    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
+    `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--after:${after}px">` +
     `<div class="surface">` +
     `<h2 class="head d${d}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
@@ -3289,7 +3305,7 @@ function treeHtml(): string {
     const whole = foldOf(b.address) === "whole";
     const on = prefixesOf(state.focus).includes(b.address);
     return (
-      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--d:${d}">` +
+      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--d:${d}">` +
       foldMark(b) +
       `<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span></div>` +
       (whole ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
@@ -3299,9 +3315,9 @@ function treeHtml(): string {
   const S = state.scope;
   const above = prefixesOf(S)
     .slice(0, -1)
-    .map((a) => `<div class="row above" data-a="${esc(a)}" style="--h:${hueOf(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
+    .map((a) => `<div class="row above" data-a="${esc(a)}" style="${hueVars(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
     .join("");
-  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="--h:${hueOf(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
+  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="${hueVars(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
   return `<div class="tree">${above}${root}${level(S)
     .map((b) => node(b, depthOf(S) + 1))
     .join("")}<div class="laser"></div></div>`;
@@ -3503,7 +3519,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3511,6 +3527,7 @@ const SWITCHES: Switch[] = [
   { key: "line", name: "reading line", values: ["middle", "ends"] },
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
+  { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
@@ -3927,7 +3944,7 @@ let runs = 0;
  * the slice in its own hue, seen only through the cell's own outline, its round corners included.
  */
 function runOf(c: Cell, d: string, round: number, S: number): string {
-  const s = c.r0 === 0 || !state.index ? undefined : sliceIn(state.index, c.a);
+  const s = c.r0 === 0 ? undefined : sliceIn(state, c.a);
   if (!s || s.to - s.from < RUN.slice || (c.a1 - c.a0) * c.r1 * plateK(S) < RUN.wide) return "";
   const m = S / 2;
   const R = c.r1 * plateK(S) + 2;
@@ -4216,7 +4233,7 @@ function marksHtml(b: Brief, hides: boolean): string {
   const c = b.commit ? past.commits.get(b.commit) : undefined;
   if (c) {
     const { readings, other } = touchedBy(c);
-    const bars = readings.slice(0, 7).map((r) => `<b class="brief" style="--h:${bodyHue(r.address)};--w:10px"></b>`).join("");
+    const bars = readings.slice(0, 7).map((r) => `<b class="brief" style="${bodyHueVars(r.address)};--w:10px"></b>`).join("");
     const more = readings.length > 7 ? `<b class="more">+${readings.length - 7}</b>` : "";
     return `<span class="marks">${bars}${more}${other ? `${bars ? `<i class="sep"></i>` : ""}<i class="other"></i>` : ""}</span>`;
   }
@@ -5108,7 +5125,7 @@ function touchedBy(c: Commit): { readings: Brief[]; other: number } {
 }
 
 /** The hue a reading takes in the body, the middle of its slice of the body's wheel, whichever world the state holds. */
-const bodyHue = (a: string): number => (bodyWorld.index ? hueIn(bodyWorld.index, a) : 0);
+const bodyHueVars = (a: string): string => hueVarsIn(bodyWorld, a);
 
 /** When a commit was made, as the page writes it. */
 const whenOf = (c: Commit): string => new Date(c.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -5119,7 +5136,7 @@ const bylineOf = (c: Commit): string => `${c.author} · ${whenOf(c)} · ${c.hash
 /** The readings a commit touched, each in its hue in the body, and a word for what else it changed; nothing where neither. */
 function touchedHtml(c: Commit): string {
   const { readings, other } = touchedBy(c);
-  const touched = readings.map((r) => `<span class="reading" style="--h:${bodyHue(r.address)}">${esc(r.title)}</span>`).join("");
+  const touched = readings.map((r) => `<span class="reading" style="${bodyHueVars(r.address)}">${esc(r.title)}</span>`).join("");
   return touched + (other ? `<span class="also">and ${other} other file${other === 1 ? "" : "s"}</span>` : "");
 }
 
@@ -5127,7 +5144,7 @@ function touchedHtml(c: Commit): string {
 function commitHtml(b: Brief, c: Commit, after: number): string {
   const touched = touchedHtml(c);
   return (
-    `<article class="brief commit whole${prefixesOf(state.focus).includes(b.address) ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="--h:${hueOf(b.address)};--after:${after}px">` +
+    `<article class="brief commit whole${prefixesOf(state.focus).includes(b.address) ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--after:${after}px">` +
     `<div class="surface"><h2 class="head"><span class="title">${esc(c.subject)}</span></h2>` +
     `<p class="said chrome">${esc(bylineOf(c))}</p>` +
     (touched ? `<div class="touched chrome">${touched}</div>` : "") +
@@ -7878,11 +7895,11 @@ export const PALETTE: Record<string, [light: string, dark: string]> = {
   track: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .13)"],
   meter: ["oklch(62% 0.19 28)", "oklch(70% 0.14 28)"],
   rim: ["rgb(0 0 0 / .08)", "rgb(255 255 255 / .1)"],
-  rest: ["oklch(88% 0.045 var(--h))", "oklch(35% 0.04 var(--h))"],
-  door: ["oklch(74% 0.085 var(--h))", "oklch(54% 0.07 var(--h))"],
-  on: ["oklch(42% 0.072 var(--h))", "oklch(84% 0.055 var(--h))"],
-  lit: ["oklch(60% 0.12 var(--h))", "oklch(74% 0.1 var(--h))"],
-  glow: ["oklch(80% 0.08 var(--h))", "oklch(47% 0.06 var(--h))"],
+  rest: ["oklch(88% calc(0.045 * var(--hk)) var(--h))", "oklch(35% calc(0.04 * var(--hk)) var(--h))"],
+  door: ["oklch(74% calc(0.085 * var(--hk)) var(--h))", "oklch(54% calc(0.07 * var(--hk)) var(--h))"],
+  on: ["oklch(42% calc(0.072 * var(--hk)) var(--h))", "oklch(84% calc(0.055 * var(--hk)) var(--h))"],
+  lit: ["oklch(60% calc(0.12 * var(--hk)) var(--h))", "oklch(74% calc(0.1 * var(--hk)) var(--h))"],
+  glow: ["oklch(80% calc(0.08 * var(--hk)) var(--h))", "oklch(47% calc(0.06 * var(--hk)) var(--h))"],
   grey: ["oklch(90% 0 0)", "oklch(32% 0 0)"],
   hub: ["oklch(92% 0.01 60)", "oklch(27% 0.01 60)"],
   glass: ["oklch(97.5% 0.002 60 / .82)", "oklch(26% 0.006 60 / .8)"],
@@ -7921,6 +7938,7 @@ const CSS = `
   --gap: 24px; --rim-top: 3%; --rim-foot: 6%; --measure: 600px; --dim: .4; --edge: 8%;
   --thin: 0;
   --h: 60;
+  --hk: 1;
 }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; --thin: 30; }
@@ -8492,11 +8510,11 @@ svg.shape { cursor: grab; overflow: visible; }
    side, from the paled to the focus: 84% 0.075, 79% 0.1, 70% 0.115, 64% 0.11, 50% 0.085; the dark side mirrors them
    against its own ground */
 svg.plate .cell, svg.plate .run path {
-  --p-away: light-dark(oklch(84% 0.075 var(--h)), oklch(40% 0.066 var(--h)));
-  --p-rest: light-dark(oklch(79% 0.1 var(--h)), oklch(47% 0.08 var(--h)));
-  --p-on: light-dark(oklch(70% 0.115 var(--h)), oklch(56% 0.095 var(--h)));
-  --p-lit: light-dark(oklch(64% 0.11 var(--h)), oklch(65% 0.105 var(--h)));
-  --p-here: light-dark(oklch(50% 0.085 var(--h)), oklch(82% 0.09 var(--h)));
+  --p-away: light-dark(oklch(84% calc(0.075 * var(--hk)) var(--h)), oklch(40% calc(0.066 * var(--hk)) var(--h)));
+  --p-rest: light-dark(oklch(79% calc(0.1 * var(--hk)) var(--h)), oklch(47% calc(0.08 * var(--hk)) var(--h)));
+  --p-on: light-dark(oklch(70% calc(0.115 * var(--hk)) var(--h)), oklch(56% calc(0.095 * var(--hk)) var(--h)));
+  --p-lit: light-dark(oklch(64% calc(0.11 * var(--hk)) var(--h)), oklch(65% calc(0.105 * var(--hk)) var(--h)));
+  --p-here: light-dark(oklch(50% calc(0.085 * var(--hk)) var(--h)), oklch(82% calc(0.09 * var(--hk)) var(--h)));
   --c: var(--p-rest);
 }
 svg.plate .cell > path { fill: var(--c); stroke: var(--c); stroke-linejoin: round; }
