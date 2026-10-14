@@ -5915,7 +5915,10 @@ function drawCrumb(): void {
   ui.crumb.hidden = run.length < 2 && S === "" && trail.length === 0 && back === "";
   // narrow, the whole run would cut every name to a letter, so it keeps the level above and stands for the rest with
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
-  const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
+  // where the focus stands inside the reading open, it keeps that reading rather than the level above, since a section
+  // within it is drawn as its number alone and says nothing without the reading's name before it
+  const inside = run.includes(S) && run.includes(state.focus) && depthOf(state.focus) > depthOf(S);
+  const kept = narrow() && run.length > 2 ? (inside ? [S, state.focus] : run.slice(-2)) : run;
   const above = run.length - kept.length;
   // the run says what each step is and where it stands, each by one means, and no shape is drawn around any of them.
   // The weight says the kind: a reading stands bold, a section at normal weight with its number before it, as the lane
@@ -5927,13 +5930,39 @@ function drawCrumb(): void {
     const b = brief(a);
     return b && body && !reading(a) ? numberIn(b, scopeFor(a)) : "";
   };
+  // the root, where every way down begins, is the whole wheel and is drawn as it, a ring, its name told on pointing;
+  // a section within the reading open is its number alone, since the reading's name already says where it stands and
+  // the head keeps its title, so a deep address reads as one reading and a number
   const step = (a: string): string => {
     const head = a === state.focus;
     const where = depthOf(a) < depthOf(S) ? "above" : a === S ? "root" : "in";
-    const cls = ["step", reading(a) ? "scope" : "", where, ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
-    const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     const n = numbered(a);
-    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${n ? `<span class="num">${esc(n)}</span>` : ""}${esc(brief(a)!.title)}</span>`;
+    const ring = body && a === "";
+    const bare = where === "in" && !head && n !== "";
+    const cls = ["step", reading(a) ? "scope" : "", where, ...(ring ? ["ring"] : []), ...(bare ? ["bare"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
+    const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
+    const title = esc(brief(a)!.title);
+    const face = ring ? `<i aria-label="${title}"></i>` : `${n ? `<span class="num">${esc(n)}</span>` : ""}${bare ? "" : title}`;
+    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearing(a) : "");
+  };
+  // narrow, the line has no room for them
+  // beside the reading open stand its status, from its stamp, and how far through it the focus stands, by the text
+  // of the briefs before the focus in the reading's own order, the focus's included
+  const bearing = (a: string): string => {
+    const b = brief(a);
+    const stamp = b ? stampOf(b) : "";
+    // the reading in its own order, depth first, stopping at the cards it raises, as the lane lays it
+    const order: string[] = [a];
+    const walk = (x: string): void => level(x).forEach((k) => (order.push(k.address), isCard(k) || walk(k.address)));
+    walk(a);
+    const own = (x: string): number => state.index?.own.get(x) ?? 0;
+    const total = order.reduce((n, x) => n + own(x), 0);
+    const at = order.indexOf(state.focus);
+    const before = order.slice(0, at + 1).reduce((n, x) => n + own(x), 0);
+    const t = total > 0 ? clamp(before / total, 0, 1) : 0;
+    const pct = Math.round(t * 100);
+    const through = `<span class="through" data-tip="${pct}% of the way through this reading, by its text" ${hued(a)}><i style="width:${pct}%"></i></span>`;
+    return (stamp ? `<span class="stamp">${esc(stamp)}</span>` : "") + through;
   };
   const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
   // among files, where the focus stands inside the last reading named, its number follows, a step of its own in full ink
@@ -5970,12 +5999,12 @@ function trimPlace(): void {
   if (!narrow()) return;
   const place = ui.crumb.querySelector<HTMLElement>(".place");
   if (!place) return;
-  const cut = () => Array.from(place.querySelectorAll<HTMLElement>(".step:not(.more):not(.now)"));
+  const cut = () => Array.from(place.querySelectorAll<HTMLElement>(".step:not(.more):not(.now):not(.root)"));
   for (let guard = 0; guard < 24; guard++) {
     const steps = cut();
     if (!steps.some((el) => el.scrollWidth > el.clientWidth + 1) || steps.length === 0) return;
-    // the chevron that followed the name goes with it
-    steps[0].nextElementSibling?.matches("svg") && steps[0].nextElementSibling.remove();
+    // what followed the name up to the next, its bearing and the mark before the next, goes with it
+    while (steps[0].nextElementSibling && !steps[0].nextElementSibling.matches(".step")) steps[0].nextElementSibling.remove();
     steps[0].remove();
     if (!place.querySelector(".more")) place.insertAdjacentHTML("afterbegin", `<span class="step more">…</span>${CHEVRON}`);
   }
@@ -8056,6 +8085,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) .step:is(.above, .in):is(:hover, .lit) { color: var(--on); }
 :is(#crumb, #gcrumb) .step.now.at { min-width: 0; }
 :is(#crumb, #gcrumb) .step.at .num { margin-right: 0; font-size: 1em; color: inherit; }
+:is(#crumb, #gcrumb) .step.root.scope { color: var(--on); }
+/* narrow, the reading open gives way with the head rather than being cut, since a number after it says nothing alone */
+#areas.alone :is(#crumb, #gcrumb) .step.root.scope { flex: 0 1 auto; min-width: 4em; }
+:is(#crumb, #gcrumb) .step.bare .num { margin-right: 0; }
+:is(#crumb, #gcrumb) .step.ring { display: grid; place-items: center; width: 14px; height: 14px; }
+:is(#crumb, #gcrumb) .step.ring i { width: 11px; height: 11px; border-radius: 50%; background: conic-gradient(in oklch longer hue, light-dark(oklch(74% .085 0), oklch(54% .07 0)), light-dark(oklch(74% .085 0), oklch(54% .07 0))); -webkit-mask: radial-gradient(circle, transparent 3px, #000 3.5px); mask: radial-gradient(circle, transparent 3px, #000 3.5px); transition: transform .15s; }
+:is(#crumb, #gcrumb) .step.ring:is(:hover, .lit) i { transform: scale(1.18); }
+:is(#crumb, #gcrumb) .stamp { flex: none; margin-left: -1px; font-size: .86em; color: var(--faint); }
+:is(#crumb, #gcrumb) .through { flex: none; position: relative; width: 22px; height: 3px; border-radius: 2px; background: var(--track); overflow: hidden; }
+:is(#crumb, #gcrumb) .through i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--door); transition: width .16s; }
 :is(#crumb, #gcrumb) svg.door { width: 9px; height: 9px; color: var(--door); stroke-width: 1.4; opacity: 1; }
 /* the last step is where the reader stands, so it is the one that is not faint */
 :is(#crumb, #gcrumb) .step.now { flex: 0 1 auto; min-width: 3em; color: var(--ink); cursor: default; }
