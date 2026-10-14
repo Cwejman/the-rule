@@ -2610,7 +2610,7 @@ const programIcon = (k: string): string =>
 
 const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
-  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => 240, grow: true, onFocus: true },
+  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => 280, grow: true, onFocus: true },
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
   // the plate is the body whole, so it stays the body while the history is read
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => onBody(() => plateSvg(w, h)), width: () => onBody(plateWidth), grow: false, onFocus: true },
@@ -3308,34 +3308,80 @@ function drawOverview(): void {
   });
 }
 
-// ## 3.5 The tree: the lane as an outline
+// ## 3.5 The tree: the way down, line by line
 //
-// The lane's briefs as a file tree: a row per brief in the lane, nested under
-// its parent, unfolded where the brief is whole. Unfolding in the tree is
-// unfolding in the lane, one state. The name goes; a line lies across the row of the focus.
+// The way down laid line by line, in the language a canvas drawn as text draws
+// in: the way from the root to the reading open, each step saying what stands
+// beside it, and beneath the last step the reading open as the lane holds it.
+// Folding in the tree is folding in the lane, one state; what is laid open
+// beside the way is the tree's own and moves nothing in the lane.
+
+/** The levels of the way laid whole in the tree, around the step that stands in them: the tree's own, and the page's only. */
+const besideOpen = new Set<string>();
 
 function treeHtml(): string {
-  const node = (b: Brief, d: number): string => {
-    if (!inLane(b.address)) return "";
-    const whole = foldOf(b.address) === "whole";
-    const on = prefixesOf(state.focus).includes(b.address);
-    return (
-      `<div class="node"><div class="row${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--d:${d}">` +
-      foldMark(b) +
-      `<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span></div>` +
-      (whole ? level(b.address).map((k) => node(k, d + 1)).join("") : "") +
-      `</div>`
-    );
-  };
   const S = state.scope;
-  const above = prefixesOf(S)
-    .slice(0, -1)
-    .map((a) => `<div class="row above" data-a="${esc(a)}" style="${hueVars(a)};--d:${depthOf(a)}"><span class="mark leaf"></span><span class="name" data-go="${esc(a)}">${esc(brief(a)!.title)}</span></div>`)
-    .join("");
-  const root = `<div class="row root${state.focus === S ? " here" : ""}" data-a="${esc(S)}" style="${hueVars(S)};--d:${depthOf(S)}"><span class="mark leaf"></span><span class="name" data-go="${esc(S)}">${esc(brief(S)!.title)}</span></div>`;
-  return `<div class="tree">${above}${root}${level(S)
-    .map((b) => node(b, depthOf(S) + 1))
-    .join("")}<div class="laser"></div></div>`;
+  const body = state === bodyWorld;
+  const onWay = new Set(prefixesOf(state.focus));
+  const reading = (a: string): boolean => body && (a === "" || isCard(brief(a)));
+  // a node is its row and what hangs beneath it; the tick into its row says what reaching it crosses, the hue of the
+  // reading entered at a file's boundary, the branch's ink on the way to the focus, and the quiet line otherwise
+  const node = (a: string, row: string, kids: string): string =>
+    `<div class="node${reading(a) && a !== "" ? " door" : ""}${onWay.has(a) ? " on" : ""}" ${hued(a)}>${row}${kids ? `<div class="kids">${kids}</div>` : ""}</div>`;
+  const num = (b: Brief, root: string): string => {
+    const n = reading(b.address) ? "" : numberIn(b, root);
+    return n ? `<span class="num">${esc(n)}</span>` : "";
+  };
+  const cls = (a: string, ...more: string[]): string =>
+    ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
+  const spacer = `<span class="mark leaf"></span>`;
+  // a row that hides something says how much in the figure after its name, as a canvas drawn as text does
+  const marks = (b: Brief): string => (isCard(b) || (foldOf(b.address) !== "whole" && level(b.address).length) ? marksHtml(b, true) : "");
+  const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
+  // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
+  const way = prefixesOf(S);
+  const stepRow = (a: string, i: number): string => {
+    const b = brief(a)!;
+    const takes = a === S ? `data-go="${esc(a)}"` : `data-scope="${esc(a)}"`;
+    const ring = body && a === "" ? `<span class="ring" aria-hidden="true"><i></i></span>` : spacer;
+    // what stands beside a step is counted in the level above it, and laying that level whole is pressed from the step
+    const up = i > 0 ? way[i - 1] : null;
+    const many = up !== null ? level(up).length - 1 : 0;
+    const open = up !== null && besideOpen.has(up);
+    const beside =
+      up !== null && many > 0
+        ? `<button class="beside${open ? " on" : ""}" data-beside="${esc(up)}" data-tip="${open ? "close the level back to the way" : `${many} more beside it in its level`}">${open ? "−" : `+${many}`}</button>`
+        : "";
+    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
+  };
+  // a sibling the way passed by: a row as any row of the outline, and pressing it goes there
+  const sibling = (b: Brief): string =>
+    node(
+      b.address,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}${marks(b)}</div>`,
+      "",
+    );
+  // the reading open as the lane holds it, folds and all
+  const outline = (b: Brief): string => {
+    if (!inLane(b.address)) return "";
+    const whole = foldOf(b.address) === "whole" && !isCard(b);
+    // a card opens rather than folds, so it carries no fold mark
+    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}${marks(b)}</div>`;
+    return node(b.address, row, whole ? level(b.address).map(outline).join("") : "");
+  };
+  const step = (i: number): string => {
+    const a = way[i];
+    const kids =
+      i === way.length - 1
+        ? level(S).map(outline).join("")
+        : besideOpen.has(a)
+          ? level(a)
+              .map((k) => (k.address === way[i + 1] ? step(i + 1) : sibling(k)))
+              .join("")
+          : step(i + 1);
+    return node(a, stepRow(a, i), kids);
+  };
+  return `<div class="tree">${step(0)}<div class="laser"></div></div>`;
 }
 
 // ## 3.6 The ahead: what lies beneath, and is not in the lane
@@ -5941,6 +5987,7 @@ function drawCrumb(): void {
     const b = brief(a);
     return b && body && !reading(a) ? numberIn(b, scopeFor(a)) : "";
   };
+  // narrow, the line has no room for the reading open's status and its bar
   // the root, where every way down begins, is the whole wheel and is drawn as it, a ring, its name told on pointing;
   // a section within the reading open is its number alone, since the reading's name already says where it stands and
   // the head keeps its title, so a deep address reads as one reading and a number
@@ -5954,26 +6001,7 @@ function drawCrumb(): void {
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     const title = esc(brief(a)!.title);
     const face = ring ? `<i aria-label="${title}"></i>` : `${n ? `<span class="num">${esc(n)}</span>` : ""}${bare ? "" : title}`;
-    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearing(a) : "");
-  };
-  // narrow, the line has no room for them
-  // beside the reading open stand its status, from its stamp, and how far through it the focus stands, by the text
-  // of the briefs before the focus in the reading's own order, the focus's included
-  const bearing = (a: string): string => {
-    const b = brief(a);
-    const stamp = b ? stampOf(b) : "";
-    // the reading in its own order, depth first, stopping at the cards it raises, as the lane lays it
-    const order: string[] = [a];
-    const walk = (x: string): void => level(x).forEach((k) => (order.push(k.address), isCard(k) || walk(k.address)));
-    walk(a);
-    const own = (x: string): number => state.index?.own.get(x) ?? 0;
-    const total = order.reduce((n, x) => n + own(x), 0);
-    const at = order.indexOf(state.focus);
-    const before = order.slice(0, at + 1).reduce((n, x) => n + own(x), 0);
-    const t = total > 0 ? clamp(before / total, 0, 1) : 0;
-    const pct = Math.round(t * 100);
-    const through = `<span class="through" data-tip="${pct}% of the way through this reading, by its text" ${hued(a)}><i style="width:${pct}%"></i></span>`;
-    return (stamp ? `<span class="stamp">${esc(stamp)}</span>` : "") + through;
+    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearingHtml(a) : "");
   };
   const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
   // among files, where the focus stands inside the last reading named, its number follows, a step of its own in full ink
@@ -6027,6 +6055,27 @@ function tintGround(): void {
   b.setProperty("--ck", `${settings.tint}`);
   // the whole wheel runs in full, though its own ink is grey; a reading outside where the wheel is laid from is grey
   b.setProperty("--ghc", top ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
+}
+
+/**
+ * What stands beside the reading open, in the way down and the tree alike: its status from its stamp, and a bar of how
+ * far through it the focus stands, by the text of the briefs up to the focus in the reading's own order, the focus's
+ * included, so the bar says where the focus is in the reading and not how far the lane has scrolled.
+ */
+function bearingHtml(a: string): string {
+  const b = brief(a);
+  const stamp = b ? stampOf(b) : "";
+  // the reading in its own order, depth first, stopping at the cards it raises, as the lane lays it
+  const order: string[] = [a];
+  const walk = (x: string): void => level(x).forEach((k) => (order.push(k.address), isCard(k) || walk(k.address)));
+  walk(a);
+  const own = (x: string): number => state.index?.own.get(x) ?? 0;
+  const total = order.reduce((n, x) => n + own(x), 0);
+  const at = order.indexOf(state.focus);
+  const before = order.slice(0, at + 1).reduce((n, x) => n + own(x), 0);
+  const pct = Math.round((total > 0 ? clamp(before / total, 0, 1) : 0) * 100);
+  const through = `<span class="through" data-tip="${pct}% of the way through this reading, by its text" ${hued(a)}><i style="width:${pct}%"></i></span>`;
+  return (stamp ? `<span class="stamp">${esc(stamp)}</span>` : "") + through;
 }
 
 /**
@@ -6211,14 +6260,21 @@ function drawLaser(): void {
   const row = tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(a)}"]`);
   laser.hidden = !row;
   if (!row) return;
-  laser.style.top = `${row.offsetTop + row.offsetHeight - 1}px`;
-  laser.style.left = `${row.offsetLeft}px`;
-  laser.style.width = `${row.offsetWidth}px`;
+  // the line takes the hue of the brief it lies under, as the reading line's marks do
+  hueVars(a).split(";").forEach((kv) => {
+    const [k, v] = kv.split(":");
+    if (k && v !== undefined) laser.style.setProperty(k, v);
+  });
+  // rows nest in nodes, so where a row stands is read against the tree rather than from its offsets
+  const rr = row.getBoundingClientRect();
+  const tr = tree.getBoundingClientRect();
+  laser.style.top = `${rr.bottom - tr.top - 1}px`;
+  laser.style.left = `${rr.left - tr.left}px`;
+  laser.style.width = `${rr.width}px`;
   if (a !== state.focus) return;
   const wing = tree.closest<HTMLElement>(".slot")!;
-  const rr = row.getBoundingClientRect();
   const wr = wing.getBoundingClientRect();
-  if (rr.top < wr.top + 24 || rr.bottom > wr.bottom - 48) wing.scrollTo({ top: row.offsetTop - wing.clientHeight / 2, behavior: "smooth" });
+  if (rr.top < wr.top + 24 || rr.bottom > wr.bottom - 48) wing.scrollTo({ top: rr.top - tr.top - wing.clientHeight / 2, behavior: "smooth" });
 }
 
 /** Where each figure stands, measured as it is laid: a figure of the row by its name, and the rail apart. */
@@ -7308,6 +7364,13 @@ const onClick = (e: MouseEvent): void => {
   if (t.closest(".canvas") && scrubbing) return;
   const fold = t.closest<HTMLElement>("[data-fold]");
   if (fold) return void cycle(fold.dataset.fold!);
+  // a step of the tree's way lays its level whole beside it, or closes it back to the step
+  const beside = t.closest<HTMLElement>("[data-beside]");
+  if (beside) {
+    const a = beside.dataset.beside!;
+    if (!besideOpen.delete(a)) besideOpen.add(a);
+    return void drawWings();
+  }
   // a card is the part itself, standing here: pressing it goes there, as pressing a figure's cell does
   const opened = t.closest<HTMLElement>(".lane .card[data-card]");
   if (opened) return void goTo(opened.dataset.card!);
@@ -8159,11 +8222,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas.alone :is(#crumb, #gcrumb) .step.root.scope { flex: 0 1 auto; min-width: 4em; }
 :is(#crumb, #gcrumb) .step.bare .num { margin-right: 0; }
 :is(#crumb, #gcrumb) .step.ring { display: grid; place-items: center; width: 14px; height: 14px; }
-:is(#crumb, #gcrumb) .step.ring i { width: 11px; height: 11px; border-radius: 50%; background: conic-gradient(in oklch longer hue, light-dark(oklch(74% .085 0), oklch(54% .07 0)), light-dark(oklch(74% .085 0), oklch(54% .07 0))); -webkit-mask: radial-gradient(circle, transparent 3px, #000 3.5px); mask: radial-gradient(circle, transparent 3px, #000 3.5px); transition: transform .15s; }
+:is(#crumb, #gcrumb) .step.ring i, .tree .ring i { width: 11px; height: 11px; border-radius: 50%; background: conic-gradient(in oklch longer hue, light-dark(oklch(74% .085 0), oklch(54% .07 0)), light-dark(oklch(74% .085 0), oklch(54% .07 0))); -webkit-mask: radial-gradient(circle, transparent 3px, #000 3.5px); mask: radial-gradient(circle, transparent 3px, #000 3.5px); transition: transform .15s; }
 :is(#crumb, #gcrumb) .step.ring:is(:hover, .lit) i { transform: scale(1.18); }
-:is(#crumb, #gcrumb) .stamp { flex: none; margin-left: -1px; font-size: .86em; color: var(--faint); }
-:is(#crumb, #gcrumb) .through { flex: none; position: relative; width: 22px; height: 3px; border-radius: 2px; background: var(--track); overflow: hidden; }
-:is(#crumb, #gcrumb) .through i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--door); transition: width .16s; }
+:is(#crumb, #gcrumb, .tree) .stamp { flex: none; margin-left: -1px; font-size: .86em; color: var(--faint); }
+:is(#crumb, #gcrumb, .tree) .through { flex: none; position: relative; width: 22px; height: 3px; border-radius: 2px; background: var(--track); overflow: hidden; }
+:is(#crumb, #gcrumb, .tree) .through i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--door); transition: width .16s; }
 :is(#crumb, #gcrumb) svg.door { width: 9px; height: 9px; color: var(--door); stroke-width: 1.4; opacity: 1; }
 /* the last step is where the reader stands, so it is the one that is not faint */
 :is(#crumb, #gcrumb) .step.now { flex: 0 1 auto; min-width: 3em; color: var(--ink); cursor: default; }
@@ -8636,15 +8699,43 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
 
 .tree { position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; max-width: 320px; }
-.tree .row { position: relative; display: flex; align-items: center; gap: 6px; padding: 2px 8px 2px calc(20px + var(--d) * 14px); border-radius: 6px; }
-.tree .row .mark { position: absolute; left: calc(2px + var(--d) * 14px); top: 3px; }
-.tree .row.root { color: var(--ink); font-weight: calc(600 - var(--thin)); margin-bottom: 4px; }
-.tree .row.above .name { color: var(--faint); }
+/* the tree is drawn as a file tree is: a level steps in, and its line drops from beneath the mark of the row that holds
+   it, each node beneath carrying its stretch of the line and the last only down to its own row */
+.tree .node { position: relative; }
+.tree .kids { padding-left: 14px; }
+.tree .kids > .node::before { content: ""; position: absolute; left: -7px; top: 0; bottom: 0; width: 1.25px; background: var(--track); }
+.tree .kids > .node:last-child::before { bottom: auto; height: 11px; }
+/* the tick into a row says what reaching it crosses: the branch's ink on the way to the focus, and the hue of the
+   reading entered, a step stronger, at a file's boundary */
+.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: 10px; width: 7px; height: 1.25px; background: var(--track); }
+.tree .kids > .node.on > .row::after { background: var(--on); }
+.tree .kids > .node.door > .row::after { height: 1.5px; background: var(--door); }
+.tree .row { position: relative; display: flex; align-items: center; gap: 5px; min-height: 21px; padding: 0 6px 0 0; border-radius: 6px; }
+.tree .row .mark { position: static; flex: none; width: 14px; height: 14px; }
+.tree .ring { flex: none; width: 14px; height: 14px; display: grid; place-items: center; }
 .tree .row:hover, .tree .row.lit { background: var(--wash); }
-.tree .name { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tree .row.on .name { color: var(--ink); }
+.tree .name { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.tree .num { flex: none; margin-right: -1px; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); }
+/* the way is told as the way down tells it: a reading bold, what stands above the reading open muted, the reading open
+   in its branch's ink; the rows on the way to the focus take their branch's ink, and a card is underlined in its hue */
+.tree .row.file .name { font-weight: calc(600 - var(--thin)); }
+.tree .row:is(.above, .sib) .name { color: var(--muted); }
+.tree .row:is(.open, .on) .name { color: var(--on); }
+.tree .row.card:not(.step) .name { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
 .tree .row.here .name, .tree .row.lit .name { color: var(--on); font-weight: calc(600 - var(--thin)); }
 .pointing .tree .row.here:not(.lit) .name { color: var(--ink); font-weight: calc(500 - var(--thin)); }
+/* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
+/* where a row is short of room its figure gives way first, then its status, and its name last */
+.tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
+.tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
+.tree .marks i.image { width: 5px; height: 5px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
+.tree .marks .brief { display: block; flex: none; width: calc(var(--w) / 2); height: 3px; border-radius: 1.5px; background: var(--door); }
+.tree .marks .sep { width: 3px; background: none; }
+.tree .marks .more { flex: none; font-size: .72em; line-height: 1; color: var(--faint); background: none; }
+.tree .beside { flex: none; margin-left: 1px; padding: 0 4px; border: 0; border-radius: 4px; background: none; font: inherit; font-size: .82em; line-height: 1.5; color: var(--faint); cursor: pointer; transition: color .15s, background .15s; }
+.tree .beside:hover { color: var(--on); background: var(--track); }
+.tree .beside.on { color: var(--ink); background: var(--track); }
 .tree .laser { position: absolute; height: 1.5px; background: var(--on); border-radius: 1px; transition: top .28s cubic-bezier(.2,.7,.2,1), left .28s, width .28s; pointer-events: none; }
 
 svg.fig { display: block; overflow: visible; touch-action: none; user-select: none; }
@@ -8802,7 +8893,7 @@ body.touch .knob.turning .hint { opacity: 1; }
    pixels a hand asks for; a badge carries its word alone, in a target of its own; and nothing waits on hovering */
 body.touch .tree .row { padding-top: 9px; padding-bottom: 9px; }
 /* the chevron that folds a row is the one small target in the outline, so a finger is given the room around it */
-body.touch .tree .row .mark { width: 30px; height: 34px; top: 0; left: calc(-5px + var(--d) * 14px); }
+body.touch .tree .row .mark { width: 30px; height: 34px; }
 body.touch .switches .pick { padding: 9px 8px; }
 /* the depth strip is scrubbed rather than aimed at, so its cells grow for a finger without taking the whole line */
 body.touch .depth { gap: 4px; }
