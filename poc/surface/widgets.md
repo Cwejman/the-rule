@@ -166,9 +166,9 @@ Whether the sprouts stand is a second setting in the tree's head, apart from its
 
 The tree takes the width its rows need, measured as it is laid, up to three hundred and twenty pixels, past which a long name is cut; its rows change with the folds and the scope rather than with each step, so the row is laid again only when what the tree needs has changed, and a step never moves the prose.
 
-A reader may pull its edge narrower, down to a hundred and twenty, as any column's edge [is pulled](layout.md#3-the-gaps-are-the-handles), and a layout keeps the pull. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
+A reader may pull its edge, as any column's edge [is pulled](layout.md#3-the-gaps-are-the-handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
 
-*The pull, the author's ask of 2026-10-14, for a reader who would rather have names cut or wrapped than a wide tree.*
+*The pull, the author's ask of 2026-10-14, for a reader who would rather have names cut or wrapped than a wide tree; past the most, the author's of the same day, since an open tree cuts nothing and a wide one is the only way its names stand on one line.*
 
 Pressing a row's name goes to the brief. The way to the focus is filled in the tree's own lines, as water runs through pipes: down each level it passes through, to the row it passes into, in that level's ink. When the focus moves the water runs on from where it stood: a step to the next brief runs one short length down the same line, a step back draws it back, a level newly reached fills from its top a moment after the one above it, and a move across the body runs from where the old way and the new part. The wing scrolls only to keep the focus in view, driven by the lane and never free.
 
