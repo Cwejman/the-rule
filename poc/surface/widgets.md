@@ -264,13 +264,17 @@ As the width tightens [the gutter narrows](framework.md#28-giving-way) rather th
 
 ## 6. Settings
 
-Settings is a wing widget that edits [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values, in groups by what they change, each group named over a hairline with its meters first and its switches after: the type, the colour, the page, how the reading moves, then the canvas's and git's own. A setting a program holds as its own, the tree's room or the plate's reach, is set in that program's head and is not among them.
+Settings is a wing widget that edits [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values.
+
+They stand in groups by what they change, each group named over a hairline with its meters first and its switches after: the type, the colour, the page, how the reading moves, then the canvas's and git's own. A setting a program holds as its own, the tree's room or the plate's reach, is set in that program's head and is not among them.
 
 *Reasoned, the author's, 2026-09-13; [a dial](refused.md#w-a-dial) was built first and refused. The groups, the author's ask of 2026-10-14, when the meters ran past the wing's edge and the switches stood as one list in no order, their names and values wrapping a word at a time.*
 
 ### 6.1 The meters
 
-Each meter is a 270 degree arc with rounded ends, the value drawn in a warm red over a faint track, its icon in the middle, and a word naming it beneath, its full name on pointing; while it is pointed at or turned its value stands in its word's place, so the value is read where the eye already is and never covers anything. The meters of a group stand four to a row. Dragging a meter up or down turns it and the wheel steps it. A drag turns a meter in place and never redraws the wing under the pointer.
+Each meter is a 270 degree arc with rounded ends, the value drawn in a warm red over a faint track, its icon in the middle, and a word naming it beneath, its full name on pointing.
+
+While it is pointed at or turned its value stands in its word's place, so the value is read where the eye already is and never covers anything. The meters of a group stand four to a row. Dragging a meter up or down turns it and the wheel steps it. A drag turns a meter in place and never redraws the wing under the pointer.
 
 The type is the zoom, the heading ratio and the line height; the colour, the headings' hue and the ground's; the page, the gap, the dim, the edge fade and the height of the file figures the tree and the cards draw. The two hues stand at nought until a reader turns them, and [what they colour](#182-the-ground-and-the-headings-may-take-the-hue) is said with the colour. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
 
@@ -278,7 +282,9 @@ The type is the zoom, the heading ratio and the line height; the colour, the hea
 
 ### 6.2 The switches
 
-Each switch is a setting's name with its few values beneath it, held together in one quiet track with the chosen one raised. A value is never broken between lines: where a wing is too narrow the track wraps whole values, and the name above never shares their line. The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides).
+Each switch is a setting's name with its few values beneath it, held together in one quiet track with the chosen one raised. A value is never broken between lines: where a wing is too narrow the track wraps whole values, and the name above never shares their line.
+
+The theme is light, dark, or whatever the system is set to, which is where a reader starts; how the two themes are composed is [one palette with two sides](implementation.md#64-one-palette-two-sides).
 
 The weight is cost or experience: what a brief weighs in the tails and the plate. Cost is its text alone, which is what reading it costs and where a reader starts. Experience counts its images as well, as the text that would fill their room at the default measure. The colour is every brief or files: whether [a brief's slice of the colour wheel](#18-a-brief-is-its-slice-of-the-colour-wheel) is shared among the briefs directly beneath it or among the files placed in it, and a reader starts with every brief. The colour from is the root or the scope: where the wheel is laid from, [the scope a trial](#181-a-trial-colour-from-the-scope) that greys all outside it and works with either way the colour is shared; a reader starts from the root.
 
