@@ -1511,6 +1511,8 @@ type Settings = {
   /** whether the tree stands dense, a row a line and a long name cut, or open, with room between rows and names whole */
   treeRoom: "dense" | "open";
   treeSprouts: "shown" | "hidden";
+  /** whether every step of the tree's way stands among its level, or only those the reader opened */
+  treeWhole: "way" | "whole";
   /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
   tint: number;
   /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
@@ -1557,6 +1559,7 @@ const DEFAULTS: Settings = {
   crumb: "brief",
   treeRoom: "dense",
   treeSprouts: "shown",
+  treeWhole: "way",
   tint: 0,
   heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
@@ -2588,6 +2591,7 @@ const ICON: Record<string, string> = {
   follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
   scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
   files: `<path d="M4.5 2h4.5l2.5 2.5V14h-7z"/><path d="M9 2v2.5h2.5"/>`,
+  whole: `<path d="M3 3h4M5 6.5h4M5 10h4M5 13.5h4M4 4.5v9"/><path d="M11 6.5h2.5M11 10h2.5" opacity=".5"/>`,
   sprout: `<path d="M3 3h6M5 5.5v7M5 8.5h4M5 12.5h6"/>`,
   spaced: `<path d="M2.5 3.5h11M2.5 12.5h11M8 5.5v5M6.5 7 8 5.5 9.5 7M6.5 9 8 10.5 9.5 9"/>`,
   shape: `<path d="M3 3h7M3 6h9M6 9h6M6 12h4"/>`,
@@ -3111,7 +3115,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts", "treeWhole"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3372,9 +3376,9 @@ function treeHtml(): string {
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
   // a row that hides levels draws beneath it the files it holds, as the cards do, under its name
-  const sprout = (b: Brief): string => {
+  const sprout = (b: Brief, beside = false): string => {
     if (settings.treeSprouts !== "shown") return "";
-    const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
+    const hides = beside || isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
     return hides && level(b.address).length ? `<div class="sprout">${filesHtml(b.address)}</div>` : "";
   };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
@@ -3389,7 +3393,7 @@ function treeHtml(): string {
     const many = up !== null ? level(up).length - 1 : 0;
     const open = up !== null && besideOpen.has(up);
     const beside =
-      up !== null && many > 0
+      up !== null && many > 0 && settings.treeWhole !== "whole"
         ? `<button class="beside${open ? " on" : ""}" data-beside="${esc(up)}" data-tip="${open ? "close the level back to the way" : `${many} more beside it in its level`}">${open ? "−" : `+${many}`}</button>`
         : "";
     return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
@@ -3398,7 +3402,7 @@ function treeHtml(): string {
   const sibling = (b: Brief): string =>
     node(
       b.address,
-      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
       "",
     );
   // the reading open as the lane holds it, folds and all
@@ -3414,7 +3418,7 @@ function treeHtml(): string {
     const kids =
       i === way.length - 1
         ? level(S).map(outline).join("")
-        : besideOpen.has(a)
+        : besideOpen.has(a) || settings.treeWhole === "whole"
           ? level(a)
               .map((k) => (k.address === way[i + 1] ? step(i + 1) : sibling(k)))
               .join("")
@@ -3718,6 +3722,7 @@ function settleHeld(): void {
   if (settings.plateGrain !== "file") settings.plateGrain = "brief";
   if (settings.treeRoom !== "open") settings.treeRoom = "dense";
   if (settings.treeSprouts !== "hidden") settings.treeSprouts = "shown";
+  if (settings.treeWhole !== "whole") settings.treeWhole = "way";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -5800,10 +5805,13 @@ function headSettings(k: string): string {
     const open = settings.treeRoom === "open";
     const tip = open ? "rows stand apart and names wrap — press to draw them close" : "rows stand close and names are cut — press to give them room";
     const shown = settings.treeSprouts === "shown";
+    const whole = settings.treeWhole === "whole";
+    const wtip = whole ? "every step of the way stands among its level, the whole in view — press to show the way alone" : "the way alone, a level opened by its count — press to stand every step among its level";
     const stip = shown ? "a folded row draws what it hides beneath it — press to draw the rows alone" : "the rows alone — press to draw beneath a folded row what it hides";
     return (
       `<button class="pick${open ? " on" : ""}" data-toggle="room" data-tip="${esc(tip)}">${icon("spaced")}</button>` +
-      `<button class="pick${shown ? " on" : ""}" data-toggle="sprouts" data-tip="${esc(stip)}">${icon("sprout")}</button>`
+      `<button class="pick${shown ? " on" : ""}" data-toggle="sprouts" data-tip="${esc(stip)}">${icon("sprout")}</button>` +
+      `<button class="pick${whole ? " on" : ""}" data-toggle="whole" data-tip="${esc(wtip)}">${icon("whole")}</button>`
     );
   }
   if (k !== "prose" && k !== "gitProse") return "";
@@ -7553,6 +7561,7 @@ const onClick = (e: MouseEvent): void => {
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
     } else if (what === "from") settings.mapFrom = { ...settings.mapFrom, [w]: settings.mapFrom[w] === "scope" ? "whole" : "scope" };
+    else if (what === "whole") settings.treeWhole = settings.treeWhole === "whole" ? "way" : "whole";
     else if (what === "sprouts") settings.treeSprouts = settings.treeSprouts === "shown" ? "hidden" : "shown";
     else if (what === "room") settings.treeRoom = settings.treeRoom === "open" ? "dense" : "open";
     else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
