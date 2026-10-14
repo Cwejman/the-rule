@@ -8105,9 +8105,10 @@ body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)
    through: it takes its slice whole as a run, as its rim does, lightly, as tinted frosted glass would, by the ground's
    meter even where the ground itself is plain, so at the root each part's card is its own hue */
 body.tinted .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
-/* its edge is a light laid over the ground, as glass catches it, rather than a grey line; the card the reading stands on
-   or the pointer is on keeps its hued outline */
-body.tinted .brief .card:not(.here):not(.lit) { outline-color: light-dark(rgb(255 255 255 / .9), rgb(255 255 255 / .1)); }
+/* its edge is its own slice's run in the pale tone, a step deeper than its fill, rather than a grey line, which on a
+   coloured ground reads as laid over it; the card the reading stands on or the pointer is on takes the lit run as ever */
+body.tinted .brief .card:not(.here):not(.lit) { outline-color: transparent; }
+body.tinted .brief .card:not(.here):not(.lit)::before { opacity: 1; background: ${roleRun("rest")}; }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
