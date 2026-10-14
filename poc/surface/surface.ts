@@ -3698,9 +3698,9 @@ const onRail = (): boolean => fits().rail > 0;
 const aheadWidth = (): number => SHAPE.pad * 2 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + SHAPE.tail;
 
 /** One block drawn small: a heading a short bar, a paragraph a filled block, an image a frame, so no figure passes an image off as prose. */
-const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number, style = ""): string =>
+const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number, attrs = ""): string =>
   kind === "image" || kind === "card"
-    ? `<rect class="${kind}"${style ? ` ${style}` : ""} x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
+    ? `<rect class="${kind}"${attrs ? ` ${attrs}` : ""} x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
     : `<rect class="${kind}" x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" rx="1"/>`;
 
 /** The lane's briefs and their blocks as laid, in the scroll box's own coordinates; an image's width is its share of the lane's. */
@@ -3747,7 +3747,7 @@ function shapeSvg(W: number, H: number): string {
     // the rail nests a step tighter than a column does, so a level six deep still leaves a row room for its marks
     const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
-      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1), b.card ? hued(b.card) : ""))
+      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1), b.card ? `data-a="${esc(b.card)}" ${hued(b.card)}` : ""))
       .join("");
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
     // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
@@ -8104,7 +8104,10 @@ body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)
 /* on a ground that takes the hue a card is a thing of its own colour standing on it, never a pane the ground shows
    through: it takes its slice whole as a run, as its rim does, lightly, as tinted frosted glass would, by the ground's
    meter even where the ground itself is plain, so at the root each part's card is its own hue */
-body.tinted .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
+body.tinted .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
+/* its edge is a light laid over the ground, as glass catches it, rather than a grey line; the card the reading stands on
+   or the pointer is on keeps its hued outline */
+body.tinted .brief .card:not(.here):not(.lit) { outline-color: light-dark(rgb(255 255 255 / .9), rgb(255 255 255 / .1)); }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
@@ -8664,7 +8667,9 @@ svg.shape .cell.lit .para, svg.shape .cell.lit .head { fill: var(--lit); }
 /* a card is not prose of this reading, so it is drawn as an outline rather than a filled block: the shape says where
    the lane stops before the reader reaches it, and a fold within one never looks like a crossing out of it */
 svg.shape .card { fill: none; stroke: var(--door); stroke-width: 1; }
-svg.shape .cell.here .card, svg.shape .cell.lit .card { stroke: var(--lit); }
+/* a card lights where the lane's card does, when the reading stands on it or the pointer is on it anywhere, since it
+   carries the address of the reading beyond it; the brief that raises it lighting does not light it */
+svg.shape .card.here, svg.shape .card.lit { stroke: var(--lit); stroke-width: 1.6; fill: var(--rest); fill-opacity: .45; }
 svg.shape .above .head { fill: var(--grey); }
 svg.shape .above.lit .head, svg.shape .above:hover .head { fill: var(--lit); }
 /* only the two regions take the pointer; the marks drawn over them never do */
