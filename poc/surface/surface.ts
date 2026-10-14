@@ -1504,6 +1504,8 @@ type Settings = {
   colour: "brief" | "file";
   /** where the colour wheel is laid from: the root, or, as a trial, the scope, all outside it grey */
   colourFrom: "root" | "scope";
+  /** whether the way down names every brief on the way to the focus, or only the files, the focus told by its number */
+  crumb: "brief" | "file";
   /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
   layouts: (Held | null)[];
   /** the slot of the layout in use */
@@ -1542,6 +1544,7 @@ const DEFAULTS: Settings = {
   git: "off",
   colour: "brief",
   colourFrom: "root",
+  crumb: "brief",
   layouts: Array.from({ length: 9 }, () => null),
   slot: 0,
 };
@@ -3525,7 +3528,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3534,6 +3537,7 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
+  { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
@@ -5900,29 +5904,52 @@ function drawCrumb(): void {
   const back = narrow() ? "" : badgeHtml("undo", undefined, true);
   // the run of levels goes down to the brief in focus, not only to the scope: a reader scrolling into a brief has its
   // heading off the screen, and the address of where they stand is what the line is for
-  const run = prefixesOf(state.focus);
+  const body = state !== gitWorld;
+  // a reading is a file: the root, or a placed file's root. Git has no files, and there the run to the scope reads as one
+  const reading = (a: string): boolean => (body ? a === "" || isCard(brief(a)) : depthOf(a) <= depthOf(S));
+  // among files alone, the run names only the readings on the way, and where the focus stands inside the last of them
+  // it is told by its number after it, which says where without spending a name on it
+  const files = body && settings.crumb === "file";
+  const run = prefixesOf(state.focus).filter((a) => !files || reading(a));
   // wide, it stands across the page whatever stands in the row, since git's programs read the body's scope too
   ui.crumb.hidden = run.length < 2 && S === "" && trail.length === 0 && back === "";
   // narrow, the whole run would cut every name to a letter, so it keeps the level above and stands for the rest with
   // one mark, as the trail is cut at its root; the way out a level at a time is the badge beside it
   const kept = narrow() && run.length > 2 ? run.slice(-2) : run;
   const above = run.length - kept.length;
-  // the run says three things, and the type tells them apart rather than any shape drawn around them. The scope, the
-  // way down to the reading the reader has opened, stands bold. The address within it stands at normal weight, since it
-  // is a place inside what the bold already named. The head, what the reader is looking at, takes full ink, and where
-  // it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is.
+  // the run says what each step is and where it stands, each by one means, and no shape is drawn around any of them.
+  // The weight says the kind: a reading stands bold, a section at normal weight with its number before it, as the lane
+  // numbers it. The ink says where: what is above the reading open stands muted, the sections within it fainter, and
+  // the head, what the reader is looking at, takes full ink, underlined in its branch's hue where it opens onto a
+  // reading of its own, as a link that can be followed is. The mark before a step says what going to it crosses: a
+  // chevron within a file, and a slash in the hue of the reading entered at a file's boundary, which is a door.
+  const numbered = (a: string): string => {
+    const b = brief(a);
+    return b && body && !reading(a) ? numberIn(b, scopeFor(a)) : "";
+  };
   const step = (a: string): string => {
     const head = a === state.focus;
-    const cls = ["step", depthOf(a) <= depthOf(S) ? "scope" : "in", ...(a === S ? ["root"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].join(" ");
+    const where = depthOf(a) < depthOf(S) ? "above" : a === S ? "root" : "in";
+    const cls = ["step", reading(a) ? "scope" : "", where, ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
-    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${esc(brief(a)!.title)}</span>`;
+    const n = numbered(a);
+    return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${n ? `<span class="num">${esc(n)}</span>` : ""}${esc(brief(a)!.title)}</span>`;
   };
+  const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
+  // among files, where the focus stands inside the last reading named, its number follows, a step of its own in full ink
+  const last = kept[kept.length - 1];
+  const at = files && last !== state.focus && brief(state.focus) ? numbered(state.focus) : "";
+  const tail = at ? `${CHEVRON}<span class="step in now at" data-a="${esc(state.focus)}" ${hued(state.focus)}><span class="num">${esc(at)}</span></span>` : "";
   // the acts of the rightmost stand after it: where it is a reading of its own, entering it and widening out of it are
   // both there, since that is what enter and shift with enter do where the reader is standing
   const ends = isCard(brief(state.focus)) ? badgeHtml("scope", undefined, true) + badgeHtml("out", undefined, true) : badgeHtml("out", undefined, true);
   const place =
     (above ? `<span class="step more" data-tip="${above} level${above > 1 ? "s" : ""} above, cut at the root">…</span>${CHEVRON}` : "") +
-    kept.filter((a) => brief(a)).map(step).join(CHEVRON);
+    kept
+      .filter((a) => brief(a))
+      .map((a, i) => (i ? mark(a) : "") + step(a))
+      .join("") +
+    tail;
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
@@ -8015,11 +8042,21 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) { position: absolute; top: 12px; z-index: 5; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; color: var(--faint); }
 :is(#crumb, #gcrumb) .step { cursor: pointer; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
 :is(#crumb, #gcrumb) .step:hover, :is(#crumb, #gcrumb) .step.lit { color: var(--on); }
-/* the run's three parts are told apart by the type and nothing else: the scope bold, the address within it at normal
-   weight, and the head at full ink, underlined in its hue where it opens onto a reading of its own */
-:is(#crumb, #gcrumb) .step.scope { flex: none; font-weight: calc(600 - var(--thin)); color: var(--muted); }
-:is(#crumb, #gcrumb) .step.in { font-weight: calc(400 - var(--thin)); color: var(--faint); }
+/* each step is told by one means for each thing it says: the weight its kind, a reading bold and a section at normal
+   weight after its number; the ink where it stands, above the reading open muted, within it faint, and the head at
+   full ink, underlined in its hue where it opens onto a reading of its own; and the mark before it what going to it
+   crosses, a slash in the hue of the reading entered at a file's boundary */
+:is(#crumb, #gcrumb) .step { font-weight: calc(400 - var(--thin)); }
+:is(#crumb, #gcrumb) .step.scope { flex: none; font-weight: calc(600 - var(--thin)); }
+:is(#crumb, #gcrumb) .step.above { color: var(--muted); }
+:is(#crumb, #gcrumb) .step.in { color: var(--faint); }
 :is(#crumb, #gcrumb) .step.root { flex: none; color: var(--muted); }
+:is(#crumb, #gcrumb) .step .num { margin-right: .35em; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); transition: color .1s; }
+:is(#crumb, #gcrumb) .step:is(:hover, .lit) .num { color: inherit; }
+:is(#crumb, #gcrumb) .step:is(.above, .in):is(:hover, .lit) { color: var(--on); }
+:is(#crumb, #gcrumb) .step.now.at { min-width: 0; }
+:is(#crumb, #gcrumb) .step.at .num { margin-right: 0; font-size: 1em; color: inherit; }
+:is(#crumb, #gcrumb) svg.door { width: 9px; height: 9px; color: var(--door); stroke-width: 1.4; opacity: 1; }
 /* the last step is where the reader stands, so it is the one that is not faint */
 :is(#crumb, #gcrumb) .step.now { flex: 0 1 auto; min-width: 3em; color: var(--ink); cursor: default; }
 :is(#crumb, #gcrumb) .step.now.opens { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .22em; }
@@ -8062,6 +8099,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #areas:not(.alone) :is(#crumb, #gcrumb) { top: var(--way-top); height: ${WAY.height}px; }
 /* wide, a level is cut only where it is long, so a short name keeps its whole width and every level stays */
 #areas:not(.alone) :is(#crumb, #gcrumb) .step:not(.more) { flex: 0 0 auto; max-width: 16em; min-width: 0; }
+#areas:not(.alone) :is(#crumb, #gcrumb) .step.now { max-width: 24em; }
 /* a gap is taken hold of where it stands, and nothing is drawn for it but the pointer saying so */
 #seams { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .seam { position: absolute; top: 0; bottom: 0; pointer-events: auto; cursor: col-resize; }
