@@ -154,7 +154,7 @@ What is laid open beside the way is the tree's own and lasts only while the page
 
 Beneath the way the reading open stands as the lane holds it: one row per brief in the lane, nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
 
-A row carries its number faint before its name, and after it, where it is folded or is a card, [the figure of what it hides](canvas.md#46-a-folded-node-says-how-deep-it-is) at about half its length, as text does on the canvas. A card is underlined in its branch's hue, as a name that opens onto a reading of its own is, with its status after it. The rows on the way to the focus take their branch's ink.
+A row carries its number faint before its name, and after it, where it is folded or is a card, [the figure of what it hides](canvas.md#46-a-folded-node-says-how-deep-it-is) at about half its length, as text does on the canvas. A card is underlined in its branch's hue, as a name that opens onto a reading of its own is, with its status after it, and carries no fold mark, since it opens rather than folds. Where a row is short of room its figure gives way first, then its status, and its name last. The rows on the way to the focus take their branch's ink.
 
 Pressing a row's name goes to the brief. A line lies across the highlighted row and glides as the highlight moves. The wing scrolls only to keep the focus in view, driven by the lane and never free.
 
