@@ -8105,13 +8105,15 @@ body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)
    through: it takes the middle two fifths of its slice as a run, the whole slice spread across a card reading too wide,
    lightly, as tinted frosted glass would, by the ground's
    meter even where the ground itself is plain, so at the root each part's card is its own hue */
-body.tinted .brief .card { --n0: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) - (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); --n1: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) + (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--n0)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--n0))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) calc((var(--n0) + var(--n1)) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) calc((var(--n0) + var(--n1)) / 2))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1)) var(--n1)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--n1)))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
+body.tinted .brief .card { --n0: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) - (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); --n1: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) + (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n0)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n0))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) calc((var(--n0) + var(--n1)) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) calc((var(--n0) + var(--n1)) / 2))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n1)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n1)))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
+/* a card the reading is not on, nor the pointer, keeps its lightness and holds back its colour, so the lit one stands out */
+body.tinted .brief .card:not(.here):not(.lit) { --cs: .45; }
 /* its edge is its own slice's run in the pale tone, a step deeper than its fill, rather than a grey line, which on a
    coloured ground reads as laid over it; the card the reading stands on or the pointer is on takes the lit run as ever */
 body.tinted .brief .card:not(.here):not(.lit) { outline-color: transparent; }
 body.tinted .brief .card:not(.here):not(.lit)::before { --h0: var(--n0); --h1: var(--n1); opacity: 1; background: ${roleRun("rest")}; }
-/* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
-:is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
+/* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's and a card's with it */
+:is(.brief .head .title, .opening h1, .brief .card-head) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
 html { -webkit-tap-highlight-color: transparent; }
 body { display: flex; flex-direction: column; background: var(--ground); color: var(--ink); font-family: var(--prose-face); font-size: var(--body); font-weight: calc(400 - var(--thin)); line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; }
@@ -8476,7 +8478,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
 .brief .card-body { min-width: 0; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
-.brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h3); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
+.brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
 .brief .card .stamp { flex: none; white-space: nowrap; }
 .brief .card p { margin-bottom: 10px; }
 .brief .card p:last-of-type { margin-bottom: 0; }
