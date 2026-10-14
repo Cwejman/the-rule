@@ -2620,7 +2620,7 @@ const programIcon = (k: string): string =>
 
 const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
-  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => 280, grow: true, onFocus: true },
+  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => treeWidth, grow: true, onFocus: true },
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
   // the plate is the body whole, so it stays the body while the history is read
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => onBody(() => plateSvg(w, h)), width: () => onBody(plateWidth), grow: false, onFocus: true },
@@ -5639,6 +5639,7 @@ function drawStacks(): void {
       boxes.set(x.it.k, { x: col.x, y: Math.round(y), w: col.w, h: height });
       // a slot shorter than a figure can draw in is left empty rather than drawn at a scale below nothing
       if (x.f.grow) x.el.innerHTML = height >= FIGURE_FLOOR ? x.f.draw(W, height) : "";
+      if (x.it.k === "tree") fitTree(x.el);
       const next = slotted[i + 1];
       if (next && x.f.grow && next.f.grow) stackGaps.push({ c: col.c, i: L[col.c].items.indexOf(x.it), x: col.x, w: col.w, y: y + height, h: s.gap });
       y += height + s.gap + HEADROOM;
@@ -5650,6 +5651,26 @@ function drawStacks(): void {
 }
 
 /** Draws one figure again where it already stands, for what changes with the focus or the pointer. */
+/**
+ * The width the tree takes: what its rows need, measured as it is laid, between a least and a most past which a long
+ * name is cut. Its rows change with the folds and the scope rather than with each step, so the row is laid again
+ * only when the width it needs has changed.
+ */
+let treeWidth = 280;
+const TREE_WIDTH = { least: 150, most: 320 };
+function fitTree(el: HTMLElement): void {
+  const tree = el.querySelector<HTMLElement>(".tree");
+  if (!tree) return;
+  tree.style.width = "max-content";
+  tree.style.maxWidth = "none";
+  const need = Math.ceil(clamp(tree.getBoundingClientRect().width + 2, TREE_WIDTH.least, TREE_WIDTH.most));
+  tree.style.width = "";
+  tree.style.maxWidth = "";
+  if (Math.abs(need - treeWidth) <= 2) return;
+  treeWidth = need;
+  requestAnimationFrame(drawAll);
+}
+
 function drawHosted(k: string): void {
   const el = hostOf(k);
   const at = slots.get(`fig:${k}`);
@@ -5659,7 +5680,7 @@ function drawHosted(k: string): void {
   if (k === "plate") setPlate(el, f.draw(Math.round(col.w), at.height));
   else el.innerHTML = f.draw(Math.round(col.w), at.height);
   // the tree's water is measured from its rows, which only stand once it is laid
-  if (k === "tree") drawLaser();
+  if (k === "tree") fitTree(el), drawLaser();
   // a figure of fixed size takes the height it needs, so one that now needs another lays its stack again
   if (!f.grow) {
     el.style.height = "";
