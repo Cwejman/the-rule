@@ -2628,7 +2628,7 @@ const programIcon = (k: string): string =>
 
 const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
-  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => treeWidth, grow: true, onFocus: true },
+  tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => Math.min(treeNeed, TREE_WIDTH.most), grow: true, onFocus: true },
   ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
   // the plate is the body whole, so it stays the body while the history is read
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => onBody(() => plateSvg(w, h)), width: () => onBody(plateWidth), grow: false, onFocus: true },
@@ -2826,8 +2826,8 @@ const aloneIn = (c: Column): string | null => c.items.find((it) => isAlone(it.k)
  * rows a reader may rather see cut or wrapped than wide.
  */
 const pullable = (c: Column | undefined): boolean => !!c && (aloneIn(c) !== null || c.items.some((it) => it.k === "tree"));
-/** A figure's own width in its column: the tree's never past where it was pulled to, nor past what its rows need. */
-const ownIn = (c: Column, k: string): number => (k === "tree" && c.w ? Math.max(TREE_WIDTH.least, Math.min(c.w, PROGRAMS.tree.own())) : PROGRAMS[k].own());
+/** A figure's own width in its column: the tree's, pulled, the pull, never past what its rows need on one line. */
+const ownIn = (c: Column, k: string): number => (k === "tree" && c.w ? Math.max(TREE_WIDTH.least, Math.min(c.w, treeNeed)) : PROGRAMS[k].own());
 /** The width a column stands at of its own: a lone program at its pulled width or its own, a stack of figures at its widest. */
 const colOwn = (c: Column): number => {
   const a = aloneIn(c);
@@ -5668,22 +5668,27 @@ function drawStacks(): void {
 
 /** Draws one figure again where it already stands, for what changes with the focus or the pointer. */
 /**
- * The width the tree takes: what its rows need, measured as it is laid, between a least and a most past which a long
- * name is cut. Its rows change with the folds and the scope rather than with each step, so the row is laid again
- * only when the width it needs has changed.
+ * The width the tree's rows need, every name on one line, measured as it is laid. Unpulled the tree takes it up to a
+ * most, past which a long name is cut or wraps; pulled it takes it up to the pull, as wide as its longest name at
+ * the widest. Its rows change with the folds and the scope rather than with each step, so the row is laid again
+ * only when the need has changed.
  */
-let treeWidth = 280;
-const TREE_WIDTH = { least: 120, most: 320 };
+let treeNeed = 280;
+const TREE_WIDTH = { least: 120, most: 320, widest: 640 };
 function fitTree(el: HTMLElement): void {
   const tree = el.querySelector<HTMLElement>(".tree");
   if (!tree) return;
+  // what the rows need is every name on one line, so an open tree, whose names wrap, is measured as a dense one
+  const open = tree.classList.contains("open");
+  tree.classList.remove("open");
   tree.style.width = "max-content";
   tree.style.maxWidth = "none";
-  const need = Math.ceil(clamp(tree.getBoundingClientRect().width + 2, TREE_WIDTH.least, TREE_WIDTH.most));
+  const need = Math.ceil(clamp(tree.getBoundingClientRect().width + 2, TREE_WIDTH.least, TREE_WIDTH.widest));
   tree.style.width = "";
   tree.style.maxWidth = "";
-  if (Math.abs(need - treeWidth) <= 2) return;
-  treeWidth = need;
+  if (open) tree.classList.add("open");
+  if (Math.abs(need - treeNeed) <= 2) return;
+  treeNeed = need;
   requestAnimationFrame(drawAll);
 }
 
@@ -8908,7 +8913,7 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .adj.foot .gloss { margin-bottom: 2px; }
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
 
-.tree { --tick: 10px; position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; max-width: 320px; }
+.tree { --tick: 10px; position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; }
 /* open, the rows stand apart and a long name wraps rather than being cut, the marks before it held to its first line */
 .tree.open { --tick: 13px; line-height: 1.4; }
 .tree.open .row { align-items: flex-start; min-height: 26px; padding-block: 3px; }
