@@ -144,9 +144,13 @@ Pressing a step goes there, and pressing one above the reading open takes the la
 
 Each step of the way but the root says after its name how many stand beside it in its level, and pressing that lays the level whole in place.
 
-The step then stands among its siblings, so a reader sees what the way passed by without scrolling the lane or leaving the reading. Pressed again, the level closes back to the step. A sibling is a row as any row of the outline, its number, its name and the figure of what it hides, and pressing it goes there.
+The step then stands among its siblings, so a reader sees what the way passed by without scrolling the lane or leaving the reading. Pressed again, the level closes back to the step. A sibling is a row as any row of the outline, its number and its name, with [the files it holds](#23-the-reading-open-as-an-outline) beneath it, and pressing it goes there.
 
 What is laid open beside the way is the tree's own and lasts only while the page is open: it moves nothing in the lane.
+
+The tree may also stand every step among its level at once, a setting in its head that a layout holds: the way then runs down through the whole of each level it passes, each parent among its siblings and each sibling with its files beneath it, so the reading open is seen in its place in the body rather than as a line down to it. The counts are not offered then, since every level already stands whole.
+
+*The whole way, the author's ask of 2026-10-14, to give perspective on the whole.*
 
 *The session's, 2026-10-14, proposed to the author, who let it stand.*
 
