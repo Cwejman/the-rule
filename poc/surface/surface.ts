@@ -8090,13 +8090,14 @@ const CSS = `
 html, body { margin: 0; height: 100%; }
 /* the ground may take the part of the reading open's slice the screen stands over, top to foot, as strongly as its
    meter says: its chroma and its step from plain grow with --ghk, and the part eases as the reader moves, since a
-   number registered is one a transition carries.
+   number registered is one a transition carries. It eases slowly, over a second and a half, so a change of
+   place is felt as a drift of the light rather than a cut.
    What paints the ground solid takes the run's middle; at nought nothing of it is set */
 @property --gh0 { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --gh1 { syntax: "<number>"; inherits: true; initial-value: 360; }
 @property --ghk { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --ghc { syntax: "<number>"; inherits: true; initial-value: 1; }
-body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 .3s, --gh1 .3s, --ghk .2s, --ghc .5s; }
+body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 1.6s ease, --gh1 1.6s ease, --ghk 1.2s ease, --ghc 1.6s ease; }
 html body.tinted { background-image: linear-gradient(180deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
 /* on a ground that takes the hue the greys take it too, as far as the ground does: a neutral grey on a coloured ground
    reads as something laid over it, and the ink, the muted and the faint keep their lightness and lean to the hue */
