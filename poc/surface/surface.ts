@@ -1458,6 +1458,8 @@ type Settings = {
   fade: number;
   /** the spacing of the prose's lines, as a multiple of the serif's size */
   leading: number;
+  /** the height of a file's bar where the files a brief holds are drawn, in pixels */
+  figure: number;
   /** the most width the canvas takes beside or without the lane, so a wide screen keeps its space */
   canvas: number;
   /** where the reading line stands: always at the middle, or easing onto the opening and the last brief at the ends */
@@ -1527,6 +1529,7 @@ const DEFAULTS: Settings = {
   dim: 0.4,
   fade: 12,
   leading: 1.45,
+  figure: 4,
   canvas: 720,
   line: "ends",
   weight: "cost",
@@ -2515,7 +2518,7 @@ function cardHtml(a: string): string {
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${huedRun(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
-    `<div class="card-body">${blocks(shown)}</div>` +
+    `<div class="card-body">${level(a).length ? `<div class="card-files">${filesHtml(a)}</div>` : ""}${blocks(shown)}</div>` +
     line +
     `</div>`
   );
@@ -3368,51 +3371,11 @@ function treeHtml(): string {
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
-  // a row that hides levels draws them beneath it as a tree on its side: from a point under the name a line forks to
-  // each brief of the level it hides, and each forks again, a level a step to the right, to the full depth. A line is
-  // as thick as the branch it leads to weighs, its own text and everything beneath it, and a brief's own text is a dot
-  // where it stands, so how deep a branch reaches, where it divides and where its weight lies read as one shape
+  // a row that hides levels draws beneath it the files it holds, as the cards do, under its name
   const sprout = (b: Brief): string => {
     if (settings.treeSprouts !== "shown") return "";
     const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
-    if (!hides || !level(b.address).length) return "";
-    const own = (a: string): number => Math.max(1, state.index!.own.get(a) ?? 0);
-    const weight = new Map<string, number>();
-    const weigh = (a: string): number => {
-      const w = own(a) + level(a).reduce((n, k) => n + weigh(k.address), 0);
-      weight.set(a, w);
-      return w;
-    };
-    const total = weigh(b.address) - own(b.address);
-    const most = settings.treeRoom === "open" ? 96 : 64;
-    const H = clamp(6 + Math.log2(1 + total / 4000) * 9, 12, most);
-    // each brief takes a share of the height as its branch weighs, and stands at the middle of its share
-    const lines: string[] = [];
-    const dots: string[] = [];
-    let deep = 0;
-    const nodes: { a: string; d: number; y: number; from: number; w: number }[] = [];
-    const lay = (a: string, d: number, y0: number, from: number): void => {
-      let y = y0;
-      for (const c of level(a)) {
-        const h = (weight.get(c.address)! / total) * H;
-        nodes.push({ a: c.address, d, y: y + h / 2, from, w: weight.get(c.address)! });
-        deep = Math.max(deep, d + 1);
-        lay(c.address, d + 1, y, y + h / 2);
-        y += h;
-      }
-    };
-    lay(b.address, 0, 0, H / 2);
-    const dx = clamp(Math.floor(190 / deep), 9, 26);
-    const thick = (w: number): number => clamp(0.5 + Math.sqrt(w / total) * 4.5, 0.5, 4.5);
-    for (const n of nodes) {
-      const x0 = n.d * dx + 1.5;
-      const x1 = x0 + dx;
-      const m = (x0 + x1) / 2;
-      lines.push(`<path d="M${x0.toFixed(1)} ${n.from.toFixed(2)}C${m.toFixed(1)} ${n.from.toFixed(2)} ${m.toFixed(1)} ${n.y.toFixed(2)} ${x1.toFixed(1)} ${n.y.toFixed(2)}" stroke-width="${thick(n.w).toFixed(2)}" ${hued(n.a)}/>`);
-      dots.push(`<circle cx="${x1.toFixed(1)}" cy="${n.y.toFixed(2)}" r="${clamp(0.6 + Math.sqrt(own(n.a) / total) * 3, 0.6, 2.6).toFixed(2)}" ${hued(n.a)}/>`);
-    }
-    const tip = `${nodes.length} ${nodes.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep, ${Math.round(total / 1000)}k characters`;
-    return `<div class="sprout" title="${tip}"><svg width="${deep * dx + 6}" height="${Math.ceil(H) + 2}"><g class="limbs">${lines.join("")}</g><g class="buds">${dots.join("")}</g></svg></div>`;
+    return hides && level(b.address).length ? `<div class="sprout">${filesHtml(b.address)}</div>` : "";
   };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
   // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
@@ -3608,7 +3571,7 @@ function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null;
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads" | "figure"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
@@ -3617,11 +3580,12 @@ const KNOBS: Knob[] = [
   { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
   { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
   { key: "tint", row: "page", name: "ground hue", min: 0, max: 1, step: 0.05, glyph: `<rect x="3" y="3" width="10" height="10" rx="2"/><path d="M3 9.5 9.5 3M6.5 13 13 6.5"/>` },
+  { key: "figure", row: "page", name: "file figures", min: 2, max: 9, step: 0.5, glyph: `<path d="M3 5h7M5 8h5M5 11h8M3 5v6"/>` },
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
 ];
 
 /** A knob's value as it reads: the gap in pixels, the fade as a share of the height, the rest to two places. */
-const knobText = (k: Knob, v: number): string => (k.key === "gap" ? `${Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2));
+const knobText = (k: Knob, v: number): string => (k.key === "gap" || k.key === "figure" ? `${k.key === "figure" ? v : Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2));
 
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
 function meterArc(t: number, r: number): string {
@@ -4382,6 +4346,37 @@ function closeReading(r: string): void {
   // what stood open inside it goes with it, since nothing there can be reached once its way is shut
   state.opened = state.opened.filter((a) => a !== r && !a.startsWith(r + "/"));
   pickNode(r, null, false);
+}
+
+/**
+ * The files a brief holds, as the outline lays them: its own row first, a bar as long as its text and everything beneath
+ * it short of a file, then each file placed beneath it, a step right per file placed in a file, on the tree's spine and
+ * ticks. A file is one bar, not its briefs, since a tree of every brief grows past any room; the bar parts at its three
+ * heaviest sections where each holds a share worth telling, and the rest of it runs as one quiet stretch. The bars'
+ * height is the reader's, a meter, and the outline and the cards draw the same figure.
+ */
+function filesHtml(a: string): string {
+  const own = (x: string): number => state.index!.own.get(x) ?? 0;
+  const within = (x: string): number => own(x) + level(x).reduce((n, k) => n + (isCard(k) ? 0 : within(k.address)), 0);
+  const placed = (x: string): Brief[] => level(x).flatMap((k) => (isCard(k) ? [k] : placed(k.address)));
+  const bar = (x: string): string => {
+    const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, w: within(k.address) }));
+    const total = Math.max(1, own(x) + sections.reduce((n, c) => n + c.w, 0));
+    const L = clamp(Math.log2(1 + total / 300) * 11, 3, 90);
+    const heavy = new Set([...sections].sort((p, q) => q.w - p.w).slice(0, 3).filter((c) => c.w / total > 0.08));
+    const runs: { w: number; big: boolean; names: string[] }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
+    for (const c of sections) {
+      const r = runs[runs.length - 1];
+      if (r && !r.big && !heavy.has(c)) (r.w += c.w), r.names.push(c.t);
+      else runs.push({ w: c.w, big: heavy.has(c), names: [c.t] });
+    }
+    return runs.map((r) => `<i${r.big ? "" : ` class="q"`} style="width:${Math.max(1, (L * r.w) / total - 1).toFixed(1)}px" title="${esc(r.names.join(" · "))}"></i>`).join("");
+  };
+  const node = (x: string): string => {
+    const kids = placed(x);
+    return `<div class="fnode" ${hued(x)}><div class="frow">${bar(x)}</div>${kids.length ? `<div class="fkids">${kids.map((k) => node(k.address)).join("")}</div>` : ""}</div>`;
+  };
+  return `<div class="files">${node(a)}</div>`;
 }
 
 /**
@@ -5450,6 +5445,8 @@ function drawLayout(): void {
   root.setProperty("--head-tight", s.headings === "mono" ? "0" : "1");
   root.setProperty("--gap", `${s.gap}px`);
   root.setProperty("--dim", `${s.dim}`);
+  root.setProperty("--figure", `${s.figure}px`);
+  document.body.classList.toggle("narrow", narrow());
   root.setProperty("--edge", `${s.fade}%`);
   // wide nothing stands over the prose's box, so it keeps no clear rim at its top, only the fade
   root.setProperty("--rim-top", narrow() ? `${RIM.top}%` : "0%");
@@ -8866,12 +8863,20 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .pointing .tree .row.here:not(.lit) .name { color: var(--ink); font-weight: calc(500 - var(--thin)); }
 /* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
 /* where a row is short of room its figure gives way first, then its status, and its name last */
-.tree .sprout { margin: -1px 0 2px var(--under, 19px); line-height: 0; pointer-events: none; }
-.tree .sprout svg { display: block; overflow: visible; }
-.tree .sprout .spine { stroke: var(--track); stroke-width: 1; fill: none; }
-.tree .sprout .limbs path { fill: none; stroke: var(--door); stroke-linecap: round; opacity: .6; }
-.tree .sprout .buds circle { fill: var(--door); opacity: .85; }
-.tree .row:is(:hover, .lit) + .sprout :is(path, circle) { opacity: 1; }
+.files { --fh: var(--figure, 4px); --fp: calc(var(--fh) + 3px); line-height: 0; }
+.files .frow { position: relative; display: flex; align-items: center; gap: 1px; height: var(--fp); }
+.files .frow i { flex: none; height: var(--fh); border-radius: calc(var(--fh) / 2); background: var(--door); opacity: .85; }
+.files .frow i.q { opacity: .35; }
+.files .fkids { padding-left: 9px; }
+.files .fkids > .fnode { position: relative; }
+.files .fkids > .fnode::before { content: ""; position: absolute; left: -6px; top: 0; bottom: 0; width: 1px; background: var(--track); }
+.files .fkids > .fnode:last-child::before { bottom: auto; height: calc(var(--fp) / 2 + .5px); }
+.files .fkids > .fnode > .frow::before { content: ""; position: absolute; left: -6px; top: calc(50% - .5px); width: 5px; height: 1px; background: var(--track); }
+.tree .sprout { margin: 0 0 3px var(--under, 19px); }
+.tree .row:is(:hover, .lit) + .sprout .frow i { opacity: 1; }
+.tree .row:is(:hover, .lit) + .sprout .frow i.q { opacity: .5; }
+.brief .card .card-files { float: right; margin: .35em 0 .5em 1.5em; max-width: 45%; }
+body.narrow .brief .card .card-files { float: none; max-width: none; margin: 0 0 .7em; }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
 .tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
