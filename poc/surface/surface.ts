@@ -1506,6 +1506,8 @@ type Settings = {
   colourFrom: "root" | "scope";
   /** whether the way down names every brief on the way to the focus, or only the files, the focus told by its number */
   crumb: "brief" | "file";
+  /** whether the tree stands dense, a row a line and a long name cut, or open, with room between rows and names whole */
+  treeRoom: "dense" | "open";
   /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
   tint: number;
   /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
@@ -1549,6 +1551,7 @@ const DEFAULTS: Settings = {
   colour: "brief",
   colourFrom: "root",
   crumb: "brief",
+  treeRoom: "dense",
   tint: 0,
   heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
@@ -3318,16 +3321,35 @@ function drawOverview(): void {
 
 /** The levels of the way laid whole in the tree, around the step that stands in them: the tree's own, and the page's only. */
 const besideOpen = new Set<string>();
+/**
+ * The way the tree's water ran to before the focus last moved, and when it moved: only the stretch newly reached flows,
+ * and a tree drawn again while it flows takes it up where it was rather than starting it over.
+ */
+let treeFlow: { focus: string | null; before: Set<string>; at: number } = { focus: null, before: new Set(), at: 0 };
 
 function treeHtml(): string {
   const S = state.scope;
   const body = state === bodyWorld;
   const onWay = new Set(prefixesOf(state.focus));
+  // the way to the focus fills as water runs through pipes, from the top down, and only what it newly reaches flows:
+  // a step down the reading flows one level, and a move across the body flows from where the old way and the new part
+  const way0 = prefixesOf(state.focus);
+  if (treeFlow.focus !== state.focus) treeFlow = { focus: state.focus, before: new Set(treeFlow.focus === null ? [] : prefixesOf(treeFlow.focus)), at: performance.now() };
+  const since = (performance.now() - treeFlow.at) / 1000;
+  const fresh = since > 2 ? [] : way0.filter((a) => !treeFlow.before.has(a));
+  const first = fresh.length ? depthOf(fresh[0]) : 0;
   const reading = (a: string): boolean => body && (a === "" || isCard(brief(a)));
   // a node is its row and what hangs beneath it; the tick into its row says what reaching it crosses, the hue of the
   // reading entered at a file's boundary, the branch's ink on the way to the focus, and the quiet line otherwise
-  const node = (a: string, row: string, kids: string): string =>
-    `<div class="node${reading(a) && a !== "" ? " door" : ""}${onWay.has(a) ? " on" : ""}" ${hued(a)}>${row}${kids ? `<div class="kids">${kids}</div>` : ""}</div>`;
+  const node = (a: string, row: string, kids: string): string => {
+    // the level the way runs down carries the water down its line, from its top to the row the way passes into
+    const next = onWay.has(a) ? way0[depthOf(a) + 1] : undefined;
+    const delay = (x: string): string => `--delay:${((depthOf(x) - first) * 0.16 - since).toFixed(3)}s`;
+    const flow = next === undefined ? "" : fresh.includes(next) ? `<i class="flow fresh" style="${delay(next)}"></i>` : `<i class="flow"></i>`;
+    const newly = a !== "" && fresh.includes(a);
+    const cls = ["node", reading(a) && a !== "" ? "door" : "", onWay.has(a) ? "on" : "", newly ? "fresh" : ""].filter(Boolean).join(" ");
+    return `<div class="${cls}" style="${hueVars(a)}${newly ? `;${delay(a)}` : ""}">${row}${kids ? `<div class="kids">${flow}${kids}</div>` : ""}</div>`;
+  };
   const num = (b: Brief, root: string): string => {
     const n = reading(b.address) ? "" : numberIn(b, root);
     return n ? `<span class="num">${esc(n)}</span>` : "";
@@ -3381,7 +3403,7 @@ function treeHtml(): string {
           : step(i + 1);
     return node(a, stepRow(a, i), kids);
   };
-  return `<div class="tree">${step(0)}<div class="laser"></div></div>`;
+  return `<div class="tree${settings.treeRoom === "open" ? " open" : ""}">${step(0)}</div>`;
 }
 
 // ## 3.6 The ahead: what lies beneath, and is not in the lane
@@ -3582,7 +3604,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb" | "treeRoom"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3592,6 +3614,7 @@ const SWITCHES: Switch[] = [
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
+  { key: "treeRoom", name: "the tree", values: ["dense", "open"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
@@ -5553,6 +5576,8 @@ function drawHosted(k: string): void {
   if (el.hidden || !at || !col || f?.kind !== "figure") return;
   if (k === "plate") setPlate(el, f.draw(Math.round(col.w), at.height));
   else el.innerHTML = f.draw(Math.round(col.w), at.height);
+  // the tree's water is measured from its rows, which only stand once it is laid
+  if (k === "tree") drawLaser();
   // a figure of fixed size takes the height it needs, so one that now needs another lays its stack again
   if (!f.grow) {
     el.style.height = "";
@@ -6249,29 +6274,26 @@ function drawFocusMarks(): void {
   drawLaser();
 }
 
-/** The tree's line lies under the highlighted row: the pointed brief while pointing, the focus otherwise. */
+/**
+ * The water in the tree's lines: down each level the way passes through, from the level's top to the row it passes into,
+ * measured once the rows are laid, since a name that wraps sets where the next row stands. And the wing keeps the focus
+ * in view, driven by the lane and never free.
+ */
 function drawLaser(): void {
-  // the tree draws the world the keys act in, so only that world moves its line
+  // the tree draws the world the keys act in, so only that world moves its water
   if (worldNow() !== keysWorld()) return;
   const tree = ui.areas.querySelector<HTMLElement>(".tree");
-  const laser = tree?.querySelector<HTMLElement>(".laser");
-  if (!tree || !laser) return;
-  const a = state.pointed !== null && tree.querySelector(`.row[data-a="${cssEsc(state.pointed)}"]`) ? state.pointed : state.focus;
-  const row = tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(a)}"]`);
-  laser.hidden = !row;
-  if (!row) return;
-  // the line takes the hue of the brief it lies under, as the reading line's marks do
-  hueVars(a).split(";").forEach((kv) => {
-    const [k, v] = kv.split(":");
-    if (k && v !== undefined) laser.style.setProperty(k, v);
+  if (!tree) return;
+  const tick = parseFloat(getComputedStyle(tree).getPropertyValue("--tick")) || 10;
+  all<HTMLElement>(".flow", tree).forEach((f) => {
+    const kids = f.parentElement!;
+    const into = kids.querySelector<HTMLElement>(":scope > .node.on > .row");
+    f.style.height = into ? `${Math.max(0, into.getBoundingClientRect().top - kids.getBoundingClientRect().top + tick)}px` : "0px";
   });
-  // rows nest in nodes, so where a row stands is read against the tree rather than from its offsets
+  const row = tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(state.focus)}"]`);
+  if (!row) return;
   const rr = row.getBoundingClientRect();
   const tr = tree.getBoundingClientRect();
-  laser.style.top = `${rr.bottom - tr.top - 1}px`;
-  laser.style.left = `${rr.left - tr.left}px`;
-  laser.style.width = `${rr.width}px`;
-  if (a !== state.focus) return;
   const wing = tree.closest<HTMLElement>(".slot")!;
   const wr = wing.getBoundingClientRect();
   if (rr.top < wr.top + 24 || rr.bottom > wr.bottom - 48) wing.scrollTo({ top: rr.top - tr.top - wing.clientHeight / 2, behavior: "smooth" });
@@ -8698,16 +8720,31 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .adj.foot .gloss { margin-bottom: 2px; }
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
 
-.tree { position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; max-width: 320px; }
+.tree { --tick: 10px; position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; max-width: 320px; }
+/* open, the rows stand apart and a long name wraps rather than being cut, the marks before it held to its first line */
+.tree.open { --tick: 13px; line-height: 1.4; }
+.tree.open .row { align-items: flex-start; min-height: 26px; padding-block: 3px; }
+.tree.open .name { white-space: normal; overflow: visible; }
+.tree.open .row > :is(.mark, .ring, .num) { margin-top: 2px; }
+.tree.open .row > :is(.stamp, .through, .marks, .beside) { margin-top: 5px; }
+.tree.open .kids > .node > .row::after { top: var(--tick); }
 /* the tree is drawn as a file tree is: a level steps in, and its line drops from beneath the mark of the row that holds
    it, each node beneath carrying its stretch of the line and the last only down to its own row */
 .tree .node { position: relative; }
 .tree .kids { padding-left: 14px; }
 .tree .kids > .node::before { content: ""; position: absolute; left: -7px; top: 0; bottom: 0; width: 1.25px; background: var(--track); }
-.tree .kids > .node:last-child::before { bottom: auto; height: 11px; }
+.tree .kids > .node:last-child::before { bottom: auto; height: calc(var(--tick) + 1px); }
+/* the water: down the line of each level the way passes through, to the row it passes into, in the hue of the level;
+   what is newly reached runs from the top down, a level after the one above it */
+.tree .kids { position: relative; }
+.tree .flow { position: absolute; z-index: 1; left: 6.9px; top: 0; width: 1.5px; height: 0; border-radius: 1px; background: var(--on); transform-origin: top; pointer-events: none; }
+.tree .flow.fresh { animation: tree-flow .22s cubic-bezier(.4, 0, .6, 1) var(--delay, 0s) both; }
+@keyframes tree-flow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.tree .kids > .node.fresh > .row::after { transform-origin: left; animation: tree-tick .12s ease-out calc(var(--delay, 0s) + .2s) both; }
+@keyframes tree-tick { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 /* the tick into a row says what reaching it crosses: the branch's ink on the way to the focus, and the hue of the
    reading entered, a step stronger, at a file's boundary */
-.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: 10px; width: 7px; height: 1.25px; background: var(--track); }
+.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: var(--tick); width: 7px; height: 1.25px; background: var(--track); }
 .tree .kids > .node.on > .row::after { background: var(--on); }
 .tree .kids > .node.door > .row::after { height: 1.5px; background: var(--door); }
 .tree .row { position: relative; display: flex; align-items: center; gap: 5px; min-height: 21px; padding: 0 6px 0 0; border-radius: 6px; }
@@ -8736,7 +8773,6 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .beside { flex: none; margin-left: 1px; padding: 0 4px; border: 0; border-radius: 4px; background: none; font: inherit; font-size: .82em; line-height: 1.5; color: var(--faint); cursor: pointer; transition: color .15s, background .15s; }
 .tree .beside:hover { color: var(--on); background: var(--track); }
 .tree .beside.on { color: var(--ink); background: var(--track); }
-.tree .laser { position: absolute; height: 1.5px; background: var(--on); border-radius: 1px; transition: top .28s cubic-bezier(.2,.7,.2,1), left .28s, width .28s; pointer-events: none; }
 
 svg.fig { display: block; overflow: visible; touch-action: none; user-select: none; }
 svg.fig .cell { cursor: pointer; }
