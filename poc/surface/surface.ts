@@ -2591,6 +2591,10 @@ const ICON: Record<string, string> = {
   follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
   scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
   files: `<path d="M4.5 2h4.5l2.5 2.5V14h-7z"/><path d="M9 2v2.5h2.5"/>`,
+  nesting: `<path d="M4 3v10M4 6h7M4 10.5h7"/>`,
+  line: `<path d="M2.5 8h11"/><path d="M5 4.5h6M5 11.5h6" opacity=".45"/>`,
+  flick: `<path d="M4.5 11.5 11 5M7.5 5H11v3.5"/><path d="M3 8.5l1.5-1.5M6 13l1.5-1.5" opacity=".45"/>`,
+  side: `<rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2.5 10.5h11" opacity=".5"/>`,
   whole: `<path d="M3 3h4M5 6.5h4M5 10h4M5 13.5h4M4 4.5v9"/><path d="M11 6.5h2.5M11 10h2.5" opacity=".5"/>`,
   sprout: `<path d="M3 3h6M5 5.5v7M5 8.5h4M5 12.5h6"/>`,
   spaced: `<path d="M2.5 3.5h11M2.5 12.5h11M8 5.5v5M6.5 7 8 5.5 9.5 7M6.5 9 8 10.5 9.5 9"/>`,
@@ -3608,17 +3612,15 @@ const IDLE_NARROW = new Set(["ahead", "flick", "room", "dock"]);
 const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
 /**
- * The settings in groups by what they change, each group its meters first and its switches after: the type, the
- * colour, the page and how the reading moves, then the canvas's and git's own. A setting a program holds in its head
- * is set there and is not among these.
+ * The settings that are the whole page's, in groups by what they change, each group its meters first and its switches
+ * after: the type, the colour, the page and the body. What one program or one part of the page holds is pressed where
+ * it stands, in its head, on the way down or on the dock, and is not among these.
  */
 const GROUPS: { name: string; knobs: Knob["key"][]; switches: Switch["key"][] }[] = [
   { name: "type", knobs: ["zoom", "ratio", "leading"], switches: ["headings", "prose"] },
   { name: "colour", knobs: ["heads", "tint"], switches: ["theme", "colour", "colourFrom"] },
-  { name: "page", knobs: ["gap", "dim", "fade", "figure"], switches: ["room", "dock"] },
-  { name: "reading", knobs: [], switches: ["line", "crumb", "ahead", "flick", "weight"] },
-  { name: "the canvas", knobs: [], switches: ["tree", "face"] },
-  { name: "git", knobs: [], switches: ["git"] },
+  { name: "page", knobs: ["gap", "dim", "fade", "figure"], switches: ["room"] },
+  { name: "the body", knobs: [], switches: ["weight", "git"] },
 ];
 
 /** A meter's word beneath it, one word that fits its column; its full name is its tip. */
@@ -3650,7 +3652,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3662,7 +3664,6 @@ const SWITCHES: Switch[] = [
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
-  { key: "face", name: "the face", values: ["shown", "hidden"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
   { key: "room", name: "room left over", values: ["spread", "centred"] },
   { key: "dock", name: "the dock", values: ["foot", "left"] },
@@ -5783,14 +5784,28 @@ function mapFromAct(w: "body" | "history"): string {
 }
 
 /** A program's own settings, which stand in its head: the prose's gutters, the canvas's face and the way its root runs. */
+/**
+ * A setting of a few values that one program or one part of the page holds, pressed where it stands to its next value:
+ * lit where it stands away from where a reader starts, and its tip saying what it is now and what a press makes it.
+ */
+function switchPress(key: Switch["key"], glyph: string, said: Record<string, string>): string {
+  const w = SWITCHES.find((x) => x.key === key)!;
+  const now = settings[key] as string | number;
+  const next = w.values[(w.values.indexOf(now) + 1) % w.values.length];
+  const tip = `${said[String(now)]} — press for ${said[String(next)]}`;
+  return `<button class="pick${now !== DEFAULTS[key] ? " on" : ""}" data-set="${key}" data-value="${next}" data-tip="${esc(tip)}">${icon(glyph)}</button>`;
+}
+
 function headSettings(k: string): string {
   const w = PROGRAMS[k]?.world ?? "body";
   // a canvas's acts are its world's, so what they say is reckoned there
   if (k === "canvas" || k === "gitCanvas") {
     const on = settings.follow[w];
     const tip = on ? "follows where you are as you move — press to keep the view where you leave it" : "keeps the view where you leave it — press to follow where you are as you move";
-    return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + mapFromAct(w) + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
+    const nesting = switchPress("tree", "nesting", { spine: "a level hangs from a spine", thread: "a thread runs through a level's rows" });
+    return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + nesting + mapFromAct(w) + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
   }
+  if (k === "ahead") return shownHere("ahead") ? switchPress("ahead", "ahead", { hidden: "answers for a brief that hides something", always: "answers for every brief with anything beneath it" }) : "";
   if (k === "plate") {
     const on = settings.plate === "scope";
     const tip = on ? "draws the reading you are scoped to — press to draw the body whole" : "draws the body whole — press to draw only the reading you are scoped to";
@@ -5816,7 +5831,9 @@ function headSettings(k: string): string {
   }
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
-  return ([0, 1] as const)
+  const line = switchPress("line", "line", { middle: "the reading line stands at the middle", ends: "the reading line eases onto the opening and the last brief" });
+  const flick = shownHere("flick") ? switchPress("flick", "flick", { "1": "a flick of the wheel carries on", "0": "the wheel moves only as far as it turns" }) : "";
+  return line + flick + ([0, 1] as const)
     .map((i) => {
       const side = i ? "right" : "left";
       const tip = `the links in the gutter at the ${side} — press to ${g[i] ? "take them away" : "stand them there"}`;
@@ -6167,7 +6184,9 @@ function drawCrumb(): void {
   const shown = trail.slice(-TRAIL_SHOWN);
   const cut = trail.length - shown.length;
   const way = trail.length ? `<span class="trail">${cut ? `<span class="step more" data-tip="${cut} earlier moves, cut at the root">…</span>` : ""}${shown.map(hopCell).join("")}</span>` : "";
-  ui.crumb.innerHTML = `<span class="place">${place}${ends}</span>${depth}${way}${back}`;
+  // whether the line names every brief or the readings alone is the line's own, pressed at its end
+  const mode = body ? `<span class="modes">${switchPress("crumb", "files", { brief: "the way down names every brief", file: "the way down names the readings alone" })}</span>` : "";
+  ui.crumb.innerHTML = `<span class="place">${place}${ends}</span>${depth}${way}${back}${mode}`;
   placeCrumb();
   trimPlace();
   if (body) tintGround();
@@ -6531,7 +6550,7 @@ function drawChooser(): void {
   // the layouts stand in a group of their own at the dock's end, since they are not a program but every arrangement of them
   const n = slotsNow().filter(Boolean).length;
   const said = overview ? "the layouts — press, or escape, to go back to the page" : `the layouts — ${n} kept; press to see them all, or lay one by its digit`;
-  const layouts = `<span class="group"><button class="pick${overview ? " on" : ""}" data-overview data-tip="${esc(said)}">${icon("layouts")}</button></span>`;
+  const layouts = `<span class="group"><button class="pick${overview ? " on" : ""}" data-overview data-tip="${esc(said)}">${icon("layouts")}</button>${switchPress("dock", "side", { foot: "the dock stands at the foot", left: "the dock stands at the left" })}</span>`;
   ui.strips.innerHTML = `<div class="strip dock ${settings.dock}">${groups}${layouts}</div>`;
 }
 
@@ -8046,7 +8065,7 @@ function onKnobWheel(e: WheelEvent): void {
 function onWheel(e: WheelEvent): void {
   holding = null;
   const t = e.target as HTMLElement;
-  if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas") || t.closest("#layouts")) return;
+  if (t.closest(".scroll") || t.closest("[data-knob]") || t.closest(".canvas") || t.closest("#layouts") || t.closest(".settings")) return;
   // from anywhere else the wheel scrolls the body's prose, so the reader never has to reach for it, or the
   // history's where it is the only prose standing
   const into: WorldName | null = narrow() ? narrowShown() : laidAt("prose") ? "body" : laidAt("gitProse") && gitReady() ? "history" : null;
@@ -8413,6 +8432,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* how the reader came here stands spaced away from how here is placed, on the same line */
 :is(#crumb, #gcrumb) .trail { flex: none; padding-left: 28px; gap: 3px; }
 :is(#crumb, #gcrumb) .place { flex: 1 1 auto; overflow: hidden; }
+:is(#crumb, #gcrumb) .modes { display: inline-flex; margin-left: 6px; opacity: 0; transition: opacity .2s; }
+:is(#crumb, #gcrumb):hover .modes { opacity: 1; }
+:is(#crumb, #gcrumb) .modes .pick { width: 22px; height: 20px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); opacity: .6; }
+:is(#crumb, #gcrumb) .modes .pick.on { opacity: 1; color: var(--ink); }
+:is(#crumb, #gcrumb) .modes .pick:hover { background: var(--wash); opacity: 1; }
+:is(#crumb, #gcrumb) .modes .icon { width: 13px; height: 13px; }
 :is(#crumb, #gcrumb) .cell { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 3px; color: var(--door); cursor: pointer; transition: color .15s, background .15s; }
 :is(#crumb, #gcrumb) .cell svg { width: 10px; height: 10px; opacity: 1; }
 :is(#crumb, #gcrumb) .cell.link svg { width: 11px; height: 11px; stroke-width: 1.5; }
