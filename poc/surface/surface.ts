@@ -6070,16 +6070,18 @@ function tintGround(): void {
   // the top the wheel is laid from, the whole wheel, leaves the ground plain: run down its reading it was too much
   const top = a === "" || a === wheelTop(state);
   const [h0, h1] = top ? [60, 60] : whole ? [0, 360] : [sl.from, sl.to];
+  // what the whole page takes is the reading's own, and changes only as the reader crosses into another reading, since
+  // every element inherits it; what moves with the scroll is set on the wash alone, which nothing inherits from
+  const reading = { gh: `${Math.round(((h0 + h1) / 2) * 10) / 10}`, ghk: top ? "0" : `${settings.tint}`, ck: `${settings.tint}`, ghc: top ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1") };
+  const b = document.body.style;
+  for (const [k, v] of Object.entries(reading)) if (b.getPropertyValue(`--${k}`) !== v) b.setProperty(`--${k}`, v);
+  let wash = document.getElementById("wash");
+  if (!wash) document.body.prepend((wash = Object.assign(document.createElement("div"), { id: "wash" })));
   const el = ui.scroll;
   const H = Math.max(el.scrollHeight, 1);
   const at = (f: number): string => `${Math.round((h0 + (h1 - h0) * clamp(f, 0, 1)) * 10) / 10}`;
-  const b = document.body.style;
-  b.setProperty("--gh0", at(el.scrollTop / H));
-  b.setProperty("--gh1", at((el.scrollTop + el.clientHeight) / H));
-  b.setProperty("--ghk", top ? "0" : `${settings.tint}`);
-  b.setProperty("--ck", `${settings.tint}`);
-  // the whole wheel runs in full, though its own ink is grey; a reading outside where the wheel is laid from is grey
-  b.setProperty("--ghc", top ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
+  wash.style.setProperty("--w0", at(el.scrollTop / H));
+  wash.style.setProperty("--w1", at((el.scrollTop + el.clientHeight) / H));
 }
 
 /**
@@ -8177,16 +8179,21 @@ html, body { margin: 0; height: 100%; }
    meter says: its chroma and its step from plain grow with --ghk, and the part eases as the reader moves, since a
    number registered is one a transition carries. It eases slowly, over a second and a half, so a change of
    place is felt as a drift of the light rather than a cut.
-   What paints the ground solid takes the run's middle; at nought nothing of it is set */
-@property --gh0 { syntax: "<number>"; inherits: true; initial-value: 0; }
-@property --gh1 { syntax: "<number>"; inherits: true; initial-value: 360; }
+   The page inherits only the reading's own hue, which changes as the reader crosses readings; the run that moves
+   with the scroll is the wash's alone, a layer beneath everything that nothing inherits from, since a hue every
+   element inherits, eased on every scroll, made every element restyle every frame and the scroll drop frames.
+   What paints the ground solid takes the reading's hue; at nought nothing of it is set */
+@property --gh { syntax: "<number>"; inherits: true; initial-value: 60; }
+@property --w0 { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --w1 { syntax: "<number>"; inherits: false; initial-value: 360; }
 @property --ghk { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --ghc { syntax: "<number>"; inherits: true; initial-value: 1; }
-body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 1.6s ease, --gh1 1.6s ease, --ghk 1.2s ease, --ghc 1.6s ease; }
-html body.tinted { background-image: linear-gradient(180deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
+body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh))); transition: --gh 1.6s ease, --ghk 1.2s ease, --ghc 1.6s ease; }
+#wash { display: none; position: fixed; inset: 0; z-index: -1; pointer-events: none; transition: --w0 1.6s ease, --w1 1.6s ease; }
+body.tinted #wash { display: block; background-image: linear-gradient(180deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--w0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--w0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--w0) + var(--w1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--w0) + var(--w1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--w1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--w1)))); }
 /* on a ground that takes the hue the greys take it too, as far as the ground does: a neutral grey on a coloured ground
    reads as something laid over it, and the ink, the muted and the faint keep their lightness and lean to the hue */
-body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(92% calc(0.005 + 0.012 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); --muted: light-dark(oklch(51.9% calc(0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(74% calc(0.005 + 0.025 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); --faint: light-dark(oklch(72.5% calc(0.035 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(55% calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); }
+body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)) var(--gh)), oklch(92% calc(0.005 + 0.012 * var(--ghk) * var(--ghc)) var(--gh))); --muted: light-dark(oklch(51.9% calc(0.03 * var(--ghk) * var(--ghc)) var(--gh)), oklch(74% calc(0.005 + 0.025 * var(--ghk) * var(--ghc)) var(--gh))); --faint: light-dark(oklch(72.5% calc(0.035 * var(--ghk) * var(--ghc)) var(--gh)), oklch(55% calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh))); }
 /* on a ground that takes the hue a card is a thing of its own colour standing on it, never a pane the ground shows
    through: its colour is the ground's and its own on top of it, so it never stands paler than a coloured ground, and
    it takes the middle two fifths of its slice as a run, the whole slice spread across a card reading too wide,
