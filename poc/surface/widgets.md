@@ -160,6 +160,8 @@ Where a row hides a level, folded or a card, what it hides stands beneath it as 
 
 Whether the sprouts stand is a second setting in the tree's head, apart from its room, and a layout holds it too.
 
+The tree takes the width its rows need, measured as it is laid, from a hundred and fifty pixels to three hundred and twenty, past which a long name is cut; its rows change with the folds and the scope rather than with each step, so the row is laid again only when what the tree needs has changed, and a step never moves the prose.
+
 Pressing a row's name goes to the brief. The way to the focus is filled in the tree's own lines, as water runs through pipes: down each level it passes through, to the row it passes into, in that level's ink. When the focus moves the water runs on from where it stood: a step to the next brief runs one short length down the same line, a step back draws it back, a level newly reached fills from its top a moment after the one above it, and a move across the body runs from where the old way and the new part. The wing scrolls only to keep the focus in view, driven by the lane and never free.
 
 The tree stands dense or open, set in its head as a setting of its own, which a layout holds with it: dense, a row a line and a long name cut; open, the rows standing apart and a long name wrapping whole. It stood among the switches until 2026-10-14, where a reader looking for the tree's room had to know to look under a name among sixteen.
