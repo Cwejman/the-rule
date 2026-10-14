@@ -1506,10 +1506,10 @@ type Settings = {
   colourFrom: "root" | "scope";
   /** whether the way down names every brief on the way to the focus, or only the files, the focus told by its number */
   crumb: "brief" | "file";
-  /** whether the ground is plain, or takes faintly the hue of the reading open or of the brief in focus */
-  ground: "plain" | "reading" | "focus";
-  /** whether a heading's title stands in ink, or in its branch's hue as its number does when lit */
-  headInk: "ink" | "hue";
+  /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
+  tint: number;
+  /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
+  heads: number;
   /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
   layouts: (Held | null)[];
   /** the slot of the layout in use */
@@ -1549,8 +1549,8 @@ const DEFAULTS: Settings = {
   colour: "brief",
   colourFrom: "root",
   crumb: "brief",
-  ground: "plain",
-  headInk: "ink",
+  tint: 0,
+  heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
   slot: 0,
 };
@@ -3485,13 +3485,15 @@ function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null;
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
+  { key: "heads", row: "type", name: "heading hue", min: 0, max: 1, step: 0.05, glyph: `<path d="M4 4h8M8 4v8"/><circle cx="12.5" cy="12" r="1.2" fill="currentColor"/>` },
   { key: "leading", row: "type", name: "line height", min: 1.2, max: 2.2, step: 0.05, glyph: `<path d="M6 4h7M6 8h7M6 12h7M3 4v8"/>` },
   { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
   { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
+  { key: "tint", row: "page", name: "ground hue", min: 0, max: 1, step: 0.05, glyph: `<rect x="3" y="3" width="10" height="10" rx="2"/><path d="M3 9.5 9.5 3M6.5 13 13 6.5"/>` },
   { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
 ];
 
@@ -3534,7 +3536,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb" | "ground" | "headInk"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3543,8 +3545,6 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
-  { key: "ground", name: "the ground", values: ["plain", "reading", "focus"], labels: ["plain", "the reading's hue", "the focus's hue"] },
-  { key: "headInk", name: "heading ink", values: ["ink", "hue"], labels: ["ink", "their hue"] },
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
@@ -5325,7 +5325,7 @@ function drawLayout(): void {
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
-  document.body.classList.toggle("hue-heads", s.headInk === "hue");
+  root.setProperty("--headk", `${s.heads}`);
   onBody(tintGround);
   laidNow = null;
   shapedAt = onBody(shapeWidth);
@@ -6001,20 +6001,24 @@ function drawCrumb(): void {
 }
 
 /**
- * The ground takes, faintly, the hue of where the reader stands, the reading open or the brief in focus, as a switch
- * sets, so the colour that says where in the body a thing sits is felt under the whole page and not only in its marks.
- * Where that is the root, or the top the wheel is laid from, which has no middle, the ground is plain; it eases there.
+ * The ground takes, as strongly as its meter says, the run of the reading open's slice of the wheel, from the page's
+ * left edge to its right as a card's rim runs its slice, so the colour that says where in the body a reading sits is
+ * felt under the whole page and not only in its marks. At the root it runs the whole wheel, as the root's rim does; a
+ * reading outside where the wheel is laid from is grey. It eases as the reader crosses from one reading to the next.
  */
 function tintGround(): void {
-  const by = settings.ground;
-  const a = by === "focus" ? state.focus : state.scope;
-  const tinted = by !== "plain" && a !== "" && a !== wheelTop(state) && state.index?.by.has(a) === true;
-  const v = tinted ? hueVars(a) : "";
-  const h = /--h:([\d.]+)/.exec(v)?.[1];
-  const k = /--hk:([\d.]+)/.exec(v)?.[1] ?? "1";
+  const a = state.scope;
+  const sl = sliceIn(state, a);
+  const whole = a === "" || a === wheelTop(state) || !sl;
+  const [h0, h1] = whole ? [0, 360] : [sl.from, sl.to];
+  const k = /--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1";
   const b = document.body.style;
-  if (h !== undefined) b.setProperty("--gh", h);
-  b.setProperty("--ghk", tinted ? k : "0");
+  b.setProperty("--gh0", `${Math.round(h0 * 10) / 10}`);
+  b.setProperty("--gh1", `${Math.round(h1 * 10) / 10}`);
+  b.setProperty("--ghk", `${settings.tint}`);
+  b.setProperty("--ghc", whole && a !== "" && !sl ? "0" : k);
+  // at nought the ground is the palette's own, untouched
+  document.body.classList.toggle("tinted", settings.tint > 0);
 }
 
 /**
@@ -8075,12 +8079,17 @@ const CSS = `
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-/* the ground may take the hue of where the reader stands, faintly: its chroma and its step from plain grow with --ghk,
-   so it eases in and out, and its hue eases as the reader moves; a hue registered is one a transition can carry */
-@property --gh { syntax: "<number>"; inherits: true; initial-value: 60; }
+/* the ground may take the run of the reading open's slice, as strongly as its meter says: its chroma and its step from
+   plain grow with --ghk, and the run eases as the reader moves, since a number registered is one a transition carries.
+   What paints the ground solid takes the run's middle; at nought nothing of it is set */
+@property --gh0 { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --gh1 { syntax: "<number>"; inherits: true; initial-value: 360; }
 @property --ghk { syntax: "<number>"; inherits: true; initial-value: 0; }
-body { --ground: light-dark(oklch(calc(100% - 1.6% * var(--ghk)) calc(0.02 * var(--ghk)) var(--gh)), oklch(calc(18.5% + 1.5% * var(--ghk)) calc(0.005 + 0.014 * var(--ghk)) var(--gh))); transition: --gh .5s, --ghk .5s; }
-body.hue-heads :is(.brief .head .title, .opening h1) { color: var(--on); }
+@property --ghc { syntax: "<number>"; inherits: true; initial-value: 1; }
+body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 .5s, --gh1 .5s, --ghk .2s, --ghc .5s; }
+html body.tinted { background-image: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
+/* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
+:is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
 html { -webkit-tap-highlight-color: transparent; }
 body { display: flex; flex-direction: column; background: var(--ground); color: var(--ink); font-family: var(--prose-face); font-size: var(--body); font-weight: calc(400 - var(--thin)); line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; }
@@ -8543,8 +8552,8 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .head .num { flex: 0 0 auto; margin-right: .4em; font-family: var(--sans); font-size: calc(.5em + 4px); font-weight: calc(500 - var(--thin)); letter-spacing: 0; color: var(--faint); }
 .head .title { flex: 1 1 auto; }
 .brief.lit .title { color: var(--on); }
-/* where the headings already stand in their hue, a lit one brightens to the lit tone, as its number does where it stands */
-body.hue-heads .brief.lit .head .title { color: var(--lit); }
+/* where the headings already lean to their hue, a lit one leans as far again towards the lit tone */
+.brief.lit .head .title { color: color-mix(in oklch, var(--lit) calc(var(--headk, 0) * 100%), var(--on)); }
 .brief.on .num { color: var(--on); font-weight: calc(600 - var(--thin)); }
 .brief.here .num { color: var(--lit); }
 .mark { position: absolute; width: 16px; height: 16px; display: grid; place-items: center; color: var(--door); opacity: .7; transition: opacity .15s; }
