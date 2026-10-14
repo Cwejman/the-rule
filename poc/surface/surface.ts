@@ -3368,10 +3368,10 @@ function treeHtml(): string {
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
-  // a row that hides levels draws them beneath it as the shape of its branch: a column per level, nearest first, and a
-  // block per brief as tall as its branch weighs, its own text and all beneath it, each hanging from its parent's block
-  // under the share the parent's own text takes. Its whole height grows with the branch, so how deep it goes, where it
-  // branches and where its weight lies read true, and how many briefs stand side by side does not
+  // a row that hides levels draws them beneath it as a tree on its side: from a point under the name a line forks to
+  // each brief of the level it hides, and each forks again, a level a step to the right, to the full depth. A line is
+  // as thick as the branch it leads to weighs, its own text and everything beneath it, and a brief's own text is a dot
+  // where it stands, so how deep a branch reaches, where it divides and where its weight lies read as one shape
   const sprout = (b: Brief): string => {
     if (settings.treeSprouts !== "shown") return "";
     const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
@@ -3385,26 +3385,34 @@ function treeHtml(): string {
     };
     const total = weigh(b.address) - own(b.address);
     const most = settings.treeRoom === "open" ? 96 : 64;
-    const H = clamp(6 + Math.log2(1 + total / 4000) * 9, 8, most);
-    const k = H / total;
-    const blocks: { a: string; d: number; y: number; h: number }[] = [];
-    const lay = (a: string, d: number, y0: number): void => {
+    const H = clamp(6 + Math.log2(1 + total / 4000) * 9, 12, most);
+    // each brief takes a share of the height as its branch weighs, and stands at the middle of its share
+    const lines: string[] = [];
+    const dots: string[] = [];
+    let deep = 0;
+    const nodes: { a: string; d: number; y: number; from: number; w: number }[] = [];
+    const lay = (a: string, d: number, y0: number, from: number): void => {
       let y = y0;
       for (const c of level(a)) {
-        const h = weight.get(c.address)! * k;
-        blocks.push({ a: c.address, d, y, h });
-        lay(c.address, d + 1, y + own(c.address) * k);
+        const h = (weight.get(c.address)! / total) * H;
+        nodes.push({ a: c.address, d, y: y + h / 2, from, w: weight.get(c.address)! });
+        deep = Math.max(deep, d + 1);
+        lay(c.address, d + 1, y, y + h / 2);
         y += h;
       }
     };
-    lay(b.address, 0, 0);
-    const deep = Math.max(...blocks.map((x) => x.d)) + 1;
-    const cw = clamp(Math.floor(150 / deep) - 1, 3, 12);
-    const rects = blocks
-      .map((x) => `<rect x="${(x.d * (cw + 1)).toFixed(1)}" y="${x.y.toFixed(2)}" width="${cw}" height="${Math.max(0.6, x.h - (x.h > 2.5 ? 0.7 : 0)).toFixed(2)}" rx="${Math.min(1.5, x.h / 2).toFixed(2)}" ${hued(x.a)}/>`)
-      .join("");
-    const tip = `${blocks.length} ${blocks.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep, ${Math.round(total / 1000)}k characters`;
-    return `<div class="sprout" title="${tip}"><svg width="${deep * (cw + 1)}" height="${Math.ceil(H)}">${rects}</svg></div>`;
+    lay(b.address, 0, 0, H / 2);
+    const dx = clamp(Math.floor(190 / deep), 9, 26);
+    const thick = (w: number): number => clamp(0.5 + Math.sqrt(w / total) * 4.5, 0.5, 4.5);
+    for (const n of nodes) {
+      const x0 = n.d * dx + 1.5;
+      const x1 = x0 + dx;
+      const m = (x0 + x1) / 2;
+      lines.push(`<path d="M${x0.toFixed(1)} ${n.from.toFixed(2)}C${m.toFixed(1)} ${n.from.toFixed(2)} ${m.toFixed(1)} ${n.y.toFixed(2)} ${x1.toFixed(1)} ${n.y.toFixed(2)}" stroke-width="${thick(n.w).toFixed(2)}" ${hued(n.a)}/>`);
+      dots.push(`<circle cx="${x1.toFixed(1)}" cy="${n.y.toFixed(2)}" r="${clamp(0.6 + Math.sqrt(own(n.a) / total) * 3, 0.6, 2.6).toFixed(2)}" ${hued(n.a)}/>`);
+    }
+    const tip = `${nodes.length} ${nodes.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep, ${Math.round(total / 1000)}k characters`;
+    return `<div class="sprout" title="${tip}"><svg width="${deep * dx + 6}" height="${Math.ceil(H) + 2}"><g class="limbs">${lines.join("")}</g><g class="buds">${dots.join("")}</g></svg></div>`;
   };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
   // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
@@ -8861,8 +8869,9 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .sprout { margin: -1px 0 2px var(--under, 19px); line-height: 0; pointer-events: none; }
 .tree .sprout svg { display: block; overflow: visible; }
 .tree .sprout .spine { stroke: var(--track); stroke-width: 1; fill: none; }
-.tree .sprout rect { fill: var(--door); opacity: .7; }
-.tree .row:hover + .sprout rect, .tree .row.lit + .sprout rect { opacity: 1; }
+.tree .sprout .limbs path { fill: none; stroke: var(--door); stroke-linecap: round; opacity: .6; }
+.tree .sprout .buds circle { fill: var(--door); opacity: .85; }
+.tree .row:is(:hover, .lit) + .sprout :is(path, circle) { opacity: 1; }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
 .tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
