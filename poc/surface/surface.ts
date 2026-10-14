@@ -6001,24 +6001,26 @@ function drawCrumb(): void {
 }
 
 /**
- * The ground takes, as strongly as its meter says, the run of the reading open's slice of the wheel, from the page's
- * left edge to its right as a card's rim runs its slice, so the colour that says where in the body a reading sits is
- * felt under the whole page and not only in its marks. At the root it runs the whole wheel, as the root's rim does; a
- * reading outside where the wheel is laid from is grey. It eases as the reader crosses from one reading to the next.
+ * The ground takes, as strongly as its meter says, the reading open's slice of the wheel laid down the reading's length,
+ * and shows the part of it the screen stands over: the top of the screen takes the hue that far into the slice that
+ * the screen's top is into the reading, and its foot likewise. So it says where the reader is within the reading as a
+ * scrollbar would, in the colour the briefs there take, and at the root it is the wheel's part where the parts the
+ * reader is passing stand. A reading outside where the wheel is laid from is grey. Drawn again on every scroll.
  */
 function tintGround(): void {
+  document.body.classList.toggle("tinted", settings.tint > 0);
+  if (settings.tint <= 0) return;
   const a = state.scope;
   const sl = sliceIn(state, a);
-  const whole = a === "" || a === wheelTop(state) || !sl;
-  const [h0, h1] = whole ? [0, 360] : [sl.from, sl.to];
-  const k = /--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1";
+  const [h0, h1] = a === "" || a === wheelTop(state) || !sl ? [0, 360] : [sl.from, sl.to];
+  const el = ui.scroll;
+  const H = Math.max(el.scrollHeight, 1);
+  const at = (f: number): string => `${Math.round((h0 + (h1 - h0) * clamp(f, 0, 1)) * 10) / 10}`;
   const b = document.body.style;
-  b.setProperty("--gh0", `${Math.round(h0 * 10) / 10}`);
-  b.setProperty("--gh1", `${Math.round(h1 * 10) / 10}`);
+  b.setProperty("--gh0", at(el.scrollTop / H));
+  b.setProperty("--gh1", at((el.scrollTop + el.clientHeight) / H));
   b.setProperty("--ghk", `${settings.tint}`);
-  b.setProperty("--ghc", whole && a !== "" && !sl ? "0" : k);
-  // at nought the ground is the palette's own, untouched
-  document.body.classList.toggle("tinted", settings.tint > 0);
+  b.setProperty("--ghc", /--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1");
 }
 
 /**
@@ -6847,6 +6849,7 @@ function onScroll(): void {
   markAway();
   drawShapeCursor();
   drawFade();
+  if (state === bodyWorld) tintGround();
   pointer.still = true;
   // scrolling swings the highlight back to the centre: what the pointer rested on is let go
   if (state.pointed !== null) {
@@ -8079,15 +8082,16 @@ const CSS = `
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-/* the ground may take the run of the reading open's slice, as strongly as its meter says: its chroma and its step from
-   plain grow with --ghk, and the run eases as the reader moves, since a number registered is one a transition carries.
+/* the ground may take the part of the reading open's slice the screen stands over, top to foot, as strongly as its
+   meter says: its chroma and its step from plain grow with --ghk, and the part eases as the reader moves, since a
+   number registered is one a transition carries.
    What paints the ground solid takes the run's middle; at nought nothing of it is set */
 @property --gh0 { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --gh1 { syntax: "<number>"; inherits: true; initial-value: 360; }
 @property --ghk { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --ghc { syntax: "<number>"; inherits: true; initial-value: 1; }
-body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 .5s, --gh1 .5s, --ghk .2s, --ghc .5s; }
-html body.tinted { background-image: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
+body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 .3s, --gh1 .3s, --ghk .2s, --ghc .5s; }
+html body.tinted { background-image: linear-gradient(180deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
