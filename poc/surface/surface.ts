@@ -1506,6 +1506,10 @@ type Settings = {
   colourFrom: "root" | "scope";
   /** whether the way down names every brief on the way to the focus, or only the files, the focus told by its number */
   crumb: "brief" | "file";
+  /** whether the ground is plain, or takes faintly the hue of the reading open or of the brief in focus */
+  ground: "plain" | "reading" | "focus";
+  /** whether a heading's title stands in ink, or in its branch's hue as its number does when lit */
+  headInk: "ink" | "hue";
   /** the layouts kept by number, nine slots, each how the page is laid; the slot of the one in use stands empty, since the page itself holds it */
   layouts: (Held | null)[];
   /** the slot of the layout in use */
@@ -1545,6 +1549,8 @@ const DEFAULTS: Settings = {
   colour: "brief",
   colourFrom: "root",
   crumb: "brief",
+  ground: "plain",
+  headInk: "ink",
   layouts: Array.from({ length: 9 }, () => null),
   slot: 0,
 };
@@ -3528,7 +3534,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb" | "ground" | "headInk"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3537,6 +3543,8 @@ const SWITCHES: Switch[] = [
   { key: "weight", name: "weight", values: ["cost", "experience"] },
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
+  { key: "ground", name: "the ground", values: ["plain", "reading", "focus"], labels: ["plain", "the reading's hue", "the focus's hue"] },
+  { key: "headInk", name: "heading ink", values: ["ink", "hue"], labels: ["ink", "their hue"] },
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
@@ -5317,6 +5325,8 @@ function drawLayout(): void {
   // the theme picks a side of every colour; the system setting leaves it to the browser, so nothing flashes
   if (s.theme === "system") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = s.theme;
+  document.body.classList.toggle("hue-heads", s.headInk === "hue");
+  onBody(tintGround);
   laidNow = null;
   shapedAt = onBody(shapeWidth);
   if (!narrow()) return drawLaid();
@@ -5985,8 +5995,26 @@ function drawCrumb(): void {
   ui.crumb.innerHTML = `<span class="place">${place}${ends}</span>${depth}${way}${back}`;
   placeCrumb();
   trimPlace();
+  if (body) tintGround();
   // the heads carry each world's depth, which a change of folds or scope moves
   if (!narrow()) drawHeads();
+}
+
+/**
+ * The ground takes, faintly, the hue of where the reader stands, the reading open or the brief in focus, as a switch
+ * sets, so the colour that says where in the body a thing sits is felt under the whole page and not only in its marks.
+ * Where that is the root, or the top the wheel is laid from, which has no middle, the ground is plain; it eases there.
+ */
+function tintGround(): void {
+  const by = settings.ground;
+  const a = by === "focus" ? state.focus : state.scope;
+  const tinted = by !== "plain" && a !== "" && a !== wheelTop(state) && state.index?.by.has(a) === true;
+  const v = tinted ? hueVars(a) : "";
+  const h = /--h:([\d.]+)/.exec(v)?.[1];
+  const k = /--hk:([\d.]+)/.exec(v)?.[1] ?? "1";
+  const b = document.body.style;
+  if (h !== undefined) b.setProperty("--gh", h);
+  b.setProperty("--ghk", tinted ? k : "0");
 }
 
 /**
@@ -8047,6 +8075,12 @@ const CSS = `
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
+/* the ground may take the hue of where the reader stands, faintly: its chroma and its step from plain grow with --ghk,
+   so it eases in and out, and its hue eases as the reader moves; a hue registered is one a transition can carry */
+@property --gh { syntax: "<number>"; inherits: true; initial-value: 60; }
+@property --ghk { syntax: "<number>"; inherits: true; initial-value: 0; }
+body { --ground: light-dark(oklch(calc(100% - 1.6% * var(--ghk)) calc(0.02 * var(--ghk)) var(--gh)), oklch(calc(18.5% + 1.5% * var(--ghk)) calc(0.005 + 0.014 * var(--ghk)) var(--gh))); transition: --gh .5s, --ghk .5s; }
+body.hue-heads :is(.brief .head .title, .opening h1) { color: var(--on); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
 html { -webkit-tap-highlight-color: transparent; }
 body { display: flex; flex-direction: column; background: var(--ground); color: var(--ink); font-family: var(--prose-face); font-size: var(--body); font-weight: calc(400 - var(--thin)); line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; }
@@ -8509,6 +8543,8 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .head .num { flex: 0 0 auto; margin-right: .4em; font-family: var(--sans); font-size: calc(.5em + 4px); font-weight: calc(500 - var(--thin)); letter-spacing: 0; color: var(--faint); }
 .head .title { flex: 1 1 auto; }
 .brief.lit .title { color: var(--on); }
+/* where the headings already stand in their hue, a lit one brightens to the lit tone, as its number does where it stands */
+body.hue-heads .brief.lit .head .title { color: var(--lit); }
 .brief.on .num { color: var(--on); font-weight: calc(600 - var(--thin)); }
 .brief.here .num { color: var(--lit); }
 .mark { position: absolute; width: 16px; height: 16px; display: grid; place-items: center; color: var(--door); opacity: .7; transition: opacity .15s; }
