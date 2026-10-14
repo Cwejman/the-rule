@@ -8092,10 +8092,6 @@ html, body { margin: 0; height: 100%; }
 @property --ghc { syntax: "<number>"; inherits: true; initial-value: 1; }
 body.tinted { --ground: light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); transition: --gh0 .3s, --gh1 .3s, --ghk .2s, --ghc .5s; }
 html body.tinted { background-image: linear-gradient(180deg in oklch increasing hue, light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh0)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh0))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))), light-dark(oklch(calc(100% - 3% * var(--ghk)) calc(0.04 * var(--ghk) * var(--ghc)) var(--gh1)), oklch(calc(18.5% + 3% * var(--ghk)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) var(--gh1)))); }
-/* the prose stands on a sheet of the plain ground, half a gap wider than its box on either side, so the hue lies around and behind it: the prose is dimmed and faded
-   by its transparency, and over the hue that let the hue into the ink, which read as a tinted film laid over the page
-   rather than a ground beneath it */
-body.tinted :is(#scroll, #gscroll) { box-sizing: content-box; padding-inline: calc(var(--gap) / 2); margin-left: calc(var(--gap) / -2); background: light-dark(#ffffff, oklch(18.5% 0.005 60)); }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
