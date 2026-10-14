@@ -2821,15 +2821,24 @@ function whereIs(k: string, L: Column[] = layoutNow()): { c: number; i: number }
 const standing = (k: string): boolean => whereIs(k) !== null;
 /** The program a column stands alone for, where it holds one. */
 const aloneIn = (c: Column): string | null => c.items.find((it) => isAlone(it.k))?.k ?? null;
+/**
+ * Whether a column's width is the reader's to pull: one a lone program stands in, and one the tree stands in, whose
+ * rows a reader may rather see cut or wrapped than wide.
+ */
+const pullable = (c: Column | undefined): boolean => !!c && (aloneIn(c) !== null || c.items.some((it) => it.k === "tree"));
+/** A figure's own width in its column: the tree's never past where it was pulled to, nor past what its rows need. */
+const ownIn = (c: Column, k: string): number => (k === "tree" && c.w ? Math.max(TREE_WIDTH.least, Math.min(c.w, PROGRAMS.tree.own())) : PROGRAMS[k].own());
 /** The width a column stands at of its own: a lone program at its pulled width or its own, a stack of figures at its widest. */
 const colOwn = (c: Column): number => {
   const a = aloneIn(c);
-  return a ? Math.max(PROGRAMS[a].least(), c.w ?? PROGRAMS[a].own()) : Math.max(0, ...c.items.map((it) => PROGRAMS[it.k].own()));
+  return a ? Math.max(PROGRAMS[a].least(), c.w ?? PROGRAMS[a].own()) : Math.max(0, ...c.items.map((it) => ownIn(c, it.k)));
 };
 /** The least a column narrows to before it gives way: a figure is never pulled, so its column stands at its own. */
 const colLeast = (c: Column): number => {
   const a = aloneIn(c);
-  return a ? PROGRAMS[a].least() : colOwn(c);
+  if (a) return PROGRAMS[a].least();
+  // a column the tree stands in narrows to the tree's least, or to the widest figure beside it
+  return c.items.some((it) => it.k === "tree") ? Math.max(TREE_WIDTH.least, ...c.items.filter((it) => it.k !== "tree").map((it) => PROGRAMS[it.k].own())) : colOwn(c);
 };
 
 /** The layout a reader keeps, made whole: every program at most once, a program standing alone in a column of its own, and no column empty. */
@@ -2843,7 +2852,8 @@ function keptLayout(raw: unknown): Column[] {
     const w = typeof c?.w === "number" && c.w > 0 ? c.w : undefined;
     // a program that stands alone never shares its column, so a stack holding one is parted around it
     let run: Item[] = [];
-    const flush = () => void (run.length && cols.push({ items: run }), (run = []));
+    // a stack keeps its pulled width only where the tree stands in it, the one figure a reader pulls
+    const flush = () => void (run.length && cols.push(w && run.some((it) => it.k === "tree") ? { w, items: run } : { items: run }), (run = []));
     items.forEach((it) => (isAlone(it.k) ? (flush(), cols.push(w ? { w, items: [it] } : { items: [it] })) : run.push(it)));
     flush();
   });
@@ -5663,7 +5673,7 @@ function drawStacks(): void {
  * only when the width it needs has changed.
  */
 let treeWidth = 280;
-const TREE_WIDTH = { least: 150, most: 320 };
+const TREE_WIDTH = { least: 120, most: 320 };
 function fitTree(el: HTMLElement): void {
   const tree = el.querySelector<HTMLElement>(".tree");
   if (!tree) return;
@@ -5702,7 +5712,7 @@ function drawHosted(k: string): void {
  */
 function drawSeams(): void {
   const L = layoutNow();
-  const pulls = (c: number | null) => c !== null && !!L[c] && aloneIn(L[c]) !== null;
+  const pulls = (c: number | null) => c !== null && pullable(L[c]);
   const reach = 24;
   const html = laid().spaces.flatMap((sp, j) => {
     if (!pulls(sp.left) && !pulls(sp.right)) return [];
@@ -5930,7 +5940,7 @@ function showMove(k: string, z: Zone | null, from: Column[], w: number | undefin
  */
 function pullSeam(left: number | null, right: number | null, dx: number, start: Map<number, number>): void {
   const L = layoutNow().map((c) => ({ ...c }));
-  const pulls = (c: number | null): c is number => c !== null && !!L[c] && aloneIn(L[c]) !== null;
+  const pulls = (c: number | null): c is number => c !== null && pullable(L[c]);
   const w0 = (c: number) => start.get(c) ?? colOwn(L[c]);
   const least = (c: number) => colLeast(L[c]);
   const edge = settings.room === "centred" ? 2 : 1;
