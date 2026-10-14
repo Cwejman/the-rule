@@ -336,7 +336,7 @@ A strip in the way down says how far the scope stands unfolded: a cell per level
 
 The two keys that move it stand together past its cells, [as one pair with their shift drawn once](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), since the strip is the act's own picture and needs no word beside it.
 
-The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole.
+The strip counts the reading and not the body. A card's level lies past [a boundary](../practice.md#11-a-file-is-one-linear-reading) and no unfolding reaches it, so it is no rung: the cells say only what the depth can actually give, and the last of them unfolds the reading whole. A level counts what unfolds in it, a leaf with prose past its face as readily as a brief with a level beneath it, so a leaf left at its face keeps its level short of unfolded, and the last cell stands one past the deepest brief that unfolds and lays that level's prose whole. Until 2026-10-14 the strip counted only briefs with a level, so a folded leaf was passed over and the deepest level's prose was never reached by it.
 
 *The author's, 2026-09-15; the strip as built the same day, and bounded to the reading on his report of 2026-09-18 that it offered a level he could not reach.*
 
