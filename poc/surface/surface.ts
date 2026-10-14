@@ -3571,17 +3571,17 @@ function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null;
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads" | "figure"; row: "type" | "page"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads" | "figure"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
-  { key: "zoom", row: "type", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
-  { key: "ratio", row: "type", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
-  { key: "heads", row: "type", name: "heading hue", min: 0, max: 1, step: 0.05, glyph: `<path d="M4 4h8M8 4v8"/><circle cx="12.5" cy="12" r="1.2" fill="currentColor"/>` },
-  { key: "leading", row: "type", name: "line height", min: 1.2, max: 2.2, step: 0.05, glyph: `<path d="M6 4h7M6 8h7M6 12h7M3 4v8"/>` },
-  { key: "gap", row: "page", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
-  { key: "dim", row: "page", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
-  { key: "tint", row: "page", name: "ground hue", min: 0, max: 1, step: 0.05, glyph: `<rect x="3" y="3" width="10" height="10" rx="2"/><path d="M3 9.5 9.5 3M6.5 13 13 6.5"/>` },
-  { key: "figure", row: "page", name: "file figures", min: 2, max: 9, step: 0.5, glyph: `<path d="M3 5h7M5 8h5M5 11h8M3 5v6"/>` },
-  { key: "fade", row: "page", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
+  { key: "zoom", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
+  { key: "ratio", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
+  { key: "heads", name: "heading hue", min: 0, max: 1, step: 0.05, glyph: `<path d="M4 4h8M8 4v8"/><circle cx="12.5" cy="12" r="1.2" fill="currentColor"/>` },
+  { key: "leading", name: "line height", min: 1.2, max: 2.2, step: 0.05, glyph: `<path d="M6 4h7M6 8h7M6 12h7M3 4v8"/>` },
+  { key: "gap", name: "gap between areas", min: 8, max: 64, step: 2, glyph: `<path d="M3 4v8M13 4v8M6 8h4"/>` },
+  { key: "dim", name: "dim the rest", min: 0, max: 0.8, step: 0.05, glyph: `<circle cx="8" cy="8" r="5"/><path d="M8 3a5 5 0 0 1 0 10z" fill="currentColor"/>` },
+  { key: "tint", name: "ground hue", min: 0, max: 1, step: 0.05, glyph: `<rect x="3" y="3" width="10" height="10" rx="2"/><path d="M3 9.5 9.5 3M6.5 13 13 6.5"/>` },
+  { key: "figure", name: "file figures", min: 2, max: 9, step: 0.5, glyph: `<path d="M3 5h7M5 8h5M5 11h8M3 5v6"/>` },
+  { key: "fade", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
 ];
 
 /** A knob's value as it reads: the gap in pixels, the fade as a share of the height, the rest to two places. */
@@ -3603,23 +3603,46 @@ function meterArc(t: number, r: number): string {
 const IDLE_NARROW = new Set(["ahead", "flick", "room", "dock"]);
 const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
+/**
+ * The settings in groups by what they change, each group its meters first and its switches after: the type, the
+ * colour, the page and how the reading moves, then the canvas's and git's own. A setting a program holds in its head
+ * is set there and is not among these.
+ */
+const GROUPS: { name: string; knobs: Knob["key"][]; switches: Switch["key"][] }[] = [
+  { name: "type", knobs: ["zoom", "ratio", "leading"], switches: ["headings", "prose"] },
+  { name: "colour", knobs: ["heads", "tint"], switches: ["theme", "colour", "colourFrom"] },
+  { name: "page", knobs: ["gap", "dim", "fade", "figure"], switches: ["room", "dock"] },
+  { name: "reading", knobs: [], switches: ["line", "crumb", "ahead", "flick", "weight"] },
+  { name: "the canvas", knobs: [], switches: ["tree", "face"] },
+  { name: "git", knobs: [], switches: ["git"] },
+];
+
+/** A meter's word beneath it, one word that fits its column; its full name is its tip. */
+const KNOB_WORD: Record<Knob["key"], string> = { zoom: "zoom", ratio: "ratio", leading: "lines", heads: "headings", tint: "ground", gap: "gap", dim: "dim", fade: "fade", figure: "figures" };
+
 function settingsHtml(): string {
   const s = settings;
+  // a meter names itself beneath, and while it is pointed at or turned its value stands there in its name's place
   const knob = (k: Knob) => {
     const t = clamp((s[k.key] - k.min) / (k.max - k.min), 0, 1);
-    const shown = knobText(k, s[k.key]);
     return (
-      `<div class="knob" data-knob="${k.key}" title="${k.name}: ${shown}">` +
+      `<div class="knob" data-knob="${k.key}" title="${k.name}">` +
       `<svg viewBox="0 0 40 40"><path class="track" d="${meterArc(1, 15)}"/><path class="value" d="${meterArc(Math.max(t, 0.002), 15)}"/><g class="glyph" transform="translate(12 12)">${k.glyph}</g></svg>` +
-      `<span class="hint chrome dim">${k.name} ${shown}</span></div>`
+      `<span class="said"><span class="n">${KNOB_WORD[k.key]}</span><span class="v">${knobText(k, s[k.key])}</span></span></div>`
     );
   };
+  // a switch's name stands over its values, which keep each whole, so a narrow wing wraps a value and never a word of it
   const row = (w: Switch) =>
-    `<span class="name">${w.name}</span><span class="values">${w.values
+    `<div class="switch"><span class="name">${w.name}</span><span class="values">${w.values
       .map((v, i) => `<button class="pick${s[w.key] === v ? " on" : ""}" data-set="${w.key}" data-value="${v}">${w.labels?.[i] ?? v}</button>`)
-      .join("")}</span>`;
-  const rows = (["type", "page"] as const).map((r) => KNOBS.filter((k) => k.row === r && shownHere(k.key))).filter((ks) => ks.length);
-  return `<div class="settings">${rows.map((ks) => `<div class="knobs">${ks.map(knob).join("")}</div>`).join("")}<div class="switches chrome">${SWITCHES.filter((w) => shownHere(w.key)).map(row).join("")}</div></div>`;
+      .join("")}</span></div>`;
+  const groups = GROUPS.map((g) => {
+    const ks = g.knobs.map((key) => KNOBS.find((k) => k.key === key)!).filter((k) => shownHere(k.key));
+    const ws = g.switches.map((key) => SWITCHES.find((w) => w.key === key)!).filter((w) => shownHere(w.key));
+    if (!ks.length && !ws.length) return "";
+    return `<section class="group"><h4 class="chrome">${g.name}</h4>${ks.length ? `<div class="knobs">${ks.map(knob).join("")}</div>` : ""}${ws.length ? `<div class="switches chrome">${ws.map(row).join("")}</div>` : ""}</section>`;
+  });
+  return `<div class="settings">${groups.join("")}</div>`;
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
@@ -3649,9 +3672,8 @@ function drawMeter(el: HTMLElement): void {
   const t = clamp((v - k.min) / (k.max - k.min), 0, 1);
   const shown = knobText(k, v);
   el.querySelector(".value")?.setAttribute("d", meterArc(Math.max(t, 0.002), 15));
-  el.title = `${k.name}: ${shown}`;
-  const hint = el.querySelector(".hint");
-  if (hint) hint.textContent = `${k.name} ${shown}`;
+  const told = el.querySelector(".said .v");
+  if (told) told.textContent = shown;
 }
 
 const SETTINGS_KEY = "surface.settings";
@@ -8982,24 +9004,27 @@ svg.plate .cell.here > path { filter: drop-shadow(0 0 var(--lamp) var(--p-halo))
 svg.plate .label { font-family: var(--sans); font-size: 11px; fill: var(--ink); pointer-events: none; }
 svg.plate .cell.here .label { fill: light-dark(var(--ink), var(--ground)); }
 
-.settings { width: 216px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.knobs { display: flex; gap: 12px; justify-content: center; }
-.knob { position: relative; width: 40px; height: 40px; cursor: ns-resize; touch-action: none; user-select: none; color: var(--faint); }
-.knob svg { width: 40px; height: 40px; display: block; }
+.settings { width: 216px; display: flex; flex-direction: column; gap: 18px; padding: 4px 0 12px; }
+.settings .group { display: flex; flex-direction: column; gap: 10px; }
+.settings h4 { margin: 0; padding-bottom: 4px; border-bottom: 1px solid var(--track); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.knobs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 2px; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: ns-resize; touch-action: none; user-select: none; color: var(--faint); }
+.knob svg { width: 36px; height: 36px; display: block; }
 .knob .track { fill: none; stroke: var(--track); stroke-width: 3; stroke-linecap: round; }
 .knob .value { fill: none; stroke: var(--meter); stroke-width: 3; stroke-linecap: round; }
 .knob .glyph { fill: none; stroke: var(--muted); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
-.knob .hint { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 2px; white-space: nowrap; opacity: 0; transition: opacity .15s; pointer-events: none; }
-.knob:hover .hint { opacity: 1; }
-/* a finger covers the knob it turns, so the value stands above it while it is turning, where the hand is not */
-body.touch .knob .hint { top: auto; bottom: 100%; margin: 0 0 6px; }
-body.touch .knob.turning .hint { opacity: 1; }
-.switches { display: grid; grid-template-columns: auto auto; gap: 2px 8px; align-items: center; }
-.switches .name { justify-self: end; color: var(--faint); }
-.switches .values { display: flex; gap: 2px; }
-.switches .pick { padding: 2px 5px; border-radius: 6px; color: var(--muted); }
-.switches .pick.on { color: var(--ink); }
-.switches .pick:hover { background: var(--wash); }
+.knob .said { display: grid; width: 100%; font-family: var(--sans); font-size: 11px; line-height: 1.2; text-align: center; color: var(--faint); white-space: nowrap; }
+.knob .said > * { grid-area: 1 / 1; transition: opacity .12s; }
+.knob .said .v { opacity: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+.knob:is(:hover, .turning) .said .n { opacity: 0; }
+.knob:is(:hover, .turning) .said .v { opacity: 1; }
+.switches { display: flex; flex-direction: column; gap: 7px; }
+.switch { display: flex; flex-direction: column; gap: 3px; }
+.switches .name { font-size: 12px; color: var(--faint); }
+.switches .values { display: flex; flex-wrap: wrap; gap: 2px; align-self: flex-start; padding: 2px; border-radius: 8px; background: var(--wash); }
+.switches .pick { padding: 2px 8px; border-radius: 6px; color: var(--muted); white-space: nowrap; }
+.switches .pick.on { color: var(--ink); background: var(--ground); box-shadow: 0 0 0 1px var(--track); }
+.switches .pick:not(.on):hover { color: var(--ink); }
 
 /* where the lane stands alone the row folds into one round mark at the foot, and a press opens it as a wide pill: the
    same table in a second grain. Both stand on a glass of their own, a muted surface over whatever the prose is doing
