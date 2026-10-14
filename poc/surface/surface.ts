@@ -2016,8 +2016,8 @@ const ACTS: Record<string, Action> = {
     keys: [{ key: "ArrowRight", shift: true }],
     help: () => "Unfolds every brief of the scope one level further, and folds what lies beyond it. Holding the space bar unfolds the scope whole.",
     also: "Pressing or scrubbing the depth strip.",
-    can: () => unfoldedDepth() < scopeDepth(),
-    run: () => unfoldTo(Math.min(scopeDepth(), unfoldedDepth() + 1)),
+    can: () => unfoldedDepth() < foldDepth(),
+    run: () => unfoldTo(Math.min(foldDepth(), unfoldedDepth() + 1)),
   },
   shallower: {
     label: () => "a level less",
@@ -4776,16 +4776,23 @@ const ofReading = (b: Brief): boolean => within(b.address, state.scope) && !isCa
 /** The deepest level of the reading, counted from the scope root. */
 const scopeDepth = (): number => Math.max(0, ...state.body!.briefs.filter(ofReading).map((b) => depthIn(b.address)));
 
-/** The depth the scope stands unfolded to: the largest such that every brief with a level above it is whole. */
+/**
+ * How many levels the scope unfolds through before nothing is left folded: one past the deepest brief that has anything
+ * to unfold, a level of its own or prose past its face. A leaf is counted as a parent is, so the last step lays the
+ * deepest prose whole rather than stopping with the leaves still at their faces.
+ */
+const foldDepth = (): number => Math.max(0, ...state.body!.briefs.filter((b) => ofReading(b) && b.address !== state.scope && unfolds(b)).map((b) => depthIn(b.address) + 1));
+
+/** The depth the scope stands unfolded to: the largest such that every brief above it that unfolds at all is whole. */
 function unfoldedDepth(): number {
   let d = 0;
-  while (d < scopeDepth() && state.body!.briefs.every((b) => !ofReading(b) || depthIn(b.address) !== d || levelIn(b).length === 0 || foldOf(b.address) === "whole")) d++;
+  while (d < foldDepth() && state.body!.briefs.every((b) => !ofReading(b) || depthIn(b.address) !== d || !unfolds(b) || foldOf(b.address) === "whole")) d++;
   return d;
 }
 
 /** The depth strip, in the way down: a cell per level beneath the scope, the unfolded depth marked; pressing or scrubbing across sets it, in the lane as on the canvas. */
 function depthHtml(): string {
-  const n = scopeDepth();
+  const n = foldDepth();
   if (n === 0) return "";
   const unfolded = unfoldedDepth();
   const cells = Array.from({ length: n }, (_, i) => `<span class="dc${i + 1 <= unfolded ? " on" : ""}" data-depth="${i + 1}">${i + 1}</span>`).join("");
