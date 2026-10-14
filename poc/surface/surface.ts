@@ -3365,8 +3365,45 @@ function treeHtml(): string {
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
-  // a row that hides something says how much in the figure after its name, as a canvas drawn as text does
-  const marks = (b: Brief): string => (isCard(b) || (foldOf(b.address) !== "whole" && level(b.address).length) ? marksHtml(b, true) : "");
+  // a row that hides levels draws them beneath it, small, as the tree it would grow: a bar per brief of the level it
+  // hides, as long as that brief's own text, and beneath a brief that branches a comb with a tooth per brief of its own
+  // level, so the shape of what is folded, how wide and how deep, is read where the folded level would stand
+  const sprout = (b: Brief): string => {
+    const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
+    const kids = hides ? level(b.address) : [];
+    if (!kids.length) return "";
+    const open = settings.treeRoom === "open";
+    const [pitch, bar, step, cap] = open ? [4, 2.5, 6, 12] : [3, 2, 5, 9];
+    const long = (a: string, most: number): number => clamp(2 + Math.log2(1 + (state.index!.own.get(a) ?? 0) / 150) * (most / 6), 2, most);
+    const shown = kids.slice(0, cap);
+    let i = 0;
+    const y = (): number => 2 + i * pitch;
+    const out: string[] = [];
+    const spine: number[] = [];
+    // what the cap leaves out is told by the last bars fading, rather than by a count beside them
+    const fade = (n: number): string => (kids.length > cap && n >= cap - 2 ? ` fill-opacity="${(0.35 * (cap - n)).toFixed(2)}"` : "");
+    shown.forEach((k, n) => {
+      spine.push(y());
+      out.push(`<rect x="0.6" y="${y()}" width="${long(k.address, 32).toFixed(1)}" height="${bar}" rx="${bar / 2}" ${hued(k.address)}${fade(n)}/>`);
+      i++;
+      const g = level(k.address);
+      if (!g.length) return;
+      // the comb hangs from beneath its bar, a short spine down and its teeth along the row after
+      const top = y() - pitch + bar;
+      out.push(`<path class="spine" d="M${step + 0.6} ${top}V${y() + bar / 2}"/>`);
+      let x = step + 2;
+      for (const c of g.slice(0, 14)) {
+        const w = long(c.address, 7);
+        out.push(`<rect x="${x.toFixed(1)}" y="${y()}" width="${w.toFixed(1)}" height="${bar}" rx="${Math.min(bar, w) / 2}" ${hued(c.address)}${fade(n)}/>`);
+        x += w + 1.2;
+      }
+      if (g.some((c) => level(c.address).length)) out.push(`<circle class="deeper" cx="${(x + 1.5).toFixed(1)}" cy="${y() + bar / 2}" r="${bar / 2}"/>`);
+      i++;
+    });
+    const h = y() - pitch + bar + 3;
+    const tip = `${kids.length} beneath it${kids.length > cap ? `, the first ${cap} drawn` : ""}`;
+    return `<div class="sprout" title="${tip}"><svg width="96" height="${h}"><path class="spine" d="M0.6 0V${spine[spine.length - 1] + bar / 2}"/>${out.join("")}</svg></div>`;
+  };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
   // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
   const way = prefixesOf(S);
@@ -3388,7 +3425,7 @@ function treeHtml(): string {
   const sibling = (b: Brief): string =>
     node(
       b.address,
-      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}${marks(b)}</div>`,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`,
       "",
     );
   // the reading open as the lane holds it, folds and all
@@ -3396,8 +3433,8 @@ function treeHtml(): string {
     if (!inLane(b.address)) return "";
     const whole = foldOf(b.address) === "whole" && !isCard(b);
     // a card opens rather than folds, so it carries no fold mark
-    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}${marks(b)}</div>`;
-    return node(b.address, row, whole ? level(b.address).map(outline).join("") : "");
+    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
+    return node(b.address, row + sprout(b), whole ? level(b.address).map(outline).join("") : "");
   };
   const step = (i: number): string => {
     const a = way[i];
@@ -8800,6 +8837,12 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .pointing .tree .row.here:not(.lit) .name { color: var(--ink); font-weight: calc(500 - var(--thin)); }
 /* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
 /* where a row is short of room its figure gives way first, then its status, and its name last */
+.tree .sprout { margin: -1px 0 1px 6.4px; line-height: 0; pointer-events: none; }
+.tree .sprout svg { display: block; overflow: visible; }
+.tree .sprout .spine { stroke: var(--track); stroke-width: 1; fill: none; }
+.tree .sprout rect { fill: var(--door); opacity: .7; }
+.tree .sprout .deeper { fill: var(--faint); }
+.tree .row:hover + .sprout rect, .tree .row.lit + .sprout rect { opacity: 1; }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
 .tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
