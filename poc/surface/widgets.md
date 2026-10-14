@@ -120,13 +120,47 @@ Other means were weighed and are not built: a hairline in the hue down the lane'
 
 ## 2. The tree
 
-The tree is a [wing](framework.md#2-the-areas) widget: the lane as an outline, one row per brief in the lane, each nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
+The tree is a [wing](framework.md#2-the-areas) widget: [the way down](lane.md#75-the-way-down-stands-over-the-lane) laid line by line, and beneath its last step the reading open as an outline. What the way down says on one line it says here with the room to say more, in the language [a canvas drawn as text](canvas.md#411-a-node-may-be-one-line-of-text-joined-as-a-file-tree-is) already draws in.
+
+*The author's, 2026-10-14: the tree was hardly used, being older than the way down and the canvas's text, and is the way down made larger once it is drawn as they are. Until then it was the lane alone as an outline, with the levels above the scope as dim rows over its root.*
+
+### 2.1 The way, line by line
+
+The way from the root to the reading open stands at the top, each step nested beneath the one before it, and each told as the way down tells it.
+
+The root stands as the ring of the whole wheel, a reading bold, a section at normal weight after its number, what stands above the reading open muted. The reading open stands in its branch's ink, with its status and the bar of how far through it the focus stands.
+
+The lines join the steps as a file tree's do, a line down the left and a tick into each row. Where a step crosses into a file the line into it is drawn in the hue of the reading entered, a step stronger, as a canvas draws an opening; within a file it is the quiet line.
+
+Pressing a step goes there, and pressing one above the reading open takes the lane out to it.
+
+*The author's ask, 2026-10-14; how each is drawn is the session's, read from the way down and the canvas's text.*
+
+### 2.2 What stands beside the way
+
+Each step of the way but the root says after its name how many stand beside it in its level, and pressing that lays the level whole in place.
+
+The step then stands among its siblings, so a reader sees what the way passed by without scrolling the lane or leaving the reading. Pressed again, the level closes back to the step. A sibling is a row as any row of the outline, its number, its name and the figure of what it hides, and pressing it goes there.
+
+What is laid open beside the way is the tree's own and lasts only while the page is open: it moves nothing in the lane.
+
+*The session's, 2026-10-14, proposed to the author, who let it stand.*
+
+### 2.3 The reading open, as an outline
+
+Beneath the way the reading open stands as the lane holds it: one row per brief in the lane, nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
+
+A row carries its number faint before its name, and after it, where it is folded or is a card, [the figure of what it hides](canvas.md#46-a-folded-node-says-how-deep-it-is) at about half its length, as text does on the canvas. A card is underlined in its branch's hue, as a name that opens onto a reading of its own is, with its status after it. The rows on the way to the focus take their branch's ink.
 
 Pressing a row's name goes to the brief. A line lies across the highlighted row and glides as the highlight moves. The wing scrolls only to keep the focus in view, driven by the lane and never free.
 
-When the lane is [scoped](lane.md#7-scoping-the-lane), the levels above stand as dim rows over the root, each a way out.
+*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an unfolding of its own](refused.md#u-a-tree-with-an-unfolding-of-its-own) were built first and refused. The numbers, the figures and the cards as the canvas's text draws them, the author's ask of 2026-10-14. It does not stand on a phone, where it [read poorly whole](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
 
-*Reasoned, the author's, 2026-09-13; [columns of siblings](refused.md#o-the-path-as-columns-of-siblings-stacked) and [a tree with an unfolding of its own](refused.md#u-a-tree-with-an-unfolding-of-its-own) were built first and refused. It does not stand on a phone, where it [read poorly whole](touch.md#42-the-outline-and-the-radial-are-not-ready-for-a-finger), 2026-09-16.*
+### 2.4 What the tree does not yet say
+
+What lies beside the way across the body rather than in it: the links the reading open and its neighbours share with other parts, which [the pane of bearings](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions) asks for and dimensions would ground. And whether it names files alone when [the way down](#62-the-switches) does.
+
+*Open, 2026-10-14.*
 
 ## 3. The shape
 
