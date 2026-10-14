@@ -8132,8 +8132,9 @@ const paletteCss = (hued: boolean): string =>
  * edges, --h0 and --h1, and at its middle, so no half sweeps past half the wheel. Where no slice is set it is the
  * role's one hue.
  */
-const roleRun = (role: string): string => {
-  const [light, dark] = PALETTE[role];
+const roleRun = (role: string): string => toneRun(...PALETTE[role]);
+/** A run across a slice in any tone given as its light and dark values, each written with var(--h) where the hue goes. */
+const toneRun = (light: string, dark: string): string => {
   const h0 = "var(--h0, var(--h))";
   const h1 = "var(--h1, var(--h))";
   const at = (h: string): string => `light-dark(${light.replaceAll("var(--h)", h)}, ${dark.replaceAll("var(--h)", h)})`;
@@ -8200,12 +8201,15 @@ body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)
    lightly, as tinted frosted glass would, by the ground's
    meter even where the ground itself is plain, so at the root each part's card is its own hue */
 body.tinted .brief .card { --n0: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) - (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); --n1: calc(calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2) + (var(--h1, var(--h)) - var(--h0, var(--h))) * .2); background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.04 * var(--ghk) * var(--ghc) + 0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n0)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc) + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n0))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.04 * var(--ghk) * var(--ghc) + 0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) calc((var(--n0) + var(--n1)) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc) + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) calc((var(--n0) + var(--n1)) / 2))), light-dark(oklch(calc(100% - 3.5% * var(--ck)) calc(0.04 * var(--ghk) * var(--ghc) + 0.028 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n1)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.03 * var(--ghk) * var(--ghc) + 0.026 * var(--ck) * var(--hk, 1) * var(--cs, 1)) var(--n1)))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
-/* a card the reading is not on, nor the pointer, keeps its lightness and holds back its colour, so the lit one stands out */
-body.tinted .brief .card:not(.here):not(.lit) { --cs: .45; }
+/* a card the reading is not on, nor the pointer, keeps its lightness and holds back a little of its colour, so the lit
+   one stands out without the others reading bland, and its edge is a livelier tone of its own hue than a pale shade */
+body.tinted .brief .card:not(.here):not(.lit) { --cs: .75; }
 /* its edge is its own slice's run in the pale tone, a step deeper than its fill, rather than a grey line, which on a
    coloured ground reads as laid over it; the card the reading stands on or the pointer is on takes the lit run as ever */
 body.tinted .brief .card:not(.here):not(.lit) { outline-color: transparent; }
-body.tinted .brief .card:not(.here):not(.lit)::before { --h0: var(--n0); --h1: var(--n1); opacity: 1; background: ${roleRun("rest")}; }
+body.tinted .brief .card:not(.here):not(.lit)::before { --h0: var(--n0); --h1: var(--n1); opacity: 1; background: ${toneRun("oklch(82% calc(0.085 * var(--hk, 1)) var(--h))", PALETTE.rest[1])}; }
+/* on a light ground the lit card's rim is a clearer colour than the lit ink, more saturated and less dark */
+body.tinted .brief .card:is(.here, .lit)::before { background: ${toneRun("oklch(68% calc(0.15 * var(--hk, 1)) var(--h))", PALETTE.lit[1])}; }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's and a card's with it */
 :is(.brief .head .title, .opening h1, .brief .card-head) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
