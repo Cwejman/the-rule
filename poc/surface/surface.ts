@@ -1508,6 +1508,7 @@ type Settings = {
   crumb: "brief" | "file";
   /** whether the tree stands dense, a row a line and a long name cut, or open, with room between rows and names whole */
   treeRoom: "dense" | "open";
+  treeSprouts: "shown" | "hidden";
   /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
   tint: number;
   /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
@@ -1552,6 +1553,7 @@ const DEFAULTS: Settings = {
   colourFrom: "root",
   crumb: "brief",
   treeRoom: "dense",
+  treeSprouts: "shown",
   tint: 0,
   heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
@@ -2583,6 +2585,7 @@ const ICON: Record<string, string> = {
   follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
   scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
   files: `<path d="M4.5 2h4.5l2.5 2.5V14h-7z"/><path d="M9 2v2.5h2.5"/>`,
+  sprout: `<path d="M3 3h6M5 5.5v7M5 8.5h4M5 12.5h6"/>`,
   spaced: `<path d="M2.5 3.5h11M2.5 12.5h11M8 5.5v5M6.5 7 8 5.5 9.5 7M6.5 9 8 10.5 9.5 9"/>`,
   shape: `<path d="M3 3h7M3 6h9M6 9h6M6 12h4"/>`,
   tree: `<path d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/>`,
@@ -3105,7 +3108,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3365,44 +3368,43 @@ function treeHtml(): string {
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
-  // a row that hides levels draws them beneath it, small, as the tree it would grow: a bar per brief of the level it
-  // hides, as long as that brief's own text, and beneath a brief that branches a comb with a tooth per brief of its own
-  // level, so the shape of what is folded, how wide and how deep, is read where the folded level would stand
+  // a row that hides levels draws them beneath it, small, as the tree it would grow: every brief it hides, each a bar at
+  // its own depth, in its hue and as long as its own text, hung on spines as the tree's rows are. It is the tree itself,
+  // not a summary of it, so a large one is pressed together in height rather than cut, the rows merging into the
+  // silhouette of the branch. It stops at a card within, which is a reading of its own and drawn as one bar
   const sprout = (b: Brief): string => {
+    if (settings.treeSprouts !== "shown") return "";
     const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
-    const kids = hides ? level(b.address) : [];
-    if (!kids.length) return "";
-    const open = settings.treeRoom === "open";
-    const [pitch, bar, step, cap] = open ? [4, 2.5, 6, 12] : [3, 2, 5, 9];
-    const long = (a: string, most: number): number => clamp(2 + Math.log2(1 + (state.index!.own.get(a) ?? 0) / 150) * (most / 6), 2, most);
-    const shown = kids.slice(0, cap);
-    let i = 0;
-    const y = (): number => 2 + i * pitch;
-    const out: string[] = [];
-    const spine: number[] = [];
-    // what the cap leaves out is told by the last bars fading, rather than by a count beside them
-    const fade = (n: number): string => (kids.length > cap && n >= cap - 2 ? ` fill-opacity="${(0.35 * (cap - n)).toFixed(2)}"` : "");
-    shown.forEach((k, n) => {
-      spine.push(y());
-      out.push(`<rect x="0.6" y="${y()}" width="${long(k.address, 32).toFixed(1)}" height="${bar}" rx="${bar / 2}" ${hued(k.address)}${fade(n)}/>`);
-      i++;
-      const g = level(k.address);
-      if (!g.length) return;
-      // the comb hangs from beneath its bar, a short spine down and its teeth along the row after
-      const top = y() - pitch + bar;
-      out.push(`<path class="spine" d="M${step + 0.6} ${top}V${y() + bar / 2}"/>`);
-      let x = step + 2;
-      for (const c of g.slice(0, 14)) {
-        const w = long(c.address, 7);
-        out.push(`<rect x="${x.toFixed(1)}" y="${y()}" width="${w.toFixed(1)}" height="${bar}" rx="${Math.min(bar, w) / 2}" ${hued(c.address)}${fade(n)}/>`);
-        x += w + 1.2;
-      }
-      if (g.some((c) => level(c.address).length)) out.push(`<circle class="deeper" cx="${(x + 1.5).toFixed(1)}" cy="${y() + bar / 2}" r="${bar / 2}"/>`);
-      i++;
+    if (!hides || !level(b.address).length) return "";
+    const rows: { a: string; d: number }[] = [];
+    const walk = (a: string, d: number): void =>
+      level(a).forEach((k) => {
+        rows.push({ a: k.address, d });
+        if (!isCard(k)) walk(k.address, d + 1);
+      });
+    walk(b.address, 0);
+    const most = settings.treeRoom === "open" ? 72 : 48;
+    const pitch = Math.min(3.5, most / rows.length);
+    const bar = Math.max(0.8, Math.min(2, pitch - 1));
+    const step = 5;
+    const x = (d: number): number => 0.6 + d * step;
+    const y = (i: number): number => 2 + i * pitch;
+    const long = (a: string): number => clamp(2 + Math.log2(1 + (state.index!.own.get(a) ?? 0) / 150) * 5, 2, 34);
+    // a spine falls from beneath each bar to its last child, and the first level's from the row the sprout hangs from
+    const spines = rows.map((r, i) => {
+      let last = -1;
+      for (let j = i + 1; j < rows.length && rows[j].d > r.d; j++) if (rows[j].d === r.d + 1) last = j;
+      return last < 0 ? "" : `M${x(r.d + 1).toFixed(1)} ${(y(i) + bar).toFixed(1)}V${(y(last) + bar / 2).toFixed(1)}`;
     });
-    const h = y() - pitch + bar + 3;
-    const tip = `${kids.length} beneath it${kids.length > cap ? `, the first ${cap} drawn` : ""}`;
-    return `<div class="sprout" title="${tip}"><svg width="96" height="${h}"><path class="spine" d="M0.6 0V${spine[spine.length - 1] + bar / 2}"/>${out.join("")}</svg></div>`;
+    const top = rows.reduce((n, r, i) => (r.d === 0 ? i : n), 0);
+    spines.unshift(`M0.6 0V${(y(top) + bar / 2).toFixed(1)}`);
+    const bars = rows
+      .map((r, i) => `<rect x="${(x(r.d) + 1.4).toFixed(1)}" y="${y(i).toFixed(1)}" width="${long(r.a).toFixed(1)}" height="${bar.toFixed(1)}" rx="${(bar / 2).toFixed(1)}" ${hued(r.a)}/>`)
+      .join("");
+    const deep = Math.max(...rows.map((r) => r.d)) + 1;
+    const h = y(rows.length - 1) + bar + 3;
+    const tip = `${rows.length} ${rows.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep`;
+    return `<div class="sprout" title="${tip}"><svg width="${(x(deep) + 40).toFixed(0)}" height="${h.toFixed(0)}"><path class="spine" d="${spines.join("")}"/>${bars}</svg></div>`;
   };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
   // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
@@ -3721,6 +3723,7 @@ function settleHeld(): void {
   if (settings.plate !== "scope") settings.plate = "whole";
   if (settings.plateGrain !== "file") settings.plateGrain = "brief";
   if (settings.treeRoom !== "open") settings.treeRoom = "dense";
+  if (settings.treeSprouts !== "hidden") settings.treeSprouts = "shown";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -5748,7 +5751,12 @@ function headSettings(k: string): string {
   if (k === "tree") {
     const open = settings.treeRoom === "open";
     const tip = open ? "rows stand apart and names wrap — press to draw them close" : "rows stand close and names are cut — press to give them room";
-    return `<button class="pick${open ? " on" : ""}" data-toggle="room" data-tip="${esc(tip)}">${icon("spaced")}</button>`;
+    const shown = settings.treeSprouts === "shown";
+    const stip = shown ? "a folded row draws what it hides beneath it — press to draw the rows alone" : "the rows alone — press to draw beneath a folded row what it hides";
+    return (
+      `<button class="pick${open ? " on" : ""}" data-toggle="room" data-tip="${esc(tip)}">${icon("spaced")}</button>` +
+      `<button class="pick${shown ? " on" : ""}" data-toggle="sprouts" data-tip="${esc(stip)}">${icon("sprout")}</button>`
+    );
   }
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
@@ -6339,10 +6347,15 @@ function drawFocusMarks(): void {
  * in view, driven by the lane and never free.
  */
 function drawLaser(): void {
-  // the tree draws the world the keys act in, so only that world moves its water
-  if (worldNow() !== keysWorld()) return;
   const tree = ui.areas.querySelector<HTMLElement>(".tree");
   if (!tree) return;
+  // a sprout stands under its row's name, wherever the number before the name has left it
+  all<HTMLElement>(".sprout", tree).forEach((sp) => {
+    const name = sp.previousElementSibling?.querySelector<HTMLElement>(".name");
+    if (name) sp.style.setProperty("--under", `${name.offsetLeft}px`);
+  });
+  // the tree draws the world the keys act in, so only that world moves its water
+  if (worldNow() !== keysWorld()) return;
   const tick = parseFloat(getComputedStyle(tree).getPropertyValue("--tick")) || 10;
   all<HTMLElement>(".flow", tree).forEach((f) => {
     const kids = f.parentElement!;
@@ -7492,6 +7505,7 @@ const onClick = (e: MouseEvent): void => {
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
     } else if (what === "from") settings.mapFrom = { ...settings.mapFrom, [w]: settings.mapFrom[w] === "scope" ? "whole" : "scope" };
+    else if (what === "sprouts") settings.treeSprouts = settings.treeSprouts === "shown" ? "hidden" : "shown";
     else if (what === "room") settings.treeRoom = settings.treeRoom === "open" ? "dense" : "open";
     else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
     else settings.plate = settings.plate === "scope" ? "whole" : "scope";
@@ -8844,11 +8858,10 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .pointing .tree .row.here:not(.lit) .name { color: var(--ink); font-weight: calc(500 - var(--thin)); }
 /* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
 /* where a row is short of room its figure gives way first, then its status, and its name last */
-.tree .sprout { margin: -1px 0 1px 6.4px; line-height: 0; pointer-events: none; }
+.tree .sprout { margin: -1px 0 2px var(--under, 19px); line-height: 0; pointer-events: none; }
 .tree .sprout svg { display: block; overflow: visible; }
 .tree .sprout .spine { stroke: var(--track); stroke-width: 1; fill: none; }
 .tree .sprout rect { fill: var(--door); opacity: .7; }
-.tree .sprout .deeper { fill: var(--faint); }
 .tree .row:hover + .sprout rect, .tree .row.lit + .sprout rect { opacity: 1; }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
 .tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
