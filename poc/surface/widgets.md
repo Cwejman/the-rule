@@ -82,7 +82,7 @@ So a brief's colour narrows as the reader goes down. A part of the root spans a 
 
 A fill wide enough that a run of colour can be seen across it, as most cells of [the plate](#7-the-plate) near its centre are, takes its slice whole, as a run across it. So does a rim drawn around a card in its slice's hue: [the lane's card](lane.md#12-a-placed-part-raises-a-card) where the reading stands on it or it is lit by a pointer on it anywhere, and [the canvas's box](canvas.md#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) that leads to a reading, heads one, is selected, is where the reading stands or is under the pointer. A box with the quiet rim keeps it. The run is read along the rim, the slice going round the wheel from the card's left edge to its right, and never across the rim's weight, since a card is wide where a word is short. The root's rim, the whole wheel, runs all of it, as the scope's does under [the trial](#181-a-trial-colour-from-the-scope). In text, where a ring stands close around a name, it takes the middle, as the name's ink does.
 
-Everything else, a name's ink, a line, an underline, a mark or a small cell, takes the middle of its slice, since a run across a word or a hairline reads as noise rather than as place. Ink can therefore match where slices nest: a parent with an odd number of children shares its middle with the middle one, and slices too thin to tell apart read alike. The root, the whole wheel, has no middle, and its ink keeps the hue of nought degrees it has always had.
+Everything else, a name's ink, a line, an underline, a mark or a small cell, takes the middle of its slice, since a run across a word or a hairline reads as noise rather than as place. Ink can therefore match where slices nest: a parent with an odd number of children shares its middle with the middle one, and slices too thin to tell apart read alike. The root, the whole wheel, has no middle, so its ink takes no hue at all: it stands in grey, its lightness kept, as whatever lies outside the wheel does under [the trial](#181-a-trial-colour-from-the-scope). Its ink kept the hue of nought degrees until 2026-10-14, which read as the root being red, in its heading and its figures alike.
 
 The wheel begins with the first part's middle at thirty degrees, the warm red it has always taken, and the parts follow round in their order, so neighbours stand near in hue; with seven parts, each middle stands about 51 degrees from the next.
 
@@ -94,7 +94,7 @@ Whether a slice is shared among every brief or among files alone is [a switch](#
 
 #### 1.8.1 A trial: colour from the scope
 
-As a trial a reader turns on, the wheel can be laid from the scope instead of from the root. Then the scope's brief is the whole wheel and takes its ink as the root does, and the briefs beneath it share it as the root's would. At the root it changes nothing.
+As a trial a reader turns on, the wheel can be laid from the scope instead of from the root. Then the scope's brief is the whole wheel and takes its ink as the root does, grey, and the briefs beneath it share it as the root's would. At the root it changes nothing.
 
 Everything outside the scope is drawn in grey, its lightness kept and its hue taken away: the levels above it, wherever the way down, a map drawn from the root or a plate drawn whole shows them, and every branch off the way to it.
 
