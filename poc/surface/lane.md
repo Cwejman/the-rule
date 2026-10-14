@@ -266,15 +266,17 @@ How the reader came here is the trail, against the lane's right edge on the same
 
 *Reasoned, the author's, 2026-09-14; the growing past the lane his ask of 2026-09-18, and the three parts told by the type his direction of the same day, after a first cut drew them as chips and he refused it; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day; the run reaching down to the focus rather than to the scope, his ask of 2026-09-16, from reading on a phone and finding he wanted the address of where he had scrolled to. Wide, from 2026-10-01, each world's way down stands over [its own prose](layout.md#6-the-body-and-git-two-worlds), or over its canvas where its prose does not stand, a head's room below the top edge. The weight for the kind, the numbers, the slash at a boundary and the files alone are the author's ask of 2026-10-14, that the line say more and may show files only; the means are the session's, until the author has looked.*
 
-#### 7.5.1 What more the line could say
+#### 7.5.1 What the line carries beside the names
 
-The line tells the kind, the place and the boundary, and there is more it could carry, each held back until the author has looked at the three it now carries.
+Past the kind, the place and the boundary, the line says where a way down begins, which reading the reader is in, and how far into it they stand.
 
-The root could be drawn as a mark rather than its title, the whole wheel as a small ring, since every way down begins there. The reading open could carry its hue at rest, where now only the slash into it does, and the sections within it could stand as their numbers alone, the head keeping its title, so a deep address reads as one reading and a number. Beside the reading open could stand its status from its stamp, and how far through it the focus stands.
+The root is drawn as a ring rather than its title, the whole wheel, since every way down begins there and its name is told on pointing. The reading open carries its hue at rest, in the ink of its branch, so the one name the reader stands in reads apart from the muted ones above it. The sections within it stand as their numbers alone and the head keeps its title, so a deep address reads as one reading and a number. Beside the reading open stand its status from its stamp, and a short bar in its hue of how far through it the focus stands, by the text of the briefs up to the focus in the reading's own order, the focus's included.
 
-Some of these belong to [the pane of bearings](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions) rather than to a line, where the path is drawn line by line and has the room to say each of them.
+Narrow, the status and the bar give way, and where the focus is inside the reading open the line keeps that reading before the head rather than the level above, since a number says nothing without the reading's name; the reading gives way with the head rather than being cut.
 
-*Open, the session's, 2026-10-14.*
+Some of this belongs as well to [the pane of bearings](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions), where the path is drawn line by line and has the room to say each of these at length.
+
+*The author's ask of 2026-10-14, taking all five the session had proposed; the means are the session's, until the author has looked. The bar counts text and not the folds, so it says where the focus stands in the reading and not how far the lane has scrolled.*
 
 ## 8. A record is ordered by time
 
