@@ -8451,10 +8451,10 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a card is for looking at directly, not for reading through, so it never dims: the prose around it carries the
    reading's ink and the card carries its own. What says which card the reading stands on is its outline taking the
    branch's hue, which is as much as a thing meant to be scanned should ever change */
-.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; color: var(--muted); transition: outline-color .16s, color .16s; }
-/* the card the reading stands on takes full ink and its outline takes the branch's hue; the others stay legible and
-   quiet, which is what a thing meant to be scanned should do rather than fade */
-.brief .card.here, .brief .card.lit { color: var(--ink); outline-color: var(--lit); }
+.brief .card { margin: 22px 0; padding: 16px 18px 12px; border-radius: 10px; background: var(--wash); outline: 1px solid var(--rim); outline-offset: -1px; cursor: pointer; transition: outline-color .16s; }
+/* every card stands in the ink of the prose around it, and the one the reading stands on is told by its outline alone,
+   which takes the branch's hue: a card quieter than the prose beside it read as faded */
+.brief .card.here, .brief .card.lit { outline-color: var(--lit); }
 /* that outline runs the card's slice across it, over the outline it covers, and comes and goes as the outline's hue does */
 .brief .card { position: relative; }
 .brief .card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; background: ${roleRun("lit")}; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); opacity: 0; transition: opacity .15s; }
