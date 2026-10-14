@@ -1773,15 +1773,15 @@ const sliceIn = (w: World, address: string): Slice | undefined => {
 };
 /**
  * A brief's colour as the style a drawing sets on it: the middle of its slice, which is its hue wherever it is drawn as
- * ink, where the root, the whole wheel, has none and keeps 0. Outside where the wheel is laid from it is grey, its hue
- * taken away by --hk; that is said on every brief while the wheel is laid from the scope, since a brief inherits it.
+ * ink. The top the wheel is laid from, the root or the scope, is the whole wheel and has no middle, so its ink takes no
+ * hue: it is grey, its lightness kept, as everything outside where the wheel is laid from is, the hue taken away by
+ * --hk. That is said on every brief, since a brief inherits it from whatever it is drawn inside.
  */
 const hueVarsIn = (w: World, address: string): string => {
   const top = wheelTop(w);
   const s = address === top ? undefined : sliceIn(w, address);
   const h = s ? Math.round((((((s.from + s.to) / 2) % 360) + 360) % 360) * 10) / 10 : 0;
-  if (top === "" && settings.colourFrom !== "scope") return `--h:${h}`;
-  return `--h:${h};--hk:${s || address === top ? 1 : 0}`;
+  return `--h:${h};--hk:${s ? 1 : 0}`;
 };
 const hueVars = (address: string): string => hueVarsIn(state, address);
 const hued = (address: string): string => `style="${hueVars(address)}"`;
@@ -6012,7 +6012,8 @@ function tintGround(): void {
   if (settings.tint <= 0) return;
   const a = state.scope;
   const sl = sliceIn(state, a);
-  const [h0, h1] = a === "" || a === wheelTop(state) || !sl ? [0, 360] : [sl.from, sl.to];
+  const whole = a === "" || a === wheelTop(state) || !sl;
+  const [h0, h1] = whole ? [0, 360] : [sl.from, sl.to];
   const el = ui.scroll;
   const H = Math.max(el.scrollHeight, 1);
   const at = (f: number): string => `${Math.round((h0 + (h1 - h0) * clamp(f, 0, 1)) * 10) / 10}`;
@@ -6020,7 +6021,8 @@ function tintGround(): void {
   b.setProperty("--gh0", at(el.scrollTop / H));
   b.setProperty("--gh1", at((el.scrollTop + el.clientHeight) / H));
   b.setProperty("--ghk", `${settings.tint}`);
-  b.setProperty("--ghc", /--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1");
+  // the whole wheel runs in full, though its own ink is grey; a reading outside where the wheel is laid from is grey
+  b.setProperty("--ghc", whole && (a === "" || a === wheelTop(state)) ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
 }
 
 /**
