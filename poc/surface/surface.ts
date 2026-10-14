@@ -3698,13 +3698,13 @@ const onRail = (): boolean => fits().rail > 0;
 const aheadWidth = (): number => SHAPE.pad * 2 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + SHAPE.tail;
 
 /** One block drawn small: a heading a short bar, a paragraph a filled block, an image a frame, so no figure passes an image off as prose. */
-const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number): string =>
+const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number, style = ""): string =>
   kind === "image" || kind === "card"
-    ? `<rect class="${kind}" x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
+    ? `<rect class="${kind}"${style ? ` ${style}` : ""} x="${(x + 0.5).toFixed(1)}" y="${(y + 0.5).toFixed(1)}" width="${Math.max(1, w - 1)}" height="${Math.max(1, h - 1).toFixed(1)}" rx="1.5"/>`
     : `<rect class="${kind}" x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" rx="1"/>`;
 
 /** The lane's briefs and their blocks as laid, in the scroll box's own coordinates; an image's width is its share of the lane's. */
-function laidBlocks(): { a: string; top: number; height: number; blocks: { top: number; height: number; kind: ABlock["kind"]; width: number }[] }[] {
+function laidBlocks(): { a: string; top: number; height: number; blocks: { top: number; height: number; kind: ABlock["kind"]; width: number; card?: string }[] }[] {
   const c = ui.content.getBoundingClientRect().top;
   return all<HTMLElement>(".brief", ui.lane).map((el) => {
     const r = el.getBoundingClientRect();
@@ -3714,7 +3714,8 @@ function laidBlocks(): { a: string; top: number; height: number; blocks: { top: 
         const xr = x.getBoundingClientRect();
         return { top: xr.top - c, height: xr.height, kind, width };
       };
-      if (b.classList.contains("card")) return [at(b, "card")];
+      // a card is the reading on the other side, so it is drawn in that reading's hue and not the brief's that raises it
+      if (b.classList.contains("card")) return [{ ...at(b, "card"), card: (b as HTMLElement).dataset.card }];
       if (b.tagName !== "FIGURE") return [at(b, b.tagName === "H1" || b.tagName === "H2" ? "head" : "para")];
       const img = b.querySelector("img, svg");
       const caption = b.querySelector("figcaption");
@@ -3746,7 +3747,7 @@ function shapeSvg(W: number, H: number): string {
     // the rail nests a step tighter than a column does, so a level six deep still leaves a row room for its marks
     const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
-      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1)))
+      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1), b.card ? hued(b.card) : ""))
       .join("");
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
     // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
@@ -6004,8 +6005,8 @@ function drawCrumb(): void {
  * The ground takes, as strongly as its meter says, the reading open's slice of the wheel laid down the reading's length,
  * and shows the part of it the screen stands over: the top of the screen takes the hue that far into the slice that
  * the screen's top is into the reading, and its foot likewise. So it says where the reader is within the reading as a
- * scrollbar would, in the colour the briefs there take, and at the root it is the wheel's part where the parts the
- * reader is passing stand. A reading outside where the wheel is laid from is grey. Drawn again on every scroll.
+ * scrollbar would, in the colour the briefs there take. At the root, the whole wheel, it is plain. A reading outside
+ * where the wheel is laid from is grey. Drawn again on every scroll.
  */
 function tintGround(): void {
   document.body.classList.toggle("tinted", settings.tint > 0);
@@ -6013,16 +6014,20 @@ function tintGround(): void {
   const a = state.scope;
   const sl = sliceIn(state, a);
   const whole = a === "" || a === wheelTop(state) || !sl;
-  const [h0, h1] = whole ? [0, 360] : [sl.from, sl.to];
+  // the top the wheel is laid from, the whole wheel, leaves the ground plain: run down its reading it was too much
+  const top = a === "" || a === wheelTop(state);
+  const [h0, h1] = top ? [60, 60] : whole ? [0, 360] : [sl.from, sl.to];
   const el = ui.scroll;
   const H = Math.max(el.scrollHeight, 1);
   const at = (f: number): string => `${Math.round((h0 + (h1 - h0) * clamp(f, 0, 1)) * 10) / 10}`;
   const b = document.body.style;
   b.setProperty("--gh0", at(el.scrollTop / H));
   b.setProperty("--gh1", at((el.scrollTop + el.clientHeight) / H));
-  b.setProperty("--ghk", `${settings.tint}`);
+  b.setProperty("--ghk", top ? "0" : `${settings.tint}`);
+  // a plain ground keeps the cards as they stand on any plain ground
+  document.body.classList.toggle("plain", top);
   // the whole wheel runs in full, though its own ink is grey; a reading outside where the wheel is laid from is grey
-  b.setProperty("--ghc", whole && (a === "" || a === wheelTop(state)) ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
+  b.setProperty("--ghc", top ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
 }
 
 /**
@@ -8100,7 +8105,7 @@ body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)
 /* on a ground that takes the hue a card is a thing of its own colour standing on it, never a pane the ground shows
    through: it takes its slice whole as a run, as its rim does, a step from the ground, so at the root each part's card
    is its own hue over the wheel rather than a glass over it */
-body.tinted .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))))); }
+body.tinted:not(.plain) .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))))); }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
