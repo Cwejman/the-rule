@@ -6024,8 +6024,7 @@ function tintGround(): void {
   b.setProperty("--gh0", at(el.scrollTop / H));
   b.setProperty("--gh1", at((el.scrollTop + el.clientHeight) / H));
   b.setProperty("--ghk", top ? "0" : `${settings.tint}`);
-  // a plain ground keeps the cards as they stand on any plain ground
-  document.body.classList.toggle("plain", top);
+  b.setProperty("--ck", `${settings.tint}`);
   // the whole wheel runs in full, though its own ink is grey; a reading outside where the wheel is laid from is grey
   b.setProperty("--ghc", top ? "1" : (/--hk:([\d.]+)/.exec(hueVars(a))?.[1] ?? "1"));
 }
@@ -8103,9 +8102,9 @@ html body.tinted { background-image: linear-gradient(180deg in oklch increasing 
    reads as something laid over it, and the ink, the muted and the faint keep their lightness and lean to the hue */
 body.tinted { --ink: light-dark(oklch(19.1% calc(0.012 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(92% calc(0.005 + 0.012 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); --muted: light-dark(oklch(51.9% calc(0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(74% calc(0.005 + 0.025 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); --faint: light-dark(oklch(72.5% calc(0.035 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2)), oklch(55% calc(0.005 + 0.03 * var(--ghk) * var(--ghc)) calc((var(--gh0) + var(--gh1)) / 2))); }
 /* on a ground that takes the hue a card is a thing of its own colour standing on it, never a pane the ground shows
-   through: it takes its slice whole as a run, as its rim does, a step from the ground, so at the root each part's card
-   is its own hue over the wheel rather than a glass over it */
-body.tinted:not(.plain) .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 5% * var(--ghk)) calc(0.045 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ghk)) calc(0.005 + 0.035 * var(--ghk) * var(--hk, 1)) var(--h1, var(--h))))); }
+   through: it takes its slice whole as a run, as its rim does, lightly, as tinted frosted glass would, by the ground's
+   meter even where the ground itself is plain, so at the root each part's card is its own hue */
+body.tinted .brief .card { background: linear-gradient(90deg in oklch increasing hue, light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) var(--h0, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h0, var(--h)))), light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2)), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) calc((var(--h0, var(--h)) + var(--h1, var(--h))) / 2))), light-dark(oklch(calc(100% - 5% * var(--ck)) calc(0.032 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))), oklch(calc(18.5% + 5.5% * var(--ck)) calc(0.005 + 0.026 * var(--ck) * var(--hk, 1)) var(--h1, var(--h))))); box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / .85), rgb(255 255 255 / .06)); }
 /* a heading's title stands as far from ink towards its branch's hue as its meter says, the opening's with it */
 :is(.brief .head .title, .opening h1) { color: color-mix(in oklch, var(--on) calc(var(--headk, 0) * 100%), var(--ink)); }
 /* a browser paints its own grey over what a finger taps, and it lingers over whatever the press then draws */
