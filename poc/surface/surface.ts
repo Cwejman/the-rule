@@ -3326,6 +3326,13 @@ const besideOpen = new Set<string>();
  * and a tree drawn again while it flows takes it up where it was rather than starting it over.
  */
 let treeFlow: { focus: string | null; before: Set<string>; at: number } = { focus: null, before: new Set(), at: 0 };
+/** The water down each level, by the brief whose level it is: where it ran from and to, and when it set out. */
+const flowStood = new Map<string, { from: number; to: number; at: number }>();
+/** How long the water takes down a stretch, in milliseconds, as the line's transition says. */
+const FLOW_MS = 240;
+/** Where the water stands in a level now, reckoned from where it set out, so a tree laid again mid-run takes it on. */
+const flowNow = (r: { from: number; to: number; at: number } | undefined): number =>
+  r ? r.from + (r.to - r.from) * clamp((performance.now() - r.at) / FLOW_MS, 0, 1) : 0;
 
 function treeHtml(): string {
   const S = state.scope;
@@ -3345,7 +3352,7 @@ function treeHtml(): string {
     // the level the way runs down carries the water down its line, from its top to the row the way passes into
     const next = onWay.has(a) ? way0[depthOf(a) + 1] : undefined;
     const delay = (x: string): string => `--delay:${((depthOf(x) - first) * 0.16 - since).toFixed(3)}s`;
-    const flow = next === undefined ? "" : fresh.includes(next) ? `<i class="flow fresh" style="${delay(next)}"></i>` : `<i class="flow"></i>`;
+    const flow = next === undefined ? "" : `<i class="flow" data-of="${esc(a)}"${fresh.includes(next) ? ` style="${delay(next)}"` : ""}></i>`;
     const newly = a !== "" && fresh.includes(a);
     const cls = ["node", reading(a) && a !== "" ? "door" : "", onWay.has(a) ? "on" : "", newly ? "fresh" : ""].filter(Boolean).join(" ");
     return `<div class="${cls}" style="${hueVars(a)}${newly ? `;${delay(a)}` : ""}">${row}${kids ? `<div class="kids">${flow}${kids}</div>` : ""}</div>`;
@@ -6290,7 +6297,20 @@ function drawLaser(): void {
   all<HTMLElement>(".flow", tree).forEach((f) => {
     const kids = f.parentElement!;
     const into = kids.querySelector<HTMLElement>(":scope > .node.on > .row");
-    f.style.height = into ? `${Math.max(0, into.getBoundingClientRect().top - kids.getBoundingClientRect().top + tick)}px` : "0px";
+    const to = into ? Math.max(0, into.getBoundingClientRect().top - kids.getBoundingClientRect().top + tick) : 0;
+    const of = f.dataset.of!;
+    const was = flowStood.get(of);
+    // a line just laid starts where the water stands in that level, nothing where the level is newly reached, so
+    // whatever lays the tree again runs it on from there rather than from each level's top
+    if (!f.dataset.laid) {
+      f.dataset.laid = "1";
+      f.style.transition = "none";
+      f.style.height = `${flowNow(was)}px`;
+      void f.offsetHeight;
+      f.style.transition = "";
+    }
+    if (was?.to !== to) flowStood.set(of, { from: flowNow(was), to, at: performance.now() + Math.max(0, parseFloat(f.style.getPropertyValue("--delay")) || 0) * 1000 });
+    f.style.height = `${to}px`;
   });
   const row = tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(state.focus)}"]`);
   if (!row) return;
@@ -8749,8 +8769,7 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
    what is newly reached runs from the top down, a level after the one above it */
 .tree .kids { position: relative; }
 .tree .flow { position: absolute; z-index: 1; left: 6.9px; top: 0; width: 1.5px; height: 0; border-radius: 1px; background: var(--on); transform-origin: top; pointer-events: none; }
-.tree .flow.fresh { animation: tree-flow .22s cubic-bezier(.4, 0, .6, 1) var(--delay, 0s) both; }
-@keyframes tree-flow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.tree .flow { transition: height .24s linear var(--delay, 0s); }
 .tree .kids > .node.fresh > .row::after { transform-origin: left; animation: tree-tick .12s ease-out calc(var(--delay, 0s) + .2s) both; }
 @keyframes tree-tick { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 /* the tick into a row says what reaching it crosses: the branch's ink on the way to the focus, and the hue of the
