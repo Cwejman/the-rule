@@ -2583,6 +2583,7 @@ const ICON: Record<string, string> = {
   follow: `<circle cx="8" cy="8" r="4.5"/><circle cx="8" cy="8" r="1"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2"/>`,
   scoped: `<circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 6 6H8z"/>`,
   files: `<path d="M4.5 2h4.5l2.5 2.5V14h-7z"/><path d="M9 2v2.5h2.5"/>`,
+  spaced: `<path d="M2.5 3.5h11M2.5 12.5h11M8 5.5v5M6.5 7 8 5.5 9.5 7M6.5 9 8 10.5 9.5 9"/>`,
   shape: `<path d="M3 3h7M3 6h9M6 9h6M6 12h4"/>`,
   tree: `<path d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/>`,
   ahead: `<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>`,
@@ -3104,7 +3105,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3611,7 +3612,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb" | "treeRoom"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "face" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -3621,7 +3622,6 @@ const SWITCHES: Switch[] = [
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
-  { key: "treeRoom", name: "the tree", values: ["dense", "open"] },
   { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "face", name: "the face", values: ["shown", "hidden"] },
@@ -3683,6 +3683,7 @@ function settleHeld(): void {
   settings.follow = { body: follow.body !== false, history: follow.history !== false };
   if (settings.plate !== "scope") settings.plate = "whole";
   if (settings.plateGrain !== "file") settings.plateGrain = "brief";
+  if (settings.treeRoom !== "open") settings.treeRoom = "dense";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -5700,6 +5701,11 @@ function headSettings(k: string): string {
     const gtip = files ? "a cell per file — press for a cell per brief" : "a cell per brief — press for a cell per file";
     return scope + `<button class="pick${files ? " on" : ""}" data-toggle="grain" data-tip="${esc(gtip)}">${icon("files")}</button>`;
   }
+  if (k === "tree") {
+    const open = settings.treeRoom === "open";
+    const tip = open ? "rows stand apart and names wrap — press to draw them close" : "rows stand close and names are cut — press to give them room";
+    return `<button class="pick${open ? " on" : ""}" data-toggle="room" data-tip="${esc(tip)}">${icon("spaced")}</button>`;
+  }
   if (k !== "prose" && k !== "gitProse") return "";
   const g = settings.gutters[w];
   return ([0, 1] as const)
@@ -7433,7 +7439,7 @@ const onClick = (e: MouseEvent): void => {
     saveSettings();
     return void drawAll();
   }
-  // a canvas's following and the plate's reach are settings of their own, set in their heads
+  // a canvas's following, the plate's reach and the tree's room are settings of their own, set in their heads
   const toggle = t.closest<HTMLElement>("[data-toggle]")?.dataset.toggle;
   if (toggle) {
     const [what, w] = toggle.split(":") as [string, "body" | "history"];
@@ -7442,6 +7448,7 @@ const onClick = (e: MouseEvent): void => {
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
     } else if (what === "from") settings.mapFrom = { ...settings.mapFrom, [w]: settings.mapFrom[w] === "scope" ? "whole" : "scope" };
+    else if (what === "room") settings.treeRoom = settings.treeRoom === "open" ? "dense" : "open";
     else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
     else settings.plate = settings.plate === "scope" ? "whole" : "scope";
     saveSettings();
