@@ -3368,43 +3368,43 @@ function treeHtml(): string {
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
-  // a row that hides levels draws them beneath it, small, as the tree it would grow: every brief it hides, each a bar at
-  // its own depth, in its hue and as long as its own text, hung on spines as the tree's rows are. It is the tree itself,
-  // not a summary of it, so a large one is pressed together in height rather than cut, the rows merging into the
-  // silhouette of the branch. It stops at a card within, which is a reading of its own and drawn as one bar
+  // a row that hides levels draws them beneath it as the shape of its branch: a column per level, nearest first, and a
+  // block per brief as tall as its branch weighs, its own text and all beneath it, each hanging from its parent's block
+  // under the share the parent's own text takes. Its whole height grows with the branch, so how deep it goes, where it
+  // branches and where its weight lies read true, and how many briefs stand side by side does not
   const sprout = (b: Brief): string => {
     if (settings.treeSprouts !== "shown") return "";
     const hides = isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
     if (!hides || !level(b.address).length) return "";
-    const rows: { a: string; d: number }[] = [];
-    const walk = (a: string, d: number): void =>
-      level(a).forEach((k) => {
-        rows.push({ a: k.address, d });
-        if (!isCard(k)) walk(k.address, d + 1);
-      });
-    walk(b.address, 0);
-    const most = settings.treeRoom === "open" ? 72 : 48;
-    const pitch = Math.min(3.5, most / rows.length);
-    const bar = Math.max(0.8, Math.min(2, pitch - 1));
-    const step = 5;
-    const x = (d: number): number => 0.6 + d * step;
-    const y = (i: number): number => 2 + i * pitch;
-    const long = (a: string): number => clamp(2 + Math.log2(1 + (state.index!.own.get(a) ?? 0) / 150) * 5, 2, 34);
-    // a spine falls from beneath each bar to its last child, and the first level's from the row the sprout hangs from
-    const spines = rows.map((r, i) => {
-      let last = -1;
-      for (let j = i + 1; j < rows.length && rows[j].d > r.d; j++) if (rows[j].d === r.d + 1) last = j;
-      return last < 0 ? "" : `M${x(r.d + 1).toFixed(1)} ${(y(i) + bar).toFixed(1)}V${(y(last) + bar / 2).toFixed(1)}`;
-    });
-    const top = rows.reduce((n, r, i) => (r.d === 0 ? i : n), 0);
-    spines.unshift(`M0.6 0V${(y(top) + bar / 2).toFixed(1)}`);
-    const bars = rows
-      .map((r, i) => `<rect x="${(x(r.d) + 1.4).toFixed(1)}" y="${y(i).toFixed(1)}" width="${long(r.a).toFixed(1)}" height="${bar.toFixed(1)}" rx="${(bar / 2).toFixed(1)}" ${hued(r.a)}/>`)
+    const own = (a: string): number => Math.max(1, state.index!.own.get(a) ?? 0);
+    const weight = new Map<string, number>();
+    const weigh = (a: string): number => {
+      const w = own(a) + level(a).reduce((n, k) => n + weigh(k.address), 0);
+      weight.set(a, w);
+      return w;
+    };
+    const total = weigh(b.address) - own(b.address);
+    const most = settings.treeRoom === "open" ? 96 : 64;
+    const H = clamp(6 + Math.log2(1 + total / 4000) * 9, 8, most);
+    const k = H / total;
+    const blocks: { a: string; d: number; y: number; h: number }[] = [];
+    const lay = (a: string, d: number, y0: number): void => {
+      let y = y0;
+      for (const c of level(a)) {
+        const h = weight.get(c.address)! * k;
+        blocks.push({ a: c.address, d, y, h });
+        lay(c.address, d + 1, y + own(c.address) * k);
+        y += h;
+      }
+    };
+    lay(b.address, 0, 0);
+    const deep = Math.max(...blocks.map((x) => x.d)) + 1;
+    const cw = clamp(Math.floor(150 / deep) - 1, 3, 12);
+    const rects = blocks
+      .map((x) => `<rect x="${(x.d * (cw + 1)).toFixed(1)}" y="${x.y.toFixed(2)}" width="${cw}" height="${Math.max(0.6, x.h - (x.h > 2.5 ? 0.7 : 0)).toFixed(2)}" rx="${Math.min(1.5, x.h / 2).toFixed(2)}" ${hued(x.a)}/>`)
       .join("");
-    const deep = Math.max(...rows.map((r) => r.d)) + 1;
-    const h = y(rows.length - 1) + bar + 3;
-    const tip = `${rows.length} ${rows.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep`;
-    return `<div class="sprout" title="${tip}"><svg width="${(x(deep) + 40).toFixed(0)}" height="${h.toFixed(0)}"><path class="spine" d="${spines.join("")}"/>${bars}</svg></div>`;
+    const tip = `${blocks.length} ${blocks.length === 1 ? "brief" : "briefs"} beneath, ${deep} ${deep === 1 ? "level" : "levels"} deep, ${Math.round(total / 1000)}k characters`;
+    return `<div class="sprout" title="${tip}"><svg width="${deep * (cw + 1)}" height="${Math.ceil(H)}">${rects}</svg></div>`;
   };
   const stamp = (b: Brief): string => (isCard(b) && stampOf(b) ? `<span class="stamp">${esc(stampOf(b))}</span>` : "");
   // the way: a step above the reading open takes the lane out to it, and the reading open goes to its opening
