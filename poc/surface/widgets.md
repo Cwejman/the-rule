@@ -164,6 +164,10 @@ Where a row hides a level, folded or a card, what it hides stands beneath it as 
 
 Whether the sprouts stand is a second setting in the tree's head, apart from its room, and a layout holds it too.
 
+The tree may also follow the levels the lane has unfolded, a third setting in its head: a level whose briefs all stand folded is then not listed but drawn as its sprout beneath the brief above it, so folding the scope back a level with shift and left leaves the tree with the levels still unfolded alone, and a reader looks at one level of the reading's shape without every brief beneath it. Where the focus stands in a level drawn so, the way ends at the row that holds it.
+
+*The levels synced to the lane, the author's ask of 2026-10-15, to look at one level of the topology at a time.*
+
 The tree takes the width its rows need, measured as it is laid, up to three hundred and twenty pixels, past which a long name is cut; its rows change with the folds and the scope rather than with each step, so the row is laid again only when what the tree needs has changed, and a step never moves the prose.
 
 A reader may pull its edge, as any column's edge [is pulled](layout.md#3-the-gaps-are-the-handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
