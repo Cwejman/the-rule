@@ -1513,6 +1513,8 @@ type Settings = {
   treeSprouts: "shown" | "hidden";
   /** whether every step of the tree's way stands among its level, or only those the reader opened */
   treeWhole: "way" | "whole";
+  /** whether the tree lists a level whose briefs all stand folded, or draws it as its figure beneath the brief above */
+  treeLevels: "all" | "unfolded";
   /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
   tint: number;
   /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
@@ -1560,6 +1562,7 @@ const DEFAULTS: Settings = {
   treeRoom: "dense",
   treeSprouts: "shown",
   treeWhole: "way",
+  treeLevels: "all",
   tint: 0,
   heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
@@ -2595,6 +2598,7 @@ const ICON: Record<string, string> = {
   line: `<path d="M2.5 8h11"/><path d="M5 4.5h6M5 11.5h6" opacity=".45"/>`,
   flick: `<path d="M4.5 11.5 11 5M7.5 5H11v3.5"/><path d="M3 8.5l1.5-1.5M6 13l1.5-1.5" opacity=".45"/>`,
   side: `<rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2.5 10.5h11" opacity=".5"/>`,
+  levels: `<path d="M2.5 3.5h11M2.5 7.5h11"/><path d="M5 11.5h4.5M5 13.8h7" stroke-width="2" opacity=".45"/>`,
   whole: `<path d="M3 3v9.5M3 4h2M3 8h2M3 12.5h2"/><path d="M7 4h6.5M7 12.5h5" opacity=".4"/><path d="M7 8h6.5" stroke-width="1.8"/>`,
   sprout: `<path d="M2.5 3.5h9"/><path d="M4 5.5v6.5M4 8.5h1.5M4 12h1.5" stroke-width="1.1"/><path d="M7.5 8.5h6M7.5 12h3.5" stroke-width="2.4"/>`,
   spaced: `<path d="M7 3.5h6.5M7 8h6.5M7 12.5h6.5"/><path d="M3.5 3v10M2 4.5 3.5 3 5 4.5M2 11.5 3.5 13 5 11.5"/>`,
@@ -3129,7 +3133,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts", "treeWhole"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts", "treeWhole", "treeLevels"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3423,9 +3427,12 @@ function treeHtml(): string {
   const outline = (b: Brief): string => {
     if (!inLane(b.address)) return "";
     const whole = foldOf(b.address) === "whole" && !isCard(b);
+    // synced to the levels, a level whose briefs all stand folded is drawn as its figure rather than listed, so the
+    // levels the lane has unfolded are seen alone
+    const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
     const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
-    return node(b.address, row + sprout(b), whole ? level(b.address).map(outline).join("") : "");
+    return node(b.address, row + sprout(b, whole && !listed), listed ? level(b.address).map(outline).join("") : "");
   };
   const step = (i: number): string => {
     const a = way[i];
@@ -3668,6 +3675,7 @@ function settleHeld(): void {
   if (settings.treeRoom !== "open") settings.treeRoom = "dense";
   if (settings.treeSprouts !== "hidden") settings.treeSprouts = "shown";
   if (settings.treeWhole !== "whole") settings.treeWhole = "way";
+  if (settings.treeLevels !== "unfolded") settings.treeLevels = "all";
 }
 /**
  * Only what the reader has actually set is kept, which is what they differ from the defaults in. A reader who never
@@ -5782,12 +5790,15 @@ function headSettings(k: string): string {
     const tip = open ? "rows stand apart and names wrap — press to draw them close" : "rows stand close and names are cut — press to give them room";
     const shown = settings.treeSprouts === "shown";
     const whole = settings.treeWhole === "whole";
+    const levels = settings.treeLevels === "unfolded";
+    const ltip = levels ? "a level folded in the lane stands as its figure beneath the brief above — press to list every row the lane holds" : "every row the lane holds is listed — press to draw a level folded in the lane as its figure, so the levels unfolded are seen alone";
     const wtip = whole ? "every step of the way stands among its level, the whole in view — press to show the way alone" : "the way alone, a level opened by its count — press to stand every step among its level";
     const stip = shown ? "a folded row draws what it hides beneath it — press to draw the rows alone" : "the rows alone — press to draw beneath a folded row what it hides";
     return (
       `<button class="pick${open ? " on" : ""}" data-toggle="room" data-tip="${esc(tip)}">${icon("spaced")}</button>` +
       `<button class="pick${shown ? " on" : ""}" data-toggle="sprouts" data-tip="${esc(stip)}">${icon("sprout")}</button>` +
-      `<button class="pick${whole ? " on" : ""}" data-toggle="whole" data-tip="${esc(wtip)}">${icon("whole")}</button>`
+      `<button class="pick${whole ? " on" : ""}" data-toggle="whole" data-tip="${esc(wtip)}">${icon("whole")}</button>` +
+      `<button class="pick${levels ? " on" : ""}" data-toggle="levels" data-tip="${esc(ltip)}">${icon("levels")}</button>`
     );
   }
   if (k !== "prose" && k !== "gitProse") return "";
@@ -7555,6 +7566,7 @@ const onClick = (e: MouseEvent): void => {
       // turned on, it takes the reader's place up again at once
       if (settings.follow[w]) inNamed(w, () => ((state.followed = null), canvasOn() && followFocus()));
     } else if (what === "from") settings.mapFrom = { ...settings.mapFrom, [w]: settings.mapFrom[w] === "scope" ? "whole" : "scope" };
+    else if (what === "levels") settings.treeLevels = settings.treeLevels === "unfolded" ? "all" : "unfolded";
     else if (what === "whole") settings.treeWhole = settings.treeWhole === "whole" ? "way" : "whole";
     else if (what === "sprouts") settings.treeSprouts = settings.treeSprouts === "shown" ? "hidden" : "shown";
     else if (what === "room") settings.treeRoom = settings.treeRoom === "open" ? "dense" : "open";
