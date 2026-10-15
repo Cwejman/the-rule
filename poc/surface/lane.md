@@ -36,9 +36,9 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-A card carries [the figure of the files it holds](widgets.md#23-the-reading-open-as-an-outline), the same figure the tree draws under a folded row: a bar for the card's own reading, and beneath it a bar per file placed in it, a step right per file placed in a file. Where the lane is wide it floats at the card's right and the prose runs beside it, so it takes no height of its own; where the lane stands alone on a phone it stands above the face. How many briefs wait is still said by the count beneath.
+A card carries no figure of what lies beyond it; how much waits is said by the count beneath it, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
 
-*The author's, 2026-10-05. The figure, the author's ask of 2026-10-14; an overview drawn at the card's right until 2026-10-05 was little help and its fixed height left a card of a line or two standing tall, where this one is as tall as the files it holds and runs beside the prose.*
+*The author's, 2026-10-05. An overview drawn at the card's right until 2026-10-05 was little help and its fixed height left a card of a line or two standing tall. The figure of the files it holds stood there from 2026-10-14 to 2026-10-15: floated beside a card's prose it ran past a short card's edge and crowded a long one, and the author moved it to the ahead.*
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 

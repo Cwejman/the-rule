@@ -124,7 +124,7 @@ The author's verdict: going for a small, not so pretty icon up top is absolutely
 
 An icicle: what lies beneath a brief as columns left to right, one per depth, each cell as tall as its branch is heavy.
 
-Superseded by [the shape's form](widgets.md#4-the-ahead) on the author's reading: a second mode of presentation beside the shape, where one figure drawn twice, once for the lane and once for what lies beneath it, teaches the reader one thing.
+Superseded by [the shape's form](#z-the-ahead-in-the-shapes-form) on the author's reading: a second mode of presentation beside the shape, where one figure drawn twice, once for the lane and once for what lies beneath it, teaches the reader one thing.
 
 ## t. A tinted surface as the fold
 
@@ -142,7 +142,7 @@ The author found it strange again: unfolding there and unfolding in the text sho
 
 A step on the ahead's ladder that merged a whole level into one block when it did not fit.
 
-The author found it incomprehensible. [The ladder](widgets.md#42-a-ladder-down-when-it-does-not-fit) drops the deepest level instead and marks it with a tail, so every brief still in view keeps its place.
+The author found it incomprehensible. [The ladder](#z-the-ahead-in-the-shapes-form) dropped the deepest level instead and marked it with a tail, so every brief still in view kept its place.
 
 ## w. A dial
 
@@ -161,3 +161,9 @@ Surveyed across eighteen widths and seven configurations: the same seven figures
 Where the lane stood alone, one round mark at the foot of the page, which a press opened as a wide pill of the choices and a second press closed.
 
 The author's verdict on reading it: every choice is two presses away, and while the pill stands open it hides [the acts of what was chosen](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it), which stand in the same place. A mark and a pill also read as two different things, one sheer and one solid. [One row that always stands](touch.md#3-one-chooser-in-two-grains), of the few choices a phone has, has none of that, and it is short enough to need no opening.
+
+## z. The ahead in the shape's form
+
+What lay beneath a brief drawn as the shape draws the lane: the brief with the paragraphs its face hid, then everything beneath it, a heading bar and its paragraphs as blocks, shifted right by nesting. Where it did not fit it stepped down a ladder: one block per brief, then the deepest level dropped and carried as a grey tail on the brief that held it. It stopped at a card.
+
+It gave way on 2026-10-15 to [the figure of the files a brief holds](widgets.md#41-it-draws-the-files-the-brief-holds), drawn large: a column of blocks told how much prose waited and little of where, while a file named over a bar parted at its sections tells both, and reaches the readings past a card that make up most of what lies ahead.

@@ -234,25 +234,19 @@ Neither press is there under a finger, where [the rail takes none](touch.md#53-t
 
 ## 4. The ahead
 
-The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on. It stops where the lane stops: what a card leads to waits past a boundary and no fold reaches it, so the ahead never draws it.
+The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on.
 
-*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view.*
+*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view, then [in the shape's form](refused.md#z-the-ahead-in-the-shapes-form) until 2026-10-15.*
 
-### 4.1 It draws in the shape's form
+### 4.1 It draws the files the brief holds
 
-It draws [as the shape draws](#3-the-shape), so a reader learns one figure and not two: first the brief itself with the paragraphs its face hides, then everything beneath it, each brief a heading bar and its paragraphs as blocks, shifted right by nesting. So unfolding a brief that is only more paragraphs is understood as exactly that, before it is pressed.
+It draws [the figure of the files a brief holds](#23-the-reading-open-as-an-outline) at a reading size: the brief's own bar first, then each file placed beneath it, a step right per file placed in a file, on the tree's spine and ticks. Every file is named over its bar, and a name goes there.
 
-No names are drawn in the cells; the cell under the pointer is named beneath the figure, and above it the brief whose hidden part is drawn is named by its whole path, since the path is its address. The figure is only as large as what it draws needs, and it keeps its root while the pointer moves within it, so it does not redraw under the pointer. Pressing a cell goes there, which unfolds it.
+The heaviest file's bar runs the wing's width and the rest are measured by the same log, so sizes compare across the whole figure, and each bar parts at its five heaviest sections where each holds more than a twentieth of it.
 
-*Reasoned, the author's ask of 2026-09-13.*
+It reaches past a card, unlike the lane: what lies ahead of a brief is mostly the readings it places, and a figure of files is small enough to draw them all, where a figure of every paragraph was not.
 
-### 4.2 A ladder down when it does not fit
-
-Where what it draws is too large for its paragraphs to stay legible it steps down a ladder that never loses the structure.
-
-First, one block per brief, its own size, with every brief still in place. Where that still does not fit, the deepest level is dropped and the brief that held it carries a grey tail as long as the dropped level is heavy, [as the shape marks a fold](#31-a-folded-brief-tells-what-it-hides), until what is left fits. The caption says which step it stands on.
-
-*Reasoned, the author's, 2026-09-13; [a step that merged a whole level into one block](refused.md#v-a-level-merged-into-one-block) was refused.*
+*The author's ask of 2026-10-15, when the figure of files had grown more telling than the ahead's own; the files laid across rather than in a column, the author's of the same day.*
 
 ## 5. Links
 
