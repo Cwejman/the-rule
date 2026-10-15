@@ -2521,7 +2521,7 @@ function cardHtml(a: string): string {
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${huedRun(a)}>` +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
-    `<div class="card-body">${level(a).length ? `<div class="card-files">${filesHtml(a)}</div>` : ""}${blocks(shown)}</div>` +
+    `<div class="card-body">${blocks(shown)}</div>` +
     line +
     `</div>`
   );
@@ -3470,85 +3470,19 @@ function aheadTarget(): string | null {
   return aheadRoot;
 }
 
-/** A block as the ahead draws it: its kind, its height in lines of the lane, and its width as a share of the measure. */
+/** A block as a figure of the lane draws it: its kind, its height in lines of the lane, and its width as a share of the measure. */
 type ABlock = { kind: "head" | "para" | "image" | "card"; lines: number; width: number };
-const HEAD_BLOCK: ABlock = { kind: "head", lines: 1.5, width: 0.6 };
 
-/** A block of prose as the lane would present it: text sized from its characters, an image at its own size at the lane's measure and its caption beneath as text. */
-function aheadBlocks(t: Tok): ABlock[] {
-  const text = (n: number): ABlock => ({ kind: "para", lines: 0.6 + n / LINE_CHARS, width: 1 });
-  if (t.type !== "image") return [text(textOf([t]).length)];
-  const s = settings;
-  const image: ABlock = { kind: "image", lines: 0.6 + imageLines(t, s.measure, 17 * s.zoom * s.leading), width: t.width ? Math.min(1, t.width / s.measure) : 1 };
-  return t.caption?.length ? [image, text(textOf(t.caption).length)] : [image];
-}
-
-type ARow = { a: string; depth: number; blocks: ABlock[]; hidden: number };
-
-function aheadSvg(W: number, H: number): string {
+/**
+ * What lies ahead of the highlighted brief, drawn as the files it holds at a reading size: its own bar first, then each
+ * file placed beneath it, every file named over a bar as long as its text, the heaviest running the width, and parted
+ * at its heaviest sections. A name goes there.
+ */
+function aheadSvg(W: number, _H: number): string {
   const target = aheadTarget();
   if (target === null) return "";
-  const ix = state.index!;
   const t = brief(target)!;
-  // the rows: the brief itself with the paragraphs its face hides, then everything beneath it, in reading order
-  const rows: ARow[] = [{ a: target, depth: 0, blocks: [HEAD_BLOCK, ...blocksOf(t).slice(1).flatMap(aheadBlocks)], hidden: 0 }];
-  // a card's reading waits past a boundary and no fold reaches it, so the ahead stops where the lane stops
-  const walk = (parent: string, d: number): void =>
-    level(parent).filter((k) => !isCard(k)).forEach((k) => {
-      rows.push({ a: k.address, depth: d, blocks: [HEAD_BLOCK, ...blocksOf(k).flatMap(aheadBlocks)], hidden: 0 });
-      walk(k.address, d + 1);
-    });
-  walk(target, 1);
-  const GAP = { block: 0.35, brief: 1.2 };
-  const totalOf = (rs: ARow[]) => rs.reduce((sum, r) => sum + r.blocks.reduce((x, blk) => x + blk.lines + GAP.block, 0) + GAP.brief, 0);
-  // a line of the lane is a couple of pixels here, as in the shape, and the whole must fit its room
-  const scale = (rs: ARow[]) => Math.min(2.4, (H - 8) / Math.max(1, totalOf(rs)));
-  // the ladder keeps the structure: blocks while legible, else one block per brief as tall as its blocks, else the
-  // deepest level dropped and its weight shown as a tail on the brief that holds it, until what is left fits
-  const asBrief = (r: ARow): ARow => ({ ...r, blocks: [HEAD_BLOCK, { kind: "para", width: 1, lines: r.blocks.slice(1).reduce((x, blk) => x + blk.lines, 0) }] });
-  const deepest = Math.max(0, ...rows.map((r) => r.depth));
-  const toDepth = (d: number): ARow[] =>
-    rows
-      .filter((r) => r.depth <= d)
-      .map((r) => ({ ...asBrief(r), hidden: r.depth === d && level(r.a).length > 0 ? ix.branch.get(r.a)! - ix.own.get(r.a)! : 0 }));
-  let grain = "";
-  let drawn: ARow[] = rows;
-  if (scale(rows) < 1.8) {
-    grain = "by brief";
-    drawn = rows.map(asBrief);
-    for (let d = deepest; scale(drawn) < 1.2 && d > 0; d--) {
-      drawn = toDepth(d - 1);
-      grain = `by brief, ${d - 1 === 0 ? "the first level" : `to depth ${d - 1}`}`;
-    }
-  }
-  const k = scale(drawn);
-  const total = totalOf(drawn);
-  const w = Math.min(W, SHAPE.pad * 2 + Math.max(0, ...drawn.map((r) => r.depth)) * SHAPE.indent + SHAPE.bar + 4 + SHAPE.tail);
-  const h = Math.ceil(total * k + 8);
-  let y = 4;
-  const cells = drawn.map((r) => {
-    const x = SHAPE.pad + r.depth * SHAPE.indent;
-    const top = y;
-    let lastY = y;
-    let lastH = 1;
-    const bars = r.blocks
-      .map((blk) => {
-        const bh = Math.max(1.2, blk.lines * k - 0.6);
-        const rect = blockRect(blk.kind, x, y, Math.max(4, Math.round(SHAPE.bar * blk.width)), bh);
-        lastY = y;
-        lastH = bh;
-        y += blk.lines * k + GAP.block * k;
-        return rect;
-      })
-      .join("");
-    const tail = r.hidden > 0 ? `<rect class="hidden" x="${x + SHAPE.bar + 4}" y="${lastY.toFixed(1)}" width="${clamp(3 + Math.sqrt(r.hidden) / 4, 3, SHAPE.tail).toFixed(1)}" height="${Math.max(1.2, lastH).toFixed(1)}" rx="1"/>` : "";
-    y += GAP.brief * k;
-    return `<g class="cell" data-a="${esc(r.a)}" ${hued(r.a)}><rect class="hit" x="0" y="${top.toFixed(1)}" width="${w}" height="${(y - top).toFixed(1)}"/>${bars}${tail}</g>`;
-  });
-  // the cells carry no names; the one under the pointer is named beneath the figure
-  const named = state.pointed !== null && state.pointed !== target && state.pointed.startsWith(target + "/") ? brief(state.pointed) : null;
-  // the brief whose hidden part is drawn is named by its whole path, since the path is its address
-  return `<div class="ahead-box"><div class="chrome ahead-where">${pathHtml(t.address)}<span class="name">${esc(t.address === "" ? state.body!.title : t.title)}</span>${grain ? `<span class="dim">${grain}</span>` : ""}</div><svg class="fig ahead" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${cells.join("")}</svg><div class="chrome ahead-name">${named ? esc(named.title) : "&nbsp;"}</div></div>`;
+  return `<div class="ahead-box"><div class="chrome ahead-where">${pathHtml(t.address)}<span class="name">${esc(t.address === "" ? state.body!.title : t.title)}</span></div>${filesHtml(target, { w: Math.max(120, W - 8) })}</div>`;
 }
 
 // ## 3.7 Links: beside each link, its target; at the foot, what points here
@@ -3822,7 +3756,8 @@ const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ??
 /** Whether the shape stands as the rail now, which is what takes its marks away. */
 const onRail = (): boolean => fits().rail > 0;
 /** The width the ahead stands in: its deepest possible row with its tail. */
-const aheadWidth = (): number => SHAPE.pad * 2 + (state.index?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + SHAPE.tail;
+/** The ahead stands wide enough to name a file over its bar. */
+const aheadWidth = (): number => 260;
 
 /** One block drawn small: a heading a short bar, a paragraph a filled block, an image a frame, so no figure passes an image off as prose. */
 const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number, attrs = ""): string =>
@@ -4393,15 +4328,24 @@ function closeReading(r: string): void {
  * heaviest sections where each holds a share worth telling, and the rest of it runs as one quiet stretch. The bars'
  * height is the reader's, a meter, and the outline and the cards draw the same figure.
  */
-function filesHtml(a: string): string {
+function filesHtml(a: string, large?: { w: number }): string {
   const own = (x: string): number => state.index!.own.get(x) ?? 0;
   const within = (x: string): number => own(x) + level(x).reduce((n, k) => n + (isCard(k) ? 0 : within(k.address)), 0);
   const placed = (x: string): Brief[] => level(x).flatMap((k) => (isCard(k) ? [k] : placed(k.address)));
+  // large, as the ahead draws it, the heaviest file runs the room's width and the rest by the same log, each named
+  const STEP = large ? 14 : 9;
+  const deep = (x: string, d: number): number => Math.max(d, ...placed(x).map((k) => deep(k.address, d + 1)));
+  const heaviest = (x: string): number => Math.max(within(x), ...placed(x).map((k) => heaviest(k.address)));
+  const logOf = (w: number): number => Math.log2(1 + w / 300);
+  const span = large ? large.w - deep(a, 0) * STEP - 4 : 0;
+  const top = large ? logOf(heaviest(a)) : 1;
   const bar = (x: string): string => {
     const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, w: within(k.address) }));
     const total = Math.max(1, own(x) + sections.reduce((n, c) => n + c.w, 0));
-    const L = clamp(Math.log2(1 + total / 300) * 11, 3, 90);
-    const heavy = new Set([...sections].sort((p, q) => q.w - p.w).slice(0, 3).filter((c) => c.w / total > 0.08));
+    const L = large ? Math.max(6, (span * logOf(total)) / top) : clamp(logOf(total) * 11, 3, 90);
+    // small, it parts at its three heaviest sections; large, at its five heaviest, since there is room to tell them
+    const [many, share] = large ? [5, 0.05] : [3, 0.08];
+    const heavy = new Set([...sections].sort((p, q) => q.w - p.w).slice(0, many).filter((c) => c.w / total > share));
     const runs: { w: number; big: boolean; names: string[] }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
     for (const c of sections) {
       const r = runs[runs.length - 1];
@@ -4412,9 +4356,11 @@ function filesHtml(a: string): string {
   };
   const node = (x: string): string => {
     const kids = placed(x);
-    return `<div class="fnode" ${hued(x)}><div class="frow">${bar(x)}</div>${kids.length ? `<div class="fkids">${kids.map((k) => node(k.address)).join("")}</div>` : ""}</div>`;
+    // the first row is the brief the figure is drawn for, named already wherever the figure stands
+    const name = large && x !== a ? `<span class="fname" data-go="${esc(x)}">${esc(brief(x)!.title)}</span>` : "";
+    return `<div class="fnode" ${hued(x)}>${name}<div class="frow">${bar(x)}</div>${kids.length ? `<div class="fkids">${kids.map((k) => node(k.address)).join("")}</div>` : ""}</div>`;
   };
-  return `<div class="files">${node(a)}</div>`;
+  return `<div class="files${large ? " large" : ""}">${node(a)}</div>`;
 }
 
 /**
@@ -8980,8 +8926,14 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .sprout { margin: 0 0 3px var(--under, 19px); }
 .tree .row:is(:hover, .lit) + .sprout .frow i { opacity: 1; }
 .tree .row:is(:hover, .lit) + .sprout .frow i.q { opacity: .5; }
-.brief .card .card-files { float: right; margin: .35em 0 .5em 1.5em; max-width: 45%; }
-body.narrow .brief .card .card-files { float: none; max-width: none; margin: 0 0 .7em; }
+.files.large { --fh: calc(var(--figure, 4px) * 2); }
+.files.large .fnode { margin-top: 5px; }
+.files.large .fname { display: block; font-family: var(--sans); font-size: var(--small); line-height: 1.3; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; padding-bottom: 1px; }
+.files.large .fname:hover { color: var(--on); }
+.files.large .fkids { padding-left: 14px; }
+.files.large .fkids > .fnode::before { left: -8px; }
+.files.large .fkids > .fnode > .frow::before { left: -8px; width: 6px; }
+.files.large .fkids > .fnode:last-child::before { height: calc(1.3em + 1px + var(--fp) / 2); }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
 .tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
@@ -8995,7 +8947,8 @@ body.narrow .brief .card .card-files { float: none; max-width: none; margin: 0 0
 
 svg.fig { display: block; overflow: visible; touch-action: none; user-select: none; }
 svg.fig .cell { cursor: pointer; }
-.ahead-box { max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.ahead-box { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.ahead-box > .files { width: 100%; text-align: left; }
 svg.ahead .hit { fill: transparent; }
 svg.ahead .para { fill: var(--rest); }
 svg.ahead .head { fill: var(--door); }
@@ -9006,8 +8959,8 @@ svg.fig .image { fill: none; stroke: var(--door); stroke-width: 1; }
 svg.fig .cell.here .image { stroke: var(--on); }
 svg.fig .cell.lit .image { stroke: var(--lit); }
 .ahead-name { min-height: 1.2em; text-align: center; color: var(--ink); }
-.ahead-where { display: flex; flex-direction: column; align-items: center; gap: 1px; max-width: 100%; }
-.ahead-where .path { justify-content: center; }
+.ahead-where { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; max-width: 100%; }
+.ahead-where .path { justify-content: flex-start; }
 .ahead-where .name { color: var(--muted); }
 
 svg.shape .hit { fill: transparent; }
