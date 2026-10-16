@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(1.025) translate(-32 -35)">
+    <rect class="g" x="14" y="14" width="36" height="42" rx="1"/>
+    <rect class="s" x="14" y="14" width="36" height="42" rx="1"/>
+    <path class="s" d="M10 14 H54 M8 56 H56"/>
+    <rect class="f" x="19" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="19" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="29" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="29" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="39" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="39" y="20" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="19" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="19" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="f" x="29" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="29" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="f" x="39" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="39" y="28" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="19" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="19" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="29" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="29" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="39" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="39" y="36" width="6" height="5" rx="0.5"/>
+    <rect class="f" x="19" y="44" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="19" y="44" width="6" height="5" rx="0.5"/>
+    <rect class="g" x="39" y="44" width="6" height="5" rx="0.5"/>
+    <rect class="s" x="39" y="44" width="6" height="5" rx="0.5"/>
+    <path class="g" d="M29 56 V46 H35 V56"/>
+    <path class="s" d="M29 56 V46 H35 V56"/>
+</g>
+</svg>

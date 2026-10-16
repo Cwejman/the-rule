@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(0.964) translate(-32 -32)">
+    <path class="g" d="M13 12 V42 a3.5 3.5 0 0 0 7 0 V12 Z"/>
+    <path class="f" d="M13 30 V42 a3.5 3.5 0 0 0 7 0 V30 Z"/>
+    <path class="s" d="M13 12 V42 a3.5 3.5 0 0 0 7 0 V12 M12 12 h9"/>
+    <path class="g" d="M23 12 V42 a3.5 3.5 0 0 0 7 0 V12 Z"/>
+    <path class="f" d="M23 36 V42 a3.5 3.5 0 0 0 7 0 V36 Z"/>
+    <path class="s" d="M23 12 V42 a3.5 3.5 0 0 0 7 0 V12 M22 12 h9"/>
+    <path class="g" d="M33 12 V42 a3.5 3.5 0 0 0 7 0 V12 Z"/>
+    <path class="f" d="M33 24 V42 a3.5 3.5 0 0 0 7 0 V24 Z"/>
+    <path class="s" d="M33 12 V42 a3.5 3.5 0 0 0 7 0 V12 M32 12 h9"/>
+    <path class="g" d="M43 12 V42 a3.5 3.5 0 0 0 7 0 V12 Z"/>
+    <path class="f" d="M43 33 V42 a3.5 3.5 0 0 0 7 0 V33 Z"/>
+    <path class="s" d="M43 12 V42 a3.5 3.5 0 0 0 7 0 V12 M42 12 h9"/>
+    <path class="f" d="M6 22 H58 V27 H6 Z"/>
+    <path class="s" d="M6 22 H58 V27 H6 Z"/>
+    <path class="s" d="M8 27 V52 M56 27 V52 M4 52 H60"/>
+</g>
+</svg>

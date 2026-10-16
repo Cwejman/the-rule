@@ -804,12 +804,19 @@ async function trace(rootArg: string): Promise<Body> {
 
   // a file's drawing stands in the .img beside it under the file's own name, linked by nothing but that name, and is set
   // into the page cleaned as a sketch is, so the hue of the branch the file stands under reaches it (practice 8.7)
+  // a run of files sharing a name's start shares one: a file with none of its own takes the one named for the longest
+  // start of its name that ends before a dash, so ideas.svg stands for every ideas-2026-09-16.md beside it
+  const drawn = (file: string, ext: string): string | undefined => {
+    const parts = basename(file).replace(/\.md$/i, "").split("-");
+    for (let n = parts.length; n > 0; n--) {
+      const abs = join(rootDir, dirname(file), ".img", parts.slice(0, n).join("-") + ext);
+      if (existsSync(abs) && statSync(abs).isFile()) return cleanSketch(readFileSync(abs, "utf8"));
+    }
+  };
   briefs.filter((b) => b.address === "" || b.card).forEach((b) => {
-    const abs = join(rootDir, dirname(b.file), ".img", basename(b.file).replace(/\.md$/i, "") + ".svg");
-    if (existsSync(abs) && statSync(abs).isFile()) b.drawing = cleanSketch(readFileSync(abs, "utf8"));
+    b.drawing = drawn(b.file, ".svg");
     // its icon beside it, the same thing in the fewest lines, names it where it is named in a line
-    const ico = abs.replace(/\.svg$/, ".icon.svg");
-    if (existsSync(ico) && statSync(ico).isFile()) b.icon = cleanSketch(readFileSync(ico, "utf8"));
+    b.icon = drawn(b.file, ".icon.svg");
   });
 
   return { title: root.title, root: root.file, briefs, warnings, traced: new Date().toISOString() };

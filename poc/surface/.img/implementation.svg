@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(0.869) translate(-32 -33)">
+    <path class="f" d="M18 20 H46 V56 H18 Z"/>
+    <path class="s" d="M18 20 H46 V56 H18 Z"/>
+    <path class="t" d="M18 26 H46 M18 32 H46 M18 38 H46 M18 44 H46 M18 50 H46 M25 20 v6 M39 20 v6 M32 26 v6 M25 32 v6 M39 32 v6 M32 38 v6 M25 44 v6 M39 44 v6 M32 50 v6"/>
+    <path class="s" d="M12 8 V58 M52 8 V58 M7 22 H57 M7 40 H57"/>
+    <path class="t" d="M12 22 L18 8 M52 22 L46 8 M12 40 L7 58 M52 40 L57 58"/>
+    <path class="s" d="M4 58 H60"/>
+</g>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(1.066) translate(-32 -36.75)">
+    <path class="g" d="M12 19 Q22 14 32 19 V28 Q22 23 12 28 Z"/>
+    <path class="s" d="M12 19 Q22 14 32 19 V28 Q22 23 12 28 Z"/>
+    <path class="g" d="M52 19 Q42 14 32 19 V28 Q42 23 52 28 Z"/>
+    <path class="s" d="M52 19 Q42 14 32 19 V28 Q42 23 52 28 Z"/>
+    <path class="t" d="M16 21 Q22 18 28 20.5 M16 24.5 Q22 21.5 28 24 M36 20.5 Q42 18 48 21 M36 24 Q42 21.5 48 24.5"/>
+    <path class="f" d="M9 29 H55 L51 33 H13 Z"/>
+    <path class="s" d="M9 29 H55 L51 33 H13 Z"/>
+    <path class="f" d="M29 33 h6 v18 h-6 Z"/>
+    <path class="s" d="M29 33 h6 v18 h-6 Z"/>
+    <path class="f" d="M18 57 H46 L42 51 H22 Z"/>
+    <path class="s" d="M18 57 H46 L42 51 H22 Z"/>
+</g>
+</svg>

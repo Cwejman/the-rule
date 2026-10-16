@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(0.964) translate(-32 -35.8)">
+    <path class="f" d="M9.0 52.0 L11.3 42.0 L19.4 45.9 L18.0 52.0 Z"/>
+    <path class="s" d="M9.0 52.0 L11.3 42.0 L19.4 45.9 L18.0 52.0 Z"/>
+    <path class="g" d="M11.3 42.0 L17.7 34.0 L23.3 41.1 L19.4 45.9 Z"/>
+    <path class="s" d="M11.3 42.0 L17.7 34.0 L23.3 41.1 L19.4 45.9 Z"/>
+    <path class="f" d="M17.7 34.0 L26.9 29.6 L28.9 38.4 L23.3 41.1 Z"/>
+    <path class="s" d="M17.7 34.0 L26.9 29.6 L28.9 38.4 L23.3 41.1 Z"/>
+    <path class="f" d="M37.1 29.6 L46.3 34.0 L40.7 41.1 L35.1 38.4 Z"/>
+    <path class="s" d="M37.1 29.6 L46.3 34.0 L40.7 41.1 L35.1 38.4 Z"/>
+    <path class="g" d="M46.3 34.0 L52.7 42.0 L44.6 45.9 L40.7 41.1 Z"/>
+    <path class="s" d="M46.3 34.0 L52.7 42.0 L44.6 45.9 L40.7 41.1 Z"/>
+    <path class="f" d="M52.7 42.0 L55.0 52.0 L46.0 52.0 L44.6 45.9 Z"/>
+    <path class="s" d="M52.7 42.0 L55.0 52.0 L46.0 52.0 L44.6 45.9 Z"/>
+    <path class="f" d="M26.9 19.6 L37.1 19.6 L35.1 28.4 L28.9 28.4 Z"/>
+    <path class="s" d="M26.9 19.6 L37.1 19.6 L35.1 28.4 L28.9 28.4 Z"/>
+    <path class="t" d="M32 21 V27 M29.5 24.5 L32 27 L34.5 24.5"/>
+    <path class="s" d="M4 52 H60"/>
+</g>
+</svg>

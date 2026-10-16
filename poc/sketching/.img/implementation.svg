@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(1.038) translate(-32 -28.5)">
+    <path class="f" d="M6 16 H58 V23 H6 Z"/>
+    <path class="s" d="M6 16 H58 V23 H6 Z"/>
+    <path class="t" d="M18 16 v4.5 M21 16 v3 M24 16 v4.5 M27 16 v3 M30 16 v4.5 M33 16 v3 M36 16 v4.5 M39 16 v3 M42 16 v4.5 M45 16 v3 M48 16 v4.5 M51 16 v3 M54 16 v4.5"/>
+    <path class="f" d="M8 23 V44 L13 38 V23 Z"/>
+    <path class="s" d="M8 23 V44 L13 38 V23 Z"/>
+    <path class="g" d="M28 13 H38 V26 H34 V44 L29 38 V26 H28 Z"/>
+    <path class="s" d="M28 13 H38 V26 H34 V44 L29 38 V26 H28 Z"/>
+    <path class="t" d="M29.5 19 h7"/>
+    <circle class="s" cx="33" cy="32" r="0"/>
+</g>
+</svg>

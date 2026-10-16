@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="drawing" viewBox="0 0 64 64" width="128" height="128">
+<style>
+svg.drawing .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .5; }
+svg.drawing .f { fill: var(--rest, #dfe5e8); }
+svg.drawing .g { fill: var(--ground, #ffffff); }
+</style>
+<g transform="translate(32 32) scale(0.904) translate(-32 -36)">
+    <path class="f" d="M5 18 V53 C14 50 24 50 32 55 C40 50 50 50 59 53 V18"/>
+    <path class="s" d="M5 18 V53 C14 50 24 50 32 55 C40 50 50 50 59 53 V18"/>
+    <path class="g" d="M32 17 C24 12 14 12 8 14 V48 C14 46 24 46 32 51 C40 46 50 46 56 48 V14 C50 12 40 12 32 17 Z"/>
+    <path class="s" d="M32 17 C24 12 14 12 8 14 V48 C14 46 24 46 32 51 C40 46 50 46 56 48 V14 C50 12 40 12 32 17 Z M32 17 V51"/>
+    <path class="t" d="M13 22 C18 21 23 21 27 23 M13 28 C18 27 23 27 27 29 M13 34 C18 33 23 33 27 35 M36 23 C39 21 41 21 43 21 M36 29 C39 27 41 27 43 27 M36 35 C39 33 41 33 43 33"/>
+    <path class="f" d="M47 12 V60 L49.5 57 L52 60 V12"/>
+    <path class="s" d="M47 12 V60 L49.5 57 L52 60 V12"/>
+</g>
+</svg>
