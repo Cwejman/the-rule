@@ -62,6 +62,12 @@ A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates)
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
+Cards that follow one another with nothing written between them stand as tiles, side by side in a grid as wide as the lane. A run of placements is a set of doors the brief offers at once, and as a column of whole cards it made a reader scroll past every face before seeing what the set held. Each tile is its file's image, or its graphic, then its title and stamp, the start of its face and the count beneath it, so the run is taken in at a glance.
+
+A tile opens as a card does, and does not unfold where it stands: a grid in which one tile grew by its prose would push its neighbours out of line. Related cards tile in the same way, each keeping its dashed rim.
+
+*The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day.*
+
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
 
 The line holds the last thing it has reached, and never falls back. A card stands inside the prose of the brief that places it, so a line asking what it is inside of answered the card while it crossed one and the brief again in the prose after it: an entry that places six parts bounced the address, the way down and the map's selection between the parent and one card after another, thirteen times in one scroll of this body's root, where the reading has seven places to stand. A reading is passed through in one direction, so where the reader stands moves in one direction too.
