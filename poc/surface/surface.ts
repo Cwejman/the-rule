@@ -383,6 +383,8 @@ type Brief = {
   card?: boolean;
   /** set by the trace on the root brief of a file: what its stamp says of it beyond being under the rule, its status or who ratified it */
   stamp?: Record<string, string>;
+  /** set by the trace on the root brief of a file that carries a drawing: its markup, cleaned as a sketch's is */
+  drawing?: string;
   /** set by the history's trace on a leaf: the full hash of the commit it stands for, which the light tier tells the rest of */
   commit?: string;
 };
@@ -797,6 +799,13 @@ async function trace(rootArg: string): Promise<Body> {
     return { asset, src: `/asset/${asset.split("/").map(encodeURIComponent).join("/")}?v=${Math.round(statSync(abs).mtimeMs)}`, ...size, ...(svg ? { svg } : {}) };
   };
   await Promise.all(images.map(async ({ tok, file }) => Object.assign(tok, await resolveImage(tok, file))));
+
+  // a file's drawing stands in the .img beside it under the file's own name, linked by nothing but that name, and is set
+  // into the page cleaned as a sketch is, so the hue of the branch the file stands under reaches it (practice 8.7)
+  briefs.filter((b) => b.address === "" || b.card).forEach((b) => {
+    const abs = join(rootDir, dirname(b.file), ".img", basename(b.file).replace(/\.md$/i, "") + ".svg");
+    if (existsSync(abs) && statSync(abs).isFile()) b.drawing = cleanSketch(readFileSync(abs, "utf8"));
+  });
 
   return { title: root.title, root: root.file, briefs, warnings, traced: new Date().toISOString() };
 }
@@ -2523,6 +2532,7 @@ function cardHtml(a: string): string {
   const line = actLine("card-act", a, { fold: foldable, figure: hidden.length ? actFigure(b, hidden, []) : "", beneath, unfold: foldable });
   return (
     `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${huedRun(a)}>` +
+    (b.drawing ? `<div class="card-drawing" aria-hidden="true">${b.drawing}</div>` : "") +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
@@ -8728,6 +8738,10 @@ body.moving .lot, .lot.lit { background: var(--wash); }
    reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
 .brief .card .acts [data-act="scope"] { display: none; }
 .brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
+/* a card whose file carries a drawing stands it first, above the title on the text's left edge and on the card's own
+   ground, large enough to be seen as a drawing rather than an icon; the drawing's own keylines leave room inside its square */
+.brief .card-drawing { margin: 4px 0 8px -10px; }
+.brief .card-drawing svg { display: block; width: 92px; height: 92px; overflow: visible; }
 .brief .card-body { min-width: 0; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
