@@ -326,9 +326,11 @@ It is drawn in one hand, so a run of them reads as a set. Each is line art on a 
 
 A file with a drawing may carry an icon beside it as well, `.img/widgets.icon.svg`: the same thing said in the fewest lines, on a 16-unit square with no texture, for where the file is named in a line of text, the rows of a tree or the steps of a way down. They are two files and not one sheet of both, since a sheet's parts show only through a page that picks them out, and each file should open as itself anywhere a repository is browsed.
 
+A run of files that share a name's start shares a drawing: a file with none of its own takes the one named for the longest start of its name that ends before a dash, so `.img/ideas.svg` stands for every `ideas-2026-09-16.md` beside it, and a day given its own drawing keeps it. A run is a record of entries of one kind, which a drawing apiece would only tell apart less well than their names do. The icon is found the same way.
+
 A file with no icon is named without one; its drawing is never shrunk to stand in, since a drawing made to be seen large reads as a smudge at a letter's size.
 
-*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand. The icon beside the drawing, the author's ask the same day, over a sprite sheet of both.*
+*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand. The icon beside the drawing, the author's ask the same day, over a sprite sheet of both; the drawing a run shares, the author's ask the same day for the dated ideas.*
 
 ## 9. Reading and moving by script
 
