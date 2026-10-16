@@ -2345,7 +2345,26 @@ function badgePair(first: string, second: string): string {
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const inline = (toks: Tok[] = []): string => toks.map((t) => (INLINE[t.type] ?? INLINE.text)(t)).join("");
-const blocks = (toks: Tok[] = []): string => toks.map((t) => (BLOCK[t.type] ?? BLOCK.other)(t)).join("");
+/**
+ * A run of blocks drawn. Cards that follow one another with nothing written between them, placed or related, stand as
+ * tiles in a grid rather than as a column of cards (lane 1.2); a card alone stands as a card.
+ */
+const blocks = (toks: Tok[] = []): string => {
+  const out: string[] = [];
+  let run: Tok[] = [];
+  const flush = () => {
+    out.push(run.length > 1 ? `<div class="tiles">${run.map((t) => tileHtml(t.to ?? "", t.type === "related")).join("")}</div>` : run.map((t) => BLOCK[t.type](t)).join(""));
+    run = [];
+  };
+  toks.forEach((t) => {
+    if (t.type === "card" || t.type === "related") return void run.push(t);
+    if (t.type === "space" && run.length) return;
+    flush();
+    out.push((BLOCK[t.type] ?? BLOCK.other)(t));
+  });
+  flush();
+  return out.join("");
+};
 
 const INLINE: Record<string, (t: Tok) => string> = {
   text: (t) => (t.tokens ? inline(t.tokens) : esc(t.text ?? "")),
@@ -2572,17 +2591,35 @@ const PICTURE = { tallest: 1, widest: 2.5 };
  * A file's image, as the card and the opening stand it: whole at its own proportion where that lies within the bounds,
  * and otherwise whole in a frame of the nearest bound, on a blurred and enlarged copy of itself, so nothing is cut.
  */
-const pictureHtml = (t: Tok, first = false): string => {
+const pictureHtml = (t: Tok, first = false, at = 0): string => {
   if (!t.src) return "";
   const alt = esc(textOf(t.tokens) || t.text || "");
   const own = t.width && t.height ? t.width / t.height : 0;
-  const frame = own ? clamp(own, PICTURE.tallest, PICTURE.widest) : 0;
+  // a tile's frame is one proportion for the whole grid, so a row of them keeps one line; the image stands whole in it
+  const frame = at || (own ? clamp(own, PICTURE.tallest, PICTURE.widest) : 0);
   const fitted = own > 0 && Math.abs(frame - own) > 0.01;
   // the opening's image is the first thing its page shows, so it is fetched at once; a card's waits until it is near
   const load = `${first ? "" : ` loading="lazy"`} decoding="async"`;
   const fill = fitted ? `<img class="fill" src="${esc(t.src)}" alt="" aria-hidden="true"${load}>` : "";
   return `<div class="picture${fitted ? " fitted" : ""}"${frame ? ` style="aspect-ratio:${Math.round(frame * 1000) / 1000}"` : ""}>${fill}<img class="main" src="${esc(t.src)}" alt="${alt}"${load}></div>`;
 };
+
+/** A card as a tile in a run of them: its image or graphic, its title and stamp, the start of its face, and its count. */
+function tileHtml(a: string, related = false): string {
+  const b = brief(a);
+  if (!b) return "";
+  const at = related ? `data-go="${esc(a)}" data-related="${esc(a)}"` : `data-a="${esc(a)}" data-card="${esc(a)}"`;
+  const face = blocksOf(b).find((t) => t.type === "paragraph");
+  const stamp = stampOf(b);
+  const top = b.picture?.src ? `<div class="tile-picture">${pictureHtml(b.picture, false, 1.6)}</div>` : b.drawing ? `<div class="tile-drawing" aria-hidden="true">${b.drawing}</div>` : "";
+  return (
+    `<div class="card tile${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
+    top +
+    `<div class="tile-text"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
+    actLine("card-act", a, { fold: false, figure: "", beneath: beneathCount(a), unfold: false }) +
+    `</div>`
+  );
+}
 
 function cardHtml(a: string, related = false): string {
   const b = brief(a);
@@ -3883,7 +3920,7 @@ const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: num
     : `<rect class="${kind}" x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" rx="1"/>`;
 
 /** The lane's briefs and their blocks as laid, in the scroll box's own coordinates; an image's width is its share of the lane's. */
-function laidBlocks(): { a: string; top: number; height: number; blocks: { top: number; height: number; kind: ABlock["kind"]; width: number; card?: string }[] }[] {
+function laidBlocks(): { a: string; top: number; height: number; blocks: { top: number; height: number; kind: ABlock["kind"]; width: number; left?: number; card?: string }[] }[] {
   const c = ui.content.getBoundingClientRect().top;
   return all<HTMLElement>(".brief", ui.lane).map((el) => {
     const r = el.getBoundingClientRect();
@@ -3895,6 +3932,15 @@ function laidBlocks(): { a: string; top: number; height: number; blocks: { top: 
       };
       // a card is the reading on the other side, so it is drawn in that reading's hue and not the brief's that raises it
       if (b.classList.contains("card")) return [{ ...at(b, "card"), card: (b as HTMLElement).dataset.card }];
+      // a run of tiles is each of its cards, those of a row standing side by side at one height
+      // a run of tiles is drawn as the grid it is: each tile at its place across the row and its share of the width
+      if (b.classList.contains("tiles")) {
+        const g = b.getBoundingClientRect();
+        return all<HTMLElement>(":scope > .card", b).map((t) => {
+          const tr = t.getBoundingClientRect();
+          return { ...at(t, "card"), left: (tr.left - g.left) / g.width, width: tr.width / g.width, card: t.dataset.card ?? t.dataset.related };
+        });
+      }
       if (b.tagName !== "FIGURE") return [at(b, b.tagName === "H1" || b.tagName === "H2" ? "head" : "para")];
       const img = b.querySelector("img, svg");
       const caption = b.querySelector("figcaption");
@@ -3926,7 +3972,7 @@ function shapeSvg(W: number, H: number): string {
     // the rail nests a step tighter than a column does, so a level six deep still leaves a row room for its marks
     const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
-      .map((b) => blockRect(b.kind, x, 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(4, Math.round(bar * b.width)), Math.max(1.2, b.height * k - 1), b.card ? `data-a="${esc(b.card)}" ${hued(b.card)}` : ""))
+      .map((b) => blockRect(b.kind, x + Math.round(bar * (b.left ?? 0)), 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(b.left === undefined ? 4 : 2, Math.round(bar * b.width) - (b.left === undefined ? 0 : 1)), Math.max(1.2, b.height * k - 1), b.card ? `data-a="${esc(b.card)}" ${hued(b.card)}` : ""))
       .join("");
     // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
     // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
@@ -8887,6 +8933,18 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* the image would cover the card's rim, so the rim, and the hue it takes where the reading stands, are drawn over it */
 .brief .card.pictured .card-picture::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px var(--rim); border-radius: inherit; pointer-events: none; }
 .brief .card.pictured::before { z-index: 2; }
+/* cards that follow one another stand as tiles, a grid as wide as the lane, each a column of its image or graphic, its
+   title and stamp, three lines of its face and its count pinned to the foot so a row keeps one foot line */
+.brief .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 14px; margin: 22px 0; }
+.brief .tiles .card.tile { margin: 0; padding: 0; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
+.brief .tile .tile-drawing { padding: 16px 16px 0; }
+.brief .tile .tile-drawing svg { display: block; width: 64px; height: 64px; margin-left: calc(-64px * 5 / 64); overflow: visible; }
+.brief .tile .tile-picture .picture { border-bottom: 1px solid var(--rim); }
+.brief .tile .tile-text { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 4px; }
+.brief .tile .card-head { font-size: 1.12em; margin: 0; }
+.brief .tile .stamp { font-size: .8em; }
+.brief .tile .tile-face { margin: 2px 0 0; font-size: .88em; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.brief .tile .act { margin: auto 0 0; padding: 10px 16px 12px; font-size: .9em; }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
 .brief .card.related { outline-style: dashed; }
 /* the opening stands its file's image beneath the title, before the first prose */
