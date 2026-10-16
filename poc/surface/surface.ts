@@ -2593,13 +2593,15 @@ function cardHtml(a: string, related = false): string {
   // address of the reading's, and a press goes to it in its own tree
   const at = related ? `data-go="${esc(a)}" data-related="${esc(a)}"` : `data-a="${esc(a)}" data-card="${esc(a)}"`;
   const stampHtml = stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : "";
-  // a card whose file carries an image is the image, its words a small tile over its lower edge, the face given up
+  // a card whose file carries an image is the image, whole and at its own proportion; its title, stamp and acts stand over
+  // its foot on a veil of the page's own ground, blurred and deepening downward, and its face is given up. Unfolded, its
+  // prose stands beneath the image with the acts at its foot, as on any card
   if (b.picture?.src)
     return (
       `<div class="card pictured${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
-      `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-tile">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div></div>` +
-      (g === "whole" ? `<div class="card-body">${blocks(all)}</div>` : "") +
-      line +
+      `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
+      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
+      (g === "whole" ? `<div class="card-body">${blocks(all)}</div>${line}` : "") +
       `</div>`
     );
   return (
@@ -8833,20 +8835,26 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card-drawing { margin: 4px 0 8px calc(-92px * 5 / 64); }
 .brief .card-drawing svg { display: block; width: 92px; height: 92px; overflow: visible; }
 .brief .card-body { min-width: 0; }
-/* a card whose file carries an image is the image, at its own proportion and no taller than a screen's half, its words a
-   small tile over the lower edge; the act line stands beneath it as on any card */
-.brief .card.pictured { padding: 0 0 12px; overflow: hidden; }
+/* a card whose file carries an image is the image, whole at its own proportion, and only a portrait taller than most of
+   a screen is cut, from the foot. Its words stand over its lower part on a veil of the page's ground: a blur that deepens
+   downward, so the image goes soft before it goes pale, and over it a wash of the ground from nothing to nearly solid, so
+   the title reads in the ink it has everywhere else, in either theme, whatever the image holds there */
+.brief .card.pictured { padding: 0; overflow: hidden; isolation: isolate; }
 .brief .card.pictured .card-picture { position: relative; }
-/* the image would cover the card's rim, so the rim, and the hue it takes where the reading stands, are drawn over it */
-.brief .card.pictured .card-picture::after { content: ""; position: absolute; inset: 0; border-radius: 10px 10px 0 0; box-shadow: inset 1px 1px 0 var(--rim), inset -1px 0 0 var(--rim); pointer-events: none; }
-.brief .card.pictured::before { z-index: 2; }
-.brief .card.pictured .picture { width: 100%; max-height: 50vh; overflow: hidden; border-radius: 10px 10px 0 0; background: var(--veil); }
+.brief .card.pictured .picture { width: 100%; max-height: 85vh; overflow: hidden; background: var(--veil); }
 .brief .card.pictured .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.brief .card.pictured .card-tile { position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); display: flex; align-items: baseline; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
-.brief .card.pictured .card-tile .card-head { font-size: var(--h3, 1.15em); flex: none; }
-.brief .card.pictured .card-tile .ficon { align-self: center; }
-.brief .card.pictured > .card-body, .brief .card.pictured > .act { padding: 0 18px; }
-.brief .card.pictured > .card-body { padding-top: 14px; }
+.brief .card.pictured :is(.card-blur, .card-veil) { position: absolute; inset: auto 0 0 0; height: max(42%, 150px); pointer-events: none; }
+.brief .card.pictured .card-blur { backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 85%); mask-image: linear-gradient(to top, #000 30%, transparent 85%); }
+/* the wash is eased, many stops rather than two, so it has no edge where it begins */
+.brief .card.pictured .card-veil { background: linear-gradient(to top, color-mix(in oklch, var(--ground) 95%, transparent) 0%, color-mix(in oklch, var(--ground) 92%, transparent) 14%, color-mix(in oklch, var(--ground) 84%, transparent) 28%, color-mix(in oklch, var(--ground) 70%, transparent) 42%, color-mix(in oklch, var(--ground) 50%, transparent) 56%, color-mix(in oklch, var(--ground) 28%, transparent) 70%, color-mix(in oklch, var(--ground) 10%, transparent) 84%, color-mix(in oklch, var(--ground) 0%, transparent) 100%); }
+.brief .card.pictured .card-over { position: absolute; inset: auto 0 0 0; padding: 0 18px 12px; }
+.brief .card.pictured .card-over .card-top { align-items: center; gap: 10px; margin-bottom: 0; }
+.brief .card.pictured .card-over .ficon { width: 1.25em; height: 1.25em; margin-right: 0; }
+.brief .card.pictured.whole > .card-body { padding: 16px 18px 0; }
+.brief .card.pictured.whole > .act { padding: 0 18px 12px; }
+/* the image would cover the card's rim, so the rim, and the hue it takes where the reading stands, are drawn over it */
+.brief .card.pictured .card-picture::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px var(--rim); border-radius: inherit; pointer-events: none; }
+.brief .card.pictured::before { z-index: 2; }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
 .brief .card.related { outline-style: dashed; }
 /* the opening stands its file's image beneath the title, before the first prose */
