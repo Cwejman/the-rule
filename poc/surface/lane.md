@@ -66,7 +66,9 @@ Cards that follow one another with nothing written between them stand as tiles, 
 
 A tile opens as a card does, and does not unfold where it stands: a grid in which one tile grew by its prose would push its neighbours out of line. Related cards tile in the same way, each keeping its dashed rim.
 
-*The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day.*
+The reading line passes through a row of tiles as through a column of cards. The row's height, down to the next row, is shared among its tiles evenly from left to right, so scrolling stands on each in turn, a step lands on its share, and the tree's water moves a tile at a time rather than the whole row at once.
+
+*The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day; the row's height shared among its tiles, the author's ask the same day, when the line and the water jumped a row at once.*
 
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
 
