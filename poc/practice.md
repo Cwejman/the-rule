@@ -320,7 +320,7 @@ One shown from files in several folders is kept in the `.img` of the folder that
 
 A file may carry a small drawing that stands for it: kept in the `.img` folder beside it under the file's own name, `.img/widgets.svg` for `widgets.md`, and `.img/README.svg` for a folder's README.
 
-Nothing in the file links it; the name is the link, so the drawing moves when the file does and a file without one is untouched. Where the file is shown as one thing, [the card that places it](surface/lane.md#12-a-placed-part-raises-a-card) first, the drawing stands for it.
+Nothing in the file links it; the name is the link, so the drawing moves when the file does and a file without one is untouched. Where the file is shown as one thing, [the card that places it](surface/lane.md#12-a-placed-part-raises-a-card) first, the drawing stands for it. The body's root entry carries one too, `.img/README.svg` beside it, which is the body's own drawing: where another project mounts the body, the card that places it there stands that drawing.
 
 It is drawn in one hand, so a run of them reads as a set. Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
 
