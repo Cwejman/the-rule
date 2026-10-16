@@ -134,7 +134,7 @@ The tree is a [wing](framework.md#2-the-areas) widget: [the way down](lane.md#75
 
 The way from the root to the reading open stands at the top, each step nested beneath the one before it, and each told as the way down tells it.
 
-The root stands as the ring of the whole wheel, a reading bold, a section at normal weight after its number, what stands above the reading open muted. The reading open stands in its branch's ink, with its status and the bar of how far through it the focus stands.
+The root stands as the body's icon, or as the ring of the whole wheel where the root carries none, a reading bold, a section at normal weight after its number, what stands above the reading open muted. The reading open stands in its branch's ink, with its status and the bar of how far through it the focus stands.
 
 The lines join the steps as a file tree's do, a line down the left and a tick into each row. Where a step crosses into a file the line into it is drawn in the hue of the reading entered, a step stronger, as a canvas draws an opening; within a file it is the quiet line.
 

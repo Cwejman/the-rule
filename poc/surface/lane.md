@@ -276,7 +276,7 @@ How here is placed is the run of levels from the root down to [the brief in focu
 
 The run says of each step what it is and where it stands, each by one means, and no shape is drawn around any of them. The weight says the kind: a reading, the root or a placed file, stands bold, and a section at normal weight after its number, as the lane numbers it in the reading it stands in. The ink says where: what stands above the sections of the reading open is muted, those sections fainter, and the head, what the reader is looking at, takes full ink, and where it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is. The mark before a step says what going to it crosses: a chevron within a file, and at a file's boundary a slash in the hue of the reading entered, as a path is written. Each is lit in its colour when pointed at; a name above the scope is a press that scopes out to it, and one within the scope a press that goes there.
 
-A reading whose file [carries an icon](../practice.md#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it) is named in the run with it before its name, in its branch's hue, so the files on the way are told apart before they are read. The root keeps its ring, which is the whole wheel and says more of where the run begins than an icon would.
+A reading whose file [carries an icon](../practice.md#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it) is named in the run with it before its name, in its branch's hue, so the files on the way are told apart before they are read. The root is named by the body's own icon, and only a body whose root carries none keeps the ring of the whole wheel.
 
 The run may name files alone, by [a switch](widgets.md#62-the-switches): the root and every placed file on the way down, and the sections that place them left out with the rest. Where the focus stands inside the last reading named, its number follows it in full ink, so the line still says where the reader stands without spending a name on it.
 
@@ -292,13 +292,13 @@ How the reader came here is the trail, against the lane's right edge on the same
 
 Past the kind, the place and the boundary, the line says where a way down begins, which reading the reader is in, and how far into it they stand.
 
-The root is drawn as a ring rather than its title, the whole wheel, since every way down begins there and its name is told on pointing. The reading open carries its hue at rest, in the ink of its branch, so the one name the reader stands in reads apart from the muted ones above it. The sections within it stand as their numbers alone and the head keeps its title, so a deep address reads as one reading and a number. Beside the reading open stand its status from its stamp, and a short bar in its hue of how far through it the focus stands, by the text of the briefs up to the focus in the reading's own order, the focus's included.
+The root is drawn as its icon rather than its title, the body's own, since every way down begins there and its name is told on pointing; a root that carries none is the ring of the whole wheel. The same icon stands in the browser's tab, so a tab of the body is told from the others in a row of them. The reading open carries its hue at rest, in the ink of its branch, so the one name the reader stands in reads apart from the muted ones above it. The sections within it stand as their numbers alone and the head keeps its title, so a deep address reads as one reading and a number. Beside the reading open stand its status from its stamp, and a short bar in its hue of how far through it the focus stands, by the text of the briefs up to the focus in the reading's own order, the focus's included.
 
 Narrow, the status and the bar give way, and where the focus is inside the reading open the line keeps that reading before the head rather than the level above, since a number says nothing without the reading's name; the reading gives way with the head rather than being cut.
 
 Some of this belongs as well to [the pane of bearings](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions), where the path is drawn line by line and has the room to say each of these at length.
 
-*The author's ask of 2026-10-14, taking all five the session had proposed; the means are the session's, until the author has looked. The bar counts text and not the folds, so it says where the focus stands in the reading and not how far the lane has scrolled.*
+*The author's ask of 2026-10-14, taking all five the session had proposed; the means are the session's, until the author has looked. The bar counts text and not the folds, so it says where the focus stands in the reading and not how far the lane has scrolled. The body's icon for the root, in place of the ring, and in the tab, the author's ask of 2026-10-16.*
 
 ## 8. A record is ordered by time
 
