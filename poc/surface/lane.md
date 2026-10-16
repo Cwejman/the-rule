@@ -40,6 +40,10 @@ A card carries no figure of what lies beyond it; how much waits is said by the c
 
 *The author's, 2026-10-05. An overview drawn at the card's right until 2026-10-05 was little help and its fixed height left a card of a line or two standing tall. The figure of the files it holds stood there from 2026-10-14 to 2026-10-15: floated beside a card's prose it ran past a short card's edge and crowded a long one, and the author moved it to the ahead.*
 
+A card whose file [carries a drawing](../practice.md#87-a-file-may-carry-a-drawing) stands it first, above the title, on the text's left edge and on the card's own ground: no field behind it and no column beside it, and the card is stacked as it is read, the drawing, the title, the face. The room above the title is not a cost; it is what lets the drawing be seen as a drawing rather than an icon, and the drawing in its line and fill takes the branch's hue, as the card's outline does.
+
+*The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card).*
+
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.

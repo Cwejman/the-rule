@@ -167,3 +167,12 @@ The author's verdict on reading it: every choice is two presses away, and while 
 What lay beneath a brief drawn as the shape draws the lane: the brief with the paragraphs its face hid, then everything beneath it, a heading bar and its paragraphs as blocks, shifted right by nesting. Where it did not fit it stepped down a ladder: one block per brief, then the deepest level dropped and carried as a grey tail on the brief that held it. It stopped at a card.
 
 It gave way on 2026-10-15 to [the figure of the files a brief holds](widgets.md#41-it-draws-the-files-the-brief-holds), drawn large: a column of blocks told how much prose waited and little of where, while a file named over a bar parted at its sections tells both, and reaches the readings past a card that make up most of what lies ahead.
+
+## aa. A file's drawing framed beside the card
+
+Ways of [the drawing a file carries](../practice.md#87-a-file-may-carry-a-drawing) on a card, laid side by side on 2026-10-16: the drawing in a column of its own, shaded or parted by a hairline, the text beside it; hung to the left of the text with nothing around it; on a plate inside the card; in a field across the card's top, set on the text's edge or centred.
+
+Before them were a wash of the branch's hue behind it, a watermark under the prose, a tab, and a figure hung outside the card in the margin.
+
+The author's verdict: the washes, the watermark, the tab and the hanger outside were not a seasoned design language, and the frames and fields each split the card into areas that a single drawing does not need. A square drawing in a lane-wide field leaves the field empty to its right. What was kept is the plainest: [the drawing set first, above the title](lane.md#12-a-placed-part-raises-a-card), on the card's own ground.
+

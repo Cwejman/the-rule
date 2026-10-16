@@ -265,6 +265,8 @@ What may be removed is what nothing living stands on, and the test reads from th
 
 A body under the rule carries two kinds of visual: a drawing where prose cannot show a shape, and an image where a page needs air. Both stand beside the prose as blocks of their own, and the prose reads whole without them, as it reads whole without a link it offers.
 
+A file may carry a third, [a drawing of its own](#87-a-file-may-carry-a-drawing), which stands for the file where it is shown as one thing rather than inside its prose.
+
 *Reasoned, the author's.*
 
 ### 8.1 The sketch
@@ -313,6 +315,16 @@ An image the writer keeps is committed beside the brief that shows it, and one t
 One shown from files in several folders is kept in the `.img` of the folder that covers them all and never above it, as a brief many stand on is kept [by the same rule](#7-a-file-is-cut-around-one-brief-and-moves-only-where-it-is-stood-on). A remote image is linked at its address, knowing it may change after the brief that shows it was written, and a writer who needs it to hold still hosts a copy instead.
 
 *Preferred, the author's, 2026-09-14, from the repository's own header and footer, kept in `.img` beside the root entry.*
+
+### 8.7 A file may carry a drawing
+
+A file may carry a small drawing that stands for it: kept in the `.img` folder beside it under the file's own name, `.img/widgets.svg` for `widgets.md`, and `.img/README.svg` for a folder's README.
+
+Nothing in the file links it; the name is the link, so the drawing moves when the file does and a file without one is untouched. Where the file is shown as one thing, [the card that places it](surface/lane.md#12-a-placed-part-raises-a-card) first, the drawing stands for it.
+
+It is drawn in one hand, so a run of them reads as a set. Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
+
+*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand.*
 
 ## 9. Reading and moving by script
 
