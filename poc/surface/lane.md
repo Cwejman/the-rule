@@ -62,13 +62,13 @@ A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates)
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
-Cards that follow one another with nothing written between them stand as tiles, side by side in a grid as wide as the lane. A run of placements is a set of doors the brief offers at once, and as a column of whole cards it made a reader scroll past every face before seeing what the set held. Each tile is its file's image, or its graphic, then its title and stamp, the start of its face and the count beneath it, so the run is taken in at a glance.
+Cards that follow one another with nothing written between them stand as tiles, side by side in a grid as wide as the lane. A run of placements is a set of doors the brief offers at once, and as a column of whole cards it made a reader scroll past every face before seeing what the set held. Each tile is its file's graphic, its title and stamp, the start of its face and the count beneath it, so the run is taken in at a glance. A tile whose file carries an image is the image card made small: the image whole at the tile's top, its blurred copy carrying it down to the row's height, and its title, stamp and count over the foot on the same veil, the face given up as on the card, so an image reads in one language at either size.
 
 A tile opens as a card does, and does not unfold where it stands: a grid in which one tile grew by its prose would push its neighbours out of line. Related cards tile in the same way, each keeping its dashed rim.
 
 The reading line passes through a row of tiles as through a column of cards. The row's height, down to the next row, is shared among its tiles evenly from left to right, so scrolling stands on each in turn, a step lands on its share, and the tree's water moves a tile at a time rather than the whole row at once.
 
-*The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day; the row's height shared among its tiles, the author's ask the same day, when the line and the water jumped a row at once.*
+*The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day; the row's height shared among its tiles, the author's ask the same day, when the line and the water jumped a row at once; an image tile drawn as the image card is, the author's the same day, when a band of image over a text tile did not hold beside the card at full width.*
 
 A card takes [the reading line](#4-where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
 
