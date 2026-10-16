@@ -2596,8 +2596,9 @@ const pictureHtml = (t: Tok, first = false, at = 0): string => {
   const alt = esc(textOf(t.tokens) || t.text || "");
   const own = t.width && t.height ? t.width / t.height : 0;
   // a tile's frame is one proportion for the whole grid, so a row of them keeps one line; the image stands whole in it
-  const frame = at || (own ? clamp(own, PICTURE.tallest, PICTURE.widest) : 0);
-  const fitted = own > 0 && Math.abs(frame - own) > 0.01;
+  const frame = at < 0 ? 0 : at || (own ? clamp(own, PICTURE.tallest, PICTURE.widest) : 0);
+  // a frame of no proportion of its own takes the room it is given, and the image stands whole in it on its copy
+  const fitted = at < 0 || (own > 0 && Math.abs(frame - own) > 0.01);
   // the opening's image is the first thing its page shows, so it is fetched at once; a card's waits until it is near
   const load = `${first ? "" : ` loading="lazy"`} decoding="async"`;
   const fill = fitted ? `<img class="fill" src="${esc(t.src)}" alt="" aria-hidden="true"${load}>` : "";
@@ -2611,12 +2612,22 @@ function tileHtml(a: string, related = false): string {
   const at = related ? `data-go="${esc(a)}" data-related="${esc(a)}"` : `data-a="${esc(a)}" data-card="${esc(a)}"`;
   const face = blocksOf(b).find((t) => t.type === "paragraph");
   const stamp = stampOf(b);
+  const line = actLine("card-act", a, { fold: false, figure: "", beneath: beneathCount(a), unfold: false });
+  // a tile whose file carries an image is drawn as the image card is, small: the image whole at the tile's top, its
+  // blurred copy carrying it down to the row's height, and the words over the foot on the veil, the face given up
+  if (b.picture?.src)
+    return (
+      `<div class="card tile pictured${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
+      `<div class="card-picture">${pictureHtml(b.picture, false, -1)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
+      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
+      `</div>`
+    );
   const top = b.picture?.src ? `<div class="tile-picture">${pictureHtml(b.picture, false, 1.6)}</div>` : b.drawing ? `<div class="tile-drawing" aria-hidden="true">${b.drawing}</div>` : "";
   return (
     `<div class="card tile${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
     top +
     `<div class="tile-text"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
-    actLine("card-act", a, { fold: false, figure: "", beneath: beneathCount(a), unfold: false }) +
+    line +
     `</div>`
   );
 }
@@ -8967,6 +8978,20 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .tile .stamp { font-size: .8em; }
 .brief .tile .tile-face { margin: 2px 0 0; font-size: .88em; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .brief .tile .act { margin: auto 0 0; padding: 10px 16px 12px; font-size: .9em; }
+/* a tile with an image is the image card made small: the tile's whole room is the picture, the image whole at its top
+   and its blurred copy carrying it down to the row's height, and the words over the foot on the same veil */
+.brief .tiles .card.tile.pictured { padding: 0; }
+.brief .tile.pictured .card-picture { position: relative; flex: 1; min-height: 260px; display: flex; }
+.brief .tile.pictured .picture { position: absolute; inset: 0; height: 100%; border: 0; }
+.brief .tile.pictured .picture img.main { object-fit: contain; object-position: top; }
+.brief .tile.pictured .picture img.fill { inset: -10%; width: 120%; height: 120%; filter: blur(30px) saturate(1.2); opacity: .9; }
+.brief .tile.pictured :is(.card-blur, .card-veil) { height: max(55%, 150px); }
+.brief .tile.pictured .card-over { padding: 0 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+.brief .tile.pictured .card-over .card-head { font-size: 1.12em; }
+.brief .tile.pictured .card-over .card-top { align-items: flex-start; }
+.brief .tile.pictured .card-over .ficon { width: 1.1em; height: 1.1em; margin-top: .14em; }
+.brief .tile.pictured .card-over .stamp { font-size: .8em; }
+.brief .tile.pictured .card-over .act { padding: 6px 0 0; margin: 0; font-size: .9em; }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
 .brief .card.related { outline-style: dashed; }
 /* the opening stands its file's image beneath the title, before the first prose */
