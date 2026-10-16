@@ -42,7 +42,9 @@ A card carries no figure of what lies beyond it; how much waits is said by the c
 
 A card whose file [carries a drawing](../practice.md#87-a-file-may-carry-a-drawing) stands it first, above the title, on the text's left edge and on the card's own ground: no field behind it and no column beside it, and the card is stacked as it is read, the drawing, the title, the face. The room above the title is not a cost; it is what lets the drawing be seen as a drawing rather than an icon, and the drawing in its line and fill takes the branch's hue, as the card's outline does.
 
-*The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card).*
+Opened, the reading stands the same drawing above its title in the opening, as the card did, so the card and the page it opens onto read as one thing; the root's opening stands the body's own.
+
+*The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, and asked for it above the opening too, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card).*
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
@@ -259,6 +261,8 @@ The line is as wide as what it spans, the lane alone or the canvas beside it, an
 How here is placed is the run of levels from the root down to [the brief in focus](#4-where-you-are-is-the-brief-in-focus), not only to the scope: a reader who has scrolled into a brief has its heading off the screen, and where they stand is what the line is for.
 
 The run says of each step what it is and where it stands, each by one means, and no shape is drawn around any of them. The weight says the kind: a reading, the root or a placed file, stands bold, and a section at normal weight after its number, as the lane numbers it in the reading it stands in. The ink says where: what stands above the sections of the reading open is muted, those sections fainter, and the head, what the reader is looking at, takes full ink, and where it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is. The mark before a step says what going to it crosses: a chevron within a file, and at a file's boundary a slash in the hue of the reading entered, as a path is written. Each is lit in its colour when pointed at; a name above the scope is a press that scopes out to it, and one within the scope a press that goes there.
+
+A reading whose file [carries an icon](../practice.md#87-a-file-may-carry-a-drawing) is named in the run with it before its name, in its branch's hue, so the files on the way are told apart before they are read. The root keeps its ring, which is the whole wheel and says more of where the run begins than an icon would.
 
 The run may name files alone, by [a switch](widgets.md#62-the-switches): the root and every placed file on the way down, and the sections that place them left out with the rest. Where the focus stands inside the last reading named, its number follows it in full ink, so the line still says where the reader stands without spending a name on it.
 

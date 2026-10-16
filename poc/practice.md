@@ -324,7 +324,11 @@ Nothing in the file links it; the name is the link, so the drawing moves when th
 
 It is drawn in one hand, so a run of them reads as a set. Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
 
-*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand.*
+A file with a drawing may carry an icon beside it as well, `.img/widgets.icon.svg`: the same thing said in the fewest lines, on a 16-unit square with no texture, for where the file is named in a line of text, the rows of a tree or the steps of a way down. They are two files and not one sheet of both, since a sheet's parts show only through a page that picks them out, and each file should open as itself anywhere a repository is browsed.
+
+A file with no icon is named without one; its drawing is never shrunk to stand in, since a drawing made to be seen large reads as a smudge at a letter's size.
+
+*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand. The icon beside the drawing, the author's ask the same day, over a sprite sheet of both.*
 
 ## 9. Reading and moving by script
 
