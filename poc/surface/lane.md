@@ -8,8 +8,6 @@ status: in force
 
 # Reading and orientation come apart
 
-![The lane at the root: a paragraph of prose, then the card of the rule with its drawing above its title, and a gutter beside it](.img/lane.webp)
-
 A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.
 
 *Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
@@ -48,15 +46,15 @@ A card whose file [carries a graphic](../practice.md#87-a-file-may-carry-a-graph
 
 Opened, the reading stands the same drawing above its title in the opening, as the card did, so the card and the page it opens onto read as one thing; the root's opening stands the body's own.
 
-A card whose file carries [an image](../practice.md#872-the-image-is-what-the-file-is-of) is the image: it fills the card whole, at its own proportion, and only a portrait taller than most of a screen is cut, from its foot. The card's words stand over the image's lower part, the icon, the title, the stamp and the acts, with the face given up, since a screenshot of a page says more of it at a glance than its first paragraph does. Unfolded, the card's prose stands beneath the image.
+A card whose file carries [an image](../practice.md#872-the-image-is-what-the-file-is-of) is the image: it fills the card whole, at its own proportion, from a square to a band two and a half times as wide as it is tall. An image outside that is never cut: it stands whole in a frame of the nearest of the two, on a blurred and enlarged copy of itself, so a tall portrait does not stand taller than the lane is wide and a panorama keeps room for the words over it. The card's words stand over the image's lower part, the icon, the title, the stamp and the acts, with the face given up, since a screenshot of a page says more of it at a glance than its first paragraph does. Unfolded, the card's prose stands beneath the image.
 
-What carries the words is a veil of the page's own ground rather than a frame: a blur that deepens toward the foot, so the image goes soft before it goes pale, and over it a wash of the ground, eased from nothing to nearly solid so it has no edge where it begins. The words read in the ink they have everywhere else, in either theme, whatever the image holds where they stand. Opened, the reading stands the image beneath its title, before the first prose, where the file writes it. This file carries one, a sight of the lane, so its own card is drawn so wherever it is placed.
+What carries the words is a veil of the page's own ground rather than a frame: a blur that deepens toward the foot, so the image goes soft before it goes pale, and over it a wash of the ground, eased from nothing to nearly solid so it has no edge where it begins. The words read in the ink they have everywhere else, in either theme, whatever the image holds where they stand. Opened, the reading stands the image beneath its title, before the first prose, where the file writes it, with the text written beneath it. [How two holons drive each other](../../ideas/resonance.md) carries one, a synthesizer's panel, and its card is drawn so wherever it is placed.
 
 What a file carries above its face, and how it is written there, is the practice's, which is a tree of its own:
 
 > [A file may carry a graphic and an image](../practice.md#87-a-file-may-carry-a-graphic-and-an-image)
 
-*The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, and asked for it above the opening too, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card). The image as the card, the author's the same day; a small tile over its foot was drawn first and gave way the same day to the image whole under a veil, since a tile is one more frame where the image needs none.*
+*The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, and asked for it above the opening too, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card). The image as the card, the author's the same day; a small tile over its foot was drawn first and gave way the same day to the image whole under a veil, since a tile is one more frame where the image needs none. The bounds of its proportion, the author's the same day, so that no image is cut and none stands too tall.*
 
 A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates) raises its card too, drawn as any card is, since what a reader needs of it is the same: what is there, and whether to go. What differs is that it stands outside the reading. The reading line passes over it as it passes over prose, a step does not stop on it, and nothing beneath it is counted for the brief that relates it. Pressing it opens the brief it names in its own tree, and the way down then reads from that tree's root, since that is where the reader now stands.
 
