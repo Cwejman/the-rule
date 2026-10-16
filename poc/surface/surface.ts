@@ -385,6 +385,8 @@ type Brief = {
   stamp?: Record<string, string>;
   /** set by the trace on the root brief of a file that carries a drawing: its markup, cleaned as a sketch's is */
   drawing?: string;
+  /** set by the trace on the root brief of a file that carries an icon: its markup, cleaned as a sketch's is */
+  icon?: string;
   /** set by the history's trace on a leaf: the full hash of the commit it stands for, which the light tier tells the rest of */
   commit?: string;
 };
@@ -805,6 +807,9 @@ async function trace(rootArg: string): Promise<Body> {
   briefs.filter((b) => b.address === "" || b.card).forEach((b) => {
     const abs = join(rootDir, dirname(b.file), ".img", basename(b.file).replace(/\.md$/i, "") + ".svg");
     if (existsSync(abs) && statSync(abs).isFile()) b.drawing = cleanSketch(readFileSync(abs, "utf8"));
+    // its icon beside it, the same thing in the fewest lines, names it where it is named in a line
+    const ico = abs.replace(/\.svg$/, ".icon.svg");
+    if (existsSync(ico) && statSync(ico).isFile()) b.icon = cleanSketch(readFileSync(ico, "utf8"));
   });
 
   return { title: root.title, root: root.file, briefs, warnings, traced: new Date().toISOString() };
@@ -2570,7 +2575,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}><h1>${esc(root.title)}</h1>${blocks(root.body)}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${blocks(root.body)}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -3424,13 +3429,13 @@ function treeHtml(): string {
       up !== null && many > 0 && settings.treeWhole !== "whole"
         ? `<button class="beside${open ? " on" : ""}" data-beside="${esc(up)}" data-tip="${open ? "close the level back to the way" : `${many} more beside it in its level`}">${open ? "−" : `+${many}`}</button>`
         : "";
-    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
+    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}${body && a !== "" ? iconHtml(b) : ""}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
   };
   // a sibling the way passed by: a row as any row of the outline, and pressing it goes there
   const sibling = (b: Brief): string =>
     node(
       b.address,
-      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
       "",
     );
   // the reading open as the lane holds it, folds and all
@@ -3441,7 +3446,7 @@ function treeHtml(): string {
     // levels the lane has unfolded are seen alone
     const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
-    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
+    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
     return node(b.address, row + sprout(b, whole && !listed), listed ? level(b.address).map(outline).join("") : "");
   };
   const step = (i: number): string => {
@@ -3514,6 +3519,9 @@ function adjHtml(to: string, detail: string): string {
 }
 
 /** Where a brief stands: the titles above it with a chevron between, whole, the root left out since it is the body. */
+/** A file's icon, where it carries one, set before its name wherever it is named in a line (practice 8.7). */
+const iconHtml = (b: Brief | undefined): string => (b?.icon ? `<span class="ficon" aria-hidden="true">${b.icon}</span>` : "");
+
 function pathHtml(to: string): string {
   const titles = prefixesOf(to).slice(1, -1).map((a) => brief(a)?.title ?? "");
   return titles.length ? `<span class="path">${titles.map((t) => `<span>${esc(t)}</span>`).join(CHEVRON)}</span>` : "";
@@ -6145,7 +6153,7 @@ function drawCrumb(): void {
     const cls = ["step", reading(a) ? "scope" : "", where, ...(ring ? ["ring"] : []), ...(bare ? ["bare"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     const title = esc(brief(a)!.title);
-    const face = ring ? `<i aria-label="${title}"></i>` : `${n ? `<span class="num">${esc(n)}</span>` : ""}${bare ? "" : title}`;
+    const face = ring ? `<i aria-label="${title}"></i>` : `${n ? `<span class="num">${esc(n)}</span>` : ""}${body && reading(a) ? iconHtml(brief(a)) : ""}${bare ? "" : title}`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearingHtml(a) : "");
   };
   const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
@@ -8401,6 +8409,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) .step { font-weight: calc(400 - var(--thin)); }
 :is(#crumb, #gcrumb) .step.scope { flex: none; font-weight: calc(600 - var(--thin)); }
 :is(#crumb, #gcrumb) .step.above { color: var(--muted); }
+/* a step clips its overflow for its ellipsis, which would cut an icon set on the baseline, so one carrying an icon centres it */
+:is(#crumb, #gcrumb) .step:has(.ficon) { display: inline-flex; align-items: center; }
+:is(#crumb, #gcrumb) .step .ficon { vertical-align: 0; }
+:is(#crumb, #gcrumb) .step .ficon svg { width: 100%; height: 100%; opacity: 1; }
 :is(#crumb, #gcrumb) .step.in { color: var(--faint); }
 :is(#crumb, #gcrumb) .step.root { flex: none; color: var(--muted); }
 :is(#crumb, #gcrumb) .step .num { margin-right: .35em; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); transition: color .1s; }
@@ -8743,6 +8755,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card-drawing { margin: 4px 0 8px -10px; }
 .brief .card-drawing svg { display: block; width: 92px; height: 92px; overflow: visible; }
 .brief .card-body { min-width: 0; }
+/* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
+.ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
+.ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
 .brief .card .stamp { flex: none; white-space: nowrap; }
