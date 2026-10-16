@@ -170,7 +170,7 @@ It gave way on 2026-10-15 to [the figure of the files a brief holds](widgets.md#
 
 ## aa. A file's drawing framed beside the card
 
-Ways of [the drawing a file carries](../practice.md#87-a-file-may-carry-a-drawing) on a card, laid side by side on 2026-10-16: the drawing in a column of its own, shaded or parted by a hairline, the text beside it; hung to the left of the text with nothing around it; on a plate inside the card; in a field across the card's top, set on the text's edge or centred.
+Ways of [the drawing a file carries](../practice.md#87-a-file-may-carry-a-graphic-and-an-image) on a card, laid side by side on 2026-10-16: the drawing in a column of its own, shaded or parted by a hairline, the text beside it; hung to the left of the text with nothing around it; on a plate inside the card; in a field across the card's top, set on the text's edge or centred.
 
 Before them were a wash of the branch's hue behind it, a watermark under the prose, a tab, and a figure hung outside the card in the margin.
 

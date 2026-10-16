@@ -155,6 +155,22 @@ In [the history](surface/history.md#22-a-story-places-its-commits), and nowhere 
 
 *Preferred, the author's, 2026-09-21, as the history was settled; placement taken past files is named here so it has one home.*
 
+### 3.8 A quoted lone link relates
+
+A lone link set in a quote relates a brief rather than placing it:
+
+```markdown
+> [Editing an order](../app/orders/edit.md)
+```
+
+It raises the brief's card where it stands, as a placement does, so a reader sees what is there and can cross to it. But the brief is not a part of the one that relates it. It stands in its own tree, it is not counted among what lies beneath, and opening it leaves this reading for that one. It is how one holon points into another, the work at the page of an application it is done on, without the other's shape becoming its own.
+
+Why it is related is said in the prose before it, as where a part is placed is, and nothing is written beneath it. It may name a file, or a brief within one by its anchor; whether a placement may name a brief within a file as well is open.
+
+A quote is markdown's own mark for what comes from elsewhere, so the difference is written once and reads the same in any renderer.
+
+*The author's decision, 2026-10-16, for a body that surveys an application beside one that maps its work, where a link heroed as a card was wanted apart from a part. Text beneath a related card, as an image has, is left for when it is wanted.*
+
 ## 4. Headings carry numbers
 
 Headings are numbered, and the numbers nest with the headings: 1, then 1.1 and 1.2 inside it, then 1.1.1. The title is unnumbered. The numbers tell a reader where they are while scrolling, and give every brief a short address that can be spoken or written anywhere, and that a script can read and move by.
@@ -265,7 +281,7 @@ What may be removed is what nothing living stands on, and the test reads from th
 
 A body under the rule carries two kinds of visual: a drawing where prose cannot show a shape, and an image where a page needs air. Both stand beside the prose as blocks of their own, and the prose reads whole without them, as it reads whole without a link it offers.
 
-A file may carry a third, [a drawing of its own](#87-a-file-may-carry-a-drawing), which stands for the file where it is shown as one thing rather than inside its prose.
+A file may also carry [a graphic and an image of its own](#87-a-file-may-carry-a-graphic-and-an-image), which stand for the file where it is shown as one thing rather than inside its prose.
 
 *Reasoned, the author's.*
 
@@ -285,7 +301,7 @@ The second use is the image in an artful sense, as a blog post uses one: breathi
 
 ### 8.3 An image opens a paragraph of its own
 
-An image is never inside a sentence, so a reader and a program both meet it as a block beside the prose rather than as a word in it, and the only text in its paragraph is the text beneath it. It never opens a brief, since [the face](#51-a-brief-opens-with-prose) is prose.
+An image is never inside a sentence, so a reader and a program both meet it as a block beside the prose rather than as a word in it, and the only text in its paragraph is the text beneath it. It never opens a brief, since [the face](#51-a-brief-opens-with-prose) is prose; the images that stand above a file's face [belong to the file](#87-a-file-may-carry-a-graphic-and-an-image), not to its brief.
 
 *Preferred, the author's, 2026-09-14; whether an image may stand inside a sentence is open, and forbidden until it is answered.*
 
@@ -316,21 +332,41 @@ One shown from files in several folders is kept in the `.img` of the folder that
 
 *Preferred, the author's, 2026-09-14, from the repository's own header and footer, kept in `.img` beside the root entry.*
 
-### 8.7 A file may carry a drawing
+### 8.7 A file may carry a graphic and an image
 
-A file may carry a small drawing that stands for it: kept in the `.img` folder beside it under the file's own name, `.img/widgets.svg` for `widgets.md`, and `.img/README.svg` for a folder's README.
+Two images may stand above a file's face, and they belong to the file rather than to any brief in it: its graphic, written before the title, and its image, written directly after the title and before the first prose. A file may carry either, both or neither, and where it is shown as one thing, [the card that places it](surface/lane.md#12-a-placed-part-raises-a-card) first, they stand for it.
 
-Nothing in the file links it; the name is the link, so the drawing moves when the file does and a file without one is untouched. Where the file is shown as one thing, [the card that places it](surface/lane.md#12-a-placed-part-raises-a-card) first, the drawing stands for it. The body's root entry carries one too, `.img/README.svg` beside it, which is the body's own drawing: where another project mounts the body, the card that places it there stands that drawing.
+```markdown
+![An open folder with a branch drawn on it](.img/orders.svg)
 
-It is drawn in one hand, so a run of them reads as a set. Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
+# The orders page
 
-A file with a drawing may carry an icon beside it as well, `.img/widgets.icon.svg`: the same thing said in the fewest lines, on a 16-unit square with no texture, for where the file is named in a line of text, the rows of a tree or the steps of a way down. They are two files and not one sheet of both, since a sheet's parts show only through a page that picks them out, and each file should open as itself anywhere a repository is browsed.
+![The orders list, three orders open](.img/orders.png)
 
-A run of files that share a name's start shares a drawing: a file with none of its own takes the one named for the longest start of its name that ends before a dash, so `.img/ideas.svg` stands for every `ideas-2026-09-16.md` beside it, and a day given its own drawing keeps it. A run is a record of entries of one kind, which a drawing apiece would only tell apart less well than their names do. The icon is found the same way.
+The orders page is where…
+```
 
-A file with no icon is named without one; its drawing is never shrunk to stand in, since a drawing made to be seen large reads as a smudge at a letter's size.
+Both are written in the file, so what the file carries is read from the file. Several files may name one graphic, and a run of entries of one kind does: each of the author's dated ideas names `.img/ideas.svg`, since a drawing apiece would tell the days apart less well than their names do. The body's root entry carries the body's own graphic, which is what a project that mounts the body stands on the card that places it there.
 
-*Preferred, the author's direction, 2026-10-16. The drawings first made were stand-ins by a session, for the root's seven placed files, to be drawn again by a better hand. The icon beside the drawing, the author's ask the same day, over a sprite sheet of both; the drawing a run shares, the author's ask the same day for the dated ideas.*
+*Preferred, the author's direction, 2026-10-16. The graphic was kept first in the `.img` beside a file under the file's name, found by the name alone, and a run's by the longest start of its name; the author moved it into the file the same day, since a name in a folder that carries meaning is state the file cannot see. The graphic and the image told apart by standing before and after the title, the author's, the same day.*
+
+#### 8.7.1 The graphic is drawn in one hand, with an icon beside it
+
+The graphic is a drawing that stands for the file, drawn in one hand so a run of them reads as a set.
+
+Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
+
+Its icon is kept beside it under the graphic's name with `.icon` before the extension, `orders.icon.svg` beside `orders.svg`: the same thing said in the fewest lines, on a 16-unit square with no texture, for where the file is named in a line of text, the rows of a tree or the steps of a way down. They are two files and not one sheet of both, since a sheet's parts show only through a page that picks them out, and each should open as itself anywhere a repository is browsed.
+
+A graphic with no icon leaves its file named without one; the graphic is never shrunk to stand in, since a drawing made to be seen large reads as a smudge at a letter's size.
+
+*Preferred, the author's direction, 2026-10-16. The drawings first made are stand-ins by a session, to be drawn again by a better hand. The icon beside the drawing, the author's ask the same day, over a sprite sheet of both.*
+
+#### 8.7.2 The image is what the file is of
+
+The image is a picture of what the file is about, where there is one to show: the screenshot of the page an application's file describes, or a photograph of the thing a file is on. Where a card stands for the file, the image fills it, and the card's own words step back to a small tile over it.
+
+*Preferred, the author's direction, 2026-10-16, for a body that surveys an application and keeps a screenshot of each page in the page's own file.*
 
 ## 9. Reading and moving by script
 
