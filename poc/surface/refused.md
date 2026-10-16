@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A closed door](.img/refused.svg)
+
 # What was tried and refused
 
 What the programs before this model reached for is kept here, each shape with the reason it is not wanted, so that none of them is put forward again as though it were new. This level is a flat run rather than a gradient, since a refusal is looked up when someone proposes it again and never read through, so no refusal stands on another, and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.

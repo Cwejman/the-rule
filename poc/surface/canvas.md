@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![An easel holding a painting of hills](.img/canvas.svg)
+
 # The canvas
 
 The canvas is the surface's second pane: the body as nodes, which a reader opens one place at a time so that the map grows to the right as they go, with the prose kept in the lane beside it. It is how a body of work is moved in, where the lane is how one reading of it is read.

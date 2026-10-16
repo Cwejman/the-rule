@@ -275,7 +275,7 @@ async function build(rootArg: string, out: string): Promise<void> {
   // image stays remote, since it may change after the build
   const rootDir = dirname(rootFileOf(rootArg));
   const outDir = dirname(resolve(out));
-  const images = body.briefs.flatMap((b) => b.body).filter((t) => t.type === "image" && t.asset && !t.svg);
+  const images = body.briefs.flatMap((b) => [...b.body, ...(b.picture ? [b.picture] : [])]).filter((t) => t.type === "image" && t.asset && !t.svg);
   const written = new Set<string>();
   images.forEach((t) => {
     const from = join(rootDir, t.asset!);
@@ -383,10 +383,12 @@ type Brief = {
   card?: boolean;
   /** set by the trace on the root brief of a file: what its stamp says of it beyond being under the rule, its status or who ratified it */
   stamp?: Record<string, string>;
-  /** set by the trace on the root brief of a file that carries a drawing: its markup, cleaned as a sketch's is */
+  /** set by the trace on the root brief of a file that carries a graphic: its markup, cleaned as a sketch's is */
   drawing?: string;
-  /** set by the trace on the root brief of a file that carries an icon: its markup, cleaned as a sketch's is */
+  /** set by the trace on the root brief of a file whose graphic has an icon beside it: its markup, cleaned as a sketch's is */
   icon?: string;
+  /** set by the trace on the root brief of a file that carries an image: the image, measured as any image is */
+  picture?: Tok;
   /** set by the history's trace on a leaf: the full hash of the commit it stands for, which the light tier tells the rest of */
   commit?: string;
 };
@@ -540,10 +542,10 @@ const lean = (toks: Tok[]): Tok[] => JSON.parse(JSON.stringify(toks, (k, v) => (
 // by heading depth. The cut is pure: it reads tokens and returns structure.
 
 type Section = { depth: number; heading: string; body: Tok[]; children: Section[] };
-type Cut = { title: string | null; lead: Tok[]; sections: Section[]; strays: string[] };
+type Cut = { title: string | null; before: Tok[]; lead: Tok[]; sections: Section[]; strays: string[] };
 
 function cut(toks: Tok[]): Cut {
-  const out: Cut = { title: null, lead: [], sections: [], strays: [] };
+  const out: Cut = { title: null, before: [], lead: [], sections: [], strays: [] };
   const open: Section[] = []; // the state.opened of sections a token falls under, shallowest first
   toks.forEach((t) => {
     const isHeading = t.type === "heading";
@@ -555,9 +557,27 @@ function cut(toks: Tok[]): Cut {
       return void open.push(s);
     }
     if (isHeading) out.strays.push(textOf(t.tokens));
-    (open.length ? open[open.length - 1].body : out.lead).push(t);
+    (open.length ? open[open.length - 1].body : out.title === null ? out.before : out.lead).push(t);
   });
   return out;
+}
+
+/**
+ * What a file carries of its own above its face (practice 8.7): its graphic, the first image before its title, and its
+ * image, an image standing first after the title before any prose. Both are the file's rather than its brief's, so the
+ * image is lifted out of the prose it would otherwise open.
+ */
+function ownImages(c: Cut): { graphic?: Tok; picture?: Tok; lead: Tok[] } {
+  const graphic = c.before.find((t) => t.type === "image");
+  const at = c.lead.findIndex((t) => t.type !== "space");
+  const picture = c.lead[at]?.type === "image" ? c.lead[at] : undefined;
+  return { graphic, picture, lead: picture ? c.lead.filter((_, i) => i !== at) : c.lead };
+}
+
+/** The lone link a quote is, where it holds nothing else: that quote relates a brief rather than placing it (practice 3.8). */
+function relatedIn(tok: Tok): Tok | null {
+  const inner = (tok.tokens ?? []).filter((t) => t.type !== "space");
+  return tok.type === "blockquote" && inner.length === 1 ? placementIn(inner[0]) : null;
 }
 
 /**
@@ -636,6 +656,13 @@ async function trace(rootArg: string): Promise<Body> {
     return free;
   };
 
+  /** A file's graphic and image, held on its root brief and measured with every other image once the trace is done. */
+  const owned: { brief: Brief; graphic?: Tok; abs: string }[] = [];
+  const carried = (brief: Brief, own: { graphic?: Tok; picture?: Tok }, abs: string): void => {
+    if (own.picture) (brief.picture = own.picture), images.push({ tok: own.picture, file: abs });
+    if (own.graphic) owned.push({ brief, graphic: own.graphic, abs }), images.push({ tok: own.graphic, file: abs });
+  };
+
   /**
    * Gathers a brief's prose for the rewriting after the trace, and says where it breaks the practice's rules for
    * images: a face is prose, so a brief never opens with an image, and an image stands as a block of its own.
@@ -706,17 +733,19 @@ async function trace(rootArg: string): Promise<Body> {
       r.cut.strays.forEach((x) => warn(`${tfile}: a second title "${x}"; read as prose`));
       // a file holds its level as sections, as cards its prose places, or as both; with neither it is a brief, not a part
       if (r.cut.sections.length === 0 && placementsIn(r.cut.lead).length === 0) return void warn(`${tfile}: placed by "${holder.title || "the title"}" and has no section and places nothing; a level with nothing in it`);
-      const lead = r.cut.lead.filter((t) => t.type !== "space");
+      const own = ownImages(r.cut);
+      const lead = own.lead.filter((t) => t.type !== "space");
       if (lead.length === 0) warn(`${tfile}: no brief of its own; a placed file opens with the prose that gives its understanding, which is what its card shows`);
       const address = addressFor(holder.address, r.cut.title);
       if (!address.endsWith(slug(r.cut.title))) warn(`${tfile}: another part titled "${r.cut.title}" stands in the same place; this one is addressed ${address}`);
       // a heading whose words the card repeats earns the reader nothing, and doubles the address as well
       if (holder.address.endsWith("/" + slug(r.cut.title)) || holder.address === slug(r.cut.title)) warn(`${tfile}: placed by a brief of the same title, so its card repeats that heading and its address reads ${address}; the heading earns nothing here`);
-      const brief: Brief = { address, title: r.cut.title, number: "", written: "", file: tfile, kind: r.kind, body: r.cut.lead, door: true, card: true, stamp: r.stamp };
+      const brief: Brief = { address, title: r.cut.title, number: "", written: "", file: tfile, kind: r.kind, body: own.lead, door: true, card: true, stamp: r.stamp };
       briefs.push(brief);
+      carried(brief, own, target);
       table.set(target, address);
       table.set(`${target}#${slug(r.cut.title)}`, address);
-      gather(r.cut.lead, target, tfile, r.cut.title);
+      gather(own.lead, target, tfile, r.cut.title);
       Object.assign(para, { type: "card", to: address, tokens: undefined, text: undefined });
       tracePlacements(brief, target, tfile);
       traceLevel(r.cut.sections, brief, target, tfile, r.kind);
@@ -729,8 +758,10 @@ async function trace(rootArg: string): Promise<Body> {
     const why = "fault" in r ? r.fault : "no title";
     return { title: "", root: rel(rootFile), briefs: [], warnings: [`${rel(rootFile)}: ${why}; nothing traced`], traced: new Date().toISOString() };
   }
-  const root: Brief = { address: "", title: r.cut.title, number: "", written: "", file: rel(rootFile), kind: r.kind, body: r.cut.lead, door: r.cut.sections.length > 0, stamp: r.stamp };
+  const rootOwn = ownImages(r.cut);
+  const root: Brief = { address: "", title: r.cut.title, number: "", written: "", file: rel(rootFile), kind: r.kind, body: rootOwn.lead, door: r.cut.sections.length > 0, stamp: r.stamp };
   briefs.push(root);
+  carried(root, rootOwn, rootFile);
   addresses.add("");
   table.set(rootFile, "");
   table.set(`${rootFile}#${slug(root.title)}`, "");
@@ -766,6 +797,16 @@ async function trace(rootArg: string): Promise<Body> {
     return { out: "outside", href: (within(abs) ? relative(rootDir, abs) : "above the root") + (anchor ? `#${anchor}` : "") };
   };
   links.forEach(({ tok, file }) => Object.assign(tok, resolveLink(tok.href ?? "", file)));
+  // a quote that is nothing but a lone link to a brief in the body relates that brief, and raises its card outside the shape
+  briefs.forEach((b) =>
+    b.body.forEach((t) => {
+      const m = relatedIn(t);
+      if (!m) return;
+      if (m.to === undefined) return void warn(`${b.file}: "${b.title || "the title"}" relates ${m.href}, which is not in the body; it stands as a quote`);
+      if (m.to === b.address) return void warn(`${b.file}: "${b.title || "the title"}" relates itself; it stands as a quote`);
+      Object.assign(t, { type: "related", to: m.to, tokens: undefined, text: undefined });
+    }),
+  );
 
   // ## 2.6 Images are measured
   //
@@ -804,19 +845,14 @@ async function trace(rootArg: string): Promise<Body> {
 
   // a file's drawing stands in the .img beside it under the file's own name, linked by nothing but that name, and is set
   // into the page cleaned as a sketch is, so the hue of the branch the file stands under reaches it (practice 8.7)
-  // a run of files sharing a name's start shares one: a file with none of its own takes the one named for the longest
-  // start of its name that ends before a dash, so ideas.svg stands for every ideas-2026-09-16.md beside it
-  const drawn = (file: string, ext: string): string | undefined => {
-    const parts = basename(file).replace(/\.md$/i, "").split("-");
-    for (let n = parts.length; n > 0; n--) {
-      const abs = join(rootDir, dirname(file), ".img", parts.slice(0, n).join("-") + ext);
-      if (existsSync(abs) && statSync(abs).isFile()) return cleanSketch(readFileSync(abs, "utf8"));
-    }
-  };
-  briefs.filter((b) => b.address === "" || b.card).forEach((b) => {
-    b.drawing = drawn(b.file, ".svg");
-    // its icon beside it, the same thing in the fewest lines, names it where it is named in a line
-    b.icon = drawn(b.file, ".icon.svg");
+  // a file's graphic is set into the page, cleaned as a sketch is, so the hue of the branch the file stands under reaches
+  // it; its icon stands beside it under its name with .icon before the extension (practice 8.7.1)
+  owned.forEach(({ brief, graphic, abs }) => {
+    const at = graphic?.asset ? join(rootDir, graphic.asset) : "";
+    if (!at || imageType(at) !== "image/svg+xml") return void (graphic?.asset && warn(`${rel(abs)}: its graphic ${graphic.asset} is not an SVG; a graphic is drawn, and it is not shown`));
+    brief.drawing = cleanSketch(readFileSync(at, "utf8"));
+    const ico = at.replace(/\.svg$/i, ".icon.svg");
+    if (existsSync(ico) && statSync(ico).isFile()) brief.icon = cleanSketch(readFileSync(ico, "utf8"));
   });
 
   return { title: root.title, root: root.file, briefs, warnings, traced: new Date().toISOString() };
@@ -975,7 +1011,7 @@ function cleanSketch(src: string): string {
 }
 
 /** Every image the body holds as a file, by its path from the root's directory. */
-const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => b.body.flatMap((t) => (t.type === "image" && t.asset ? [t.asset] : [])));
+const assetsOf = (body: Body): string[] => body.briefs.flatMap((b) => [...b.body, ...(b.picture ? [b.picture] : [])].flatMap((t) => (t.type === "image" && t.asset ? [t.asset] : [])));
 
 // ## 2.8 History is had apart from the body
 //
@@ -2336,6 +2372,8 @@ const BLOCK: Record<string, (t: Tok) => string> = {
   paragraph: (t) => `<p>${inline(t.tokens)}</p>`,
   // a paragraph that was nothing but a lone link is a placement, and the card stands in its room
   card: (t) => cardHtml(t.to ?? ""),
+  // a quote that was nothing but a lone link relates a brief: its card, outside the reading, a door to its own tree
+  related: (t) => cardHtml(t.to ?? "", true),
   text: (t) => inline(t.tokens ?? [t]),
   heading: (t) => `<p class="stray">${inline(t.tokens)}</p>`,
   list: (t) => {
@@ -2527,7 +2565,14 @@ const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; be
   `<span class="acts">${o.unfold ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
   `</div>`;
 
-function cardHtml(a: string): string {
+/** A file's image, as the card and the opening stand it: at its own proportion, measured by the trace. */
+const pictureHtml = (t: Tok): string => {
+  const alt = esc(textOf(t.tokens) || t.text || "");
+  const ratio = t.width && t.height ? ` style="aspect-ratio:${t.width} / ${t.height}"` : "";
+  return t.src ? `<div class="picture"${ratio}><img src="${esc(t.src)}" alt="${alt}" loading="lazy" decoding="async"></div>` : "";
+};
+
+function cardHtml(a: string, related = false): string {
   const b = brief(a);
   if (!b) return `<p class="chrome dim">a part that is not in the body</p>`;
   const g = foldOf(a) ?? "face";
@@ -2541,11 +2586,25 @@ function cardHtml(a: string): string {
   const hidden = all.filter((t) => !shown.includes(t));
   const beneath = beneathCount(a);
   const stamp = stampOf(b);
-  const line = actLine("card-act", a, { fold: foldable, figure: hidden.length ? actFigure(b, hidden, []) : "", beneath, unfold: foldable });
+  // a related card does not unfold where it stands, since the brief it shows is read in its own tree
+  const line = related ? actLine("card-act", a, { fold: false, figure: "", beneath, unfold: false }) : actLine("card-act", a, { fold: foldable, figure: hidden.length ? actFigure(b, hidden, []) : "", beneath, unfold: foldable });
+  // a related card stands outside the reading: the line passes over it and a step does not stop on it, so it carries no
+  // address of the reading's, and a press goes to it in its own tree
+  const at = related ? `data-go="${esc(a)}" data-related="${esc(a)}"` : `data-a="${esc(a)}" data-card="${esc(a)}"`;
+  const stampHtml = stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : "";
+  // a card whose file carries an image is the image, its words a small tile over its lower edge, the face given up
+  if (b.picture?.src)
+    return (
+      `<div class="card pictured${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
+      `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-tile">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div></div>` +
+      (g === "whole" ? `<div class="card-body">${blocks(all)}</div>` : "") +
+      line +
+      `</div>`
+    );
   return (
-    `<div class="card ${g}" data-a="${esc(a)}" data-card="${esc(a)}" ${huedRun(a)}>` +
+    `<div class="card${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
     (b.drawing ? `<div class="card-drawing" aria-hidden="true">${b.drawing}</div>` : "") +
-    `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}</div>` +
+    `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
     `</div>`
@@ -2582,7 +2641,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${blocks(root.body)}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${root.picture ? pictureHtml(root.picture) : ""}${blocks(root.body)}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -3445,6 +3504,12 @@ function treeHtml(): string {
       `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
       "",
     );
+  // what a brief relates stands after its level as doors, no part of it: the related brief's icon and name in its own
+  // hue, a slash for the door in place of a fold mark, and no sprout, since its shape is its own tree's
+  const doorsOf = (b: Brief): string =>
+    relatedOf(b)
+      .map((t) => `<div class="row related" data-go="${esc(t)}" ${hued(t)}><svg class="mark door" viewBox="0 0 14 14"><path d="M8.6 3 5.4 11"/></svg>${iconHtml(brief(t))}<span class="name" data-go="${esc(t)}">${esc(brief(t)!.title)}</span></div>`)
+      .join("");
   // the reading open as the lane holds it, folds and all
   const outline = (b: Brief): string => {
     if (!inLane(b.address)) return "";
@@ -3454,13 +3519,14 @@ function treeHtml(): string {
     const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
     const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
-    return node(b.address, row + sprout(b, whole && !listed), listed ? level(b.address).map(outline).join("") : "");
+    const kids = (listed ? level(b.address).map(outline).join("") : "") + (whole ? doorsOf(b) : "");
+    return node(b.address, row + sprout(b, whole && !listed), kids);
   };
   const step = (i: number): string => {
     const a = way[i];
     const kids =
       i === way.length - 1
-        ? level(S).map(outline).join("")
+        ? level(S).map(outline).join("") + doorsOf(brief(S)!)
         : besideOpen.has(a) || settings.treeWhole === "whole"
           ? level(a)
               .map((k) => (k.address === way[i + 1] ? step(i + 1) : sibling(k)))
@@ -3526,6 +3592,9 @@ function adjHtml(to: string, detail: string): string {
 }
 
 /** Where a brief stands: the titles above it with a chevron between, whole, the root left out since it is the body. */
+/** The briefs a brief relates by a quoted link, in the order they stand in its prose (practice 3.8). */
+const relatedOf = (b: Brief): string[] => b.body.flatMap((t) => (t.type === "related" && t.to !== undefined && brief(t.to) ? [t.to] : []));
+
 /** A file's icon, where it carries one, set before its name wherever it is named in a line (practice 8.7). */
 const iconHtml = (b: Brief | undefined): string => (b?.icon ? `<span class="ficon" aria-hidden="true">${b.icon}</span>` : "");
 
@@ -8763,6 +8832,29 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card-drawing { margin: 4px 0 8px calc(-92px * 5 / 64); }
 .brief .card-drawing svg { display: block; width: 92px; height: 92px; overflow: visible; }
 .brief .card-body { min-width: 0; }
+/* a card whose file carries an image is the image, at its own proportion and no taller than a screen's half, its words a
+   small tile over the lower edge; the act line stands beneath it as on any card */
+.brief .card.pictured { padding: 0 0 12px; overflow: hidden; }
+.brief .card.pictured .card-picture { position: relative; }
+/* the image would cover the card's rim, so the rim, and the hue it takes where the reading stands, are drawn over it */
+.brief .card.pictured .card-picture::after { content: ""; position: absolute; inset: 0; border-radius: 10px 10px 0 0; box-shadow: inset 1px 1px 0 var(--rim), inset -1px 0 0 var(--rim); pointer-events: none; }
+.brief .card.pictured::before { z-index: 2; }
+.brief .card.pictured .picture { max-height: 50vh; overflow: hidden; border-radius: 10px 10px 0 0; background: var(--veil); }
+.brief .card.pictured .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.brief .card.pictured .card-tile { position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); display: flex; align-items: baseline; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
+.brief .card.pictured .card-tile .card-head { font-size: var(--h3, 1.15em); flex: none; }
+.brief .card.pictured .card-tile .ficon { align-self: center; }
+.brief .card.pictured > .card-body, .brief .card.pictured > .act { padding: 0 18px; }
+.brief .card.pictured > .card-body { padding-top: 14px; }
+/* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
+.brief .card.related { outline-style: dashed; }
+/* the opening stands its file's image beneath the title, before the first prose */
+.opening > .picture { margin: 0 0 1.2em; border-radius: 10px; overflow: hidden; outline: 1px solid var(--rim); outline-offset: -1px; max-height: 60vh; }
+.opening > .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+/* a related brief's row in the tree is a door: a slash in its hue where a fold mark would stand */
+.tree .row.related { cursor: pointer; }
+.tree .row.related .mark.door { fill: none; stroke: var(--door); stroke-width: 1.4; stroke-linecap: round; }
+.tree .row.related .name { color: var(--muted); font-style: italic; }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
 .ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }

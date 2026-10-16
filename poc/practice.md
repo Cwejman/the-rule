@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![An open book with a ribbon marker](.img/practice.svg)
+
 # The practice
 
 The practice is how the rule is run in markdown and git. It answers what the rule leaves open: how briefs divide, how deep they go, what an entry looks like, what a file says about itself.

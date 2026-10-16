@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A flask with bubbles rising in it](.img/README.svg)
+
 # The study
 
 The study is where all of this is being found, and where it is still owed. It is the search for how knowledge is best structured, for people and AI alike, run as a series of labs on one shared corpus, a bounded set of research reports from a web sweep in August 2026. Each lab rewrites the same material under an edition of the rule and [a fresh head](../rule.md#54-the-fresh-head) reads the result cold.

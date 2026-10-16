@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A closed box](.img/repository.svg)
+
 # This repository
 
 The rule has a repository of its own as a pragmatic first step. Projects needed it as a submodule before the rule could be written again as its entry, so it moved whole, as it stands, with the rule left as ratified. What comes next is that writing.

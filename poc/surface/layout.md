@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![Tiles set into a mosaic, one still being placed](.img/layout.svg)
+
 # The page laid by hand
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.

@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![A page with its corner turned back](.img/second-thoughts.svg)
+
 # Second thoughts
 
 A doubt about a level would ordinarily be written at that level's own foot. These stand at the root instead, because a large part of what this entry connects was written by sessions, and the author has neither read nor ratified all of it. A doubt of his own, filed deep in a file he may never open again, is a doubt that has disappeared.

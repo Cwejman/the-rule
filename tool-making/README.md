@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![A hammer](.img/README.svg)
+
 # Toolmaking
 
 Beside the rule stands toolmaking, a second study of the same kind: how value is made by comprehension and carried into the tools we build, and the few primitives found so far, goals, work and roles.

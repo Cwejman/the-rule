@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![The plan of five rooms](.img/framework.svg)
+
 # Five areas, and what stands in them
 
 Five areas stand in a row: a wing at either edge, the middle between them, and a gutter at either side of the lane, wherever in the middle it stands. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, and the wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own.

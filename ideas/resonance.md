@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![Two tuning forks and their ripples meeting](.img/resonance.svg)
+
 # How two holons drive each other
 
 The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321-the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322-the-link). Neither is two wholes driving each other at once.

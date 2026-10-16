@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A house of many windows, some lit](.img/tenants.svg)
+
 # Tenants beyond prose
 
 A tenant is a domain that lives in the substrate the way knowledge does. Knowledge is the first, and [the rule's sixth section](../rule.md#6-how-far-this-goes) says the shape reaches further.

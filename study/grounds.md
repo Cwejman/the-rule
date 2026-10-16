@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A seedling and its roots in the soil](.img/grounds.svg)
+
 # The grounds
 
 Every rule the rule carries came from somewhere, and the grounds are where that is kept: one entry per rule, saying what it rests on and how strongly it holds. They are the artifact the rule is to stand beside once the study is complete, so that a reader a year from now can ask of any rule whether it is proven, settled, or a preference nobody has challenged.

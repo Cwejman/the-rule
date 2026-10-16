@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A tree's growth rings, each grown whole before the next](.img/README.svg)
+
 # The rule
 
 The rule is how knowledge is built, and with it how one moves into what is not yet known: at every step, the biggest win within reach of what is already held, left whole before the next. Written knowledge is where it was found, and where it is lived first.

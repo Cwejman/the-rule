@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![Two sheets, one over the other, marked with a plus and a minus](.img/history.svg)
+
 # Reading the substrate as a diff
 
 The surface was given git's history for a day, commits as briefs coloured by age, and it was taken out the same evening for its waiting time and for mixing a second substrate into the first. What was built, why it came out and what of it holds are kept here so the learning is not lost with the code.

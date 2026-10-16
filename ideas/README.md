@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A sprout of two leaves from the ground](.img/README.svg)
+
 # The ideas
 
 Beside the rule stand the author's ideas: positions on how a model and [a harness](../rule.md#22-beginning-today) should be offered, the domains the shape reaches into, and questions it raises on the way.

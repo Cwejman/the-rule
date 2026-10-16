@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![Test tubes in a rack](.img/labs.svg)
+
 # Where the search stands
 
 Ten labs run. What labs 03 to 07 had to teach reached the editions and stands in the law today, so their cold reads are no longer owed; what they owe instead is their provenance, [the grounds](grounds.md). Each lab is given with what it did and the verdict on it.

@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![An open hand holding out a gift](.img/gaab.svg)
+
 # Giving as a business
 
 The word for the stance is giving as a business: a service earns by what it lets its users compound, not by what it withholds from them.

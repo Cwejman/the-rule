@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A notebook with a pen laid across it](.img/README.svg)
+
 # The author's own
 
 What is the author's own and not yet read into the levels it bears on stands here: his second thoughts on what stands beneath the root, and the ideas of each day, dictated prompt by prompt and ratified as said.

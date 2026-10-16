@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![The sun rising over the horizon](.img/openlight.svg)
+
 # The project it began in
 
 The study began inside OpenLight, a project building a medium for knowledge, programs and interfaces, and much of what it reads assumes that project. What stands here is what a reader who arrives without it needs, with links to OpenLight for depth.

@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A pencil drawing one curve](.img/README.svg)
+
 # Sketching
 
 Sketching is how a session draws a structure or a flow a brief states, as an SVG in `.img` beside the brief, in the surface's own language. A model asked to draw what it wrote draws badly where it has to measure, so what is drawn is decided in prose and a thin file of code keeps the geometry exact.

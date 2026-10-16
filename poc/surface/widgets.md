@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A dial, a switch and a slider](.img/widgets.svg)
+
 # The widgets
 
 The widgets are what can stand in a wing or a gutter: the tree, the shape, the ahead, the links, the settings, the plate and the keys, each described once it exists. They keep one set of rules between them, so a reader learns a family rather than a stranger per figure.

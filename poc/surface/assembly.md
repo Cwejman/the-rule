@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![An arch of stones with its keystone being set](.img/assembly.svg)
+
 # The surface, assembled again
 
 The surface's code has grown from 1,223 lines to 7,945 in eighteen days. Most of the growth is not new function but the same function reached twice: two worlds made by copying one state in and out, two layouts kept side by side, one thing drawn by three renderers, and what to draw again written out by hand wherever something changes.

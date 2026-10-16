@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A road running between fields to the horizon](.img/lane.svg)
+
 # Reading and orientation come apart
 
 A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.

@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A lit lantern](.img/skill.svg)
+
 # The skill
 
 The skill is the harness side. It says what a session does with files under the rule, and what it leaves of its own work, the record and the note per step, in prose rather than in code, so that it writes the script it needs at the moment it needs it, in whatever language is at hand.

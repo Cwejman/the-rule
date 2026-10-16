@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A folder with a branch drawn on it](.img/README.svg)
+
 # The proof of concept
 
 The proof of concept is the rule put to use where we stand now, in the simplest medium there is: markdown files in folders, tracked in git, read by people and by sessions that begin by reading them.

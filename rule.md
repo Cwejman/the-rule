@@ -4,6 +4,8 @@ kind: brief
 ratified: the author
 ---
 
+![A cloister's arcade of three round arches](.img/rule.svg)
+
 # The rule
 
 The rule is the law, and the place to start. It turns written knowledge into a medium, one that joins us to what we know and to each other, so that keeping it in order stops being a job of its own: you take part in it, and you add to it. It gives what knowledge is made of, the gradient it is laid by, and the few principles that follow, and one reading of it leaves you able to write under it.

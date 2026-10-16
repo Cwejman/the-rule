@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A French curve](.img/skill.svg)
+
 # The skill
 
 What a session does to make a sketch: when one earns its place, the forms a sketch takes, the design language it is drawn in, and the loop from an outline to a sketch in `.img` with its text beneath.

@@ -3,6 +3,8 @@ under: the rule
 kind: brief
 ---
 
+![A magnifying glass over a leaf](.img/findings.svg)
+
 # What the method has found
 
 The labs were run to learn how knowledge is best written, and they taught something else on the way: how to run the learning. These are the findings about the work itself, each settled by repetition rather than by one run.

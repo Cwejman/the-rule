@@ -5,6 +5,8 @@ entries: newest first
 note: one entry per measurement of the study against its own law
 ---
 
+![A balance scale](.img/measured.svg)
+
 # What the study measures of itself
 
 The rule makes two promises that can be counted rather than argued: that the biggest understanding comes first, so each level down holds more prose than the one above it, and that a brief stays as brief as its understanding allows. This record holds what counting finds.

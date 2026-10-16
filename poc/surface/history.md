@@ -4,6 +4,8 @@ kind: brief
 status: open
 ---
 
+![Layers of sediment](.img/history.svg)
+
 # History
 
 History is how the knowledge came to be what it is where a reader stands: which commits touched it, and the stories told over them. Git's history is read as a holarchy of its own, with the stories as its briefs and the commits as the leaves beneath them.

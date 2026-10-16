@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![Scaffolding around a brick wall](.img/implementation.svg)
+
 # How it is built
 
 The surface is one page the browser manages, and one TypeScript file run with Bun makes it, standing beside the entry as [`surface.ts`](surface.ts). Run against a path in a working tree, the file serves the page live and tells it when a file changes. Run once with a flag, it writes the page with the body inside, and that is all the pipeline does on each commit.

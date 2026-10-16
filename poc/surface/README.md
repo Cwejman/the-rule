@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![An open book on a lectern](.img/README.svg)
+
 # The surface
 
 The surface is the interface a document and a directory listing are missing, the human side as the skill is the harness side.

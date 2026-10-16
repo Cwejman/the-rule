@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![Calipers](.img/implementation.svg)
+
 # The tool
 
 One TypeScript file run with Bun, beside the entry, that writes a sketch's skeleton and stamps its style from the palette, measures a label's room, checks a sketch against the language, and renders it for the session to look at.

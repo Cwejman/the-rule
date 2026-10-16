@@ -4,6 +4,8 @@ kind: brief
 status: in force
 ---
 
+![A fingertip and its ripple](.img/touch.svg)
+
 # A touch reading
 
 A phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size. What it leaves is the reading, with one narrow rail beside it and one mark at the foot that opens everything else.

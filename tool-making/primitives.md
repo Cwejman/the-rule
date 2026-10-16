@@ -4,6 +4,8 @@ kind: brief
 ratified: the author
 ---
 
+![A circle, a square and a triangle](.img/primitives.svg)
+
 # The primitives
 
 In making tools a few simple ontological primitives are uncovered, and only what is needed at this stage is extracted. No complete body of existing practice is taken on: not the full approach of user experience with its flows, scenarios and personas. The primitives are laid win by win under the rule.
