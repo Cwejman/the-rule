@@ -5,7 +5,7 @@ svg.drawing .t { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1px; stro
 svg.drawing .f { fill: var(--rest, #dfe5e8); }
 svg.drawing .g { fill: var(--ground, #ffffff); }
 </style>
-<g transform="translate(32 32) scale(0.98) translate(-32 -34.5)">
+<g transform="translate(32 32) scale(0.9) translate(-32 -34.5)">
     <path class="f" d="M5 16 H59 V53 H5 Z"/>
     <path class="s" d="M3 16 H61 M5 16 V53 M59 16 V53 M2 53 H62"/>
     <path class="t" d="M5 20.5 H59"/>

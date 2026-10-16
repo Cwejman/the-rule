@@ -8751,8 +8751,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card .acts [data-act="scope"] { display: none; }
 .brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
 /* a card whose file carries a drawing stands it first, above the title on the text's left edge and on the card's own
-   ground, large enough to be seen as a drawing rather than an icon; the drawing's own keylines leave room inside its square */
-.brief .card-drawing { margin: 4px 0 8px -10px; }
+   ground, large enough to be seen as a drawing rather than an icon. Its keylines keep the ink five units of sixty-four
+   inside its square, so it is drawn that far to the left and the widest ink stands on the text's edge, never past it */
+.brief .card-drawing { margin: 4px 0 8px calc(-92px * 5 / 64); }
 .brief .card-drawing svg { display: block; width: 92px; height: 92px; overflow: visible; }
 .brief .card-body { min-width: 0; }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
