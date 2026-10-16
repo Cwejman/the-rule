@@ -2566,10 +2566,11 @@ const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; be
   `</div>`;
 
 /** A file's image, as the card and the opening stand it: at its own proportion, measured by the trace. */
-const pictureHtml = (t: Tok): string => {
+const pictureHtml = (t: Tok, first = false): string => {
   const alt = esc(textOf(t.tokens) || t.text || "");
   const ratio = t.width && t.height ? ` style="aspect-ratio:${t.width} / ${t.height}"` : "";
-  return t.src ? `<div class="picture"${ratio}><img src="${esc(t.src)}" alt="${alt}" loading="lazy" decoding="async"></div>` : "";
+  // the opening's image is the first thing its page shows, so it is fetched at once; a card's waits until it is near
+  return t.src ? `<div class="picture"${ratio}><img src="${esc(t.src)}" alt="${alt}"${first ? "" : ` loading="lazy"`} decoding="async"></div>` : "";
 };
 
 function cardHtml(a: string, related = false): string {
@@ -2641,7 +2642,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${root.picture ? pictureHtml(root.picture) : ""}${blocks(root.body)}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${root.picture ? pictureHtml(root.picture, true) : ""}${blocks(root.body)}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -8839,7 +8840,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* the image would cover the card's rim, so the rim, and the hue it takes where the reading stands, are drawn over it */
 .brief .card.pictured .card-picture::after { content: ""; position: absolute; inset: 0; border-radius: 10px 10px 0 0; box-shadow: inset 1px 1px 0 var(--rim), inset -1px 0 0 var(--rim); pointer-events: none; }
 .brief .card.pictured::before { z-index: 2; }
-.brief .card.pictured .picture { max-height: 50vh; overflow: hidden; border-radius: 10px 10px 0 0; background: var(--veil); }
+.brief .card.pictured .picture { width: 100%; max-height: 50vh; overflow: hidden; border-radius: 10px 10px 0 0; background: var(--veil); }
 .brief .card.pictured .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .brief .card.pictured .card-tile { position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); display: flex; align-items: baseline; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
 .brief .card.pictured .card-tile .card-head { font-size: var(--h3, 1.15em); flex: none; }
@@ -8849,7 +8850,7 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
 .brief .card.related { outline-style: dashed; }
 /* the opening stands its file's image beneath the title, before the first prose */
-.opening > .picture { margin: 0 0 1.2em; border-radius: 10px; overflow: hidden; outline: 1px solid var(--rim); outline-offset: -1px; max-height: 60vh; }
+.opening > .picture { width: 100%; margin: 0 0 1.2em; border-radius: 10px; overflow: hidden; outline: 1px solid var(--rim); outline-offset: -1px; max-height: 60vh; }
 .opening > .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 /* a related brief's row in the tree is a door: a slash in its hue where a fold mark would stand */
 .tree .row.related { cursor: pointer; }

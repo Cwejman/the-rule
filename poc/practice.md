@@ -167,6 +167,10 @@ A lone link set in a quote relates a brief rather than placing it:
 
 It raises the brief's card where it stands, as a placement does, so a reader sees what is there and can cross to it. But the brief is not a part of the one that relates it. It stands in its own tree, it is not counted among what lies beneath, and opening it leaves this reading for that one. It is how one holon points into another, the work at the page of an application it is done on, without the other's shape becoming its own.
 
+How the surface draws one is the lane's, and the card beneath is one, relating the brief that says it:
+
+> [A placed part raises a card](surface/lane.md#12-a-placed-part-raises-a-card)
+
 Why it is related is said in the prose before it, as where a part is placed is, and nothing is written beneath it. It may name a file, or a brief within one by its anchor; whether a placement may name a brief within a file as well is open.
 
 A quote is markdown's own mark for what comes from elsewhere, so the difference is written once and reads the same in any renderer.

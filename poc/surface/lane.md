@@ -8,6 +8,8 @@ status: in force
 
 # Reading and orientation come apart
 
+![The lane at the root: a paragraph of prose, then the card of the rule with its drawing above its title, and a gutter beside it](.img/lane.webp)
+
 A reader reads one thing at a time, and the eye that moves to a second column of prose has stopped reading the first. So the lane is one, and what stands at its sides is headings and shape, never prose, since a sense of place is what a reader wants from around the text and prose is the costliest way to give it.
 
 *Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
@@ -46,7 +48,11 @@ A card whose file [carries a graphic](../practice.md#87-a-file-may-carry-a-graph
 
 Opened, the reading stands the same drawing above its title in the opening, as the card did, so the card and the page it opens onto read as one thing; the root's opening stands the body's own.
 
-A card whose file carries [an image](../practice.md#872-the-image-is-what-the-file-is-of) is the image: it fills the card at its own proportion, and the card's words step back to a small tile over its lower edge, the icon, the title and the stamp, with the face given up, since a screenshot of a page says more of it at a glance than its first paragraph does. Unfolded, the card's prose stands beneath the image. Opened, the reading stands the image beneath its title, before the first prose, where the file writes it.
+A card whose file carries [an image](../practice.md#872-the-image-is-what-the-file-is-of) is the image: it fills the card at its own proportion, and the card's words step back to a small tile over its lower edge, the icon, the title and the stamp, with the face given up, since a screenshot of a page says more of it at a glance than its first paragraph does. Unfolded, the card's prose stands beneath the image. Opened, the reading stands the image beneath its title, before the first prose, where the file writes it. This file carries one, a sight of the lane, so its own card is drawn so wherever it is placed.
+
+What a file carries above its face, and how it is written there, is the practice's, which is a tree of its own:
+
+> [A file may carry a graphic and an image](../practice.md#87-a-file-may-carry-a-graphic-and-an-image)
 
 *The author's, 2026-10-16. A mark beside the title, a figure column, a figure hung to the left of the text, a cover field and a figure set above were laid side by side the same day; the author kept the figure above, stacked and on the card's ground, and asked for it above the opening too, [and the rest are kept among the refused](refused.md#aa-a-files-drawing-framed-beside-the-card). The image as the card, with a tile over it, the author's the same day.*
 
