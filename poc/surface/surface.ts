@@ -2565,12 +2565,23 @@ const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; be
   `<span class="acts">${o.unfold ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
   `</div>`;
 
-/** A file's image, as the card and the opening stand it: at its own proportion, measured by the trace. */
+/** The proportions a file's image stands at whole: from a square to a band two and a half times as wide as it is tall. */
+const PICTURE = { tallest: 1, widest: 2.5 };
+
+/**
+ * A file's image, as the card and the opening stand it: whole at its own proportion where that lies within the bounds,
+ * and otherwise whole in a frame of the nearest bound, on a blurred and enlarged copy of itself, so nothing is cut.
+ */
 const pictureHtml = (t: Tok, first = false): string => {
+  if (!t.src) return "";
   const alt = esc(textOf(t.tokens) || t.text || "");
-  const ratio = t.width && t.height ? ` style="aspect-ratio:${t.width} / ${t.height}"` : "";
+  const own = t.width && t.height ? t.width / t.height : 0;
+  const frame = own ? clamp(own, PICTURE.tallest, PICTURE.widest) : 0;
+  const fitted = own > 0 && Math.abs(frame - own) > 0.01;
   // the opening's image is the first thing its page shows, so it is fetched at once; a card's waits until it is near
-  return t.src ? `<div class="picture"${ratio}><img src="${esc(t.src)}" alt="${alt}"${first ? "" : ` loading="lazy"`} decoding="async"></div>` : "";
+  const load = `${first ? "" : ` loading="lazy"`} decoding="async"`;
+  const fill = fitted ? `<img class="fill" src="${esc(t.src)}" alt="" aria-hidden="true"${load}>` : "";
+  return `<div class="picture${fitted ? " fitted" : ""}"${frame ? ` style="aspect-ratio:${Math.round(frame * 1000) / 1000}"` : ""}>${fill}<img class="main" src="${esc(t.src)}" alt="${alt}"${load}></div>`;
 };
 
 function cardHtml(a: string, related = false): string {
@@ -2644,7 +2655,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
 function laneHtml(): string {
   const S = state.scope;
   const root = brief(S)!;
-  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${root.picture ? pictureHtml(root.picture, true) : ""}${blocks(root.body)}</header>`;
+  const opening = `<header class="opening brief${state.focus === S ? " here" : ""}" data-a="${esc(S)}" ${hued(S)}>${root.drawing ? `<div class="card-drawing" aria-hidden="true">${root.drawing}</div>` : ""}<h1>${esc(root.title)}</h1>${root.picture ? pictureHtml(root.picture, true) + (root.picture.caption?.length ? `<p class="caption chrome">${inline(root.picture.caption)}</p>` : "") : ""}${blocks(root.body)}</header>`;
   const recordNote = (parent: string) => (level(parent)[0]?.kind === "record" ? `<p class="chrome record">A record: its order is when each entry happened, and nothing ranks them.</p>` : "");
   const order = laneOrder(S);
   const opensRecord = (b: Brief) => level(parentOf(b.address))[0] === b && b.kind === "record";
@@ -8841,8 +8852,11 @@ body.moving .lot, .lot.lit { background: var(--wash); }
    the title reads in the ink it has everywhere else, in either theme, whatever the image holds there */
 .brief .card.pictured { padding: 0; overflow: hidden; isolation: isolate; }
 .brief .card.pictured .card-picture { position: relative; }
-.brief .card.pictured .picture { width: 100%; max-height: 85vh; overflow: hidden; background: var(--veil); }
-.brief .card.pictured .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+/* an image within the bounds fills its frame exactly; one outside them stands whole in its frame on a blurred copy */
+.picture { position: relative; width: 100%; overflow: hidden; background: var(--veil); }
+.picture img.main { position: relative; display: block; width: 100%; height: 100%; object-fit: cover; }
+.picture.fitted img.main { object-fit: contain; }
+.picture img.fill { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; filter: blur(28px) saturate(1.15); opacity: .85; }
 .brief .card.pictured :is(.card-blur, .card-veil) { position: absolute; inset: auto 0 0 0; height: max(42%, 150px); pointer-events: none; }
 .brief .card.pictured .card-blur { backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 85%); mask-image: linear-gradient(to top, #000 30%, transparent 85%); }
 /* the wash is eased, many stops rather than two, so it has no edge where it begins */
@@ -8858,8 +8872,8 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
 .brief .card.related { outline-style: dashed; }
 /* the opening stands its file's image beneath the title, before the first prose */
-.opening > .picture { width: 100%; margin: 0 0 1.2em; border-radius: 10px; overflow: hidden; outline: 1px solid var(--rim); outline-offset: -1px; max-height: 60vh; }
-.opening > .picture img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.opening > .picture { margin: 0 0 1.2em; border-radius: 10px; outline: 1px solid var(--rim); outline-offset: -1px; }
+.opening > .picture + .caption { margin: -.7em 0 1.4em; font-size: .82em; color: var(--muted); }
 /* a related brief's row in the tree is a door: a slash in its hue where a fold mark would stand */
 .tree .row.related { cursor: pointer; }
 .tree .row.related .mark.door { fill: none; stroke: var(--door); stroke-width: 1.4; stroke-linecap: round; }

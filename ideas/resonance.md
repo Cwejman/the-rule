@@ -7,6 +7,9 @@ kind: brief
 
 # How two holons drive each other
 
+![A close view of a Yamaha DX7's panel: the printed diagrams of its operator algorithms in a row above teal membrane buttons labelled algorithm, feedback and keyboard level scaling, the far end soft out of focus](.img/resonance.webp)\
+The DX7's algorithms and its feedback button, in [Leo-setä's photograph](https://commons.wikimedia.org/wiki/File:Yamaha_DX7_settings.jpg) under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+
 The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321-the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322-the-link). Neither is two wholes driving each other at once.
 
 This asks how that is done, by asking it of the one field that has answered it in working machines, and brings back what the answer requires.
