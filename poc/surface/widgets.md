@@ -214,7 +214,9 @@ Beside its face a folded brief carries a grey tick for every paragraph and a sma
 
 So a reader scanning the shape sees where this reading ends before they reach it, and the two things a press can do, folding within and crossing out, never look alike. Its frame is drawn in the hue of the reading on the other side, not of the brief that raises it, so at the root each part's card says which part it is. It lights where the lane's card does, when the reading stands on it or the pointer is on it anywhere, and the brief that raises it lighting does not light it.
 
-*The author's ask of 2026-09-18, that the minimap embody the boundary; the form as built. The frame in the hue of the reading beyond, the author's of 2026-10-14, finding the parts' colour not evident at the root; that it lights with the lane's card, his the same day.*
+Cards that stand [as tiles](lane.md#12-a-placed-part-raises-a-card) are drawn as the grid they are: each frame at its place across its row and its share of the row's width, the frames of a row side by side at one height, so the shape shows a run of doors as a run and not as a stack.
+
+*The author's ask of 2026-09-18, that the minimap embody the boundary; the form as built. The frame in the hue of the reading beyond, the author's of 2026-10-14, finding the parts' colour not evident at the root; that it lights with the lane's card, his the same day. Tiles drawn as their grid, the author's ask of 2026-10-16.*
 
 ### 3.3 The levels above the scope
 
