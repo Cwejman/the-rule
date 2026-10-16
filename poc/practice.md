@@ -370,7 +370,7 @@ A graphic with no icon leaves its file named without one; the graphic is never s
 
 #### 8.7.2 The image is what the file is of
 
-The image is a picture of what the file is about, where there is one to show: the screenshot of the page an application's file describes, or a photograph of the thing a file is on. Where a card stands for the file, the image fills it, and the card's own words step back to a small tile over it.
+The image is a picture of what the file is about, where there is one to show: the screenshot of the page an application's file describes, or a photograph of the thing a file is on. Where a card stands for the file, the image fills it, and the card's own words stand over its foot.
 
 *Preferred, the author's direction, 2026-10-16, for a body that surveys an application and keeps a screenshot of each page in the page's own file.*
 
