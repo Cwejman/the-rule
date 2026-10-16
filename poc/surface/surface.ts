@@ -3500,7 +3500,8 @@ function treeHtml(): string {
   const stepRow = (a: string, i: number): string => {
     const b = brief(a)!;
     const takes = a === S ? `data-go="${esc(a)}"` : `data-scope="${esc(a)}"`;
-    const ring = body && a === "" ? `<span class="ring" aria-hidden="true"><i></i></span>` : spacer;
+    // the root is the body's own icon, or the ring of the whole wheel where it carries none
+    const ring = body && a === "" ? `<span class="ring" aria-hidden="true">${b.icon ?? "<i></i>"}</span>` : spacer;
     // what stands beside a step is counted in the level above it, and laying that level whole is pressed from the step
     const up = i > 0 ? way[i - 1] : null;
     const many = up !== null ? level(up).length - 1 : 0;
@@ -6243,7 +6244,7 @@ function drawCrumb(): void {
     const cls = ["step", reading(a) ? "scope" : "", where, ...(ring ? ["ring"] : []), ...(bare ? ["bare"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     const title = esc(brief(a)!.title);
-    const face = ring ? `<i aria-label="${title}"></i>` : `${n ? `<span class="num">${esc(n)}</span>` : ""}${body && reading(a) ? iconHtml(brief(a)) : ""}${bare ? "" : title}`;
+    const face = ring ? (brief(a)!.icon ? `<span class="ficon" aria-label="${title}">${brief(a)!.icon}</span>` : `<i aria-label="${title}"></i>`) : `${n ? `<span class="num">${esc(n)}</span>` : ""}${body && reading(a) ? iconHtml(brief(a)) : ""}${bare ? "" : title}`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearingHtml(a) : "");
   };
   const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
@@ -8247,6 +8248,22 @@ function sayBody(body: Body): void {
   body.warnings.forEach((x) => console.warn(x));
 }
 
+/**
+ * The browser's tab carries the body's own icon, as the root does in the way down (lane 7.5). A tab is drawn outside
+ * the page, where its roles do not reach, so the icon is given colours of its own for either theme of the browser around
+ * it; a root with no icon leaves the tab's icon empty.
+ */
+function drawFavicon(body: Body): void {
+  const icon = body.briefs.find((b) => b.address === "")?.icon;
+  const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+  if (!link) return;
+  if (!icon) return void (link.href = "data:,");
+  const style = `<style>.s,.t{fill:none;stroke:#2b3238;stroke-width:1.5px;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}.t{stroke-width:1px;opacity:.6}.f{fill:#cfd8dd}.g{fill:#fff}@media (prefers-color-scheme:dark){.s,.t{stroke:#e8ecee}.f{fill:#4d5a61}.g{fill:#1d2124}}</style>`;
+  const svg = icon.replace(/<style[\s\S]*?<\/style>/i, "").replace(/<svg\b([^>]*)>/i, (_m, at: string) => `<svg${at.replace(/\s(width|height|class)="[^"]*"/g, "")} width="32" height="32">${style}`);
+  link.type = "image/svg+xml";
+  link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 function setBody(body: Body): void {
   // while the history is read the body's world is held aside, so a change goes there, settled when it is turned back
   // to, and the history is read again
@@ -8255,6 +8272,7 @@ function setBody(body: Body): void {
   state.body = body;
   state.index = indexBody(body);
   sayBody(body);
+  drawFavicon(body);
   if (first) {
     // read before the address is written back, since writing it keeps the lane as it stands, which is not yet laid
     const kept = recalledLane();
@@ -9065,6 +9083,10 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .row { position: relative; display: flex; align-items: center; gap: 5px; min-height: 21px; padding: 0 6px 0 0; border-radius: 6px; }
 .tree .row .mark { position: static; flex: none; width: 14px; height: 14px; }
 .tree .ring { flex: none; width: 14px; height: 14px; display: grid; place-items: center; }
+/* where the root carries the body's icon it stands in the ring's room, at a letter's size */
+.tree .ring svg { width: 15px; height: 15px; overflow: visible; }
+:is(#crumb, #gcrumb) .step.ring .ficon { width: 15px; height: 15px; margin: 0; }
+:is(#crumb, #gcrumb) .step.ring .ficon svg { width: 100%; height: 100%; opacity: 1; }
 .tree .row:hover, .tree .row.lit { background: var(--wash); }
 .tree .name { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
 .tree .num { flex: none; margin-right: -1px; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); }
