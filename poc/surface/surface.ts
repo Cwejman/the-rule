@@ -6143,7 +6143,7 @@ function alignEnds(): void {
   const off = opening ? opening.getBoundingClientRect().top - c0 - P0 : 0; // the heading's margin collapses through the opening
   // the line reaches the last thing of the reading at the bottom, a card as much as a brief, since a step stops on it
   const reached = all<HTMLElement>(".brief, .card", ui.lane).at(-1);
-  const lastTop = reached ? reached.getBoundingClientRect().top - c0 - P0 : 0;
+  const lastTop = reached ? readTop(reached) - c0 - P0 : 0;
   const lane = (blocks.at(-1) ?? last)?.getBoundingClientRect().bottom ?? c0;
   const laneH = lane - c0 - P0;
   const tail = ui.lane.getBoundingClientRect().bottom - lane;
@@ -6500,6 +6500,24 @@ function drawAdjuncts(): void {
 }
 
 
+/**
+ * Where a thing of the reading begins for the reading line, on the screen. A brief or a card begins at its top. Tiles
+ * side by side share their row's top, so the row's height, down to the next row or the grid's foot, is shared among
+ * them evenly from left to right: scrolling through a row passes from one tile to the next as through a column of
+ * cards, and the focus and the tree's water move a tile at a time rather than the whole row at once.
+ */
+function readTop(el: HTMLElement): number {
+  const top = el.getBoundingClientRect().top;
+  if (!el.classList.contains("tile") || !el.parentElement) return top;
+  const grid = el.parentElement;
+  const tiles = all<HTMLElement>(":scope > .card", grid);
+  const tops = tiles.map((t) => t.getBoundingClientRect().top);
+  const row = tiles.filter((_, i) => Math.abs(tops[i] - top) < 1);
+  const below = tops.filter((t) => t > top + 1);
+  const end = below.length ? Math.min(...below) : grid.getBoundingClientRect().bottom;
+  return top + ((end - top) * row.indexOf(el)) / row.length;
+}
+
 /** The reading line, where it stands on the screen now. */
 const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt(ui.scroll.scrollTop);
 
@@ -6516,7 +6534,7 @@ const readingLine = (): number => ui.scroll.getBoundingClientRect().top + lineAt
 function focusUnderLine(): string {
   const y = readingLine();
   const arts = all<HTMLElement>(".brief, .card", ui.lane);
-  return arts.filter((el) => el.getBoundingClientRect().top <= y).at(-1)?.dataset.a ?? "";
+  return arts.filter((el) => readTop(el) <= y).at(-1)?.dataset.a ?? "";
 }
 
 /** Marks the path and the focus wherever rows and articles stand, and moves the tree's line, without drawing again. */
@@ -6587,7 +6605,10 @@ function drawLaser(): void {
 function drawWater(): void {
   if (!waterPlan.length || state !== bodyWorld) return;
   const y = readingLine();
-  const top = (a: string): number | undefined => ui.lane.querySelector<HTMLElement>(`:is(.brief, .card)[data-a="${cssEsc(a)}"]`)?.getBoundingClientRect().top;
+  const top = (a: string): number | undefined => {
+    const el = ui.lane.querySelector<HTMLElement>(`:is(.brief, .card)[data-a="${cssEsc(a)}"]`);
+    return el ? readTop(el) : undefined;
+  };
   for (const w of waterPlan) {
     let h = w.from;
     if (w.next !== null && w.to > w.from) {
@@ -7182,7 +7203,8 @@ function scrollToFocus(smooth: boolean): void {
   const at = cssEsc(state.focus);
   const art = ui.lane.querySelector<HTMLElement>(`.brief[data-a="${at}"], .card[data-a="${at}"]`);
   if (!art) return;
-  const top = art.getBoundingClientRect().top - ui.content.getBoundingClientRect().top;
+  // a tile is stood on at its share of its row, as the line reads it there
+  const top = readTop(art) - ui.content.getBoundingClientRect().top;
   const target = scrollFor(top + 24);
   if (smooth) {
     holding = state.focus;
