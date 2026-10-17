@@ -6231,11 +6231,17 @@ function alignEnds(): void {
       B = Math.max(0, h - tail - first - (P + laneH) * k);
     }
   }
-  // the browser anchors the scroll against a change of room above; a lane at its top stays at its top
-  const atTop = ui.scroll.scrollTop === 0;
+  // the browser anchors the scroll against a change of room above; a lane at its top stays at its top. A lane gliding
+  // to a going is not at its top but leaving it: pinned there, the glide's first frame, still at nought, was held and
+  // the glide cancelled, so a going from the top of a reading to a brief far down it stayed at the top. It is aimed
+  // again instead, where the room above has changed under it
+  const gliding = holding !== null && holding === state.focus;
+  const atTop = ui.scroll.scrollTop === 0 && !gliding;
+  const before = ui.content.style.paddingTop;
   ui.content.style.paddingTop = `${Math.round(P)}px`;
   ui.content.style.paddingBottom = `${Math.round(B) + under().foot + state.hang}px`;
   if (atTop) ui.scroll.scrollTop = 0;
+  else if (gliding && ui.content.style.paddingTop !== before) scrollToFocus(true);
   const sMax = Math.max(0, ui.scroll.scrollHeight - h);
   state.ends.top = Math.round(P) + off + 24;
   state.ends.bottom = Math.max(h / 2, Math.round(P) + lastTop + 24 - sMax);
