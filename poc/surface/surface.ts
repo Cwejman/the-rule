@@ -1572,6 +1572,8 @@ type Settings = {
   treeWhole: "way" | "whole";
   /** whether the tree lists a level whose briefs all stand folded, or draws it as its figure beneath the brief above */
   treeLevels: "all" | "unfolded";
+  /** how many words a minute the reader reads, which a card's reading time is reckoned at */
+  speed: number;
   /** how strongly the ground takes the run of the reading open's slice of the wheel: 0 plain, 1 the most it gives */
   tint: number;
   /** how far a heading's title is drawn from ink towards its branch's hue: 0 ink, 1 the hue */
@@ -1620,6 +1622,7 @@ const DEFAULTS: Settings = {
   treeSprouts: "shown",
   treeWhole: "way",
   treeLevels: "all",
+  speed: 230,
   tint: 0,
   heads: 0,
   layouts: Array.from({ length: 9 }, () => null),
@@ -2576,11 +2579,60 @@ function actFigure(b: Brief, rest: Tok[], kidsGiven?: Brief[]): string {
  * since that is what decides whether to enter. Unfolded it gives the whole of that brief, and past that the only act is
  * to open it, which changes the reading.
  */
-/** The line of acts beneath a brief or a card: what unfolding it would show, how much lies beneath, and its badges. */
+/** The glyphs a card's tally counts by, on the sixteen grid the icons are drawn on: a brief, a file, and time to read. */
+const TALLY = {
+  brief: `<path d="M3 4h6"/><path class="t" d="M3 8h10M3 11.5h7.5"/>`,
+  file: `<path d="M4 2.5h5l3 3v8H4z"/><path class="t" d="M9 2.5v3h3"/>`,
+  time: `<circle cx="8" cy="8" r="5.5"/><path class="t" d="M8 5v3l2 1.5"/>`,
+};
+const tallyGlyph = (k: keyof typeof TALLY): string => `<svg class="tally-glyph" viewBox="0 0 16 16" aria-hidden="true">${TALLY[k]}</svg>`;
+
+/** The words of a brief's own prose, as a reader reads them. */
+const wordsOf = (b: Brief): number => textOf(b.body).split(/\s+/).filter(Boolean).length;
+
+/** A reading time at the reader's speed: whole minutes, never less than one, and past an hour hours and minutes. */
+const timeText = (words: number): string => {
+  const m = Math.max(1, Math.round(words / settings.speed));
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60}` : ""}`;
+};
+
+/**
+ * What a card holds, told by glyphs rather than written out: how many briefs lie beneath it, how many files are placed
+ * among them, and how long the whole of it takes to read at the reader's speed. A count of none is left out, since a
+ * glyph beside nothing says nothing; the time always stands, as every card has some.
+ */
+function tallyHtml(a: string): string {
+  const b = brief(a);
+  if (!b) return "";
+  const under: Brief[] = [];
+  const gather = (x: string): void => level(x).forEach((k) => (under.push(k), gather(k.address)));
+  gather(a);
+  const files = under.filter(isCard).length;
+  const words = [b, ...under].reduce((n, k) => n + wordsOf(k), 0);
+  const one = (k: keyof typeof TALLY, n: string, tip: string, at = "") => `<span class="tally-${k}" title="${esc(tip)}"${at}>${tallyGlyph(k)}<span class="n">${n}</span></span>`;
+  return (
+    `<span class="tally">` +
+    (under.length ? one("brief", `${under.length}`, `${under.length} ${under.length === 1 ? "brief" : "briefs"} beneath`) : "") +
+    (files ? one("file", `${files}`, `${files} ${files === 1 ? "file" : "files"} placed beneath`) : "") +
+    one("time", timeText(words), `${words} words, read at ${settings.speed} a minute`, ` data-words="${words}"`) +
+    `</span>`
+  );
+}
+
+/** Tells every reading time again at the speed the reader has turned to, in place, as a meter turns. */
+function drawTimes(): void {
+  all<HTMLElement>(".tally-time[data-words]", ui.areas).forEach((el) => {
+    const words = Number(el.dataset.words);
+    el.querySelector(".n")!.textContent = timeText(words);
+    el.title = `${words} words, read at ${settings.speed} a minute`;
+  });
+}
+
+/** The line of acts beneath a brief or a card: what unfolding it would show, how much lies beneath, and its badges. A card tells what lies beneath it by its tally. */
 const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; beneath: number; unfold: boolean }): string =>
   `<div class="act ${kind} chrome"${o.fold ? ` data-fold="${esc(a)}"` : ""}>` +
   o.figure +
-  (o.beneath ? `<span class="beneath">${o.beneath} beneath</span>` : "") +
+  (kind === "card-act" ? tallyHtml(a) : o.beneath ? `<span class="beneath">${o.beneath} beneath</span>` : "") +
   `<span class="acts">${o.unfold ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
   `</div>`;
 
@@ -3687,7 +3739,7 @@ function linkAdjuncts(b: Brief, article: HTMLElement): { at: HTMLElement | null;
 
 // ## 3.8 Settings: a row of meters
 
-type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads" | "figure"; name: string; min: number; max: number; step: number; glyph: string };
+type Knob = { key: "zoom" | "ratio" | "leading" | "gap" | "dim" | "fade" | "tint" | "heads" | "figure" | "speed"; name: string; min: number; max: number; step: number; glyph: string };
 const KNOBS: Knob[] = [
   { key: "zoom", name: "zoom", min: 0.75, max: 1.6, step: 0.05, glyph: `<path d="M8 4v8M4 8h8"/>` },
   { key: "ratio", name: "heading ratio", min: 1, max: 1.6, step: 0.02, glyph: `<path d="M3 12h10M4.5 8.5h7M6 5h4"/>` },
@@ -3698,10 +3750,12 @@ const KNOBS: Knob[] = [
   { key: "tint", name: "ground hue", min: 0, max: 1, step: 0.05, glyph: `<rect x="3" y="3" width="10" height="10" rx="2"/><path d="M3 9.5 9.5 3M6.5 13 13 6.5"/>` },
   { key: "figure", name: "file figures", min: 2, max: 9, step: 0.5, glyph: `<path d="M3 5h7M5 8h5M5 11h8M3 5v6"/>` },
   { key: "fade", name: "fade at the edges", min: 0, max: 20, step: 1, glyph: `<path d="M8 3v10M4.5 6a4.5 4.5 0 0 0 0 4M11.5 6a4.5 4.5 0 0 1 0 4"/>` },
+  { key: "speed", name: "reading speed, in words a minute", min: 100, max: 500, step: 10, glyph: `<path d="M8 4.5C6.5 3.5 4.5 3.2 2.5 3.5V12c2-.3 4 0 5.5 1 1.5-1 3.5-1.3 5.5-1V3.5c-2-.3-4 0-5.5 1zM8 4.5V13"/>` },
 ];
 
 /** A knob's value as it reads: the gap in pixels, the fade as a share of the height, the rest to two places. */
-const knobText = (k: Knob, v: number): string => (k.key === "gap" || k.key === "figure" ? `${k.key === "figure" ? v : Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : v.toFixed(2));
+const knobText = (k: Knob, v: number): string =>
+  k.key === "gap" || k.key === "figure" ? `${k.key === "figure" ? v : Math.round(v)}px` : k.key === "fade" ? `${Math.round(v)}%` : k.key === "speed" ? `${Math.round(v)} wpm` : v.toFixed(2);
 
 /** An arc of a meter: 270 degrees from the lower left, clockwise, a fraction `t` of the way. */
 function meterArc(t: number, r: number): string {
@@ -3728,11 +3782,11 @@ const GROUPS: { name: string; knobs: Knob["key"][]; switches: Switch["key"][] }[
   { name: "type", knobs: ["zoom", "ratio", "leading"], switches: ["headings", "prose"] },
   { name: "colour", knobs: ["heads", "tint"], switches: ["theme", "colour", "colourFrom"] },
   { name: "page", knobs: ["gap", "dim", "fade", "figure"], switches: ["room"] },
-  { name: "the body", knobs: [], switches: ["weight", "git"] },
+  { name: "the body", knobs: ["speed"], switches: ["weight", "git"] },
 ];
 
 /** A meter's word beneath it, one word that fits its column; its full name is its tip. */
-const KNOB_WORD: Record<Knob["key"], string> = { zoom: "zoom", ratio: "ratio", leading: "lines", heads: "headings", tint: "ground", gap: "gap", dim: "dim", fade: "fade", figure: "figures" };
+const KNOB_WORD: Record<Knob["key"], string> = { zoom: "zoom", ratio: "ratio", leading: "lines", heads: "headings", tint: "ground", gap: "gap", dim: "dim", fade: "fade", figure: "figures", speed: "reading" };
 
 function settingsHtml(): string {
   const s = settings;
@@ -7975,6 +8029,7 @@ const dragged = (e: PointerEvent): void => {
     drawLayout();
     drawAdjuncts();
     drawMeter(drag.el);
+    if (k.key === "speed") drawTimes();
   } else {
     const k = Number(drag.el.dataset.k);
     ui.scroll.scrollTop = drag.start + dy / k;
@@ -9051,6 +9106,11 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .badge .chord { display: inline-flex; gap: 2px; }
 /* the acts stand together at the right of the line, so the figures of every line begin at one edge */
 .act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
+/* a card's tally: each count after its glyph, the glyphs drawn as the file icons are, a line and a quieter trace */
+.act .tally { display: inline-flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
+.act .tally > span { display: inline-flex; align-items: center; gap: 4px; }
+.act .tally-glyph { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.act .tally-glyph .t { opacity: .6; }
 /* the overview of the layouts: cards on a glass over the page, each the page a layout lays, drawn small */
 #layouts { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; background: color-mix(in srgb, var(--ground) 62%, transparent); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
 .lgrid { display: grid; justify-content: center; align-content: center; }
