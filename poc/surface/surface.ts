@@ -6599,13 +6599,28 @@ function drawLaser(): void {
     return { el, a, from: at(into), next: after ? after.querySelector<HTMLElement>(":scope > .row")!.dataset.a! : null, to: after ? at(after) : at(into) };
   });
   drawWater();
-  const row = tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(state.focus)}"]`);
-  if (!row) return;
-  const rr = row.getBoundingClientRect();
-  const tr = tree.getBoundingClientRect();
-  const wing = tree.closest<HTMLElement>(".slot")!;
+}
+
+/** The band of the wing, as fractions of its height, the reader's place in the tree is kept within. */
+const TREE_BAND = { top: 0.3, bottom: 0.6 };
+
+/**
+ * The wing follows the reader's place in the tree, the water's tip in the deepest level the way passes through, or the
+ * focus's row where no water runs. It is moved only as far as keeps that place inside the band, and at once, each
+ * frame the water is drawn, so it goes with the lane's own scroll. A smooth scroll asked for at every step was
+ * cancelled by the next and jumped by half a wing whenever the place neared an edge, which jittered under a reader
+ * scrolling a tree taller than its wing.
+ */
+function followTree(tip: number | undefined): void {
+  const tree = ui.areas.querySelector<HTMLElement>(".tree");
+  const wing = tree?.closest<HTMLElement>(".slot");
+  if (!tree || !wing || wing.scrollHeight <= wing.clientHeight) return;
+  const y = tip ?? tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(state.focus)}"]`)?.getBoundingClientRect().top;
+  if (y === undefined) return;
   const wr = wing.getBoundingClientRect();
-  if (rr.top < wr.top + 24 || rr.bottom > wr.bottom - 48) wing.scrollTo({ top: rr.top - tr.top - wing.clientHeight / 2, behavior: "smooth" });
+  const [hi, lo] = [wr.top + wr.height * TREE_BAND.top, wr.top + wr.height * TREE_BAND.bottom];
+  if (y < hi) wing.scrollTop -= hi - y;
+  else if (y > lo) wing.scrollTop += y - lo;
 }
 
 /**
@@ -6614,21 +6629,27 @@ function drawLaser(): void {
  * positions read per level and a height written, each frame of a scroll.
  */
 function drawWater(): void {
-  if (!waterPlan.length || state !== bodyWorld) return;
+  if (state !== bodyWorld) return;
+  if (!waterPlan.length) return followTree(undefined);
   const y = readingLine();
   const top = (a: string): number | undefined => {
     const el = ui.lane.querySelector<HTMLElement>(`:is(.brief, .card)[data-a="${cssEsc(a)}"]`);
     return el ? readTop(el) : undefined;
   };
-  for (const w of waterPlan) {
+  // every position is read before any height is written, and the tip of the deepest water is where the reader stands
+  let tip: number | undefined;
+  const heights = waterPlan.map((w) => {
     let h = w.from;
     if (w.next !== null && w.to > w.from) {
       const a0 = top(w.a);
       const a1 = top(w.next);
       if (a0 !== undefined && a1 !== undefined && a1 > a0) h += clamp((y - a0) / (a1 - a0), 0, 1) * (w.to - w.from);
     }
-    w.el.style.height = `${h.toFixed(1)}px`;
-  }
+    if (w.a) tip = w.el.parentElement!.getBoundingClientRect().top + h;
+    return h;
+  });
+  waterPlan.forEach((w, i) => (w.el.style.height = `${heights[i].toFixed(1)}px`));
+  followTree(tip);
 }
 
 /** Where each figure stands, measured as it is laid: a figure of the row by its name, and the rail apart. */
@@ -7277,8 +7298,10 @@ function onScroll(): void {
   }
   // a keyed move holds its target until the scroll has brought it to the line
   if (holding !== null) {
-    const held = ui.lane.querySelector<HTMLElement>(`.brief[data-a="${cssEsc(holding)}"]`);
-    const at = held ? held.getBoundingClientRect().top - (ui.scroll.getBoundingClientRect().top + lineAt(ui.scroll.scrollTop) - 24) : 0;
+    // a card is held as a brief is, and a tile at its share of its row: held by its brief alone, a step onto a card let go
+    // at once, and the line passing the tiles on the way handed the outline to each of them before it came to rest
+    const held = ui.lane.querySelector<HTMLElement>(`:is(.brief, .card)[data-a="${cssEsc(holding)}"]`);
+    const at = held ? readTop(held) - (readingLine() - 24) : 0;
     if (Math.abs(at) > 2) return;
     holding = null;
     clearTimeout(holdTimer);
