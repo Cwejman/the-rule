@@ -76,9 +76,9 @@ The line holds the last thing it has reached, and never falls back. A card stand
 
 A card never fades. [The step dimmer](#44-one-step-dimmer) is for prose, which is read through; a card is looked at directly, and one too faint to read has failed at the one thing it is for. So every card stands in the ink of the prose around it, and the card the reading stands on is told by its outline alone, which takes the branch's hue; a card quieter than the prose beside it read as faded, and the outline is enough to say which one the reading is on. Pointing at a card holds the brief it sits in at full ink as well, since the brief's own fading would take the card down with it.
 
-A step by the arrow keys stops on each card too, in the order the reading draws them, and at the foot of the lane the line reaches the last card as it reaches the last brief.
+A step by the arrow keys stops on each card too, in the order the reading draws them, and at the foot of the lane the line reaches the last card as it reaches the last brief. The card stepped onto holds the focus while the lane scrolls to it, as a brief does, so the outline goes to it once and does not pass back through the card or tile left behind.
 
-*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed. The author's, 2026-10-05, that a step stops on each card, since the steps passed them over. The author's, 2026-10-14, that the cards not stood on read as faded beside full prose, and the outline is enough.*
+*The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed. The author's, 2026-10-05, that a step stops on each card, since the steps passed them over. The author's, 2026-10-14, that the cards not stood on read as faded beside full prose, and the outline is enough. The hold, the author's report of 2026-10-17 that the outline did not move smoothly between tiles.*
 
 ## 2. Folded to its face, or whole
 
