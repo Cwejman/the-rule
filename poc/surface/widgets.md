@@ -284,9 +284,9 @@ Each meter is a 270 degree arc with rounded ends, the value drawn in a warm red 
 
 While it is pointed at or turned its value stands in its word's place, so the value is read where the eye already is and never covers anything. The meters of a group stand four to a row. Dragging a meter up or down turns it and the wheel steps it. A drag turns a meter in place and never redraws the wing under the pointer.
 
-The type is the zoom, the heading ratio and the line height; the colour, the headings' hue and the ground's; the page, the gap, the dim, the edge fade and the height of the file figures the tree and the cards draw. The two hues stand at nought until a reader turns them, and [what they colour](#182-the-ground-and-the-headings-may-take-the-hue) is said with the colour. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
+The type is the zoom, the heading ratio and the line height; the colour, the headings' hue and the ground's; the page, the gap, the dim, the edge fade and the height of the file figures the tree and the cards draw. The body's group holds the reading speed, in words a minute, which every card's reading time is reckoned at, and turning it tells each time again in place. The two hues stand at nought until a reader turns them, and [what they colour](#182-the-ground-and-the-headings-may-take-the-hue) is said with the colour. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
 
-*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3-the-gaps-are-the-handles) size them. The two hues, the author's ask of 2026-10-14.*
+*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3-the-gaps-are-the-handles) size them. The two hues, the author's ask of 2026-10-14. The reading speed, the author's ask of 2026-10-17; that it starts at two hundred and thirty words a minute is the session's.*
 
 ### 6.2 The switches
 

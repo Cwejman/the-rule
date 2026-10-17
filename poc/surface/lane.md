@@ -38,7 +38,11 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-A card carries no figure of what lies beyond it; how much waits is said by the count beneath it, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
+A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
+
+The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
+
+*The author's ask of 2026-10-17, in place of the count written as words beneath; the glyphs and leaving out a count of none are the session's, until the author has looked.*
 
 *The author's, 2026-10-05. An overview drawn at the card's right until 2026-10-05 was little help and its fixed height left a card of a line or two standing tall. The figure of the files it holds stood there from 2026-10-14 to 2026-10-15: floated beside a card's prose it ran past a short card's edge and crowded a long one, and the author moved it to the ahead.*
 
@@ -62,7 +66,7 @@ A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates)
 
 A brief may raise several cards, each where its link stood, and the same part may be raised in several briefs. Nothing about a card says how many places it stands in.
 
-Cards that follow one another with nothing written between them stand as tiles, side by side in a grid as wide as the lane. A run of placements is a set of doors the brief offers at once, and as a column of whole cards it made a reader scroll past every face before seeing what the set held. Each tile is its file's graphic, its title and stamp, the start of its face and the count beneath it, so the run is taken in at a glance. A tile whose file carries an image is the image card made small: the image whole at the tile's top, its blurred copy carrying it down to the row's height, and its title, stamp and count over the foot on the same veil, the face given up as on the card, so an image reads in one language at either size.
+Cards that follow one another with nothing written between them stand as tiles, side by side in a grid as wide as the lane. A run of placements is a set of doors the brief offers at once, and as a column of whole cards it made a reader scroll past every face before seeing what the set held. Each tile is its file's graphic, its title and stamp, the start of its face and its tally, so the run is taken in at a glance. A tile whose file carries an image is the image card made small: the image whole at the tile's top, its blurred copy carrying it down to the row's height, and its title, stamp and tally over the foot on the same veil, the face given up as on the card, so an image reads in one language at either size.
 
 A tile opens as a card does, and does not unfold where it stands: a grid in which one tile grew by its prose would push its neighbours out of line. Related cards tile in the same way, each keeping its dashed rim.
 
