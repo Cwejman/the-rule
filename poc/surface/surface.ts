@@ -170,10 +170,12 @@ async function serve(rootArg: string, port: number): Promise<void> {
 
   // an image is served only when the last trace reached it, so nothing else under the root is handed out
   let held = new Set<string>();
+  let traced: Body | null = null;
   const retrace = async (): Promise<Body> => {
     const b = await trace(rootArg);
     b.warnings.forEach((w) => console.warn("  " + w));
     held = new Set(assetsOf(b));
+    traced = b;
     return b;
   };
   // nothing the live process serves may be kept by the browser: the page carries the whole of the drawing, so a reader
@@ -217,6 +219,16 @@ async function serve(rootArg: string, port: number): Promise<void> {
     return p;
   };
   const past = () => pastNow().then((h) => Response.json(h, { headers: fresh }), none);
+  // when each brief was last edited, read after the body and apart from it, from the body as last traced
+  // one read for each tracing of the body, so a page and its reload asking at once blame each file once
+  let editing: { of: Body; p: Promise<Edits> } | null = null;
+  const edits = async () => {
+    const of = traced ?? (await retrace());
+    if (editing?.of !== of) editing = { of, p: editsOf(rootArg, of) };
+    const p = editing.p;
+    p.catch(() => editing?.p === p && (editing = null));
+    return p.then((e) => Response.json(e, { headers: fresh }), none);
+  };
   const stories = () => storiesNow().then((h) => Response.json(h, { headers: fresh }), none);
   // the history is read ahead of the reader, once the page has had its body, so the first turn to it finds it read: a
   // cold read of every commit takes seconds, and the body must never wait behind it
@@ -242,7 +254,7 @@ async function serve(rootArg: string, port: number): Promise<void> {
   } catch {}
 
   await retrace();
-  const routes: Record<string, () => Response | Promise<Response>> = { "/body": body, "/changes": changes, "/history.json": past, "/stories.json": stories };
+  const routes: Record<string, () => Response | Promise<Response>> = { "/body": body, "/changes": changes, "/history.json": past, "/stories.json": stories, "/edits.json": edits };
   Bun.serve({
     port,
     idleTimeout: 0, // the change stream stays open as long as the page does
@@ -290,6 +302,13 @@ async function build(rootArg: string, out: string): Promise<void> {
   // answers too; a tree that is not a repository, or a clone without its history, has none to write
   // the history is written whole or not at all: what an earlier build left is taken away first, and nothing is written
   // until every part of it has been read, so a page never reads a history out of step with itself
+  // when each brief was last edited stands beside the page as well, read after it and never inside it
+  if (existsSync(join(outDir, "edits.json"))) rmSync(join(outDir, "edits.json"));
+  try {
+    writeFileSync(join(outDir, "edits.json"), JSON.stringify(await editsOf(rootArg, body)));
+  } catch (e) {
+    console.warn(`  no edits written: ${(e as Error).message}`);
+  }
   ["history.json", "stories.json", "commits"].forEach((f) => existsSync(join(outDir, f)) && rmSync(join(outDir, f), { recursive: true }));
   try {
     const past = await historyOf(rootArg);
@@ -421,6 +440,13 @@ type Commit = {
 
 /** History's light tier: every commit that touched the root, newest first. */
 type History = { head: string; commits: Commit[]; traced: string };
+
+/**
+ * When each brief's own prose was last edited, read apart from the body: the commits that last touched a brief, each
+ * once, by its short hash, who made it, when, as seconds, and its subject; and for each address the commit, by its
+ * place in that list, or -1 where the lines are written and not yet committed, with the time they were found so.
+ */
+type Edits = { commits: [string, string, number, string][]; at: Record<string, [number, number]> };
 
 /** What a commit changed in one brief: the lines it took and gave, and the line each run began on in the file before and after, on a side that has lines. */
 type Change = { brief: string; old?: number; new?: number; removed: string[]; added: string[] };
@@ -1452,6 +1478,86 @@ async function historyOf(rootArg: string): Promise<History> {
     keep(cacheFile, { form: HISTORY_FORM, commits: kept });
   }
   return { head: listed[0]?.hash ?? "", commits: listed.map((h) => kept[h.hash]), traced: new Date().toISOString() };
+}
+
+/**
+ * When each brief's own prose was last edited, by blaming each file the body reads: the newest line from a brief's
+ * heading to the next heading is when the brief was last touched. It is a second substrate and is read apart from the
+ * body, after it, and never inside it; what a file's blame said is kept by its text and git's head, so a reread blames
+ * only a file that changed. A tree that is not a repository has no edits to tell.
+ */
+const blamed = new Map<string, { key: string; lines: { hash: string; author: string; time: number; subject: string }[] }>();
+async function editsOf(rootArg: string, body: Body): Promise<Edits> {
+  const rootDir = dirname(rootFileOf(rootArg));
+  const head = (await git(rootDir, ["rev-parse", "HEAD"])).toString().trim();
+  // what was blamed is kept in git's own folder as the history is, so a process started again blames nothing unchanged
+  const store = await (await repoOf(rootArg)).kept("edits*.json");
+  if (!blamed.size)
+    try {
+      const c = JSON.parse(readFileSync(store, "utf8"));
+      if (c.form === HISTORY_FORM) Object.entries(c.files as Record<string, { key: string; lines: [] }>).forEach(([f, v]) => blamed.set(f, v));
+    } catch {}
+  let changed = false;
+  const roots = new Map<string, string>();
+  // a file's root is its shallowest brief, where the body placed it, and its sections stand beneath that address
+  body.briefs.forEach((b) => {
+    const at = roots.get(b.file);
+    if (at === undefined || depthOf(b.address) < depthOf(at)) roots.set(b.file, b.address);
+  });
+  const known = new Set(body.briefs.map((b) => b.address));
+  const commits: Edits["commits"] = [];
+  const index = new Map<string, number>();
+  const at: Edits["at"] = {};
+  const blame = async (file: string) => {
+    const src = readFileSync(join(rootDir, file), "utf8");
+    const key = `${head} ${Bun.hash(src)}`;
+    const kept = blamed.get(file);
+    if (kept?.key === key) return { src, lines: kept.lines };
+    const out = (await git(rootDir, ["blame", "--incremental", "--", file])).toString("utf8").split("\n");
+    const info = new Map<string, { author: string; time: number; subject: string }>();
+    const lines: { hash: string; author: string; time: number; subject: string }[] = [];
+    for (let i = 0; i < out.length; i++) {
+      const m = /^([0-9a-f]{40,64}) \d+ (\d+) (\d+)$/.exec(out[i]);
+      if (!m) continue;
+      const [hash, from, count] = [m[1], Number(m[2]), Number(m[3])];
+      const said = info.get(hash) ?? { author: "", time: 0, subject: "" };
+      for (i++; i < out.length && !out[i].startsWith("filename "); i++) {
+        const [k, ...v] = out[i].split(" ");
+        if (k === "author") said.author = v.join(" ");
+        else if (k === "author-time") said.time = Number(v[0]);
+        else if (k === "summary") said.subject = v.join(" ");
+      }
+      info.set(hash, said);
+      for (let n = 0; n < count; n++) lines[from - 1 + n] = { hash, ...said };
+    }
+    blamed.set(file, { key, lines });
+    changed = true;
+    return { src, lines };
+  };
+  // a few files at once, so a cold read of every file is not one long queue nor every process at once
+  const files = [...roots.keys()].filter((f) => /\.md$/i.test(f) && existsSync(join(rootDir, f)));
+  const read = new Map<string, Awaited<ReturnType<typeof blame>>>();
+  for (let i = 0; i < files.length; i += 8) await Promise.all(files.slice(i, i + 8).map(async (f) => read.set(f, await blame(f).catch(() => ({ src: "", lines: [] })))));
+  files.forEach((file) => {
+    const { src, lines } = read.get(file)!;
+    if (!lines.length) return;
+    const starts = briefLines(src);
+    const root = roots.get(file)!;
+    starts.forEach((st, k) => {
+      const address = st.path ? (root ? `${root}/${st.path}` : st.path) : root;
+      if (!known.has(address)) return;
+      const end = (starts[k + 1]?.line ?? lines.length + 1) - 1;
+      let newest: (typeof lines)[number] | undefined;
+      for (let n = st.line - 1; n < end; n++) if (lines[n] && (!newest || lines[n].time > newest.time)) newest = lines[n];
+      if (!newest) return;
+      // lines not yet committed are blamed on a hash of noughts, at the time the blame was read
+      if (/^0+$/.test(newest.hash)) return void (at[address] = [newest.time, -1]);
+      if (!index.has(newest.hash)) (index.set(newest.hash, commits.length), commits.push([newest.hash.slice(0, 7), newest.author, newest.time, newest.subject]));
+      at[address] = [newest.time, index.get(newest.hash)!];
+    });
+  });
+  if (changed) keep(store, { form: HISTORY_FORM, files: Object.fromEntries([...blamed].filter(([f]) => roots.has(f))) });
+  return { commits, at };
 }
 
 // # 3. How it is drawn
@@ -2584,7 +2690,58 @@ const TALLY = {
   brief: `<path d="M3 4h6"/><path class="t" d="M3 8h10M3 11.5h7.5"/>`,
   file: `<path d="M4 2.5h5l3 3v8H4z"/><path class="t" d="M9 2.5v3h3"/>`,
   time: `<circle cx="8" cy="8" r="5.5"/><path class="t" d="M8 5v3l2 1.5"/>`,
+  edit: `<path d="M3 13l.8-3.2L10.6 3l2.4 2.4-6.8 6.8z"/><path class="t" d="M9.2 4.4l2.4 2.4"/>`,
 };
+
+/** When each brief was last edited, once it has been read; until then, and where there is no git, nothing is told. */
+let edits: Edits | null = null;
+
+/** Reads when each brief was last edited, after the body and apart from it, and draws the lane again with it. */
+async function loadEdits(): Promise<void> {
+  try {
+    const r = await fetch("edits.json", { cache: "no-store" });
+    if (!r.ok || !(r.headers.get("content-type") ?? "").includes("json")) return;
+    edits = await r.json();
+  } catch {
+    return;
+  }
+  const top = ui.scroll.scrollTop;
+  onBody(drawLane);
+  ui.scroll.scrollTop = top;
+}
+
+/** The last edit of a brief's own prose, or, across everything beneath it too, the newest edit anywhere in it. */
+const editOf = (a: string, deep = false): [number, number] | undefined => {
+  const own = edits?.at[a];
+  if (!deep) return own;
+  return level(a).reduce<[number, number] | undefined>((n, k) => {
+    const e = editOf(k.address, true);
+    return e && (!n || e[0] > n[0]) ? e : n;
+  }, own);
+};
+
+/** How long ago, said short: today, then days, weeks, months and years. */
+const ageText = (t: number): string => {
+  const d = (Date.now() / 1000 - t) / 86400;
+  return d < 1 ? "today" : d < 14 ? `${Math.floor(d)} d` : d < 56 ? `${Math.floor(d / 7)} w` : d < 730 ? `${Math.floor(d / 30.44)} mo` : `${Math.floor(d / 365)} y`;
+};
+
+/**
+ * The pencil and how long ago a brief was last edited, in an ink that fades with the age: an edit of today in full ink,
+ * one of a year ago nearly quiet, so what changed lately stands out and the rest do not all say a date at one weight.
+ * Pointing at it says when, who, and the commit's subject.
+ */
+function editHtml(a: string, deep = false): string {
+  const e = editOf(a, deep);
+  if (!e || !edits) return "";
+  const [t, i] = e;
+  const days = Math.max(0, (Date.now() / 1000 - t) / 86400);
+  const ink = clamp(1 - (0.65 * Math.log2(1 + days)) / Math.log2(366), 0.35, 1);
+  const c = edits.commits[i];
+  const when = new Date(t * 1000).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+  const tip = c ? `${deep ? "newest edit within, " : "edited "}${when} by ${c[1]}: ${c[3]}` : `${deep ? "newest edit within " : "edited "}not yet committed`;
+  return `<span class="tally-edit" title="${esc(tip)}" style="opacity:${ink.toFixed(2)}">${tallyGlyph("edit")}<span class="n">${c ? ageText(t) : "now"}</span></span>`;
+}
 const tallyGlyph = (k: keyof typeof TALLY): string => `<svg class="tally-glyph" viewBox="0 0 16 16" aria-hidden="true">${TALLY[k]}</svg>`;
 
 /** The words of a brief's own prose, as a reader reads them. */
@@ -2615,6 +2772,7 @@ function tallyHtml(a: string): string {
     (under.length ? one("brief", `${under.length}`, `${under.length} ${under.length === 1 ? "brief" : "briefs"} beneath`) : "") +
     (files ? one("file", `${files}`, `${files} ${files === 1 ? "file" : "files"} placed beneath`) : "") +
     one("time", timeText(words), `${words} words, read at ${settings.speed} a minute`, ` data-words="${words}"`) +
+    editHtml(a, true) +
     `</span>`
   );
 }
@@ -2632,7 +2790,7 @@ function drawTimes(): void {
 const actLine = (kind: string, a: string, o: { fold: boolean; figure: string; beneath: number; unfold: boolean }): string =>
   `<div class="act ${kind} chrome"${o.fold ? ` data-fold="${esc(a)}"` : ""}>` +
   o.figure +
-  (kind === "card-act" ? tallyHtml(a) : o.beneath ? `<span class="beneath">${o.beneath} beneath</span>` : "") +
+  (kind === "card-act" ? tallyHtml(a) : (o.beneath ? `<span class="beneath">${o.beneath} beneath</span>` : "") + (edits ? `<span class="tally">${editHtml(a)}</span>` : "")) +
   `<span class="acts">${o.unfold ? badgeHtml("unfold", a) : ""}${badgeHtml("scope", a)}</span>` +
   `</div>`;
 
@@ -2739,12 +2897,15 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
   const more = g === "face" && hasActs ? actLine("more", b.address, { fold: true, figure: actFigure(b, rest), beneath, unfold: true }) : "";
   // a whole brief folds from a line at its foot
   const less = g === "whole" && hasActs ? actLine("less", b.address, { fold: true, figure: "", beneath: 0, unfold: true }) : "";
+  // a brief with nothing to unfold still ends on its line, which says when it was last edited
+  const still = !hasActs && editOf(b.address) ? actLine("still", b.address, { fold: false, figure: "", beneath: 0, unfold: false }) : "";
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--after:${after}px">` +
     `<div class="surface">` +
     `<h2 class="head d${d}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
     more +
+    still +
     `</div>` +
     (g === "whole" ? blocks(rest) + less : "") +
     `</article>`
@@ -8436,6 +8597,8 @@ function setBody(body: Body): void {
   state.index = indexBody(body);
   sayBody(body);
   drawFavicon(body);
+  // when each brief was last edited comes after, once it is read, and is read again with every change of the body
+  void loadEdits();
   if (first) {
     // read before the address is written back, since writing it keeps the lane as it stands, which is not yet laid
     const kept = recalledLane();
@@ -9117,6 +9280,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .act .tally > span { display: inline-flex; align-items: center; gap: 4px; }
 .act .tally-glyph { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .act .tally-glyph .t { opacity: .6; }
+/* a line with nothing to fold is told, not pressed */
+.act.still { cursor: default; }
+.act.still:hover { color: var(--ink); }
 /* the overview of the layouts: cards on a glass over the page, each the page a layout lays, drawn small */
 #layouts { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; background: color-mix(in srgb, var(--ground) 62%, transparent); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
 .lgrid { display: grid; justify-content: center; align-content: center; }
