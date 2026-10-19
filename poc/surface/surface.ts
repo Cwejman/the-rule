@@ -2829,14 +2829,14 @@ function tileHtml(a: string, related = false): string {
     return (
       `<div class="card tile pictured${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture, false, -1)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
+      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
       `</div>`
     );
   const top = b.picture?.src ? `<div class="tile-picture">${pictureHtml(b.picture, false, 1.6)}</div>` : b.drawing ? `<div class="tile-drawing" aria-hidden="true">${b.drawing}</div>` : "";
   return (
     `<div class="card tile${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
     top +
-    `<div class="tile-text"><h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
+    `<div class="tile-text">${related ? whereHtml(a) : ""}<h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
     line +
     `</div>`
   );
@@ -2869,13 +2869,14 @@ function cardHtml(a: string, related = false): string {
     return (
       `<div class="card pictured${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
+      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
       (g === "whole" ? `<div class="card-body">${blocks(all)}</div>${line}` : "") +
       `</div>`
     );
   return (
     `<div class="card${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
     (b.drawing ? `<div class="card-drawing" aria-hidden="true">${b.drawing}</div>` : "") +
+    (related ? whereHtml(a) : "") +
     `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
@@ -3742,13 +3743,24 @@ function treeHtml(): string {
     const cls = ["node", reading(a) && a !== "" ? "door" : "", onWay.has(a) ? "on" : "", newly ? "fresh" : ""].filter(Boolean).join(" ");
     return `<div class="${cls}" style="${hueVars(a)}${newly ? `;${delay(a)}` : ""}">${row}${kids ? `<div class="kids">${flow}${kids}</div>` : ""}</div>`;
   };
+  // a level's numbers stand right-aligned in one column as wide as its widest, so "10." does not push its name past
+  // the names of "9." and those above it
+  const widest = new Map<string, number>();
   const num = (b: Brief, root: string): string => {
     const n = reading(b.address) ? "" : numberIn(b, root);
-    return n ? `<span class="num">${esc(n)}</span>` : "";
+    if (!n) return "";
+    const up = parentOf(b.address);
+    if (!widest.has(up)) widest.set(up, Math.max(0, ...level(up).map((k) => (reading(k.address) ? 0 : numberIn(k, root).replace(/\./g, "").length))));
+    const w = widest.get(up)!;
+    const own = n.replace(/\./g, "").length;
+    return `<span class="num"${w > own ? ` style="min-width:calc(${w}ch + ${n.length - own} * .32em)"` : ""}>${esc(n)}</span>`;
   };
   const cls = (a: string, ...more: string[]): string =>
     ["row", ...more, reading(a) ? "file" : "", isCard(brief(a)) ? "card" : "", onWay.has(a) ? "on" : "", a === state.focus ? "here" : ""].filter(Boolean).join(" ");
   const spacer = `<span class="mark leaf"></span>`;
+  // a file's icon stands in the room a fold mark takes, where its line ends, since a file opens rather than folds:
+  // standing after an empty mark, it stood a column clear of its tick, and its name a column further than its siblings'
+  const lead = (b: Brief): string => (body && b.icon ? `<span class="ficon lead" aria-hidden="true">${b.icon}</span>` : spacer);
   // a row that hides levels draws beneath it the files it holds, as the cards do, under its name
   const sprout = (b: Brief, beside = false): string => {
     if (settings.treeSprouts !== "shown") return "";
@@ -3762,7 +3774,7 @@ function treeHtml(): string {
     const b = brief(a)!;
     const takes = a === S ? `data-go="${esc(a)}"` : `data-scope="${esc(a)}"`;
     // the root is the body's own icon, or the ring of the whole wheel where it carries none
-    const ring = body && a === "" ? `<span class="ring" aria-hidden="true">${b.icon ?? "<i></i>"}</span>` : spacer;
+    const ring = body && a === "" ? `<span class="ring" aria-hidden="true">${b.icon ?? "<i></i>"}</span>` : lead(b);
     // what stands beside a step is counted in the level above it, and laying that level whole is pressed from the step
     const up = i > 0 ? way[i - 1] : null;
     const many = up !== null ? level(up).length - 1 : 0;
@@ -3771,20 +3783,20 @@ function treeHtml(): string {
       up !== null && many > 0 && settings.treeWhole !== "whole"
         ? `<button class="beside${open ? " on" : ""}" data-beside="${esc(up)}" data-tip="${open ? "close the level back to the way" : `${many} more beside it in its level`}">${open ? "−" : `+${many}`}</button>`
         : "";
-    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}${body && a !== "" ? iconHtml(b) : ""}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
+    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
   };
   // a sibling the way passed by: a row as any row of the outline, and pressing it goes there
   const sibling = (b: Brief): string =>
     node(
       b.address,
-      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${spacer}${num(b, scopeFor(b.address))}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${lead(b)}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
       "",
     );
   // what a brief relates stands after its level as doors, no part of it: the related brief's icon and name in its own
   // hue, a slash for the door in place of a fold mark, and no sprout, since its shape is its own tree's
   const doorsOf = (b: Brief): string =>
     relatedOf(b)
-      .map((t) => `<div class="row related" data-go="${esc(t)}" ${hued(t)}><svg class="mark door" viewBox="0 0 14 14"><path d="M8.6 3 5.4 11"/></svg>${iconHtml(brief(t))}<span class="name" data-go="${esc(t)}">${esc(brief(t)!.title)}</span></div>`)
+      .map((t) => `<div class="row related" data-go="${esc(t)}" data-tip="${esc(prefixesOf(t).slice(1).map((x) => brief(x)?.title ?? "").join(" › "))}" ${hued(t)}>${RELATED_MARK}<span class="name" data-go="${esc(t)}">${esc(brief(t)!.title)}</span></div>`)
       .join("");
   // the reading open as the lane holds it, folds and all
   const outline = (b: Brief): string => {
@@ -3794,7 +3806,7 @@ function treeHtml(): string {
     // levels the lane has unfolded are seen alone
     const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
-    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? spacer : foldMark(b)}${num(b, S)}${iconHtml(b)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
+    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? lead(b) : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
     const kids = (listed ? level(b.address).map(outline).join("") : "") + (whole ? doorsOf(b) : "");
     return node(b.address, row + sprout(b, whole && !listed), kids);
   };
@@ -3873,6 +3885,20 @@ const relatedOf = (b: Brief): string[] => b.body.flatMap((t) => (t.type === "rel
 
 /** A file's icon, where it carries one, set before its name wherever it is named in a line (practice 8.7). */
 const iconHtml = (b: Brief | undefined): string => (b?.icon ? `<span class="ficon" aria-hidden="true">${b.icon}</span>` : "");
+
+/** The mark of a relation, a link out of the reading: an arrow up and away, on the fourteen grid the tree's marks take. */
+const RELATED_MARK = `<svg class="mark rel" viewBox="0 0 14 14" aria-hidden="true"><path d="M4.5 9.5 9.5 4.5M5.5 4.5h4v4"/></svg>`;
+
+/**
+ * Where a related brief lives, told above its card's title in its hue: the mark of a relation, the file it stands in with
+ * that file's icon, and its number there, which is as much of the way as a reader needs to know where a press leads.
+ */
+const whereHtml = (a: string): string => {
+  const root = fileRootOf(a);
+  const file = brief(root);
+  const n = a === root ? "" : numberIn(brief(a)!, root);
+  return `<div class="card-where chrome">${RELATED_MARK}${iconHtml(file)}<span class="file">${esc(root === "" ? (state.body?.title ?? "") : (file?.title ?? ""))}</span>${n ? `<span class="num">${esc(n)}</span>` : ""}</div>`;
+};
 
 function pathHtml(to: string): string {
   const titles = prefixesOf(to).slice(1, -1).map((a) => brief(a)?.title ?? "");
@@ -6835,13 +6861,21 @@ const TREE_BAND = { top: 0.3, bottom: 0.6 };
 function followTree(tip: number | undefined): void {
   const tree = ui.areas.querySelector<HTMLElement>(".tree");
   const wing = tree?.closest<HTMLElement>(".slot");
-  if (!tree || !wing || wing.scrollHeight <= wing.clientHeight) return;
+  if (!tree || !wing) return;
+  // a tree taller than its wing fades out at an edge where more of it stands beyond, rather than being cut off there
+  const fades = () => {
+    const over = wing.scrollHeight - wing.clientHeight;
+    wing.style.setProperty("--fade-top", `${clamp(wing.scrollTop, 0, 28)}px`);
+    wing.style.setProperty("--fade-foot", `${clamp(over - wing.scrollTop, 0, 28)}px`);
+  };
+  if (wing.scrollHeight <= wing.clientHeight) return fades();
   const y = tip ?? tree.querySelector<HTMLElement>(`.row[data-a="${cssEsc(state.focus)}"]`)?.getBoundingClientRect().top;
   if (y === undefined) return;
   const wr = wing.getBoundingClientRect();
   const [hi, lo] = [wr.top + wr.height * TREE_BAND.top, wr.top + wr.height * TREE_BAND.bottom];
   if (y < hi) wing.scrollTop -= hi - y;
   else if (y > lo) wing.scrollTop += y - lo;
+  fades();
 }
 
 /**
@@ -9240,14 +9274,24 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .tile.pictured .card-over .stamp { font-size: .8em; }
 .brief .tile.pictured .card-over .act { padding: 6px 0 0; margin: 0; font-size: .9em; }
 /* a related card stands outside the reading: drawn as a card, and quieter at its rim, since it is a door and not a part */
-.brief .card.related { outline-style: dashed; }
+/* a related card is a door out of the reading: it says where it leads above its title, the mark of a relation and the
+   way to it in its own hue, and its rim is its hue's rather than dashed */
+.brief .card.related { outline-color: color-mix(in oklch, var(--door) 55%, var(--rim)); }
+.brief .card-where { display: flex; align-items: center; gap: 4px; min-width: 0; margin: 0 0 6px; font-size: .78em; line-height: 1.3; color: var(--on); }
+.brief .card-where .mark.rel { position: static; flex: none; width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.brief .card-where .ficon { margin: 0 0 0 2px; width: 1.15em; height: 1.15em; }
+.brief .card-where .file { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: calc(600 - var(--thin)); }
+.brief .card-where .num { flex: none; color: var(--faint); font-variant-numeric: tabular-nums; }
 /* the opening stands its file's image beneath the title, before the first prose */
 .opening > .picture { margin: 0 0 1.2em; border-radius: 10px; outline: 1px solid var(--rim); outline-offset: -1px; }
 .opening > .picture + .caption { margin: -.7em 0 1.4em; font-size: .82em; color: var(--muted); }
 /* a related brief's row in the tree is a door: a slash in its hue where a fold mark would stand */
 .tree .row.related { cursor: pointer; }
-.tree .row.related .mark.door { fill: none; stroke: var(--door); stroke-width: 1.4; stroke-linecap: round; }
-.tree .row.related .name { color: var(--muted); font-style: italic; }
+/* a related row is a door out of the tree, as a card's is: the mark of a relation in its own hue where a fold mark
+   stands, and its name underlined in that hue, the way it lives told on pointing */
+.tree .row.related .mark.rel { fill: none; stroke: var(--on); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.tree .row.related .name { color: var(--muted); text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.tree .row.related:is(:hover, .lit) .name { color: var(--on); }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
 .ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -9445,11 +9489,15 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .ring { flex: none; width: 14px; height: 14px; display: grid; place-items: center; }
 /* where the root carries the body's icon it stands in the ring's room, at a letter's size */
 .tree .ring svg { width: 15px; height: 15px; overflow: visible; }
+/* the wing holding a tree fades at an edge more of it stands beyond, as far as it stands, up to a row and a half */
+.slot:has(> .tree) { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top, 0px), #000 calc(100% - var(--fade-foot, 0px)), transparent); mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top, 0px), #000 calc(100% - var(--fade-foot, 0px)), transparent); }
+.tree .row > .ficon.lead { width: 14px; height: 14px; margin: 0; display: grid; place-items: center; }
+.tree .row > .ficon.lead svg { width: 15px; height: 15px; flex: none; }
 :is(#crumb, #gcrumb) .step.ring .ficon { width: 15px; height: 15px; margin: 0; }
 :is(#crumb, #gcrumb) .step.ring .ficon svg { width: 100%; height: 100%; opacity: 1; }
 .tree .row:hover, .tree .row.lit { background: var(--wash); }
 .tree .name { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
-.tree .num { flex: none; margin-right: -1px; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); }
+.tree .num { flex: none; text-align: right; margin-right: -1px; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); }
 /* the way is told as the way down tells it: a reading bold, what stands above the reading open muted, the reading open
    in its branch's ink; the rows on the way to the focus take their branch's ink, and a card is underlined in its hue */
 .tree .row.file .name { font-weight: calc(600 - var(--thin)); }
