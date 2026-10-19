@@ -40,7 +40,7 @@ The card takes one unfolding, to the whole of the brief on the other side, and n
 
 A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
 
-The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
+The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). Last stands a pencil and how long ago anything within it was [last edited](#61-the-action-line-is-the-press). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
 
 *The author's ask of 2026-10-17, in place of the count written as words beneath; the glyphs and leaving out a count of none are the session's, until the author has looked.*
 
@@ -188,7 +188,13 @@ A folded brief carries a line beneath its face that says unfold, with [a figure 
 
 The acts that work on the brief stand at the right of the figure as badges, [a key and the word for what it does](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands): unfold or fold, and, where the brief has a level beneath it, scope, which makes it the whole of the lane. They stand after the figure so that the figure of every line begins at one edge and a reader compares them down the page.
 
-The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line, and no key acts on it either, so nothing about it can ever change under the reader.
+The line is the press, and nothing else in the brief is: the text stays text, no mark stands beside the heading, and nothing tints under the pointer. A brief that hides nothing, one paragraph after its heading and no level, carries no line to press, and no key acts on it either, so nothing about it can ever change under the reader; where its last edit is known it still ends on a quiet line saying only that.
+
+The line also says when the brief's own prose was last edited, with a pencil and how long ago: today, then days, weeks, months and years, its full date, who made it and the commit's subject on pointing. Its ink fades with the age, an edit of today in full ink and one of a year ago nearly quiet, so what changed lately stands out and the rest do not all say a date at one weight. A card's tally carries the same pencil, telling the newest edit anywhere within it.
+
+The edits are read from git, which is [a view apart](../../ideas/history.md) and never a level of the body: they are read after the body and apart from it, and kept by each file's text, so a reread blames only what changed; a built page carries them beside it. Until they have come, and where there is no git, the pencil does not stand. They are told whether or not git's own programs are turned on.
+
+*The last edit, the author's ask of 2026-10-19, on the act line of a folded and a whole brief alike and on the cards, read whether or not git is on and arriving once it is ready; the short ages and the fading ink were proposed by the session and taken by the author the same day.*
 
 *Reasoned, the author's, 2026-09-13; the badges the author's ask of 2026-09-16; [a mark beside the heading](refused.md#r-a-fold-mark-beside-the-heading) and [a tinted face](refused.md#t-a-tinted-surface-as-the-fold) were built first and refused. Open: whether the badge for scoping stands on every brief with a level or only on one already unfolded, and whether the line at a whole brief's foot, which has no figure before its badges, should keep a figure's room so that both kinds of line begin at one edge.*
 
