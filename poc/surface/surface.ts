@@ -1543,6 +1543,9 @@ async function editsOf(rootArg: string, body: Body): Promise<Edits> {
     if (!lines.length) return;
     const starts = briefLines(src);
     const root = roots.get(file)!;
+    // an opening's prose begins at its title: the stamp and the graphic above it are the file's dress, swept across every file at once
+    const title = src.split(/\r?\n/).findIndex((l: string) => /^ {0,3}# /.test(l));
+    if (starts[0] && title >= 0) starts[0].line = title + 1;
     starts.forEach((st, k) => {
       const address = st.path ? (root ? `${root}/${st.path}` : st.path) : root;
       if (!known.has(address)) return;
