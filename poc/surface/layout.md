@@ -198,6 +198,16 @@ As built it is a figure of fixed size. It tells how far the history is read, how
 
 *Preferred, the author's, 2026-10-01: the selection in git's status; the rest left open by the author. What it shows as built, and what counts as selected, are the session's.*
 
+### 7.2 A letter presses each icon
+
+Every program in the dock has a letter, and pressing it is pressing the program's icon: it takes away a program that can be seen and adds one that cannot, and a full row shakes the icon. A letter lays only the row, so it acts whichever world the keys act in. Held with a modifier it is the browser's, as a digit is, so copying stays the browser's.
+
+The letter is the program's initial where it is free: P the prose, C the canvas, S the shape, T the tree, A the ahead and K the keys. The plate is W, for the body whole, and the settings M, for their meters. Git's prose and git's canvas are the body's letters with shift, as they are the body's programs read in git's world, and git's status is G.
+
+The dock's tooltip names an icon's letter, and [the keys](widgets.md#8-the-keys) show every program's letter in a group of their own, each with its icon. A program git's history is off for has no letter, as it has no icon. A phone has no dock and no keys, so a letter does nothing there.
+
+*The author's ask of 2026-10-20, a letter to toggle each widget. Which letter each takes, shift for git's prose and canvas, and the group in the keys are the session's.*
+
 ## 8. Layouts kept by number
 
 A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or from an overview the dock opens: the layouts as cards in a grid, each the page it lays drawn small, with a plus that adds one. A layout is how the page is laid, never where the reader stands in it.

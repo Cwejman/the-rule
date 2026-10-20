@@ -358,7 +358,7 @@ A cell marked or lit lights up as a coloured lamp does, and never darkens: on a 
 
 ## 8. The keys
 
-The keys is a wing widget: every act with the key that fires it, grouped by what each works on, the brief, the scope, the reading, the map, the lane and [the layouts](layout.md#8-layouts-kept-by-number), the last a row of their nine digits. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading, and the digits, have no object on the page, and this is where a reader meets them.
+The keys is a wing widget: every act with the key that fires it, grouped by what each works on: the brief, the scope, the reading, the map, the lane, [the programs](layout.md#72-a-letter-presses-each-icon) by their letters and [the layouts](layout.md#8-layouts-kept-by-number) by their digits. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading, the letters and the digits have no object on the page, and this is where a reader meets them.
 
 It answers for the focus, so what the space bar would do now is what it says, and an act out of reach stands quiet in its place. Every badge in it is pressable, and each tells what it does on pointing, so it is the help as well as the list.
 
