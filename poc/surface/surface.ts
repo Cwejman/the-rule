@@ -2021,6 +2021,21 @@ const onMap = (a?: string): boolean => (a !== undefined ? canvasOn() : handOnMap
 /** Whether a brief stands whole, by its fold in the lane. */
 const isWhole = (a: string): boolean => foldOf(a) === "whole";
 
+/** The letter that presses each program's icon: its initial where free, and git's prose and canvas the body's with shift. */
+const PROGRAM_KEYS: Record<string, Chord> = {
+  prose: { key: "p" },
+  canvas: { key: "c" },
+  plate: { key: "w" },
+  gitProse: { key: "p", shift: true },
+  gitCanvas: { key: "c", shift: true },
+  gitStatus: { key: "g" },
+  shape: { key: "s" },
+  tree: { key: "t" },
+  ahead: { key: "a" },
+  settings: { key: "m" },
+  keys: { key: "k" },
+};
+
 const ACTS: Record<string, Action> = {
   unfold: {
     label: (a) => (isWhole(acts(a)) ? "fold" : "unfold"),
@@ -2318,6 +2333,21 @@ const ACTS: Record<string, Action> = {
       },
     ]),
   ),
+  // a letter presses a program's icon in the dock, from anywhere and whichever world holds the keys
+  ...Object.fromEntries(
+    Object.entries(PROGRAM_KEYS).map(([k, c]): [string, Action] => [
+      `program-${k}`,
+      {
+        label: () => PROGRAMS[k].name.split(":")[0],
+        mark: () => ICON[PROGRAMS[k].icon],
+        keys: [c],
+        help: () => (shownNow(k) ? `Takes ${PROGRAMS[k].name.split(":")[0]} away; pressed again, it comes back where it stood.` : `Adds ${PROGRAMS[k].name.split(":")[0]}, back where it stood.`),
+        also: "Its icon in the dock.",
+        can: () => !narrow() && offered(k),
+        run: () => pressProgram(k),
+      },
+    ]),
+  ),
   undo: {
     label: () => "undo",
     keys: [{ key: "Escape" }],
@@ -2388,6 +2418,10 @@ const KEY: Record<string, { glyph: string; name: string }> = {
   // a digit is the one key whose glyph is its character, so it is set in type, filled as the full stop is
   ...Object.fromEntries(
     Array.from({ length: 9 }, (_, i) => [String(i + 1), { glyph: `<text x="8" y="11.6" text-anchor="middle" font-size="10.5" font-family="var(--sans)" fill="currentColor" stroke="none">${i + 1}</text>`, name: String(i + 1) }]),
+  ),
+  // a letter is set in type as a digit is, in capitals as a key's cap is printed
+  ...Object.fromEntries(
+    [..."abcdefghijklmnopqrstuvwxyz"].map((l) => [l, { glyph: `<text x="8" y="11.6" text-anchor="middle" font-size="10.5" font-weight="600" font-family="var(--sans)" fill="currentColor" stroke="none">${l.toUpperCase()}</text>`, name: l.toUpperCase() }]),
   ),
   // the full stop is a dot, and a dot drawn at its own weight would read as an empty cap, so it is filled
   ".": { glyph: `<circle cx="8" cy="9.8" r="1.9" fill="currentColor" stroke="none"/>`, name: "the full stop" },
@@ -3475,7 +3509,8 @@ function pressProgram(k: string): void {
 /** What the dock says of a program: what it is, and what a press and a drag would do with it. */
 function dockTip(k: string): string {
   const at = whereIs(k);
-  const name = PROGRAMS[k].name;
+  const c = PROGRAM_KEYS[k];
+  const name = PROGRAMS[k].name + (c ? ` (${chordName(c)})` : "");
   const room = !shownNow(k) && added(k) !== null;
   if (!at) return room ? `${name} — press to add it, or drag it where you want it` : `${name} — no room for it beside what stands — take something away, or narrow what stands, to add it`;
   if (laid().gone.has(at.c)) return `${name} — out of sight, with no room for it at this width${room ? " — press to bring it in" : ""}`;
@@ -4098,17 +4133,18 @@ const saveSettings = (): void =>
 // the rest on hover. It answers for the focus, so what the space bar would do
 // now is what it says.
 
-const KEY_GROUPS: { of: string; acts: string[]; tight?: boolean }[] = [
+const KEY_GROUPS: { of: string; acts: string[]; tight?: boolean; marked?: boolean }[] = [
   { of: "the brief", acts: ["unfold", "foldUp", "scope"] },
   { of: "the scope", acts: ["deeper", "shallower", "unfoldAll", "foldAll", "out"] },
   { of: "the reading", acts: ["previous", "next", "previousLevel", "nextLevel", "above", "beneath"] },
   { of: "the map", acts: ["wayHere", "onlyHere"] },
   { of: "the lane", acts: ["undo", "redo"] },
+  { of: "the programs", acts: DOCK.flat().map((k) => `program-${k}`), marked: true },
   { of: "the layouts", acts: Array.from({ length: 9 }, (_, i) => `layout${i + 1}`), tight: true },
 ];
 
 const keysHtml = (): string =>
-  `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.tight ? `<span class="row">${g.acts.map((id) => badgeHtml(id, undefined, true)).join("")}</span>` : g.acts.map((id) => badgeHtml(id)).join("")}</div>`).join("")}</div>`;
+  `<div class="keys">${KEY_GROUPS.map((g) => `<div class="group"><span class="of chrome dim">${esc(g.of)}</span>${g.tight ? `<span class="row">${g.acts.map((id) => badgeHtml(id, undefined, true)).join("")}</span>` : g.acts.filter((id) => !id.startsWith("program-") || offered(id.slice(8))).map((id) => badgeHtml(id, undefined, false, g.marked)).join("")}</div>`).join("")}</div>`;
 
 // ## 3.9 The shape: the lane as laid
 //
@@ -8430,8 +8466,8 @@ function onKeyDown(e: KeyboardEvent): void {
     space = hold;
     return;
   }
-  // a digit held with a modifier is the browser's, its tabs among them, and never lays a layout
-  if (e.code.startsWith("Digit") && (e.metaKey || e.ctrlKey || e.altKey)) return;
+  // a digit or a letter held with a modifier is the browser's, its tabs and its copying among them, and never acts here
+  if (/^(Digit|Key)/.test(e.code) && (e.metaKey || e.ctrlKey || e.altKey)) return;
   // escape is left to the browser as well, since a reader may be leaning on it for something of the page's own
   const said: Chord = { key: e.key, shift: e.shiftKey };
   const chord = actionFor(said) ? said : { key: pressed(e), shift: e.shiftKey };
