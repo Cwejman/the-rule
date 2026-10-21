@@ -9181,8 +9181,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .brief .card.here::before, .brief .card.lit::before { opacity: 1; }
 /* opening is the act a press on the card already does, so its badge stands only where a key reaches it: on the card the
    reading line is on, or the one under the pointer. Unfolding, which no press on the card gives, stands on every card */
-.brief .card .acts [data-act="scope"] { display: none; }
-.brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { display: inline-flex; }
+/* it keeps its room where it is not shown, so pointing at a card moves nothing on its line and never makes it taller */
+.brief .card .acts [data-act="scope"] { visibility: hidden; }
+.brief .card.here .acts [data-act="scope"], .brief .card.lit .acts [data-act="scope"] { visibility: visible; }
 /* a card whose file carries a drawing stands it first, above the title on the text's left edge and on the card's own
    ground, large enough to be seen as a drawing rather than an icon. Its keylines keep the ink five units of sixty-four
    inside its square, so it is drawn that far to the left and the widest ink stands on the text's edge, never past it */
@@ -9288,8 +9289,11 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* the acts stand together at the right of the line, so the figures of every line begin at one edge */
 .act .acts { display: inline-flex; align-items: center; gap: 12px; margin-left: 2px; }
 /* a card's tally: each count after its glyph, the glyphs drawn as the file icons are, a line and a quieter trace */
-.act .tally { display: inline-flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
-.act .tally > span { display: inline-flex; align-items: center; gap: 4px; }
+/* a line too narrow for all it says parts between its counts and acts, never inside one, so a time is never two lines */
+.act { flex-wrap: wrap; row-gap: 4px; }
+.act .tally { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+.act .tally > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.act .badge { white-space: nowrap; }
 .act .tally-glyph { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .act .tally-glyph .t { opacity: .6; }
 /* a line with nothing to fold is told, not pressed */
