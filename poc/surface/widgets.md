@@ -42,7 +42,7 @@ Wherever a figure draws a brief's blocks it draws an image as a frame, where a p
 
 Every widget draws the same briefs from the same sizes, so the brief highlighted, [the focus or the one under the pointer](lane.md#4-where-you-are-is-the-brief-in-focus), lights in all of them at once. Where a figure has merged past the brief being pointed at, the cell holding it is lit instead.
 
-A light eases in and out rather than snapping, so the eye follows where it went: a cell of [the plate](#7-the-plate) and its glow, a card's rim and ink, and a box on the canvas over about a sixth of a second. In prose, a lit title, number or link takes a tenth, since a reader moving the pointer across words should not see a trail of fading ink behind it. Every move eases, a scroll as much as a press or the pointer: the plate drawn again as the focus moves keeps the cells it has already laid and changes only their marks, and a widget drawn wholly anew shows its marks at once. A glow comes and goes at once, since one eased from nothing passes through black before it takes its hue.
+A light eases in and out rather than snapping, so the eye follows where it went: a cell of [the plate](#7--the-plate) and its glow, a card's rim and ink, and a box on the canvas over about a sixth of a second. In prose, a lit title, number or link takes a tenth, since a reader moving the pointer across words should not see a trail of fading ink behind it. Every move eases, a scroll as much as a press or the pointer: the plate drawn again as the focus moves keeps the cells it has already laid and changes only their marks, and a widget drawn wholly anew shows its marks at once. A glow comes and goes at once, since one eased from nothing passes through black before it takes its hue.
 
 *Reasoned, 2026-09-13. The easing the author's ask, 2026-10-12, quick on prose; its times the session's, until the author has looked.*
 
@@ -82,7 +82,7 @@ The root is the whole wheel. A brief shares its slice equally among the briefs d
 
 So a brief's colour narrows as the reader goes down. A part of the root spans a wide run of the wheel, a section of it a few degrees, and a brief a few levels deeper a sliver that reads as one hue. Below where a difference can be seen there is none, and that is the gradient met in colour: the most difference at the top, where it says the most.
 
-A fill wide enough that a run of colour can be seen across it, as most cells of [the plate](#7-the-plate) near its centre are, takes its slice whole, as a run across it. So does a rim drawn around a card in its slice's hue: [the lane's card](lane.md#12-a-placed-part-raises-a-card) where the reading stands on it or it is lit by a pointer on it anywhere, and [the canvas's box](canvas.md#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) that leads to a reading, heads one, is selected, is where the reading stands or is under the pointer. A box with the quiet rim keeps it. The run is read along the rim, the slice going round the wheel from the card's left edge to its right, and never across the rim's weight, since a card is wide where a word is short. The root's rim, the whole wheel, runs all of it, as the scope's does under [the trial](#181-a-trial-colour-from-the-scope). In text, where a ring stands close around a name, it takes the middle, as the name's ink does.
+A fill wide enough that a run of colour can be seen across it, as most cells of [the plate](#7--the-plate) near its centre are, takes its slice whole, as a run across it. So does a rim drawn around a card in its slice's hue: [the lane's card](lane.md#12-a-placed-part-raises-a-card) where the reading stands on it or it is lit by a pointer on it anywhere, and [the canvas's box](canvas.md#45-a-row-keeps-its-edge-and-says-what-it-leads-to-by-it) that leads to a reading, heads one, is selected, is where the reading stands or is under the pointer. A box with the quiet rim keeps it. The run is read along the rim, the slice going round the wheel from the card's left edge to its right, and never across the rim's weight, since a card is wide where a word is short. The root's rim, the whole wheel, runs all of it, as the scope's does under [the trial](#181-a-trial-colour-from-the-scope). In text, where a ring stands close around a name, it takes the middle, as the name's ink does.
 
 Everything else, a name's ink, a line, an underline, a mark or a small cell, takes the middle of its slice, since a run across a word or a hairline reads as noise rather than as place. Ink can therefore match where slices nest: a parent with an odd number of children shares its middle with the middle one, and slices too thin to tell apart read alike. The root, the whole wheel, has no middle, so its ink takes no hue at all: it stands in grey, its lightness kept, as whatever lies outside the wheel does under [the trial](#181-a-trial-colour-from-the-scope). Its ink kept the hue of nought degrees until 2026-10-14, which read as the root being red, in its heading and its figures alike.
 
@@ -124,7 +124,7 @@ Other means were weighed and are not built: a hairline in the hue down the lane'
 
 *The author's asks of 2026-10-14: a setting that colours the ground by where the reader is, then the ground as the run of the place the reader is in, set by a meter at nought, and a meter for the headings' hue; then, finding a run across the page laid on top of it and the root a rainbow, the run laid down the reading with only the screen's part of it shown; then that the hue read as a transparent foreground, and that a neutral grey on a coloured ground does not feel right while faded text may blend. A plain sheet under the prose was built for it and refused the same day: the prose stands on the ground like everything else. The author found the cards transparent, most of all at the root, where the wheel showed through them, and the cards took their own run. The author's, the same day, that the root's ground run through the whole wheel was too much. And that the cards keep a balanced colour there, as lightly tinted frosted glass, a touch lighter, with no grey edge. A white edge was tried and refused the same day, since it reads only on a ground darker than the card; the run narrowed to its middle, the author's of the same day, finding it too wide; the unlit cards holding back their colour, a card's heading a register larger and taking the headings' hue, his of the same day; and that a card held back stood whitish on a coloured ground, so its colour adds to the ground's; and that the ground ease far more slowly; and on a light ground, that the lit rim be more saturated and less dark, the unlit cards less bland, and their edge livelier than a darker shade; the tones are the session's. That the place is the reading open and not the brief in focus, whose slice is too thin to run, that the run is mapped by the reading's length rather than by where each brief stands, and the tones at the meters' ends, are the session's, until the author has looked. Open: a few fills drawn in a fixed light tone, the cards' boxes in the shape among them, stand out against the run, and whether they take it is the author's to see.*
 
-## 2. The tree
+## 2. ![A tree of three rows joined by lines](.img/widget-tree.icon.svg) The tree
 
 The tree is a [wing](framework.md#2-the-areas) widget: [the way down](lane.md#75-the-way-down-stands-over-the-lane) laid line by line, and beneath its last step the reading open as an outline. What the way down says on one line it says here with the room to say more, in the language [a canvas drawn as text](canvas.md#411-a-node-may-be-one-line-of-text-joined-as-a-file-tree-is) already draws in.
 
@@ -160,7 +160,7 @@ The tree may also stand every step among its level at once, a setting in its hea
 
 Beneath the way the reading open stands as the lane holds it: one row per brief in the lane, nested under its parent, unfolded where the brief is whole. It is not a second state: folding a row folds the brief in the lane and unfolding one unfolds it, so what the tree shows is exactly what the lane holds, and a reader folds a whole region from the tree without scrolling to it.
 
-A row carries its number faint before its name. A card is underlined in its branch's hue, as a name that opens onto a reading of its own is, with its status after it, and carries no fold mark, since it opens rather than folds. Where its file [carries an icon](../practice.md#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it), the icon stands in the room a fold mark takes, where the tree's tick into the row ends and its line down to the level beneath begins, in the branch's hue; set after an empty mark it stood a column clear of its line, and its name a column further in than its siblings'. A level's numbers stand right-aligned in one column as wide as its widest, so its names begin at one edge and a tenth brief does not push its name past the ninth's.
+A row carries its number faint before its name. A card is underlined in its branch's hue, as a name that opens onto a reading of its own is, with its status after it, and carries no fold mark, since it opens rather than folds. Where its file [carries an icon](../practice.md#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it), the icon stands in the room a fold mark takes, where the tree's tick into the row ends and its line down to the level beneath begins, in the branch's hue; set after an empty mark it stood a column clear of its line, and its name a column further in than its siblings'. A level's numbers stand right-aligned in one column as wide as its widest, so its names begin at one edge and a tenth brief does not push its name past the ninth's. A brief that [carries an icon](../practice.md#88-a-brief-may-carry-an-icon-in-its-heading) has it at the head of its name, after its number, at the name's size and quieter than a file's, so a row is a file's by its icon standing in the lines and a brief's by its number standing first.
 
 A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates) stands as a row beneath the brief that relates it, after that brief's level, since it is no part of the level: the mark of a relation, an arrow up and away, in its own branch's hue where a fold mark stands, and its name underlined in that hue as a card's is, since both are doors, with the way to it told on pointing; and no sprout, since what lies beneath it is its own tree's shape and not this one's. It is the one link the tree draws: a link inside a paragraph is an offer, and the tree that drew every offer would bury the shape in them, where a related card is a link its writer raised to stand as one. Where a row is short of room its status gives way before its name. The rows on the way to the focus take their branch's ink.
 
@@ -190,27 +190,29 @@ What lies beside the way across the body rather than in it: the links the readin
 
 *Open, 2026-10-14.*
 
-## 3. The shape
+## 3. ![Bars stepping right, the lane drawn small](.img/widget-shape.icon.svg) The shape
 
-The shape is the left wing's first widget: the lane as laid, drawn small, so the reader sees the shape of the prose and the nesting it stands in at once, and fold state shows as length.
+The shape is the lane's scrollbar: the lane as laid, drawn small, so the reader sees how long the reading is, where they stand in it and the nesting the prose stands in, and fold state shows as length. What a fold hides and what stands above the scope are [the tree's](#2--the-tree) to say, which names them, so the shape draws only the lane.
 
 Each brief in the lane stands as its blocks, a heading a short bar and a paragraph a block as tall as it is drawn, shifted right by the brief's depth. Every block a brief has is drawn, a list or a table as readily as a paragraph, and an image as a frame as wide and as tall as it stands in the lane.
 
 Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), nesting a step tighter and giving its marks whatever room each row has left.
 
-It is as wide as it draws: its rows as the lane lays them and the marks of each folded brief, so it takes no room it leaves bare, and it widens and narrows as the lane is scoped and folded. The ghost of what an unfolded brief would hide, drawn only under the pointer, reaches out over the gap beside it rather than keeping room of its own.
+It is as wide as it draws, its rows as the lane lays them, so it takes no room it leaves bare and widens and narrows with the depth the lane is scoped and folded to. A block is half the width it stood at while the shape carried marks beside it, and its head offers it wide again, a setting a layout holds.
 
-*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16. The author's, 2026-10-05, that it takes only the width its drawing uses; the ghosts reaching over the gap are the session's.*
+A brief that [carries an icon](../practice.md#88-a-brief-may-carry-an-icon-in-its-heading) has it beside its heading, in the room its nesting leaves to the left of its blocks, so a reader finds the briefs they come back to in the length as they do in the tree and the lane. A brief at the scope's own depth has no room there, and stands without it.
+
+*Reasoned, the author's, 2026-09-13, from the wish for a minimap that moves the briefs and their paragraphs right and left by where they stand in the nesting; the rail, 2026-09-16. The author's, 2026-10-05, that it takes only the width its drawing uses. The author's of 2026-10-21, that with the tree standing the shape is a scrollbar, and what lies beneath or above is not its to show, so it stands narrower, its width a setting; half the width and the icons in the nesting's room are the session's.*
 
 ### 3.1 A folded brief tells what it hides
 
-Beside its face a folded brief carries a grey tick for every paragraph and a small grey frame for every image, as many as the room beside it holds, then, where a level lies beneath, a grey tail as long as that level is heavy. So a reader sees at a glance where the lane is folded, whether paragraphs or levels wait there, and how much.
+Beside its face a folded brief carried a grey tick for every paragraph and a frame for every image, then a grey tail as long as the level beneath it was heavy.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13. Given way on 2026-10-21 to [the tree's sprouts](#23-the-reading-open-as-an-outline), which say what a fold hides by name, the author finding the shape and the tree saying it twice.*
 
 ### 3.2 A card says the lane stops there
 
-[A card](lane.md#12-a-placed-part-raises-a-card) is not a brief of this reading, and the shape draws it apart: a row set off from the rows around it, holding the marks of the brief on the other side, with nothing beneath it however heavy that branch is. A tail would say the level waits one fold away, and it does not; it waits one opening away.
+[A card](lane.md#12-a-placed-part-raises-a-card) is not a brief of this reading, and the shape draws it apart: a row set off from the rows around it, with nothing beneath it however heavy that branch is, since the level waits one opening away and not one fold.
 
 So a reader scanning the shape sees where this reading ends before they reach it, and the two things a press can do, folding within and crossing out, never look alike. Its frame is drawn in the hue of the reading on the other side, not of the brief that raises it, so at the root each part's card says which part it is. It lights where the lane's card does, when the reading stands on it or the pointer is on it anywhere, and the brief that raises it lighting does not light it.
 
@@ -220,9 +222,9 @@ Cards that stand [as tiles](lane.md#12-a-placed-part-raises-a-card) are drawn as
 
 ### 3.3 The levels above the scope
 
-When the lane is scoped, the levels above the scope stand to the left of the opening's row, a grey tick per ancestor, outermost leftmost, and each is a press that scopes out to that level, as the ticks to the right are what a fold hides.
+When the lane was scoped, the levels above the scope stood to the left of the opening's row, a grey tick per ancestor, each a press that scoped out to that level.
 
-*Reasoned, the author's, 2026-09-13.*
+*Reasoned, the author's, 2026-09-13. Given way on 2026-10-21 to the tree, whose way stands every level above the scope by name, each a press that takes the lane out to it.*
 
 ### 3.4 The viewport scrubs the lane
 
@@ -232,17 +234,13 @@ The viewport, the part of the lane on the screen, is drawn over the shape as a s
 
 ### 3.5 Two presses, read from where they land
 
-A brief has two presses, and what a press does is read from where it lands, so no modifier key is needed. Its blocks go to it. The room to their right, where its ticks and tail stand when it is folded and nothing stands when it is unfolded, folds or unfolds it, and folding from there never scrolls the lane.
+A press on a brief's blocks goes to it. A second press, the room to the right of its blocks, folded or unfolded it while its marks stood there, and went with them; a fold is pressed in [the tree](#23-the-reading-open-as-an-outline) and the lane.
 
-The room reaches only as far as the marks do, and keeps to its own row, since rows touch and a room reaching into its neighbour would light one row while pointing at another. A row thinner than six pixels is given six there, so it can be hit.
+A row thinner than six pixels is given six to be hit. Under a finger [the rail takes no press](touch.md#53-the-rail-takes-no-presses) and is scrubbed instead.
 
-Pointing at the room points at the brief, so [the ahead](#4-the-ahead) shows what the brief hides before the press unfolds it, and the brief lights elsewhere as it would. In the shape itself its blocks stay unlit and only the marks answer: over a folded brief its ticks and tail light, and over an unfolded one they show as a grey ghost of what a fold would hide. So resting on the room reads apart from resting on the blocks.
+*Reasoned, the author's, 2026-09-13; the rail without presses, 2026-09-16. The fold's press given way with the marks, 2026-10-21.*
 
-Neither press is there under a finger, where [the rail takes none](touch.md#53-the-rail-takes-no-presses) and is scrubbed instead.
-
-*Reasoned, the author's, 2026-09-13; the room pointing at its brief, 2026-09-14, so the ahead previews a fold from there too; the rail without presses, 2026-09-16.*
-
-## 4. The ahead
+## 4. ![An eye](.img/widget-ahead.icon.svg) The ahead
 
 The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on.
 
@@ -258,7 +256,7 @@ It reaches past a card, unlike the lane: what lies ahead of a brief is mostly th
 
 *The author's ask of 2026-10-15, when the figure of files had grown more telling than the ahead's own; the files laid across rather than in a column, the author's of the same day.*
 
-## 5. Links
+## 5. ![Two links of a chain](.img/widget-links.icon.svg) Links
 
 Links is the right [gutter's](framework.md#2-the-areas) first widget. Beside each link in a brief, on the link's own line, it tells the target: where it stands, its whole path drawn as the way down draws one, then its title and the opening words of its face, or that it leads out of the body, or that the brief is not yet written.
 
@@ -270,7 +268,7 @@ As the width tightens [the gutter narrows](framework.md#28-giving-way) rather th
 
 *Reasoned, the author's, 2026-09-13; the narrowing the author's ask of 2026-09-16, which retired a figure that carried these into the wing as a list for the brief in focus.*
 
-## 6. Settings
+## 6. ![A dial](.img/widget-settings.icon.svg) Settings
 
 Settings is a wing widget that edits [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values.
 
@@ -314,7 +312,7 @@ A face is sized to the serif's x-height, the height of its small letters, and th
 
 *The author's ask of 2026-09-13. Measured in the browser: sans and mono stood about seven percent taller than the serif at one size. Preferred: the sans read small at that match, on the author's reading, and was lifted four percent by eye.*
 
-## 7. The plate
+## 7. ![A round plate](.img/widget-plate.icon.svg) The plate
 
 The plate is a wing widget: the body whole in one round figure, the root at its centre and every other brief a cell standing on its parent's outer edge, so the way from the root to any brief is a run of cells edge to edge, each level a ring around the one inside it. The path to the focus and the focus are marked on it as everywhere, and what is folded out of the lane is pale at every depth.
 
@@ -356,7 +354,7 @@ A cell marked or lit lights up as a coloured lamp does, and never darkens: on a 
 
 *As built, 2026-09-22, the palette's rule of [even chroma](implementation.md#642-colour-stays-even-across-branches-by-chroma) met in the plate's own register. The lamp the author's, 2026-10-12, on seeing a lit cell darken on a light ground; its tones the session's, until the author has looked.*
 
-## 8. The keys
+## 8. ![A keyboard](.img/widget-keys.icon.svg) The keys
 
 The keys is a wing widget: every act with the key that fires it, grouped by what each works on: the brief, the scope, the reading, the map, the lane, [the programs](layout.md#72-a-letter-presses-each-icon) by their letters and [the layouts](layout.md#8-layouts-kept-by-number) by their digits. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading, the letters and the digits have no object on the page, and this is where a reader meets them.
 

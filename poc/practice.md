@@ -376,6 +376,22 @@ Its text beneath, the credit where the image is not the writer's, is [written as
 
 *Preferred, the author's direction, 2026-10-16, for a body that surveys an application and keeps a screenshot of each page in the page's own file.*
 
+### 8.8 A brief may carry an icon in its heading
+
+A brief may carry an icon, written in its heading after its number, where it stands as part of the heading, as an emoji would: at the size of the heading's text, and a heading that wraps runs on around it.
+
+```markdown
+## 2. ![A tree of three rows](.img/tree.icon.svg) The tree
+```
+
+It is drawn as [a file's icon is](#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it), on a 16-unit square in one hand, and kept in an `.img` as any image is. It is the brief's mark wherever the brief is named in a line: its heading, its row in the tree, the way down, its card. A file's icon stands in the tree's lines, where a file opens; a brief's stands after its number, in its name, and quieter, so the two are told apart by where they stand.
+
+How many briefs carry one is the writer's to judge, at any depth. An icon marks a brief a reader comes back to, as a tab marks a page, and it tells only while few do; a level where every brief carries one has decorated its headings rather than marked them.
+
+The icon is no part of the title, so the brief's address is its title's as before. A heading's anchor is read from its text as a renderer reads it, which keeps the space the icon stood in: `## 2. ![…](…) The tree` is anchored `#2--the-tree`, and a link to the heading before it carried the icon is to be written again, which [the check](skill.md#32-links-and-images) names.
+
+*The author's ask of 2026-10-21, an icon for a brief beside its heading as a file has one, inline as an emoji is rather than large above it; at any depth and as many as the writer judges, the author's the same day, a rule of only the top level being too strict. After the number and quieter than a file's, the session's, which the author took.*
+
 ## 9. Reading and moving by script
 
 The making wants to read a document by depth and move a brief without retyping it, and no tool for that is built. Scripts over the headings are enough for now, and what they do is said in prose in [the skill](skill.md), so a session writes the script it needs when it needs it.

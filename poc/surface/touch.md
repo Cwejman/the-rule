@@ -98,11 +98,11 @@ Wide this does not hold: the row spans the page, so it keeps its room and the pr
 
 ## 4. What stands on a phone
 
-The row holds three: the pane the reader is not in, which is one press to the other; the rail, while the prose stands; and the settings. [The help](widgets.md#8-the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
+The row holds three: the pane the reader is not in, which is one press to the other; the rail, while the prose stands; and the settings. [The help](widgets.md#8--the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
 
 Each is a press that does something at once, rather than a choice among choices. The rail leaves the row while the canvas stands or the settings are open, since it belongs to the prose.
 
-[The ahead](widgets.md#4-the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
+[The ahead](widgets.md#4--the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
 
 *The author's, 2026-09-16, and narrowed by him the same day on reading it: five became four.*
 
@@ -182,7 +182,7 @@ The scope's own root is not a choice, since the entry on the canvas takes no pre
 
 ## 5. The minimap is a rail, not a mode
 
-[The shape](widgets.md#3-the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, and it is only ever scrubbed, so the width its briefs are drawn in can go too.
+[The shape](widgets.md#3--the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, and it is only ever scrubbed, so the width its briefs are drawn in can go too.
 
 So the rail is its own drawing rather than the shape squeezed. A brief's blocks are drawn twenty-eight wide against the wing's forty-six, and the nesting steps five to a level against nine, since nothing there is aimed at and no width is needed to hit. What that leaves over goes to the prose.
 
@@ -298,9 +298,9 @@ The flick is answered by the platform: it reads a wheel, and a finger sends none
 
 [Pulling past the top](lane.md#74-pull-past-the-top) reads the wheel as well, so it is not built for a finger, and a reader widens the scope from the names in the way down instead.
 
-What a link leads to is not told on a phone. [The links](widgets.md#5-links) stand in a gutter, and the gutter is the first area to go, so the reader follows a link without being told where it goes — the one thing the reading loses outright.
+What a link leads to is not told on a phone. [The links](widgets.md#5--links) stand in a gutter, and the gutter is the first area to go, so the reader follows a link without being told where it goes — the one thing the reading loses outright.
 
-[The radial](widgets.md#7-the-plate) wants a gesture of its own before it comes back: a finger touches and holds and moves, a card beside it says what the cell under the finger is, and the card carries the press that goes there. So the finger chooses by scrubbing and commits by pressing a thing it can see, where today it commits by landing. The outline wants the same kind of answer, whatever it turns out to be.
+[The radial](widgets.md#7--the-plate) wants a gesture of its own before it comes back: a finger touches and holds and moves, a card beside it says what the cell under the finger is, and the card carries the press that goes there. So the finger chooses by scrubbing and commits by pressing a thing it can see, where today it commits by landing. The outline wants the same kind of answer, whatever it turns out to be.
 
 And everything a touch reading asks that has not been met yet: [the canvas](canvas.md) has no touch reading of its own beyond a drag that pans it, and the lane has been read on a real phone once, which is where everything above that is dated the sixteenth twice over came from.
 

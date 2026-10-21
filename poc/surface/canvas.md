@@ -362,7 +362,7 @@ Whether a map follows is a setting in its head. Following, it brings where the r
 
 ### 6.4 A map may be drawn from the scope, as the plate may
 
-A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7-the-plate) may draw the scope.
+A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-every-program-has-a-head), from the scope, as [the plate](widgets.md#7--the-plate) may draw the scope.
 
 Drawn from the scope, the scope's brief is the head of the first column, where the root stands otherwise, whether the scope is a file or a brief inside one. Everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, and each opening beside the row that named it. Its rows are numbered from the scope, so its first level reads 1, as the lane's [registers count from the scope](lane.md#71-scoping-does-what-heading-sizes-can-only-do-so-far) once scoped.
 

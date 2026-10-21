@@ -24,7 +24,7 @@ An adjunct stands in a gutter. Given a brief in the lane, read from the shared s
 
 A figure stands in a wing. Given the body and the shared state, it returns a drawing that stands on its own: the tree, the shape beneath the focus, the lane as laid, the body whole. It never touches the prose.
 
-A pane stands in the middle, and there are three: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; and the dish, which is [the plate](widgets.md#7-the-plate) at the middle's size. The two that are not the lane are maps. Each pane is drawn from the shared state, and all act through the same verbs. [The history](history.md#41-it-is-a-mode-not-a-pane) is not a pane but a mode the lane and the canvas are turned to.
+A pane stands in the middle, and there are three: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; and the dish, which is [the plate](widgets.md#7--the-plate) at the middle's size. The two that are not the lane are maps. Each pane is drawn from the shared state, and all act through the same verbs. [The history](history.md#41-it-is-a-mode-not-a-pane) is not a pane but a mode the lane and the canvas are turned to.
 
 *Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22; the history a pane 2026-09-27, and a mode 2026-09-28. Superseded wide on 2026-10-01 by [programs](layout.md#2-a-row-of-columns-each-a-stack), the adjunct kept as a setting of each prose and the history's prose and canvas programs of their own.*
 
@@ -33,7 +33,7 @@ A pane stands in the middle, and there are three: the lane, which is the reading
 Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim the canvas keeps](#27-the-keys-belong-to-one-pane), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
 
 ![A row of five areas across the page: a narrow wing on the left holding small bars and blocks with a shaded viewport over them, an empty gutter, a wide lane of grey prose lines with one coloured link in its third line, a gutter holding a short note level with that link, and a narrow wing on the right holding bars and a framed block; a thin rule beneath each area and its name under the rule, lane in bold](.img/areas.svg)\
-The five areas as they stand by default: [the shape](widgets.md#3-the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5-links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4-the-ahead) in the right wing.
+The five areas as they stand by default: [the shape](widgets.md#3--the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5--links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4--the-ahead) in the right wing.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -67,7 +67,7 @@ Any area empties by hand, from [the strip](#3-the-strip), where a widget is cycl
 
 ### 2.5 What an area holds
 
-A wing holds up to two figures, one at its top and one at its foot. A figure of fixed size, [the plate](widgets.md#7-the-plate) or [the settings](widgets.md#6-settings), takes only the height it needs; a figure that grows, the shape, [the tree](widgets.md#2-the-tree) or the ahead, takes what is left, shared evenly when both grow. A gutter holds one adjunct. Nothing nests further, splits, or is dragged.
+A wing holds up to two figures, one at its top and one at its foot. A figure of fixed size, [the plate](widgets.md#7--the-plate) or [the settings](widgets.md#6--settings), takes only the height it needs; a figure that grows, the shape, [the tree](widgets.md#2--the-tree) or the ahead, takes what is left, shared evenly when both grow. A gutter holds one adjunct. Nothing nests further, splits, or is dragged.
 
 *Reasoned, the author's, 2026-09-13; the second figure the author's ask of 2026-09-14. Superseded wide on 2026-10-01 by [a stack of any length](layout.md#21-three-ways-to-take-height), which keeps its growing and fixed figures.*
 
@@ -155,7 +155,7 @@ An entry also says whether its act can be taken at all, so a badge for an act ou
 
 ## 5. Settings are data, and a figure edits them
 
-The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6-settings), which is a wing widget like any other.
+The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6--settings), which is a wing widget like any other.
 
 The type: the zoom on the prose, the ratio by which each heading register grows over the body, and the height of the prose's lines. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), the fade at the edges, whether the room left over is spread or centred, and the edge the dock stands along. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the layout: the row of columns and what each stacks, and the gutters of each prose, by default the shape, the body's prose with the links in its right gutter, and the ahead.
 

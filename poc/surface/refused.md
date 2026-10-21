@@ -48,7 +48,7 @@ Several figures are not the fault; six that shared nothing were. [Every widget k
 
 A treemap, tried for the body whole.
 
-Refused on geometry: its cells divide in two dimensions and degenerate into slivers a pointer cannot hit, where [a droplet](widgets.md#7-the-plate) stays compact. Not refused for room, which neither figure buys.
+Refused on geometry: its cells divide in two dimensions and degenerate into slivers a pointer cannot hit, where [a droplet](widgets.md#7--the-plate) stays compact. Not refused for room, which neither figure buys.
 
 ## g. Rigid rings with the text outside
 
@@ -72,7 +72,7 @@ Reaching it is the problem. On a crowded figure the pointer cannot get from a ce
 
 The second program kept an overlay that only told, raised beside whatever the pointer rested on and never entered.
 
-What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5-links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
+What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4--the-ahead). An overlay that repeats what is in view competes with the prose.
 
 ## k. A level to a pane, three abreast
 
@@ -102,7 +102,7 @@ With the level laid in the lane there is nothing to unfold beside the brief. A p
 
 The second model's first tree drew the root's level, then beneath it the level of the brief taken, then the next, each level a column under the last.
 
-The author found it strange: a brief's children stood at the bottom of the figure rather than beneath the brief, and nothing in it folded or unfolded. [The tree](widgets.md#2-the-tree) nests as a file tree does.
+The author found it strange: a brief's children stood at the bottom of the figure rather than beneath the brief, and nothing in it folded or unfolded. [The tree](widgets.md#2--the-tree) nests as a file tree does.
 
 ## p. A fade by distance from the focus
 
@@ -138,7 +138,7 @@ The author dropped the tint and made [the action line](lane.md#61-the-action-lin
 
 The tree's second build could unfold and fold its rows apart from the lane.
 
-The author found it strange again: unfolding there and unfolding in the text should be one thing. [The tree](widgets.md#2-the-tree) is the lane's own outline, one state and never two.
+The author found it strange again: unfolding there and unfolding in the text should be one thing. [The tree](widgets.md#2--the-tree) is the lane's own outline, one state and never two.
 
 ## v. A level merged into one block
 

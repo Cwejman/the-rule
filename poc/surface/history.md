@@ -170,7 +170,7 @@ A story tells a stretch of time, not a place, so it holds whatever its run holds
 
 Selecting a commit, or a story that holds ten, in the history shows what it touched in the body.
 
-It stays selected when the mode is left, beside whatever the reader selects in the body, and there [the shape](widgets.md#3-the-shape) greys everything and colours what was touched; the canvas lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there. While the history is read, [the plate](widgets.md#7-the-plate), which stays the body, shows it beside the selection.
+It stays selected when the mode is left, beside whatever the reader selects in the body, and there [the shape](widgets.md#3--the-shape) greys everything and colours what was touched; the canvas lights the touched briefs it holds as nodes to go to; and the lane, where the reading it holds is one the selection touched, shows the change in place there. While the history is read, [the plate](widgets.md#7--the-plate), which stays the body, shows it beside the selection.
 
 In place, the blocks that changed are marked and the rest is left as it is, and what was removed is shown only when asked; a finer marking may come later. Colour there says changed against unchanged, and no hue is given to a commit, since a hue already says which branch a thing stands under.
 

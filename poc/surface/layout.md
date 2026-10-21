@@ -28,7 +28,7 @@ The words it uses here are given in the sections below.
 
 In the framework it supersedes [the three kinds of widget](framework.md#1-three-kinds-of-widget), keeping the adjunct as a setting of each prose, and of [the areas](framework.md#2-the-areas) it supersedes what an area holds, keeping only its growing and fixed figures, less the plate, which stands alone, and it supersedes the cycle that closed an area by hand, the two sides of the middle, the keys among them and the order of giving way. It keeps [the widths](framework.md#21-widths) a figure declares, [the spaces between as one](framework.md#22-the-spaces-between-are-one) when the room is spread, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose), read of a column beside the prose nearest it, with the dock's room at the foot where it stands there. It supersedes [the strip](framework.md#3-the-strip), which becomes the dock and keeps its four weights of ink, and what a pane gives back; [the one shared state](framework.md#4-one-shared-state-and-a-few-verbs), which is kept for each world but for what the page keeps once; and the measure, the canvas's width and the widget of each area among [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them).
 
-Among the widgets, the dish as [a pane of its own](widgets.md#7-the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters), with the canvas's width meter as built; where they say a wing, read a column. On the canvas, [the face's eye](canvas.md#53-what-is-selected-shows-its-face) and [the root's direction](canvas.md#410-the-roots-level-runs-down-or-across) leave [its field](canvas.md#51-the-field-the-acts-stand-in) for its head; that brief still names the other pane and the settings as the field's standing acts, which the strip has since taken. And [going](canvas.md#5-one-press-selects-two-presses-go) where the canvas stands without the prose no longer puts the prose in its place.
+Among the widgets, the dish as [a pane of its own](widgets.md#7--the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters), with the canvas's width meter as built; where they say a wing, read a column. On the canvas, [the face's eye](canvas.md#53-what-is-selected-shows-its-face) and [the root's direction](canvas.md#410-the-roots-level-runs-down-or-across) leave [its field](canvas.md#51-the-field-the-acts-stand-in) for its head; that brief still names the other pane and the settings as the field's standing acts, which the strip has since taken. And [going](canvas.md#5-one-press-selects-two-presses-go) where the canvas stands without the prose no longer puts the prose in its place.
 
 In the history it supersedes [the mode](history.md#41-it-is-a-mode-not-a-pane) and its switch, [a selection kept when the mode is left](history.md#43-a-selection-shows-what-it-touched), and [what stands beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). [Reading it ahead](history.md#411-turning-to-it-never-waits-for-what-was-read-before) stays, and so does a published page's history as files: a program of git's that waits on its first read says so in itself, and the icon of each program of git's that waits breathes in the dock as the switch did.
 
@@ -40,7 +40,7 @@ In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down
 
 The page is a row of columns from left to right, and a column holds one program or several stacked from top to bottom.
 
-A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the ahead, the settings and [the keys](widgets.md#8-the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-every-program-has-a-head).
+A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the ahead, the settings and [the keys](widgets.md#8--the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-every-program-has-a-head).
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
@@ -204,7 +204,7 @@ Every program in the dock has a letter, and pressing it is pressing the program'
 
 The letter is the program's initial where it is free: P the prose, C the canvas, S the shape, T the tree, A the ahead and K the keys. The plate is W, for the body whole, and the settings M, for their meters. Git's prose and git's canvas are the body's letters with shift, as they are the body's programs read in git's world, and git's status is G.
 
-The dock's tooltip names an icon's letter, and [the keys](widgets.md#8-the-keys) show every program's letter in a group of their own, each with its icon. A program git's history is off for has no letter, as it has no icon. A phone has no dock and no keys, so a letter does nothing there.
+The dock's tooltip names an icon's letter, and [the keys](widgets.md#8--the-keys) show every program's letter in a group of their own, each with its icon. A program git's history is off for has no letter, as it has no icon. A phone has no dock and no keys, so a letter does nothing there.
 
 *The author's ask of 2026-10-20, a letter to toggle each widget. Which letter each takes, shift for git's prose and canvas, and the group in the keys are the session's.*
 
@@ -272,7 +272,7 @@ Since no layout holds a place, what the cards differ in is only how they lay the
 
 ### 8.7 The digits
 
-A digit from 1 to 9, which named no act before, lays the layout in its slot from anywhere on the page, whether the body's world or git's is the one keys act in, the overview raised or not, and an empty slot's digit does nothing. Held with a modifier it is the browser's, and does nothing here. [The keys](widgets.md#8-the-keys) show the nine in a group of their own, those standing empty quieter.
+A digit from 1 to 9, which named no act before, lays the layout in its slot from anywhere on the page, whether the body's world or git's is the one keys act in, the overview raised or not, and an empty slot's digit does nothing. Held with a modifier it is the browser's, and does nothing here. [The keys](widgets.md#8--the-keys) show the nine in a group of their own, those standing empty quieter.
 
 *Preferred, the author's, 2026-10-07, of the digits; the group in the keys is the session's.*
 

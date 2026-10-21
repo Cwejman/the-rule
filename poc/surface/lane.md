@@ -38,7 +38,7 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
+A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4--the-ahead) and the tree when the reader is on it.
 
 The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). Last stands a pencil and how long ago anything within it was [last edited](#61-the-action-line-is-the-press). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
 
@@ -114,7 +114,7 @@ Its address is the page's address, so the place a reader stands can be handed to
 
 Where the line stands is a setting with two values, the middle or easing to the ends, since a reader who arrives at a body wants its first prose at the top of the screen, and a reader deep in one wants the line in the middle. At the middle, it stays at the middle of the viewport, with half a screen of room above the first brief and below the last so both can reach it.
 
-Easing to the ends, which is where a reader starts, it stands on the opening at the top of the lane, the opening's heading level with the first row of [the shape](widgets.md#3-the-shape), so the first prose starts at the top of the screen and not halfway down. A third of a screen of scrolling eases it to the middle. The same holds at the foot, where it eases down onto the last brief and the last block stands level with the shape's last row, so the shape stands balanced at both ends.
+Easing to the ends, which is where a reader starts, it stands on the opening at the top of the lane, the opening's heading level with the first row of [the shape](widgets.md#3--the-shape), so the first prose starts at the top of the screen and not halfway down. A third of a screen of scrolling eases it to the middle. The same holds at the foot, where it eases down onto the last brief and the last block stands level with the shape's last row, so the shape stands balanced at both ends.
 
 *Reasoned, the author's asks of 2026-09-14: the line starting on the opening, the foot made to match, and the middle kept as a setting.*
 
@@ -160,7 +160,7 @@ Scrolling afterwards folds nothing, so nothing reflows under a reader who is onl
 
 ### 5.1 Going from a figure is not an arrival
 
-Going to a brief from [the tree](widgets.md#2-the-tree) or another [figure](framework.md#1-three-kinds-of-widget) keeps every fold the reader has made, unfolds only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
+Going to a brief from [the tree](widgets.md#2--the-tree) or another [figure](framework.md#1-three-kinds-of-widget) keeps every fold the reader has made, unfolds only what stands between, so the target stands in the lane, and scrolls there. A link, a sent address and the browser's history lay afresh, since they come from outside what the reader has laid.
 
 A reload of the place the reader stood is not an arrival either. The lane as laid, its scope and every fold, is kept in the browser's storage as it changes, and a reload at the same address lays it again as it was left.
 
@@ -206,7 +206,7 @@ What the press itself gives, the paragraphs beyond the face, is drawn exactly: a
 
 What lies further, the level beneath, is drawn as a bar per brief, as long as that brief's branch is heavy, with a tick beneath the ones that hold more. Where that is too much it merges into one bar as long as the whole level is heavy, which still says how much waits once it can no longer say what.
 
-So the deeper structure yields first, and whether unfolding gives only three paragraphs is never compressed away. The marks are drawn [as the shape draws a brief's blocks](widgets.md#3-the-shape), a paragraph and a heading each its own mark, so a reader who knows the shape reads the line without learning a second language.
+So the deeper structure yields first, and whether unfolding gives only three paragraphs is never compressed away. The marks are drawn [as the shape draws a brief's blocks](widgets.md#3--the-shape), a paragraph and a heading each its own mark, so a reader who knows the shape reads the line without learning a second language.
 
 *The author's ask of 2026-09-16, that the figure say what is paragraphs and what is a nested level; the two compressions reasoned from it, and how far each rung stays legible is open until it has been read against real briefs.*
 
@@ -214,7 +214,7 @@ So the deeper structure yields first, and whether unfolding gives only three par
 
 The tree is the lane's own outline, so folding a row there is folding the brief in the lane, one state and never two, and there the folder's triangle does it, since that is what a tree reader expects.
 
-In [the plate](widgets.md#7-the-plate), a press goes to the brief and a press with the modifier key held folds or unfolds it in place. In the shape, the room to the right of a brief's blocks folds or unfolds it, [as the shape says](widgets.md#35-two-presses-read-from-where-they-land), and no modifier is needed.
+In [the plate](widgets.md#7--the-plate), a press goes to the brief and a press with the modifier key held folds or unfolds it in place. In the tree, a row's fold mark folds or unfolds it, and no modifier is needed.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -226,7 +226,7 @@ Backspace folds the brief above as well. [On the map it is one act](canvas.md#52
 
 The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with up and down moves to the brief before or after at this level instead, passing over whatever stands beneath it, [as it does on the map](canvas.md#52-the-moves-on-a-map). Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#61-the-depth-strip) does. Enter and shift with enter [scope the lane](#7-scoping-the-lane).
 
-Every key here is named where its act stands, [as a badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the few that have no object on the page, the arrows that move the reading, are met in [the keys](widgets.md#8-the-keys).
+Every key here is named where its act stands, [as a badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the few that have no object on the page, the arrows that move the reading, are met in [the keys](widgets.md#8--the-keys).
 
 *Reasoned, the author's, 2026-09-13; the space bar acting on release and unfolding the scope when held, 2026-09-14; the badges, 2026-09-16.*
 
@@ -270,7 +270,7 @@ It went to the parent brief until 2026-09-20, which is a heading inside the plac
 
 ### 7.3 The levels above stay in sight
 
-The levels above the scope stay visible in the figures, as the levels beneath a fold are: the shape draws them as [grey ticks](widgets.md#33-the-levels-above-the-scope) to the left of the opening's row, and the tree as dim rows above the root, each a press that scopes out to it. Over the lane itself they stand as the way down, beneath.
+The levels above the scope stay visible in the figures, as the levels beneath a fold are: the tree stands them as the steps of its way above the reading open, each a press that scopes out to it, where the shape [drew them as ticks](widgets.md#33-the-levels-above-the-scope) until it became a scrollbar. Over the lane itself they stand as the way down, beneath.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -328,13 +328,13 @@ The lane lays a level as a reading: the brief that gives the most understanding 
 
 ## 9. Following a link moves you
 
-A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3-the-shape) already shows it, unfolded or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
+A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3--the-shape) already shows it, unfolded or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
 
 Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#75-the-way-down-stands-over-the-lane).
 
 A target with no level beneath it cannot be a scope, so the lane scopes to its parent with the target in focus, and the way down always has a placement to show. Escape steps back a move as it undoes any change, and the trail is kept with the lane in the browser, so a reload keeps it.
 
-The reader is told where a link leads before they take it: its target stands beside the link, [in the links](widgets.md#5-links).
+The reader is told where a link leads before they take it: its target stands beside the link, [in the links](widgets.md#5--links).
 
 *Reasoned, the author's, 2026-09-15: that a non-local link scopes, that a local one does not, and that the way down levels up to carry both how here is placed and how the reader came here. The first model laid every link afresh, 2026-09-13.*
 

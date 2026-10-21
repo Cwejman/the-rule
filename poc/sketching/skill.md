@@ -24,7 +24,7 @@ Most sketches are one of a few forms, and the form follows the shape the prose s
 
 A row is parts side by side, each with its extent and its name beneath it, for areas, layers read across, or the stages of a process that do not branch.
 
-A tree is nesting drawn as [the surface's shape](../surface/widgets.md#3-the-shape) draws the lane: each part a short bar with its blocks beneath, shifted right by its depth, for a holarchy and anything that holds parts of its own.
+A tree is nesting drawn as [the surface's shape](../surface/widgets.md#3--the-shape) draws the lane: each part a short bar with its blocks beneath, shifted right by its depth, for a holarchy and anything that holds parts of its own.
 
 A flow is causes in the order they happen, left to right, each step a name and the step between them a short line with a small open chevron, for a chain of causes and a pipeline.
 
