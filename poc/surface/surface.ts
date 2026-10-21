@@ -6811,8 +6811,11 @@ function drawTreeLines(tree: HTMLElement): void {
   const inked: string[] = [];
   const stroke = (d: string, colour: string) => inked.push(`<path d="${d}" style="stroke:${colour}"/>`);
   const markOf = (row: Element): DOMRect => (row.firstElementChild as HTMLElement).getBoundingClientRect();
-  // a row whose mark's room is empty is a joint: a line into it turns down in the middle of that room
-  const joint = (row: Element): boolean => !!row.firstElementChild?.matches("span.mark.leaf");
+  // a row whose mark's room is empty, with no fold mark and no icon, is met where it begins to show: at its number, or
+  // its name where it has none; one holding a level beneath is a joint, where the line into it turns down in the middle
+  // of that room
+  const empty = (row: Element): boolean => !!row.firstElementChild?.matches(".mark.leaf");
+  const joint = (row: Element): boolean => empty(row) && !!row.parentElement?.querySelector(":scope > .kids > .node");
   for (const node of all<HTMLElement>(".node", tree)) {
     const row = node.querySelector<HTMLElement>(":scope > .row");
     const kids = node.querySelector<HTMLElement>(":scope > .kids");
@@ -6829,7 +6832,8 @@ function drawTreeLines(tree: HTMLElement): void {
       if (!r) continue;
       const sm = markOf(r);
       const y = Y(sm.top + sm.height / 2);
-      const to = joint(r) && sub.querySelector(":scope > .kids > .node") ? X(sm.left + sm.width / 2) : X(sm.left) - 1;
+      const shown = r.children[1] as HTMLElement | undefined;
+      const to = joint(r) ? X(sm.left + sm.width / 2) : empty(r) && shown ? X(shown.getBoundingClientRect().left) - 4 : X(sm.left) - 1;
       const d = `M${x} ${y}H${to}`;
       if (sub.classList.contains("on")) stroke(d, ink(sub, "--on"));
       else if (sub.classList.contains("door")) stroke(d, ink(sub, "--door"));
@@ -9319,7 +9323,7 @@ svg.rel { display: inline-block; width: .72em; height: .72em; margin-left: .3em;
 .tree .row.related { cursor: pointer; }
 /* a related row is a door out of the tree, as a card's is: the mark of a relation in its own hue where a fold mark
    stands, and its name underlined in that hue, the way it lives told on pointing */
-.tree .row.related .name { color: var(--muted); text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.tree .row.related .name { color: var(--on); }
 .tree .row.related:is(:hover, .lit) .name { color: var(--on); }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
@@ -9536,7 +9540,8 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree .row.file .name { font-weight: calc(600 - var(--thin)); }
 .tree .row:is(.above, .sib) .name { color: var(--muted); }
 .tree .row:is(.open, .on) .name { color: var(--on); }
-.tree .row.card:not(.step) .name { text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+/* a file's name stands bold in its branch's own ink, which says it opens onto a reading of its own without a line under it */
+.tree .row.card:not(.step) .name { color: var(--on); }
 .tree .row.here .name, .tree .row.lit .name { color: var(--on); font-weight: calc(600 - var(--thin)); }
 .pointing .tree .row.here:not(.lit) .name { color: var(--ink); font-weight: calc(500 - var(--thin)); }
 /* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
