@@ -1646,8 +1646,6 @@ type Settings = {
   line: "middle" | "ends";
   /** what a brief weighs in the figures that weigh: the cost of its text alone, or the experience of it, its images counted as the room they take */
   weight: "cost" | "experience";
-  /** what the ahead answers for: only a brief that hides something, or every highlighted brief with anything beneath it */
-  ahead: "hidden" | "always";
   flick: number;
   /** light, dark, or whichever the system is set to */
   theme: Theme;
@@ -1721,7 +1719,6 @@ const DEFAULTS: Settings = {
   canvas: 720,
   line: "ends",
   weight: "cost",
-  ahead: "hidden",
   flick: 1,
   theme: "system",
   headings: "serif",
@@ -1732,7 +1729,7 @@ const DEFAULTS: Settings = {
   nodes: { body: "boxes", history: "boxes" },
   mapFrom: { body: "whole", history: "whole" },
   alone: { pane: "lane", rail: "left" },
-  layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "ahead" }] }],
+  layout: [{ items: [{ k: "shape" }] }, { items: [{ k: "prose" }] }, { items: [{ k: "tree" }] }],
   gutters: { body: [null, "links"], history: [null, "links"] },
   room: "spread",
   dock: "foot",
@@ -2048,7 +2045,6 @@ const PROGRAM_KEYS: Record<string, Chord> = {
   gitStatus: { key: "g" },
   shape: { key: "s" },
   tree: { key: "t" },
-  ahead: { key: "a" },
   settings: { key: "m" },
   keys: { key: "k" },
 };
@@ -3044,7 +3040,6 @@ const programIcon = (k: string): string =>
 const WIDGETS: Record<string, Widget> = {
   shape: { kind: "figure", name: "the shape: the lane as laid", icon: "shape", draw: (w, h) => shapeSvg(w, h), width: () => shapeWidth(), grow: true },
   tree: { kind: "figure", name: "the tree", icon: "tree", draw: () => treeHtml(), width: () => Math.min(treeNeed, TREE_WIDTH.most), grow: true, onFocus: true },
-  ahead: { kind: "figure", name: "the ahead: what lies beneath and is not in the lane", icon: "ahead", draw: (w, h) => aheadSvg(w, h), width: () => aheadWidth(), grow: true, onFocus: true, onPoint: true },
   // the plate is the body whole, so it stays the body while the history is read
   plate: { kind: "figure", name: "the plate: the body whole", icon: "plate", draw: (w, h) => onBody(() => plateSvg(w, h)), width: () => onBody(plateWidth), grow: false, onFocus: true },
   settings: { kind: "figure", name: "settings", icon: "settings", draw: () => settingsHtml(), width: () => 216, grow: false },
@@ -3067,8 +3062,7 @@ const WIDGETS: Record<string, Widget> = {
 // What the pill holds is fewer choices, since there are no sides to stand on:
 // the panes, and the figures a reader opens whole over the reading and
 // dismisses. The shape is not among them, since it is not a mode a reader picks
-// but the rail beside the prose; nor is the ahead, which answers for a brief the
-// pointer rests on, and a phone has no pointer.
+// but the rail beside the prose.
 
 /** Whether the lane stands alone: the width holds nothing beside the prose at its measure, not even a gutter. */
 const narrow = (): boolean => ui.areas.clientWidth < settings.measure + 3 * settings.gap + GUTTER.least;
@@ -3206,7 +3200,6 @@ const PROGRAMS: Record<string, Program> = {
   plate: { name: "the plate: the body whole, a cell per brief where it has the room", icon: "plate", alone: true, own: () => PLATE_SIDE, least: () => PLATE_LEAST, world: "body" },
   shape: figure("shape"),
   tree: figure("tree"),
-  ahead: figure("ahead"),
   settings: figure("settings"),
   keys: figure("keys"),
 };
@@ -3215,7 +3208,7 @@ const PROGRAMS: Record<string, Program> = {
 const DOCK: string[][] = [
   ["gitStatus", "gitProse", "gitCanvas"],
   ["prose", "canvas", "plate"],
-  ["shape", "tree", "ahead", "settings", "keys"],
+  ["shape", "tree", "settings", "keys"],
 ];
 
 const isAlone = (k: string): boolean => PROGRAMS[k]?.alone === true;
@@ -3646,13 +3639,12 @@ const cardBox = (k: string, x: number, y: number, w: number, h: number, inner: s
 function cardPage(h: Held, el: HTMLElement): void {
   // what a card draws is drawn as the layout holds it, and leaves the page's own drawing state as it found it
   // the row the page laid is set aside, since a figure asks it of the row the card lays
-  const kept = { plate: plateDrawnAt, ahead: aheadRoot, laid: laidNow };
+  const kept = { plate: plateDrawnAt, laid: laidNow };
   laidNow = null;
   try {
     withHeld(h, () => layCard(el));
   } finally {
     plateDrawnAt = kept.plate;
-    aheadRoot = kept.ahead;
     laidNow = kept.laid;
   }
 }
@@ -3880,47 +3872,68 @@ function treeHtml(): string {
   return `<div class="tree${settings.treeRoom === "open" ? " open" : ""}">${step(0)}</div>`;
 }
 
-// ## 3.6 The ahead: what lies beneath, and is not in the lane
-//
-// For the highlighted brief, when its level is out of view: the whole subtree
-// beneath it drawn as the shape draws the lane, heading bars and paragraph
-// blocks shifted right by nesting, everything expanded, sized from the text
-// since none of it is drawn in the lane. Drawn only where the level beneath is
-// not in the lane, and only as large as the subtree needs.
-
-let aheadRoot: string | null = null;
-
-/** What a brief hides at its fold: paragraphs beyond its face, and its level beneath, when either is out of the lane; set to always, the ahead answers for any brief with anything beneath it. */
-const hides = (a: string): boolean => {
-  const b = brief(a);
-  if (!b) return false;
-  if (settings.ahead === "always") return blocksOf(b).length > 1 || level(a).length > 0;
-  return foldOf(a) !== "whole" && (blocksOf(b).length > 1 || (level(a).length > 0 && !level(a).some((k) => inLane(k.address))));
-};
-
-/** The brief the ahead answers for: the pointed brief when it hides something, otherwise the focus; a cell inside the figure never re-roots it. */
-function aheadTarget(): string | null {
-  const base = hides(state.focus) ? state.focus : null;
-  const p = state.pointed;
-  const within = (root: string | null) => root !== null && p !== null && p.startsWith(root + "/");
-  // the figure keeps its root while the pointer moves within it, so pointing at a cell never redraws the figure from under the pointer
-  aheadRoot = p !== null && hides(p) && !within(base) ? p : within(aheadRoot) ? aheadRoot : base;
-  return aheadRoot;
-}
-
 /** A block as a figure of the lane draws it: its kind, its height in lines of the lane, and its width as a share of the measure. */
 type ABlock = { kind: "head" | "para" | "image" | "card"; lines: number; width: number };
 
-/**
- * What lies ahead of the highlighted brief, drawn as the files it holds at a reading size: its own bar first, then each
- * file placed beneath it, every file named over a bar as long as its text, the heaviest running the width, and parted
- * at its heaviest sections. A name goes there.
- */
-function aheadSvg(W: number, _H: number): string {
-  const target = aheadTarget();
-  if (target === null) return "";
-  const t = brief(target)!;
-  return `<div class="ahead-box"><div class="chrome ahead-where">${pathHtml(t.address)}<span class="name">${esc(t.address === "" ? state.body!.title : t.title)}</span></div>${filesHtml(target, { w: Math.max(120, W - 8) })}</div>`;
+// ## 3.6 The peek: what a row of the tree hides, raised by a press
+//
+// Pressing a row's sprout raises what the row hides over the page, beside the
+// tree: the brief as a reader would meet it, then the files it holds at a reading
+// size, each named and each heavy section parted out, every name a going. It is
+// raised by a press rather than by resting, so moving into it retargets nothing,
+// and it goes on leaving it, on any scroll, on escape, or with the going it made.
+
+const PEEK = { w: 340, grace: 220 };
+let peekOf: { a: string; from: HTMLElement; leaving: ReturnType<typeof setTimeout> | undefined } | null = null;
+
+function peekHtml(a: string): string {
+  const b = brief(a)!;
+  const face = faceOf(b, 999);
+  return (
+    `<div class="peek-where">${pathHtml(a)}</div>` +
+    `<div class="peek-name" data-go="${esc(a)}">${glyphHtml(b)}${esc(b.title)}</div>` +
+    (face ? `<p class="peek-face">${esc(face)}</p>` : "") +
+    `<div class="peek-tally act">${tallyHtml(a)}</div>` +
+    filesHtml(a, { w: PEEK.w - 28 })
+  );
+}
+
+/** Raises the peek for the row a sprout stands under, beside the tree on the side the reading is, level with the sprout. */
+function raisePeek(a: string, from: HTMLElement): void {
+  if (peekOf?.a === a) return closePeek();
+  closePeek();
+  const el = ui.peek;
+  el.setAttribute("style", hueVars(a));
+  el.innerHTML = peekHtml(a);
+  el.hidden = false;
+  const r = from.getBoundingClientRect();
+  const wing = (from.closest<HTMLElement>(".slot") ?? from).getBoundingClientRect();
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
+  const right = wing.left + wing.width / 2 < innerWidth / 2;
+  const left = right ? wing.right + 8 : wing.left - w - 8;
+  el.style.left = `${Math.round(clamp(left, 8, innerWidth - w - 8))}px`;
+  el.style.top = `${Math.round(clamp(r.top - 24, 8, innerHeight - h - 8))}px`;
+  from.classList.add("peeked");
+  peekOf = { a, from, leaving: undefined };
+}
+
+function closePeek(): void {
+  if (!peekOf) return;
+  clearTimeout(peekOf.leaving);
+  peekOf.from.classList.remove("peeked");
+  peekOf = null;
+  ui.peek.hidden = true;
+  ui.peek.innerHTML = "";
+}
+
+/** The pointer has left the peek and its sprout: it goes after a moment, so a pointer crossing the gap between them keeps it. */
+function leavingPeek(e: PointerEvent): void {
+  if (!peekOf) return;
+  const over = e.target as Element | null;
+  const within = !!over && (ui.peek.contains(over) || peekOf.from.contains(over));
+  clearTimeout(peekOf.leaving);
+  peekOf.leaving = within ? undefined : setTimeout(closePeek, PEEK.grace);
 }
 
 // ## 3.7 Links: beside each link, its target; at the foot, what points here
@@ -4011,10 +4024,10 @@ function meterArc(t: number, r: number): string {
 
 /**
  * What a setting cannot change where the lane stands alone: the measure, which the width already sets; the canvas's
- * greatest width, since it takes the page whole; the ahead, which does not stand there; and the flick, which reads a
+ * greatest width, since it takes the page whole; and the flick, which reads a
  * wheel no finger sends. They are not drawn, rather than drawn and idle.
  */
-const IDLE_NARROW = new Set(["ahead", "flick", "room", "dock"]);
+const IDLE_NARROW = new Set(["flick", "room", "dock"]);
 const shownHere = (key: string): boolean => !(narrow() && IDLE_NARROW.has(key));
 
 /**
@@ -4058,7 +4071,7 @@ function settingsHtml(): string {
 }
 
 /** The switches beneath the meters: a setting with a few named values, a row apiece. */
-type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "ahead" | "tree" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
+type Switch = { key: "flick" | "theme" | "headings" | "prose" | "line" | "weight" | "tree" | "room" | "dock" | "git" | "colour" | "colourFrom" | "crumb"; name: string; values: (string | number)[]; labels?: string[] };
 const SWITCHES: Switch[] = [
   { key: "theme", name: "theme", values: THEMES },
   { key: "headings", name: "headings", values: FACES },
@@ -4068,7 +4081,6 @@ const SWITCHES: Switch[] = [
   { key: "colour", name: "colour", values: ["brief", "file"], labels: ["every brief", "files"] },
   { key: "colourFrom", name: "colour from", values: ["root", "scope"], labels: ["the root", "the scope, a trial"] },
   { key: "crumb", name: "the way down", values: ["brief", "file"], labels: ["every brief", "files"] },
-  { key: "ahead", name: "the ahead", values: ["hidden", "always"] },
   { key: "tree", name: "nesting", values: ["spine", "thread"] },
   { key: "flick", name: "flick", values: [1, 0], labels: ["on", "off"] },
   { key: "room", name: "room left over", values: ["spread", "centred"] },
@@ -4195,9 +4207,6 @@ const RAIL = { least: 72, most: 110, lane: 200 };
 const railWidth = (): number => clamp(SHAPE.pad * 2 + 4 + (state.index?.depth ?? 0) * SHAPE.railIndent + SHAPE.railBar, RAIL.least, RAIL.most);
 /** Whether the shape stands as the rail now, which is what takes its marks away. */
 const onRail = (): boolean => fits().rail > 0;
-/** The width the ahead stands in: its deepest possible row with its tail. */
-/** The ahead stands wide enough to name a file over its bar. */
-const aheadWidth = (): number => 260;
 
 /** One block drawn small: a heading a short bar, a paragraph a filled block, an image a frame, so no figure passes an image off as prose. */
 const blockRect = (kind: ABlock["kind"], x: number, y: number, w: number, h: number, attrs = ""): string =>
@@ -4727,7 +4736,7 @@ function filesHtml(a: string, large?: { w: number }): string {
   const own = (x: string): number => state.index!.own.get(x) ?? 0;
   const within = (x: string): number => own(x) + level(x).reduce((n, k) => n + (isCard(k) ? 0 : within(k.address)), 0);
   const placed = (x: string): Brief[] => level(x).flatMap((k) => (isCard(k) ? [k] : placed(k.address)));
-  // large, as the ahead draws it, the heaviest file runs the room's width and the rest by the same log, each named
+  // large, as the peek draws it, the heaviest file runs the room's width and the rest by the same log, each named
   const STEP = large ? 14 : 9;
   const deep = (x: string, d: number): number => Math.max(d, ...placed(x).map((k) => deep(k.address, d + 1)));
   const heaviest = (x: string): number => Math.max(within(x), ...placed(x).map((k) => heaviest(k.address)));
@@ -4735,19 +4744,21 @@ function filesHtml(a: string, large?: { w: number }): string {
   const span = large ? large.w - deep(a, 0) * STEP - 4 : 0;
   const top = large ? logOf(heaviest(a)) : 1;
   const bar = (x: string): string => {
-    const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, w: within(k.address) }));
+    const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, a: k.address, w: within(k.address) }));
     const total = Math.max(1, own(x) + sections.reduce((n, c) => n + c.w, 0));
     const L = large ? Math.max(6, (span * logOf(total)) / top) : clamp(logOf(total) * 11, 3, 90);
     // small, it parts at its three heaviest sections; large, at its five heaviest, since there is room to tell them
     const [many, share] = large ? [5, 0.05] : [3, 0.08];
     const heavy = new Set([...sections].sort((p, q) => q.w - p.w).slice(0, many).filter((c) => c.w / total > share));
-    const runs: { w: number; big: boolean; names: string[] }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
+    const runs: { w: number; big: boolean; names: string[]; a?: string }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
     for (const c of sections) {
       const r = runs[runs.length - 1];
       if (r && !r.big && !heavy.has(c)) (r.w += c.w), r.names.push(c.t);
-      else runs.push({ w: c.w, big: heavy.has(c), names: [c.t] });
+      else runs.push({ w: c.w, big: heavy.has(c), names: [c.t], a: c.a });
     }
-    return runs.map((r) => `<i${r.big ? "" : ` class="q"`} style="width:${Math.max(1, (L * r.w) / total - 1).toFixed(1)}px" title="${esc(r.names.join(" · "))}"></i>`).join("");
+    // large, a section parted out of its bar is a press that goes to it, as its file's name is
+    const goes = (r: (typeof runs)[number]): string => (large && r.big && r.a ? ` data-go="${esc(r.a)}"` : "");
+    return runs.map((r) => `<i${r.big ? "" : ` class="q"`}${goes(r)} style="width:${Math.max(1, (L * r.w) / total - 1).toFixed(1)}px" title="${esc(r.names.join(" · "))}"></i>`).join("");
   };
   const node = (x: string): string => {
     const kids = placed(x);
@@ -5700,7 +5711,7 @@ function commitHtml(b: Brief, c: Commit, after: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; peek: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -6161,7 +6172,6 @@ function headSettings(k: string): string {
     const nesting = switchPress("tree", "nesting", { spine: "a level hangs from a spine", thread: "a thread runs through a level's rows" });
     return (inNamed(w, () => headAct("face") + headAct("trunk") + headAct("nodes")) ?? "") + nesting + mapFromAct(w) + `<button class="pick${on ? " on" : ""}" data-toggle="follow:${w}" data-tip="${esc(tip)}">${icon("follow")}</button>`;
   }
-  if (k === "ahead") return shownHere("ahead") ? switchPress("ahead", "ahead", { hidden: "answers for a brief that hides something", always: "answers for every brief with anything beneath it" }) : "";
   if (k === "plate") {
     const on = settings.plate === "scope";
     const tip = on ? "draws the reading you are scoped to — press to draw the body whole" : "draws the body whole — press to draw only the reading you are scoped to";
@@ -7900,7 +7910,6 @@ function onPointerMove(e: PointerEvent): void {
       if (near !== null) ui.heads.querySelector(`[data-head="${cssEsc(near)}"]`)?.classList.add("near");
     }
   }
-  // the room right of a brief's blocks in the shape points at the brief like its blocks do, so the ahead shows what a fold there would unfold
   const el = named(e);
   all<HTMLElement>(".keep").forEach((k) => k.classList.remove("keep"));
   // a link keeps its brief's ink, since the link is read in the sentence it sits in; and a card keeps it because the
@@ -8051,8 +8060,15 @@ const onClick = (e: MouseEvent): void => {
   // a level above, in the shape or the crumb, scopes out to itself
   const scope = t.closest<HTMLElement>("[data-scope]");
   if (scope) return void scopeTo(scope.dataset.scope!);
+  // a row's sprout raises what the row hides beside the tree; a going from the peek takes the peek with it
+  const sprout = t.closest<HTMLElement>(".tree .sprout");
+  if (sprout) {
+    const row = sprout.previousElementSibling as HTMLElement | null;
+    return void (row?.dataset.a !== undefined && raisePeek(row.dataset.a, sprout));
+  }
   const go = t.closest<HTMLElement>("[data-go]");
-  if (go) return void goTo(go.dataset.go!);
+  if (go) return void (t.closest("#peek") && closePeek(), goTo(go.dataset.go!));
+  if (peekOf && !t.closest("#peek")) closePeek();
   const cell = t.closest<HTMLElement>("svg.fig [data-a]");
   if (!cell || scrubbing) return;
   // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
@@ -8405,6 +8421,8 @@ function onKeyDown(e: KeyboardEvent): void {
   if ((e.target as HTMLElement).closest("input, textarea")) return;
   if (e.key === "Escape" && drag?.kind === "move") return void (e.preventDefault(), cancelMove());
   if (e.key === "Escape" && overview) return void (e.preventDefault(), raiseOverview(false));
+  // escape closes the peek rather than undoing, as it lets the overview go
+  if (e.key === "Escape" && peekOf) return void (e.preventDefault(), closePeek());
   if (e.key === " ") {
     e.preventDefault();
     if (space) return;
@@ -8532,6 +8550,9 @@ function onFirstTouch(): void {
 /** Wires the gestures: which of them listens to what, on the page and on each world's own elements. */
 function wire(): void {
   document.addEventListener("pointermove", onPointerMove);
+  document.addEventListener("pointermove", leavingPeek);
+  // the peek goes the moment anything scrolls, a wheel anywhere but the peek's own room or a scroll of the reading
+  document.addEventListener("wheel", (e) => peekOf && !ui.peek.contains(e.target as Node) && closePeek(), { passive: true, capture: true });
   document.documentElement.addEventListener("pointerleave", onPointerLeave);
   document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
   // a drag acts in the world it began in, to its end
@@ -8567,7 +8588,7 @@ function wire(): void {
     pinchOn(d.canvas, w);
     scrubOn(d.crumb, w);
     imagesOn(d.lane, w);
-    d.scroll.addEventListener("scroll", () => requestAnimationFrame(() => runIn(w, onScroll)), { passive: true });
+    d.scroll.addEventListener("scroll", () => (closePeek(), requestAnimationFrame(() => runIn(w, onScroll))), { passive: true });
   });
   window.addEventListener("hashchange", onHashChange);
   window.addEventListener("resize", onResize);
@@ -8658,10 +8679,11 @@ async function start(): Promise<void> {
       <div id="layouts" hidden></div>
       <div id="strips"></div>
     </main>
-    <div id="tip" class="chrome" hidden></div>`;
+    <div id="tip" class="chrome" hidden></div>
+    <div id="peek" hidden></div>`;
   const $ = (sel: string) => document.querySelector<HTMLElement>(sel)!;
   // the page's own elements stand in both worlds' sets; each world has its own prose, way down, gauge, canvas and gutters
-  const page = { header: $("#header"), tip: $("#tip"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads") };
+  const page = { header: $("#header"), tip: $("#tip"), peek: $("#peek"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads") };
   const of = (scroll: HTMLElement, at: string): UI => ({
     ...page,
     scroll,
@@ -8922,6 +8944,18 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #tip .name { display: block; color: var(--ink); font-weight: calc(500 - var(--thin)); }
 #tip .name.plain { font-weight: calc(400 - var(--thin)); color: var(--ink); }
 #tip .gloss { display: block; color: var(--muted); margin-top: 2px; }
+/* the peek stands over the page beside the tree, the brief as a reader meets it and then the files it holds */
+#peek { position: fixed; z-index: 8; width: ${PEEK.w}px; max-height: calc(100vh - 16px); overflow: auto; padding: 12px 14px 14px; border-radius: 12px; background: var(--ground); box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 10px 28px rgb(0 0 0 / .14), 0 0 0 1px var(--rim); display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+#peek .peek-where .path { justify-content: flex-start; font-size: 11.5px; color: var(--faint); }
+#peek .peek-name { font-family: var(--serif); font-size: 17px; line-height: 1.25; color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--door); text-underline-offset: 3px; }
+#peek .peek-name:hover { color: var(--on); }
+#peek .peek-face { margin: 0; color: var(--muted); line-height: 1.4; }
+#peek .peek-tally { display: flex; font-size: 12px; color: var(--muted); }
+#peek .files { margin-top: 4px; }
+#peek .files i[data-go] { cursor: pointer; }
+#peek .files i[data-go]:hover { background: var(--lit); }
+.tree .sprout { cursor: pointer; }
+.tree .sprout.peeked .files { outline: 1px solid var(--door); outline-offset: 2px; border-radius: 3px; }
 
 /* each program stands where it is laid, those alone in a column at the page's height; where the lane stands alone
    there are no gaps to pull and no heads */
@@ -9533,21 +9567,10 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 
 svg.fig { display: block; overflow: visible; touch-action: none; user-select: none; }
 svg.fig .cell { cursor: pointer; }
-.ahead-box { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-.ahead-box > .files { width: 100%; text-align: left; }
-svg.ahead .hit { fill: transparent; }
-svg.ahead .para { fill: var(--rest); }
-svg.ahead .head { fill: var(--door); }
-svg.ahead .hidden { fill: var(--grey); }
-svg.ahead .cell.lit .para, svg.ahead .cell.lit .head { fill: var(--lit); }
 /* an image is a frame wherever a figure draws it, never a filled block that reads as prose */
 svg.fig .image { fill: none; stroke: var(--door); stroke-width: 1; }
 svg.fig .cell.here .image { stroke: var(--on); }
 svg.fig .cell.lit .image { stroke: var(--lit); }
-.ahead-name { min-height: 1.2em; text-align: center; color: var(--ink); }
-.ahead-where { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; max-width: 100%; }
-.ahead-where .path { justify-content: flex-start; }
-.ahead-where .name { color: var(--muted); }
 
 svg.shape .hit { fill: transparent; }
 svg.shape .para { fill: var(--rest); }
@@ -9561,27 +9584,8 @@ svg.shape .card { fill: none; stroke: var(--door); stroke-width: 1; }
 /* a card lights where the lane's card does, when the reading stands on it or the pointer is on it anywhere, since it
    carries the address of the reading beyond it; the brief that raises it lighting does not light it */
 svg.shape .card.here, svg.shape .card.lit { stroke: var(--lit); stroke-width: 1.6; fill: var(--rest); fill-opacity: .45; }
-svg.shape .above .head { fill: var(--grey); }
-svg.shape .above.lit .head, svg.shape .above:hover .head { fill: var(--lit); }
-/* only the two regions take the pointer; the marks drawn over them never do */
-svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .card, svg.shape .tick, svg.shape .hidden { pointer-events: none; }
-svg.shape .ghost { opacity: 0; transition: opacity .12s; }
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .ghost { opacity: 1; }
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .tick:not(.ghost), svg.shape .cell:has(.hit[data-press="fold"]:hover) .hidden:not(.ghost) { fill: var(--lit); }
-/* resting on the room to the right points at the brief, so the ahead previews it, but the brief's blocks keep their
-   colour there: only its marks light, so resting on the room reads apart from resting on the blocks */
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .para { fill: var(--rest); }
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .head { fill: var(--door); }
-svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .para { fill: var(--door); }
-svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .head { fill: var(--on); }
-svg.shape .hit[data-press="fold"] { cursor: pointer; }
-svg.shape .tick { fill: var(--grey); }
-svg.shape .tick.image { fill: none; stroke: var(--grey); stroke-width: 1; }
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .tick.image:not(.ghost) { fill: none; stroke: var(--lit); }
-svg.shape .cell:has(.hit[data-press="fold"]:hover) .image { stroke: var(--door); }
-svg.shape .cell.here:has(.hit[data-press="fold"]:hover) .image { stroke: var(--on); }
-svg.shape .hidden { fill: var(--grey); }
-svg.shape .cell.lit .hidden { fill: var(--glow); }
+/* only the region of a brief takes the pointer; the blocks drawn over it never do */
+svg.shape .head, svg.shape .para, svg.shape .image, svg.shape .card { pointer-events: none; }
 svg.shape .cursor { fill: var(--veil); pointer-events: none; }
 /* under a finger the rail is taken hold of rather than aimed at, so the band the reader holds says so: a stronger fill
    with a rim around it, and a step darker while the finger is down */
