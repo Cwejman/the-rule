@@ -4714,10 +4714,7 @@ function filesHtml(a: string, large?: { w: number }): string {
     const kids = placed(x);
     // the first row is the brief the figure is drawn for, named already wherever the figure stands
     const name = large && x !== a ? `<span class="fname" data-go="${esc(x)}">${esc(brief(x)!.title)}</span>` : "";
-    // each file the figure holds carries its icon at the head of its bar, so a sprout is read by the same marks as the
-    // tree's rows; the first row is the brief the figure is drawn for, whose icon stands in its own row above
-    const mark = x !== a && brief(x)?.icon ? `<span class="ficon" aria-hidden="true">${brief(x)!.icon}</span>` : "";
-    return `<div class="fnode" ${hued(x)}>${name}<div class="frow">${mark}${bar(x)}</div>${kids.length ? `<div class="fkids">${kids.map((k) => node(k.address)).join("")}</div>` : ""}</div>`;
+    return `<div class="fnode" ${hued(x)}>${name}<div class="frow">${bar(x)}</div>${kids.length ? `<div class="fkids">${kids.map((k) => node(k.address)).join("")}</div>` : ""}</div>`;
   };
   return `<div class="files${large ? " large" : ""}">${node(a)}</div>`;
 }
@@ -9550,9 +9547,6 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 /* what a row hides, at about half the length a box gives it, as text on the canvas draws it */
 /* where a row is short of room its figure gives way first, then its status, and its name last */
 .files { --fh: var(--figure, 4px); --fp: calc(var(--fh) + 3px); line-height: 0; }
-/* a file's icon at the head of its bar, small, and the row as tall as the icon so rows never touch */
-.files .frow:has(> .ficon) { height: max(var(--fp), 12px); }
-.files .frow > .ficon { width: 10px; height: 10px; margin: 0 3px 0 0; }
 .files .frow { position: relative; display: flex; align-items: center; gap: 1px; height: var(--fp); }
 .files .frow i { flex: none; height: var(--fh); border-radius: calc(var(--fh) / 2); background: var(--door); opacity: .85; }
 .files .frow i.q { opacity: .35; }
@@ -9560,7 +9554,6 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .files .fkids > .fnode { position: relative; }
 .files .fkids > .fnode::before { content: ""; position: absolute; left: -6px; top: 0; bottom: 0; width: 1px; background: var(--line); }
 .files .fkids > .fnode:last-child::before { bottom: auto; height: calc(var(--fp) / 2 + .5px); }
-.files .fkids > .fnode:last-child:has(> .frow > .ficon)::before { height: calc(max(var(--fp), 12px) / 2 + .5px); }
 .files .fkids > .fnode > .frow::before { content: ""; position: absolute; left: -6px; top: calc(50% - .5px); width: 5px; height: 1px; background: var(--line); }
 .tree .sprout { margin: 0 0 3px var(--under, 19px); cursor: pointer; }
 .tree .row:is(:hover, .lit) + .sprout .frow i { opacity: 1; }
