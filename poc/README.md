@@ -45,12 +45,12 @@ Reading the whole of this level against the rule turns up faults in the rule's o
 
 Seven of the rule's faces run past [the flag](practice.md#53-the-check-flags-a-face-past-four-hundred-characters): 2.2, 3.2.1, 4, 4.4, 5.2, 5.4 and 5.5. Each is one paragraph carrying its claim and its ground together, and each would break at a sentence into a face and the paragraph beneath, with no word changed.
 
-[Section 3.3](../rule.md#33-the-ground) gives four grades and three statuses, and everything written under the rule uses two more: open, for a question not yet answered, and a trial, for a thing tried by a setting. The rule could name open as the status of a question, since every level here ends with one.
+[Section 3.3](../rule.md#33--the-ground) gives four grades and three statuses, and everything written under the rule uses two more: open, for a question not yet answered, and a trial, for a thing tried by a setting. The rule could name open as the status of a question, since every level here ends with one.
 
 [Section 4](../rule.md#4-the-principles) says the grounds are linked at the end, and no link stands at the end; the empty link in that sentence is the one there is.
 
 [Section 4.2](../rule.md#42-the-order-of-a-holarchy)'s confidence line, measured once and one level deeper reading shorter while holding more, did not parse for two cold readers. And section 3.3 asks every claim to say its confidence, while sections 1, 2, 3, 5 and 6 carry no line at all.
 
-Three words: [3.2.2](../rule.md#322-the-link) "the gradients holarchy" wants an apostrophe, [4.3](../rule.md#43-work-in-progress) "in what grounds" reads as a slip, and [4.4](../rule.md#44-a-story-carries-the-causes) "has lived or am able to imagine" wants "is".
+Three words: [3.2.2](../rule.md#322--the-link) "the gradients holarchy" wants an apostrophe, [4.3](../rule.md#43-work-in-progress) "in what grounds" reads as a slip, and [4.4](../rule.md#44-a-story-carries-the-causes) "has lived or am able to imagine" wants "is".
 
 One more, found on 2026-09-19: the rule gives "grade" to a claim's confidence, and the surface had taken the same word for a brief's fold state and again for how dark an icon is drawn. The surface gives it back; whether the rule wants to say anything about a word it owns is the author's.

@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 16 16" width="32" height="32">
+<svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 16 16" width="20" height="20">
 <style>
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
 </style>
 <circle class="s" cx="8" cy="8" r="6"/><circle class="s" cx="8" cy="8" r="2"/>
 </svg>

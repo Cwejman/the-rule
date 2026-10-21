@@ -132,7 +132,7 @@ It warns of a written heading number that disagrees with a brief's place, two br
 
 ## 4. The address sits after a hash
 
-The page's URL holds the address of the brief in focus, and after `?in=` [the scope](lane.md#7-scoping-the-lane), when the lane is scoped:
+The page's URL holds the address of the brief in focus, and after `?in=` [the scope](lane.md#7--scoping-the-lane), when the lane is scoped:
 
 ```
 surface.html#/the-proof-of-concept/the-surface/reading-and-orientation-come-apart?in=the-proof-of-concept/the-surface

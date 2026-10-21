@@ -63,7 +63,7 @@ Vertically a wing's figures reach no further up or down than the prose does. The
 
 Any area empties by hand, from [the strip](#3-the-strip), where a widget is cycled off the side that held it. An area holding nothing takes no room at all, and the strip stands where it always stands, so the area fills again from there.
 
-*Reasoned, the author's, 2026-09-13; the cycle, 2026-09-16. Superseded wide on 2026-10-01 by [the dock](layout.md#7-the-dock), whose press takes a program away and puts it back.*
+*Reasoned, the author's, 2026-09-13; the cycle, 2026-09-16. Superseded wide on 2026-10-01 by [the dock](layout.md#7--the-dock), whose press takes a program away and puts it back.*
 
 ### 2.5 What an area holds
 
@@ -111,7 +111,7 @@ The history's switch is no cycle, since a mode has no side, so it carries no dot
 
 The row stands where the middle stands, which is always, so no choice is ever out of reach at any width.
 
-*Reasoned, the author's decision of 2026-09-16, from a survey of [the row per area](refused.md#x-a-row-of-icons-at-the-foot-of-every-area) across eighteen widths and seven configurations. Superseded wide on 2026-10-01 by [the dock](layout.md#7-the-dock), which keeps its four weights of ink; the history's switch stands only at the foot of a phone, where its one pane is turned to the history and back.*
+*Reasoned, the author's decision of 2026-09-16, from a survey of [the row per area](refused.md#x-a-row-of-icons-at-the-foot-of-every-area) across eighteen widths and seven configurations. Superseded wide on 2026-10-01 by [the dock](layout.md#7--the-dock), which keeps its four weights of ink; the history's switch stands only at the foot of a phone, where its one pane is turned to the history and back.*
 
 ### 3.1 Four weights of ink
 
@@ -135,7 +135,7 @@ A lone pane pressed moves to the right where what it pushed out can come back to
 
 Every widget reads one state and nothing else, and acts through the same few verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7-scoping-the-lane), and to open a reading or close it.
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7--scoping-the-lane), and to open a reading or close it.
 
 Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 
@@ -157,7 +157,7 @@ An entry also says whether its act can be taken at all, so a badge for an act ou
 
 The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6--settings), which is a wing widget like any other.
 
-The type: the zoom on the prose, the ratio by which each heading register grows over the body, and the height of the prose's lines. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4-where-you-are-is-the-brief-in-focus), the fade at the edges, whether the room left over is spread or centred, and the edge the dock stands along. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4-where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the layout: the row of columns and what each stacks, and the gutters of each prose, by default the shape, the body's prose with the links in its right gutter, and the ahead.
+The type: the zoom on the prose, the ratio by which each heading register grows over the body, and the height of the prose's lines. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4--where-you-are-is-the-brief-in-focus), the fade at the edges, whether the room left over is spread or centred, and the edge the dock stands along. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4--where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the layout: the row of columns and what each stacks, and the gutters of each prose, by default the shape, the body's prose with the links in its right gutter, and the ahead.
 
 The lane's measure and the canvas's greatest width were settings with a meter each until 2026-10-01, when the gaps between columns came to size them, and where the lane stands alone the widget of each area is still kept for it.
 

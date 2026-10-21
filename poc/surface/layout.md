@@ -10,7 +10,7 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7-the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
+It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7--the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
@@ -106,7 +106,7 @@ As the screen narrows, every column shrinks toward its program's least width, th
 
 Of two as far, the one at the right gives way first. A world's canvas gives way before that world's prose, wherever they stand, so a prose brought in by going is never the first to go.
 
-Once only the body's prose is left in the row it narrows as the screen does: its gutters, then its measure. Where no prose of the body stands, the row gives way from its right end, and whichever column is left last narrows as the screen does. Each program of a column given way stands in [the dock](#7-the-dock) between the quiet and the light, as a widget denied its room does today.
+Once only the body's prose is left in the row it narrows as the screen does: its gutters, then its measure. Where no prose of the body stands, the row gives way from its right end, and whichever column is left last narrows as the screen does. Each program of a column given way stands in [the dock](#7--the-dock) between the quiet and the light, as a widget denied its room does today.
 
 *The sharing is the author's, 2026-10-05, that what can be resized shrinks to make room, the prose and the canvas alike; it supersedes the body's prose keeping its width while the rest shrank. The rest is reasoned, the session's, 2026-10-01, not yet answered, from [the order today](framework.md#28-giving-way), the pane beside the lane first, the right before the left and the lane last. It departs from it on the gutters, which today give way before the wings and here only once the body's prose is left alone in the row, and in letting the columns at the ends give way before a map beside the prose, where today that map goes first.*
 
@@ -180,7 +180,7 @@ A program of git's has its own icon carrying git's glyph as a mark, in the dock 
 
 *Reasoned, the session's, 2026-10-01: the author asked whether git's programs need chrome of their own to be told apart, and let the grip in its place stand; the glyph as a mark on each program's own icon is the session's, not yet answered.*
 
-## 7. The dock
+## 7. ![A row of icons on a bar beneath the page](.img/dock.icon.svg) The dock
 
 The dock is what the strip becomes. It holds every program once, in groups set apart by room: git's status, git's prose and git's canvas; then the prose, the canvas and the plate; then the figures: the shape, the tree, the ahead, the settings and the keys. It stands down the left edge or along the foot, which is a setting, and it keeps the strip's four weights of ink.
 
@@ -208,7 +208,7 @@ The dock's tooltip names an icon's letter, and [the keys](widgets.md#8--the-keys
 
 *The author's ask of 2026-10-20, a letter to toggle each widget. Which letter each takes, shift for git's prose and canvas, and the group in the keys are the session's.*
 
-## 8. Layouts kept by number
+## 8. ![Four squares in a grid](.img/layouts.icon.svg) Layouts kept by number
 
 A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or from an overview the dock opens: the layouts as cards in a grid, each the page it lays drawn small, with a plus that adds one. A layout is how the page is laid, never where the reader stands in it.
 
@@ -284,7 +284,7 @@ Where the page is too narrow for anything to stand beside the body's prose at th
 
 ## 9. What is built, and what is not
 
-Everything above is built wide but the meeting of the two worlds: the row on 2026-10-01, and [the layouts](#8-layouts-kept-by-number) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
+Everything above is built wide but the meeting of the two worlds: the row on 2026-10-01, and [the layouts](#8--layouts-kept-by-number) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
 
 Where the lane stands alone a phone keeps its reading as it was: one pane, the rail, and a switch at the foot that turns the pane to the history and back, which is the mode kept for a phone. The way down stands a head's room lower wide, so the heads have the top edge to themselves.
 

@@ -10,7 +10,7 @@ kind: brief
 ![A close view of a Yamaha DX7's panel: the printed diagrams of its operator algorithms in a row above teal membrane buttons labelled algorithm, feedback and keyboard level scaling, the far end soft out of focus](.img/resonance.webp)\
 The DX7's algorithms and its feedback button, in [Leo-setä's photograph](https://commons.wikimedia.org/wiki/File:Yamaha_DX7_settings.jpg) under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
 
-The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321-the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322-the-link). Neither is two wholes driving each other at once.
+The rule gives two joins: [a brief holds smaller briefs beneath it](../rule.md#321--the-holarchy), and [a link reaches what lies elsewhere](../rule.md#322--the-link). Neither is two wholes driving each other at once.
 
 This asks how that is done, by asking it of the one field that has answered it in working machines, and brings back what the answer requires.
 
@@ -53,7 +53,7 @@ The discipline is exactly the rule's: nothing reaches into anything, each declar
 
 ## 4. What this gives the rule
 
-Mutual driving is a third relation beside [nesting](../rule.md#321-the-holarchy) and [the link](../rule.md#322-the-link), and it costs two things. A port, where each holon says what leaves it and takes what arrives, and never the other's inside. And a delay, which is what keeps each one whole; remove it and the two collapse into one thing that cannot be solved.
+Mutual driving is a third relation beside [nesting](../rule.md#321--the-holarchy) and [the link](../rule.md#322--the-link), and it costs two things. A port, where each holon says what leaves it and takes what arrives, and never the other's inside. And a delay, which is what keeps each one whole; remove it and the two collapse into one thing that cannot be solved.
 
 The meeting itself is a holon of its own. The friction of the bow belongs neither to the bow nor to the string; it is where their two characteristics cross, and it has to be somewhere. So a substrate that lets parts drive each other needs a place for junctions, and they are parts like any other.
 

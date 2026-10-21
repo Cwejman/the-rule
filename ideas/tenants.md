@@ -13,7 +13,7 @@ These are the cases as they occur, between the study and the project's vision: e
 
 *The author's, held open and marked so; begun 2026-09-11.*
 
-## 1. Sound
+## 1. ![A wave](.img/sound.icon.svg) Sound
 
 Sound is the first tenant after knowledge, and a digital audio workstation is how the substrate would hold it. A patch, an instrument's configuration, is a brief: whole, readable alone, and a part of a track, which is a part of an arrangement, which is a part of a piece.
 
@@ -27,7 +27,7 @@ A listener or a collaborator enters at the piece and descends as far as their ne
 
 ### 1.2 Every edit is a step
 
-[A step](../rule.md#52-the-step) is the holon viewed by its change, so a session at the workstation leaves a record as a writing session does. A track can be branched on its own without the whole piece carrying the conflict, and the ways in are hospitable as anywhere: by instrument, by section, by the last change, by the session that made it.
+[A step](../rule.md#52--the-step) is the holon viewed by its change, so a session at the workstation leaves a record as a writing session does. A track can be branched on its own without the whole piece carrying the conflict, and the ways in are hospitable as anywhere: by instrument, by section, by the last change, by the session that made it.
 
 ### 1.3 People make a track together as they make knowledge together
 
@@ -37,7 +37,7 @@ Each lays down a group or a bus of their own, a holon that is theirs and a part 
 
 It still exists, for public listening: the surface handed to whoever only wants to hear it, with the whole beneath for whoever wants to build on it. That one distinction is the rule's heart in sound. The walls come down, the glue goes, and building on another's work becomes first class.
 
-## 2. Image
+## 2. ![A framed picture of hills and a sun](.img/image.icon.svg) Image
 
 The visual holds the same way, and it brings the other half of the interface with it. A node-based environment such as [TouchDesigner](https://derivative.ca/) appears to the author, from memory and unexamined, to work already as a holarchy of operators: each node whole, readable alone, and a part of a network, with the signal flowing through as the buffers flow under a patch.
 
@@ -49,7 +49,7 @@ That is where the associative interface comes from: prose and the visual in one 
 
 *Reasoned, the author's, the same night as sound; nothing built.*
 
-## 3. The social, as a product across tenants
+## 3. ![Two people side by side](.img/social.icon.svg) The social, as a product across tenants
 
 The third case is not a domain but what happens between them. Sharing music is the example: today it is a feature of a platform that holds the people, the channel and the music behind one wall. Over the substrate the music is an entry in the sound tenant, the people are entries of their own, and the sharing is a connection between them, with nothing in the middle.
 
@@ -75,7 +75,7 @@ A digital commodity provider, in the author's naming: it holds the royalty, the 
 
 A job market holds the same way, an exchange as a market hub: the offers and the people are entries, the matching is the connection, and the market is whoever hosts the connecting rather than whoever owns the listing.
 
-## 4. The surface, off the screen
+## 4. ![A page stepping out of a screen](.img/off-screen.icon.svg) The surface, off the screen
 
 Not a domain but a form the reading of any of them could take, [the surface](../poc/surface/README.md) taken off the screen. Projected on a wall, level of detail becomes physical. Several projectors, aimed from different positions at one surface, lay holons over each other at different densities: the piece in focus fine and close, its neighbours coarser behind it, so depth is made of resolution rather than of pages.
 
@@ -85,7 +85,7 @@ It is the same gradient the reader draws, given room and a body: what is let go 
 
 *Reasoned, the author's, 2026-09-11; nothing built, and no domain depends on it.*
 
-## 5. The live edge
+## 5. ![A pulse](.img/live-edge.icon.svg) The live edge
 
 Not a domain but the edge of every one. Every case above has an edge where the world comes in: a stream, a sensor, a market feed, a message from another host. The substrate holds those too, as connections to external sources kept live rather than as data copied in.
 

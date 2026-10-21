@@ -97,7 +97,7 @@ Files that stand on a ratified one are not bound by it, and may change as freely
 
 A paragraph that is nothing but a link places a part there: the file it names is read, and it stands at that point as a whole of its own. It is the one way a part is connected, and [the surface draws it as a card](surface/lane.md#12-a-placed-part-raises-a-card), the part's own title and face standing in the prose as a figure does.
 
-A brief may place any number of parts, anywhere in its prose, and a link inside a sentence places nothing: it stays [an offer](../rule.md#322-the-link) like any other.
+A brief may place any number of parts, anywhere in its prose, and a link inside a sentence places nothing: it stays [an offer](../rule.md#322--the-link) like any other.
 
 *The author's decision, 2026-09-18. It replaces the practice of 2026-09-12, which gave every part a brief of its own in the entry: that forced a layer of headings nobody wanted, and the card gives the part its presentation without one.*
 
@@ -227,7 +227,7 @@ Bulleted and numbered lists carry a blank line between items, so they read as ea
 
 ### 5.5 The confidence line stands last
 
-A brief closes with its confidence line, set apart in italics, so [what the rule asks written](../rule.md#33-the-ground) has one place and a reader finds it without reading for it.
+A brief closes with its confidence line, set apart in italics, so [what the rule asks written](../rule.md#33--the-ground) has one place and a reader finds it without reading for it.
 
 It carries the grade, measured, seen, reasoned or preferred, or the status, in force, fulfilled or superseded, with the date and the ground in a phrase. A question not yet answered carries open, and a thing tried by a setting, a trial; both are statuses the arc added.
 
@@ -384,13 +384,13 @@ A brief may carry an icon, written in its heading after its number, where it sta
 ## 2. ![A tree of three rows](.img/tree.icon.svg) The tree
 ```
 
-It is drawn as [a file's icon is](#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it), on a 16-unit square in one hand, and kept in an `.img` as any image is. It is the brief's mark wherever the brief is named in a line: its heading, its row in the tree, the way down, its card. A file's icon stands in the tree's lines, where a file opens; a brief's stands after its number, in its name, and quieter, so the two are told apart by where they stand.
+It is drawn as [a file's icon is](#871-the-graphic-is-drawn-in-one-hand-with-an-icon-beside-it), on a 16-unit square in one hand, and kept in an `.img` as any image is. Its file says twenty pixels square, since a renderer that draws an image at its own size, GitHub among them, then stands it at a heading's height, and its ink falls back to a light pair and a dark one by the reader's scheme, since there it is an image the page's palette does not reach. GitHub also makes it a link to its own file, as it makes every image. It is the brief's mark wherever the brief is named in a line: its heading, its row in the tree, the way down, its card. A file's icon stands in the tree's lines, where a file opens; a brief's stands after its number, in its name, and quieter, so the two are told apart by where they stand.
 
 How many briefs carry one is the writer's to judge, at any depth. An icon marks a brief a reader comes back to, as a tab marks a page, and it tells only while few do; a level where every brief carries one has decorated its headings rather than marked them.
 
 The icon is no part of the title, so the brief's address is its title's as before. A heading's anchor is read from its text as a renderer reads it, which keeps the space the icon stood in: `## 2. ![…](…) The tree` is anchored `#2--the-tree`, and a link to the heading before it carried the icon is to be written again, which [the check](skill.md#32-links-and-images) names.
 
-*The author's ask of 2026-10-21, an icon for a brief beside its heading as a file has one, inline as an emoji is rather than large above it; at any depth and as many as the writer judges, the author's the same day, a rule of only the top level being too strict. After the number and quieter than a file's, the session's, which the author took.*
+*The author's ask of 2026-10-21, an icon for a brief beside its heading as a file has one, inline as an emoji is rather than large above it; at any depth and as many as the writer judges, the author's the same day, a rule of only the top level being too strict. After the number and quieter than a file's, the session's, which the author took. Twenty pixels and the dark fallback, the session's, read from how GitHub draws an image in a heading.*
 
 ## 9. Reading and moving by script
 

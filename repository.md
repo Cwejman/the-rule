@@ -54,7 +54,7 @@ The plan is for the rule to become this repository's root entry, leading out to 
 
 ### 2.2 Why it could not wait
 
-Hjulverkstan is taking the proof of concept up, and a closed-source client began with it the week of 2026-09-07 from a copy of the rule. That is [the drift the rule warns of](rule.md#33-the-ground): a copy quietly becomes a second rule. The biggest win within reach was the move itself, so it was taken first.
+Hjulverkstan is taking the proof of concept up, and a closed-source client began with it the week of 2026-09-07 from a copy of the rule. That is [the drift the rule warns of](rule.md#33--the-ground): a copy quietly becomes a second rule. The biggest win within reach was the move itself, so it was taken first.
 
 *Seen, in the three projects, 2026-09-14.*
 

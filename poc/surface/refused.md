@@ -108,13 +108,13 @@ The author found it strange: a brief's children stood at the bottom of the figur
 
 Every brief a little dimmer the further it stood from the reading line, continuously.
 
-The author could not read what it meant. [One step](lane.md#4-where-you-are-is-the-brief-in-focus) says it: the focus whole, the rest dimmer, and the prose fading only at the edges of the viewport.
+The author could not read what it meant. [One step](lane.md#4--where-you-are-is-the-brief-in-focus) says it: the focus whole, the rest dimmer, and the prose fading only at the edges of the viewport.
 
 ## q. Folding to the heading alone
 
 A third state beneath the face: the brief as a bare name.
 
-Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [the two states](lane.md#2-folded-to-its-face-or-whole) suffice, and folding becomes one act with one inverse.
+Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [the two states](lane.md#2--folded-to-its-face-or-whole) suffice, and folding becomes one act with one inverse.
 
 ## r. A fold mark beside the heading
 

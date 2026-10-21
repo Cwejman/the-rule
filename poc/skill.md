@@ -15,7 +15,7 @@ Nothing in it need be kept as code: the substrate is prose, and a script is a se
 
 ## 1. Read by depth
 
-A file is read the way [the gradient](../rule.md#31-the-gradient) is laid: its title and first paragraph, then each heading with the first paragraph under it, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
+A file is read the way [the gradient](../rule.md#31--the-gradient) is laid: its title and first paragraph, then each heading with the first paragraph under it, then one level deeper, and so on to the depth the work needs. A script that prints headings with the paragraph under each, to a chosen depth, gives a session the shape of a piece for a fraction of reading it whole.
 
 [A lone link](practice.md#3-a-lone-link-places-a-part) is where the file ends. What it places is not in this file, so a session that reads an entry to its depth has read what the entry says and not what its parts give, and reading on means opening each file and reading it the same way. That is the same act the reader makes at [a boundary](practice.md#11-a-file-is-one-linear-reading), and a session pays it for the same reason: depth here is cheap, and depth across every boundary at once is the whole body.
 
@@ -25,13 +25,13 @@ The whole is held that way, by depth, and a brief is read in full only where the
 
 ## 2. Address by number
 
-A brief is named by [its number](practice.md#4-headings-carry-numbers) and its file: `reading/professionals.md` §7. A script finds a brief by that address, prints it, cuts it, places it whole elsewhere, or swaps it for a new whole. That is how a brief that held is [moved and never retyped](../rule.md#53-the-rounds), and how a rewrite touches only the brief named.
+A brief is named by [its number](practice.md#4-headings-carry-numbers) and its file: `reading/professionals.md` §7. A script finds a brief by that address, prints it, cuts it, places it whole elsewhere, or swaps it for a new whole. That is how a brief that held is [moved and never retyped](../rule.md#53--the-rounds), and how a rewrite touches only the brief named.
 
 *Seen, in the labs.*
 
 ## 3. Check after every round
 
-Inserting or moving a brief renumbers every heading after it, and every pointer written by number goes stale without any link breaking. So after every [round](../rule.md#53-the-rounds) the tree is checked for what a move breaks, and a round is not done until every list beneath is empty, the orphans and the faces kept with a reason aside.
+Inserting or moving a brief renumbers every heading after it, and every pointer written by number goes stale without any link breaking. So after every [round](../rule.md#53--the-rounds) the tree is checked for what a move breaks, and a round is not done until every list beneath is empty, the orphans and the faces kept with a reason aside.
 
 [The surface's](surface/README.md) own check prints the links, the images, the placements and the faces for a tree it traces, run from [the arc's](../README.md) folder:
 
@@ -145,6 +145,6 @@ The count stands in the confidence line of the session's story, in one sentence:
 
 ## 9. Amending in place is not drawn
 
-[The rule draws the line](../rule.md#53-the-rounds) at a word: every brief a change reaches is written whole, unless the fix is a word. Where the line falls between a word and the whole, when a change is smaller than the brief and larger than a word, is not drawn; the rounds so far wrote whole where the understanding changed and amended where it did not.
+[The rule draws the line](../rule.md#53--the-rounds) at a word: every brief a change reaches is written whole, unless the fix is a word. Where the line falls between a word and the whole, when a change is smaller than the brief and larger than a word, is not drawn; the rounds so far wrote whole where the understanding changed and amended where it did not.
 
 *Open; seen in five rounds of one run.*

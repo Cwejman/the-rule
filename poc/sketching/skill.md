@@ -68,7 +68,7 @@ A sketch is laid on a grid of four pixels, drawn at 600 wide or narrower, the la
 
 ## 4. The loop
 
-A sketch is made in the steps a brief is, [the rule's rounds](../../rule.md#53-the-rounds) turned on a drawing, with [the tool](implementation.md) at each step.
+A sketch is made in the steps a brief is, [the rule's rounds](../../rule.md#53--the-rounds) turned on a drawing, with [the tool](implementation.md) at each step.
 
 First an outline in a few lines, not in SVG: what the sketch shows, which form, its parts, and the sentence that will stand beneath it. If the sentence cannot be written, the sketch has nothing to say.
 

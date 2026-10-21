@@ -18,7 +18,7 @@ Roles already exist in an existing product. In building one they are not set ear
 
 *The author's words of 2026-09-15, moved here from the entry above and ratified in their new place 2026-09-18.*
 
-## 1. Goals give the tool its purpose
+## 1. ![A flag](.img/goals.icon.svg) Goals give the tool its purpose
 
 A goal says what should become or remain true. The highest goals are unconditional: they express the enduring good without carrying today's process, roles or tool inside them.
 
@@ -26,7 +26,7 @@ Goals become more situated as understanding deepens. Conditions such as scope, t
 
 *Ratified by the author, 2026-09-14.*
 
-## 2. Work is one recursive kind
+## 2. ![A loop turning within a loop](.img/work.icon.svg) Work is one recursive kind
 
 Work is what is done in service of a goal. A whole undertaking can break into smaller work, and each part can break again as far as understanding needs.
 
@@ -50,7 +50,7 @@ Where no larger work gives the parts a more comprehensible whole, they remain fl
 
 *Ratified by the author, 2026-09-14.*
 
-## 3. Roles locate responsibility today
+## 3. ![A person](.img/roles.icon.svg) Roles locate responsibility today
 
 A role is where responsibility, judgment and the comprehension needed for that judgment presently meet. It records the current arrangement without prescribing how a future solution divides the work.
 
@@ -58,7 +58,7 @@ Responsibility is the relation that says a role answers for a goal. Work may inv
 
 *Ratified by the author, 2026-09-14.*
 
-## 4. The tool emerges through requirements and design
+## 4. ![A seedling](.img/emerges.icon.svg) The tool emerges through requirements and design
 
 A goal becomes a requirement when it is made binding on a design or implementation. The highest goals can stand before a solution, but situated requirements cannot be completed in isolation from design.
 
@@ -66,7 +66,7 @@ Each design step introduces the least tool needed to test the present understand
 
 *Ratified by the author, 2026-09-14.*
 
-## 5. Interviews advance the ground for toolmaking
+## 5. ![Two speech bubbles](.img/interviews.icon.svg) Interviews advance the ground for toolmaking
 
 An interview begins from what is already held, tests it against another person's experience and leaves changed ground for what follows. The interviews are successive movements of comprehension, not independent accounts collected for synthesis at the end.
 

@@ -44,7 +44,7 @@ The rule is not something you move into. It compounds on prose, and prose is alr
 
 You now hold why the rule exists and what it is for. This section gives what knowledge is made of under it. The gradient is the thesis given shape. The brief is the part that carries one understanding. The ground is what keeps a brief true for whoever stands on it next.
 
-### 3.1 The gradient
+### 3.1 ![Growth rings, wide at the heart and fine at the edge](.img/gradient.icon.svg) The gradient
 
 Reading is linear. A reader takes one thing after another, and prose can be laid in only one order. Knowledge is not linear: what matters most stands on many things. So the order has to be chosen, and two forces pull on it. Importance wants the biggest understanding first. Comprehension allows only what can be understood from what the reader already holds.
 
@@ -61,7 +61,7 @@ So the gradient is won one part at a time. Take any part and ask whether its mos
 
 Why before how follows. The understanding at the top is real but not yet practical, and each step down is taken knowing what it is for. This is the rule's thesis, and everything else in it serves it.
 
-### 3.2 The brief
+### 3.2 ![A leaf](.img/brief.icon.svg) The brief
 
 A part on the gradient is a brief: one piece of prose that gives one understanding, handed whole. It may make several points, but they add up to one thing. Everything the understanding needs is in the brief or pointed out of it, and that is what makes a brief a checkpoint.
 
@@ -73,19 +73,19 @@ What holds between briefs holds inside one: the prose of a brief is laid by the 
 
 A brief joins the rest of the knowledge in two ways. What it gives without, the smaller understandings, stand as briefs beneath it. What it relates to but does not carry, wherever that lies, it points to. The first is the holarchy, the second the link.
 
-#### 3.2.1 The holarchy
+#### 3.2.1 ![A circle holding three smaller circles](.img/holarchy.icon.svg) The holarchy
 
 Briefs beneath briefs make a holarchy, and the word is chosen because it says more than hierarchy does. A hierarchy says only how the parts rank, above and below. A holon is a whole that is also a part, and a holarchy is an order made of them, so the word says of every brief what the rule needs said: it stands whole and can be read alone, it is a part of the understanding above it and is itself broken down beneath, and it is free to relate beyond its place by linking.
 
 So a brief with everything beneath it is a holon, and the holarchy is the gradient made concrete: the bigger understanding above, the smaller ones it did not need beneath, all the way down.
 
-#### 3.2.2 The link
+#### 3.2.2 ![Two rounds joined by a thread](.img/link.icon.svg) The link
 
 Nesting gives a brief its place in the gradients holarchy, and the link gives it its free relations. What a brief relates to may lie anywhere in the knowledge, above it, beneath it, or in another branch altogether, and the link reaches it. The order is one; the relations are many.
 
 A link is an offer, never a missing piece. The brief reads whole without it, and the sentence around it says what following it gives, so the reader chooses in the open, as at every checkpoint. A link points back, to what was given elsewhere, or forward, to what is not yet given. Forward links are few, because the gradient already puts ground before what stands on it.
 
-### 3.3 The ground
+### 3.3 ![A shoot above the soil and its root beneath](.img/ground.icon.svg) The ground
 
 A brief is read once and stood on for long after, and peoples' knowledge compounds only as far as its briefs are safe to stand on. Two things make them safe.
 
@@ -172,7 +172,7 @@ A model infers; it does not comprehend. The rule does not say how to come closer
 
 Inference makes the most of what is in front of it. A model may bring a great deal from its training, but it is still inference over what it holds, and what is new comes from research, from people, and from the work itself. So the rule's work is on the material at hand: taken whole, asked what it really has to say, laid by the gradient.
 
-### 5.2 The step
+### 5.2 ![A flight of steps](.img/step.icon.svg) The step
 
 The tool of the step is the outline: the brief of work not yet done. It says what is to be conveyed, in what order, with what beneath, in simple terms and not in prose, so it is cheap to reason about and cheap to check, and a fault caught there is never written. Talking a thing through before committing to it is the same move, in a session as in a text. And the first step with any material is the same: not to rebuild it under the rule, but to ask what is here, in a session that holds it, and to talk before deciding what to make of it, which is usually an addition to a structure that already stands.
 
@@ -180,7 +180,7 @@ In practice it is one move. A brief reads heavy, and someone asks what we really
 
 But an outline is not the whole. Whoever writes from it without holding the whole writes a copy of a copy, so the whole is never handed off in slices. Whether reasoning in outline alone can carry the quality is open.
 
-### 5.3 The rounds
+### 5.3 ![A circle closing on itself](.img/rounds.icon.svg) The rounds
 
 What is known to work is to write the whole, since which understandings are biggest is known only against the depth beneath them, then read it under the rule brief by brief, asking of each what it really has to say, in its place among the others and in its prose, and write it again from that. The rounds end when one changes only words.
 
