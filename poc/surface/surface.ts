@@ -4253,22 +4253,12 @@ function shapeSvg(W: number, H: number): string {
     const bars = l.blocks
       .map((b) => blockRect(b.kind, x + Math.round(bar * (b.left ?? 0)), 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(b.left === undefined ? 4 : 2, Math.round(bar * b.width) - (b.left === undefined ? 0 : 1)), Math.max(1.2, b.height * k - 1), b.card ? `data-a="${esc(b.card)}" ${hued(b.card)}` : ""))
       .join("");
-    // a brief's icon stands in the room its nesting leaves to the left of its blocks, beside its heading, where nothing
-    // else is drawn; a brief at the scope's own depth has no such room, and the rail none to spare, and a brief drawn
-    // shorter than the icon has none either, since its icon would stand over the next brief's (widgets 3)
-    const b = brief(l.a);
-    const head = l.blocks[0];
-    const side = SHAPE.indent - 1;
-    const glyph =
-      b?.glyph && head && depth > 0 && !rail && l.height * k >= side
-        ? b.glyph.replace(/^(\s*<svg\b)([^>]*)>/, (_, open: string, attrs: string) => `${open}${attrs.replace(/\s(width|height|x|y)\s*=\s*"[^"]*"/g, "")} x="${x - SHAPE.indent}" y="${(4 + head.top * k + Math.max(0, head.height * k - side) / 2).toFixed(1)}" width="${side}" height="${side}">`)
-        : "";
     const top = (4 + l.top * k).toFixed(1);
     const height = Math.max(1, l.height * k).toFixed(1);
     return (
       `<g class="cell${l.a === state.focus ? " here" : ""}" data-a="${esc(l.a)}" ${hued(l.a)}>` +
       (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${bar + 5}" height="${height}"/>`) +
-      `${bars}${glyph}</g>`
+      `${bars}</g>`
     );
   });
   // the band stands half the rail's own inset clear of its rows, and the same clear of its edge, so it is not pressed
