@@ -2879,14 +2879,14 @@ function tileHtml(a: string, related = false): string {
     return (
       `<div class="card tile pictured${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture, false, -1)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
+      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${titleHtml(b, related)}</h3></div>${besideTitle(a, related, stamp)}${line}</div></div>` +
       `</div>`
     );
   const top = b.picture?.src ? `<div class="tile-picture">${pictureHtml(b.picture, false, 1.6)}</div>` : b.drawing ? `<div class="tile-drawing" aria-hidden="true">${b.drawing}</div>` : "";
   return (
     `<div class="card tile${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
     top +
-    `<div class="tile-text">${related ? whereHtml(a) : ""}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
+    `<div class="tile-text"><h3 class="card-head">${titleHtml(b, related)}</h3>${besideTitle(a, related, stamp)}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
     line +
     `</div>`
   );
@@ -2911,7 +2911,6 @@ function cardHtml(a: string, related = false): string {
   // a related card stands outside the reading: the line passes over it and a step does not stop on it, so it carries no
   // address of the reading's, and a press goes to it in its own tree
   const at = related ? `data-go="${esc(a)}" data-related="${esc(a)}"` : `data-a="${esc(a)}" data-card="${esc(a)}"`;
-  const stampHtml = stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : "";
   // a card whose file carries an image is the image, whole and at its own proportion; its title, stamp and acts stand over
   // its foot on a veil of the page's own ground, blurred and deepening downward, and its face is given up. Unfolded, its
   // prose stands beneath the image with the acts at its foot, as on any card
@@ -2919,15 +2918,14 @@ function cardHtml(a: string, related = false): string {
     return (
       `<div class="card pictured${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
+      `<div class="card-over"><div class="card-top">${iconHtml(b)}<h3 class="card-head">${titleHtml(b, related)}</h3>${besideTitle(a, related, stamp)}</div>${g === "whole" ? "" : line}</div></div>` +
       (g === "whole" ? `<div class="card-body">${blocks(all)}</div>${line}` : "") +
       `</div>`
     );
   return (
     `<div class="card${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
     (b.drawing ? `<div class="card-drawing" aria-hidden="true">${b.drawing}</div>` : "") +
-    (related ? whereHtml(a) : "") +
-    `<div class="card-top"><h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stampHtml}</div>` +
+    `<div class="card-top"><h3 class="card-head">${titleHtml(b, related)}</h3>${besideTitle(a, related, stamp)}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
     `</div>`
@@ -3847,11 +3845,12 @@ function treeHtml(): string {
       sprouted(b),
     );
   const sprouted = (b: Brief): string => (sproutOpen.has(b.address) ? level(b.address).map(sibling).join("") : "");
-  // what a brief relates stands after its level as doors, no part of it: the related brief's icon and name in its own
-  // hue, a slash for the door in place of a fold mark, and no sprout, since its shape is its own tree's
+  // what a brief relates stands after its level as doors, no part of it: a row as any other, its file's icon where a
+  // file is related, its name underlined in its own hue, the mark of a relation after it, and no sprout, since its
+  // shape is its own tree's
   const doorsOf = (b: Brief): string =>
     relatedOf(b)
-      .map((t) => `<div class="row related" data-go="${esc(t)}" data-tip="${esc(prefixesOf(t).slice(1).map((x) => brief(x)?.title ?? "").join(" › "))}" ${hued(t)}>${RELATED_MARK}<span class="name" data-go="${esc(t)}">${glyphHtml(brief(t))}${esc(brief(t)!.title)}</span></div>`)
+      .map((t) => `<div class="row related" data-go="${esc(t)}" data-tip="${esc(prefixesOf(t).slice(1).map((x) => brief(x)?.title ?? "").join(" › "))}" ${hued(t)}>${lead(brief(t)!)}<span class="name" data-go="${esc(t)}">${glyphHtml(brief(t))}${esc(brief(t)!.title)}</span>${RELATED_MARK}</div>`)
       .join("");
   // the reading open as the lane holds it, folds and all
   const outline = (b: Brief): string => {
@@ -3903,18 +3902,24 @@ const iconHtml = (b: Brief | undefined): string => (b?.icon ? `<span class="fico
 /** A brief's icon, where its heading carries one, set at the head of its name wherever it is named, as an emoji would be (practice 8.8). */
 const glyphHtml = (b: Brief | undefined): string => (b?.glyph ? `<span class="bicon" aria-hidden="true">${b.glyph}</span>` : "");
 
-/** The mark of a relation, a link out of the reading: an arrow up and away, on the fourteen grid the tree's marks take. */
-const RELATED_MARK = `<svg class="mark rel" viewBox="0 0 14 14" aria-hidden="true"><path d="M4.5 9.5 9.5 4.5M5.5 4.5h4v4"/></svg>`;
+/**
+ * The mark of a relation, a link out of the reading: an arrow up and away, after the name of what is related wherever it
+ * is named, as a link that leaves a page is marked, so the name's own icon keeps its place before it.
+ */
+const RELATED_MARK = `<svg class="rel" viewBox="0 0 14 14" aria-hidden="true"><path d="M4.5 9.5 9.5 4.5M5.5 4.5h4v4"/></svg>`;
+
+/** A card's title: the brief's icon and its name, and the mark of a relation after it where the card relates it. */
+const titleHtml = (b: Brief, related: boolean): string => `${glyphHtml(b)}${esc(b.title)}${related ? RELATED_MARK : ""}`;
 
 /**
- * Where a related brief lives, told above its card's title in its hue: the mark of a relation, the file it stands in with
- * that file's icon, and its number there, which is as much of the way as a reader needs to know where a press leads.
+ * What a card says beside its title: its file's stamp, or, where it relates a brief within a file, where that brief
+ * lives, the file with its icon and the brief's number there, which is as much of the way as a press needs told.
  */
-const whereHtml = (a: string): string => {
+const besideTitle = (a: string, related: boolean, stamp: string): string => {
   const root = fileRootOf(a);
+  if (!related || root === a) return stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : "";
   const file = brief(root);
-  const n = a === root ? "" : numberIn(brief(a)!, root);
-  return `<div class="card-where chrome">${RELATED_MARK}${iconHtml(file)}<span class="file">${esc(root === "" ? (state.body?.title ?? "") : (file?.title ?? ""))}</span>${n ? `<span class="num">${esc(n)}</span>` : ""}</div>`;
+  return `<span class="stamp card-where chrome">in ${iconHtml(file)}<span class="file">${esc(root === "" ? (state.body?.title ?? "") : (file?.title ?? ""))}</span> <span class="num">${esc(numberIn(brief(a)!, root))}</span></span>`;
 };
 
 function pathHtml(to: string): string {
@@ -9243,11 +9248,14 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a related card is a door out of the reading: it says where it leads above its title, the mark of a relation and the
    way to it in its own hue, and its rim is its hue's rather than dashed */
 .brief .card.related { outline-color: color-mix(in oklch, var(--door) 55%, var(--rim)); }
-.brief .card-where { display: flex; align-items: center; gap: 4px; min-width: 0; margin: 0 0 6px; font-size: .78em; line-height: 1.3; color: var(--on); }
-.brief .card-where .mark.rel { position: static; flex: none; width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.brief .card-where .ficon { margin: 0 0 0 2px; width: 1.15em; height: 1.15em; }
-.brief .card-where .file { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: calc(600 - var(--thin)); }
-.brief .card-where .num { flex: none; color: var(--faint); font-variant-numeric: tabular-nums; }
+/* where a related brief lives stands where a card's stamp does, quiet, the file named with its icon and the number */
+.brief .card-where { display: inline-flex; align-items: center; gap: 3px; min-width: 0; max-width: 55%; }
+.brief .card-where .ficon { margin: 0 1px 0 2px; width: 1.1em; height: 1.1em; }
+.brief .card-where .file { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.brief .card-where .num { flex: none; color: inherit; font-variant-numeric: tabular-nums; }
+/* the mark of a relation follows the name it marks, at the name's height and in its hue */
+svg.rel { display: inline-block; width: .72em; height: .72em; margin-left: .3em; vertical-align: .02em; fill: none; stroke: var(--on); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tree .row.related svg.rel { flex: none; margin-left: -1px; width: 11px; height: 11px; }
 /* the opening stands its file's image beneath the title, before the first prose */
 .opening > .picture { margin: 0 0 1.2em; border-radius: 10px; outline: 1px solid var(--rim); outline-offset: -1px; }
 .opening > .picture + .caption { margin: -.7em 0 1.4em; font-size: .82em; color: var(--muted); }
@@ -9255,7 +9263,6 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 .tree .row.related { cursor: pointer; }
 /* a related row is a door out of the tree, as a card's is: the mark of a relation in its own hue where a fold mark
    stands, and its name underlined in that hue, the way it lives told on pointing */
-.tree .row.related .mark.rel { fill: none; stroke: var(--on); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .tree .row.related .name { color: var(--muted); text-decoration: underline; text-decoration-color: var(--door); text-decoration-thickness: 1px; text-underline-offset: .2em; }
 .tree .row.related:is(:hover, .lit) .name { color: var(--on); }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
