@@ -3755,6 +3755,12 @@ function drawOverview(): void {
 /** The levels of the way laid whole in the tree, around the step that stands in them: the tree's own, and the page's only. */
 const besideOpen = new Set<string>();
 /**
+ * The rows whose sprout was pressed, each standing its level in the tree in place of the figure, a level a press: the
+ * tree's own, a look at what a row hides that moves nothing in the lane, closed again once the pointer leaves the tree
+ * or the reading scrolls (widgets 2.5).
+ */
+const sproutOpen = new Set<string>();
+/**
  * The way the tree's water ran to before the focus last moved, and when it moved: only the stretch newly reached flows,
  * and a tree drawn again while it flows takes it up where it was rather than starting it over.
  */
@@ -3810,7 +3816,7 @@ function treeHtml(): string {
   const lead = (b: Brief): string => (body && b.icon ? `<span class="ficon lead" aria-hidden="true">${b.icon}</span>` : spacer);
   // a row that hides levels draws beneath it the files it holds, as the cards do, under its name
   const sprout = (b: Brief, beside = false): string => {
-    if (settings.treeSprouts !== "shown") return "";
+    if (settings.treeSprouts !== "shown" || sproutOpen.has(b.address)) return "";
     const hides = beside || isCard(b) || (inLane(b.address) && foldOf(b.address) !== "whole");
     return hides && level(b.address).length ? `<div class="sprout">${filesHtml(b.address)}</div>` : "";
   };
@@ -3832,13 +3838,15 @@ function treeHtml(): string {
         : "";
     return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${glyphHtml(b)}${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
   };
-  // a sibling the way passed by: a row as any row of the outline, and pressing it goes there
+  // a sibling the way passed by: a row as any row of the outline, and pressing it goes there; a row whose sprout was
+  // pressed stands its level beneath it as rows of the same kind, each with its own sprout, a level a press
   const sibling = (b: Brief): string =>
     node(
       b.address,
       `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${lead(b)}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${glyphHtml(b)}${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
-      "",
+      sprouted(b),
     );
+  const sprouted = (b: Brief): string => (sproutOpen.has(b.address) ? level(b.address).map(sibling).join("") : "");
   // what a brief relates stands after its level as doors, no part of it: the related brief's icon and name in its own
   // hue, a slash for the door in place of a fold mark, and no sprout, since its shape is its own tree's
   const doorsOf = (b: Brief): string =>
@@ -3854,7 +3862,7 @@ function treeHtml(): string {
     const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
     const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? lead(b) : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${glyphHtml(b)}${esc(b.title)}</span>${stamp(b)}</div>`;
-    const kids = (listed ? level(b.address).map(outline).join("") : "") + (whole ? doorsOf(b) : "");
+    const kids = (listed ? level(b.address).map(outline).join("") : sprouted(b)) + (whole ? doorsOf(b) : "");
     return node(b.address, row + sprout(b, whole && !listed), kids);
   };
   const step = (i: number): string => {
@@ -3874,67 +3882,6 @@ function treeHtml(): string {
 
 /** A block as a figure of the lane draws it: its kind, its height in lines of the lane, and its width as a share of the measure. */
 type ABlock = { kind: "head" | "para" | "image" | "card"; lines: number; width: number };
-
-// ## 3.6 The peek: what a row of the tree hides, raised by a press
-//
-// Pressing a row's sprout raises what the row hides over the page, beside the
-// tree: the brief as a reader would meet it, then the files it holds at a reading
-// size, each named and each heavy section parted out, every name a going. It is
-// raised by a press rather than by resting, so moving into it retargets nothing,
-// and it goes on leaving it, on any scroll, on escape, or with the going it made.
-
-const PEEK = { w: 340, grace: 220 };
-let peekOf: { a: string; from: HTMLElement; leaving: ReturnType<typeof setTimeout> | undefined } | null = null;
-
-function peekHtml(a: string): string {
-  const b = brief(a)!;
-  const face = faceOf(b, 999);
-  return (
-    `<div class="peek-where">${pathHtml(a)}</div>` +
-    `<div class="peek-name" data-go="${esc(a)}">${glyphHtml(b)}${esc(b.title)}</div>` +
-    (face ? `<p class="peek-face">${esc(face)}</p>` : "") +
-    `<div class="peek-tally act">${tallyHtml(a)}</div>` +
-    filesHtml(a, { w: PEEK.w - 28 })
-  );
-}
-
-/** Raises the peek for the row a sprout stands under, beside the tree on the side the reading is, level with the sprout. */
-function raisePeek(a: string, from: HTMLElement): void {
-  if (peekOf?.a === a) return closePeek();
-  closePeek();
-  const el = ui.peek;
-  el.setAttribute("style", hueVars(a));
-  el.innerHTML = peekHtml(a);
-  el.hidden = false;
-  const r = from.getBoundingClientRect();
-  const wing = (from.closest<HTMLElement>(".slot") ?? from).getBoundingClientRect();
-  const w = el.offsetWidth;
-  const h = el.offsetHeight;
-  const right = wing.left + wing.width / 2 < innerWidth / 2;
-  const left = right ? wing.right + 8 : wing.left - w - 8;
-  el.style.left = `${Math.round(clamp(left, 8, innerWidth - w - 8))}px`;
-  el.style.top = `${Math.round(clamp(r.top - 24, 8, innerHeight - h - 8))}px`;
-  from.classList.add("peeked");
-  peekOf = { a, from, leaving: undefined };
-}
-
-function closePeek(): void {
-  if (!peekOf) return;
-  clearTimeout(peekOf.leaving);
-  peekOf.from.classList.remove("peeked");
-  peekOf = null;
-  ui.peek.hidden = true;
-  ui.peek.innerHTML = "";
-}
-
-/** The pointer has left the peek and its sprout: it goes after a moment, so a pointer crossing the gap between them keeps it. */
-function leavingPeek(e: PointerEvent): void {
-  if (!peekOf) return;
-  const over = e.target as Element | null;
-  const within = !!over && (ui.peek.contains(over) || peekOf.from.contains(over));
-  clearTimeout(peekOf.leaving);
-  peekOf.leaving = within ? undefined : setTimeout(closePeek, PEEK.grace);
-}
 
 // ## 3.7 Links: beside each link, its target; at the foot, what points here
 
@@ -4736,7 +4683,7 @@ function filesHtml(a: string, large?: { w: number }): string {
   const own = (x: string): number => state.index!.own.get(x) ?? 0;
   const within = (x: string): number => own(x) + level(x).reduce((n, k) => n + (isCard(k) ? 0 : within(k.address)), 0);
   const placed = (x: string): Brief[] => level(x).flatMap((k) => (isCard(k) ? [k] : placed(k.address)));
-  // large, as the peek draws it, the heaviest file runs the room's width and the rest by the same log, each named
+  // large, the heaviest file runs the room's width and the rest by the same log, each named
   const STEP = large ? 14 : 9;
   const deep = (x: string, d: number): number => Math.max(d, ...placed(x).map((k) => deep(k.address, d + 1)));
   const heaviest = (x: string): number => Math.max(within(x), ...placed(x).map((k) => heaviest(k.address)));
@@ -4744,21 +4691,19 @@ function filesHtml(a: string, large?: { w: number }): string {
   const span = large ? large.w - deep(a, 0) * STEP - 4 : 0;
   const top = large ? logOf(heaviest(a)) : 1;
   const bar = (x: string): string => {
-    const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, a: k.address, w: within(k.address) }));
+    const sections = level(x).filter((k) => !isCard(k)).map((k) => ({ t: k.title, w: within(k.address) }));
     const total = Math.max(1, own(x) + sections.reduce((n, c) => n + c.w, 0));
     const L = large ? Math.max(6, (span * logOf(total)) / top) : clamp(logOf(total) * 11, 3, 90);
     // small, it parts at its three heaviest sections; large, at its five heaviest, since there is room to tell them
     const [many, share] = large ? [5, 0.05] : [3, 0.08];
     const heavy = new Set([...sections].sort((p, q) => q.w - p.w).slice(0, many).filter((c) => c.w / total > share));
-    const runs: { w: number; big: boolean; names: string[]; a?: string }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
+    const runs: { w: number; big: boolean; names: string[] }[] = own(x) > 0 ? [{ w: own(x), big: false, names: [brief(x)!.title] }] : [];
     for (const c of sections) {
       const r = runs[runs.length - 1];
       if (r && !r.big && !heavy.has(c)) (r.w += c.w), r.names.push(c.t);
-      else runs.push({ w: c.w, big: heavy.has(c), names: [c.t], a: c.a });
+      else runs.push({ w: c.w, big: heavy.has(c), names: [c.t] });
     }
-    // large, a section parted out of its bar is a press that goes to it, as its file's name is
-    const goes = (r: (typeof runs)[number]): string => (large && r.big && r.a ? ` data-go="${esc(r.a)}"` : "");
-    return runs.map((r) => `<i${r.big ? "" : ` class="q"`}${goes(r)} style="width:${Math.max(1, (L * r.w) / total - 1).toFixed(1)}px" title="${esc(r.names.join(" · "))}"></i>`).join("");
+    return runs.map((r) => `<i${r.big ? "" : ` class="q"`} style="width:${Math.max(1, (L * r.w) / total - 1).toFixed(1)}px" title="${esc(r.names.join(" · "))}"></i>`).join("");
   };
   const node = (x: string): string => {
     const kids = placed(x);
@@ -5711,7 +5656,7 @@ function commitHtml(b: Brief, c: Commit, after: number): string {
 // From here on the functions touch the document. Each draws one thing from the
 // state, and drawAll draws them all in order.
 
-type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; peek: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement };
+type UI = { header: HTMLElement; crumb: HTMLElement; pull: HTMLElement; tip: HTMLElement; areas: HTMLElement; canvas: HTMLElement; dish: HTMLElement; scroll: HTMLElement; content: HTMLElement; lane: HTMLElement; notice: HTMLElement; parts: { gutterL: HTMLElement; gutterR: HTMLElement }; sheet: HTMLElement; card: HTMLElement; strips: HTMLElement; seams: HTMLElement; heads: HTMLElement };
 let ui: UI;
 
 const all = <T extends Element>(sel: string, root: ParentNode = document): T[] => Array.from(root.querySelectorAll<T>(sel));
@@ -7534,6 +7479,7 @@ const pointer = { x: -1, y: -1, still: false };
 function onScroll(): void {
   // a scroll takes the tooltip away, except the callout, which is the finger's own answer to the scrubbing it caused
   if (!ui.tip.classList.contains("callout")) hideTip();
+  closeSprouts();
   markAway();
   drawShapeCursor();
   drawWater();
@@ -7881,7 +7827,23 @@ const relayRow = (): void => {
   drawWings();
 };
 
+/** Closes the levels the tree's sprouts stood open, which were only a look; a pointer leaving the tree takes a moment first. */
+let sproutsLeaving: ReturnType<typeof setTimeout> | undefined;
+function closeSprouts(): void {
+  clearTimeout(sproutsLeaving);
+  sproutsLeaving = undefined;
+  if (!sproutOpen.size) return;
+  sproutOpen.clear();
+  drawWings();
+}
+
 function onPointerMove(e: PointerEvent): void {
+  // a level a sprout stood open goes once the pointer has left the tree, a moment after, so a pointer passing out and back keeps it
+  if (sproutOpen.size) {
+    const within = !!(e.target as Element).closest?.(".slot:has(> .tree)");
+    if (within) clearTimeout(sproutsLeaving), (sproutsLeaving = undefined);
+    else if (sproutsLeaving === undefined) sproutsLeaving = setTimeout(closeSprouts, 400);
+  }
   // over the overview of the layouts nothing beneath answers, and only the tooltip follows
   if ((e.target as Element).closest?.("#layouts")) return tip(e);
   // after a scroll, a pointer lights a brief only once it has travelled a little: a scroll that comes to rest under a
@@ -7992,6 +7954,10 @@ const onClick = (e: MouseEvent): void => {
   if (t.closest(".canvas") && scrubbing) return;
   const fold = t.closest<HTMLElement>("[data-fold]");
   if (fold) return void cycle(fold.dataset.fold!);
+  // a row's sprout stands its level in the tree in its place, the tree's own and a level a press
+  const sprout = t.closest<HTMLElement>(".tree .sprout");
+  const row = sprout?.previousElementSibling as HTMLElement | null | undefined;
+  if (row?.dataset.a !== undefined) return void (sproutOpen.add(row.dataset.a), drawWings());
   // a step of the tree's way lays its level whole beside it, or closes it back to the step
   const beside = t.closest<HTMLElement>("[data-beside]");
   if (beside) {
@@ -8060,15 +8026,8 @@ const onClick = (e: MouseEvent): void => {
   // a level above, in the shape or the crumb, scopes out to itself
   const scope = t.closest<HTMLElement>("[data-scope]");
   if (scope) return void scopeTo(scope.dataset.scope!);
-  // a row's sprout raises what the row hides beside the tree; a going from the peek takes the peek with it
-  const sprout = t.closest<HTMLElement>(".tree .sprout");
-  if (sprout) {
-    const row = sprout.previousElementSibling as HTMLElement | null;
-    return void (row?.dataset.a !== undefined && raisePeek(row.dataset.a, sprout));
-  }
   const go = t.closest<HTMLElement>("[data-go]");
-  if (go) return void (t.closest("#peek") && closePeek(), goTo(go.dataset.go!));
-  if (peekOf && !t.closest("#peek")) closePeek();
+  if (go) return void goTo(go.dataset.go!);
   const cell = t.closest<HTMLElement>("svg.fig [data-a]");
   if (!cell || scrubbing) return;
   // in the shape the blocks go and the room to their right folds or unfolds; in the other figures a press goes and the modifier folds
@@ -8421,8 +8380,6 @@ function onKeyDown(e: KeyboardEvent): void {
   if ((e.target as HTMLElement).closest("input, textarea")) return;
   if (e.key === "Escape" && drag?.kind === "move") return void (e.preventDefault(), cancelMove());
   if (e.key === "Escape" && overview) return void (e.preventDefault(), raiseOverview(false));
-  // escape closes the peek rather than undoing, as it lets the overview go
-  if (e.key === "Escape" && peekOf) return void (e.preventDefault(), closePeek());
   if (e.key === " ") {
     e.preventDefault();
     if (space) return;
@@ -8550,9 +8507,6 @@ function onFirstTouch(): void {
 /** Wires the gestures: which of them listens to what, on the page and on each world's own elements. */
 function wire(): void {
   document.addEventListener("pointermove", onPointerMove);
-  document.addEventListener("pointermove", leavingPeek);
-  // the peek goes the moment anything scrolls, a wheel anywhere but the peek's own room or a scroll of the reading
-  document.addEventListener("wheel", (e) => peekOf && !ui.peek.contains(e.target as Node) && closePeek(), { passive: true, capture: true });
   document.documentElement.addEventListener("pointerleave", onPointerLeave);
   document.addEventListener("click", (e) => runIn(worldOfEl(e.target as Element), () => onClick(e)));
   // a drag acts in the world it began in, to its end
@@ -8588,7 +8542,7 @@ function wire(): void {
     pinchOn(d.canvas, w);
     scrubOn(d.crumb, w);
     imagesOn(d.lane, w);
-    d.scroll.addEventListener("scroll", () => (closePeek(), requestAnimationFrame(() => runIn(w, onScroll))), { passive: true });
+    d.scroll.addEventListener("scroll", () => requestAnimationFrame(() => runIn(w, onScroll)), { passive: true });
   });
   window.addEventListener("hashchange", onHashChange);
   window.addEventListener("resize", onResize);
@@ -8679,11 +8633,10 @@ async function start(): Promise<void> {
       <div id="layouts" hidden></div>
       <div id="strips"></div>
     </main>
-    <div id="tip" class="chrome" hidden></div>
-    <div id="peek" hidden></div>`;
+    <div id="tip" class="chrome" hidden></div>`;
   const $ = (sel: string) => document.querySelector<HTMLElement>(sel)!;
   // the page's own elements stand in both worlds' sets; each world has its own prose, way down, gauge, canvas and gutters
-  const page = { header: $("#header"), tip: $("#tip"), peek: $("#peek"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads") };
+  const page = { header: $("#header"), tip: $("#tip"), areas: $("#areas"), dish: $("#dish"), notice: $("#header .notice"), sheet: $("#sheet"), card: $("#card"), strips: $("#strips"), seams: $("#seams"), heads: $("#heads") };
   const of = (scroll: HTMLElement, at: string): UI => ({
     ...page,
     scroll,
@@ -8944,18 +8897,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #tip .name { display: block; color: var(--ink); font-weight: calc(500 - var(--thin)); }
 #tip .name.plain { font-weight: calc(400 - var(--thin)); color: var(--ink); }
 #tip .gloss { display: block; color: var(--muted); margin-top: 2px; }
-/* the peek stands over the page beside the tree, the brief as a reader meets it and then the files it holds */
-#peek { position: fixed; z-index: 8; width: ${PEEK.w}px; max-height: calc(100vh - 16px); overflow: auto; padding: 12px 14px 14px; border-radius: 12px; background: var(--ground); box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 10px 28px rgb(0 0 0 / .14), 0 0 0 1px var(--rim); display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
-#peek .peek-where .path { justify-content: flex-start; font-size: 11.5px; color: var(--faint); }
-#peek .peek-name { font-family: var(--serif); font-size: 17px; line-height: 1.25; color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--door); text-underline-offset: 3px; }
-#peek .peek-name:hover { color: var(--on); }
-#peek .peek-face { margin: 0; color: var(--muted); line-height: 1.4; }
-#peek .peek-tally { display: flex; font-size: 12px; color: var(--muted); }
-#peek .files { margin-top: 4px; }
-#peek .files i[data-go] { cursor: pointer; }
-#peek .files i[data-go]:hover { background: var(--lit); }
-.tree .sprout { cursor: pointer; }
-.tree .sprout.peeked .files { outline: 1px solid var(--door); outline-offset: 2px; border-radius: 3px; }
 
 /* each program stands where it is laid, those alone in a column at the page's height; where the lane stands alone
    there are no gaps to pull and no heads */
@@ -9543,7 +9484,7 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .files .fkids > .fnode::before { content: ""; position: absolute; left: -6px; top: 0; bottom: 0; width: 1px; background: var(--track); }
 .files .fkids > .fnode:last-child::before { bottom: auto; height: calc(var(--fp) / 2 + .5px); }
 .files .fkids > .fnode > .frow::before { content: ""; position: absolute; left: -6px; top: calc(50% - .5px); width: 5px; height: 1px; background: var(--track); }
-.tree .sprout { margin: 0 0 3px var(--under, 19px); }
+.tree .sprout { margin: 0 0 3px var(--under, 19px); cursor: pointer; }
 .tree .row:is(:hover, .lit) + .sprout .frow i { opacity: 1; }
 .tree .row:is(:hover, .lit) + .sprout .frow i.q { opacity: .5; }
 .files.large { --fh: calc(var(--figure, 4px) * 2); }
