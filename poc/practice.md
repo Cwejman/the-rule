@@ -191,6 +191,14 @@ Letters say independence and nothing more. Prose is linear, so a set is still la
 
 *A trial, the author's proposal of 2026-09-15, its meaning as independence found in discussion; the surface's refusals are the first level lettered.*
 
+### 4.2 A heading names what its brief is for
+
+A heading names the part its brief plays in the whole above it, its purpose there, and not what its prose holds. So it is short, the few words a reader would use to point at it: "The gradient", "Composed expansion", where a heading that walks through its contents, "A goes to B so that C expands", is a summary standing where a name belongs.
+
+A heading that summarises is long, says how rather than what for, and changes whenever the prose does. A name stays while the prose is written again beneath it, and it is what can be drawn: an icon for "Composed expansion" comes to mind, and one for the sentence does not, which is how a writer finds a heading has become a summary.
+
+*The author's learning of 2026-10-21, from drawing icons for briefs here and in another project, that the headings hard to draw were the ones naming their contents rather than their purpose.*
+
 ## 5. The face is declared by position
 
 The heading and the first paragraph after it are the face of a brief, and nothing marks them: no italics, no bold, no blockquote. Position is the mark, so a renderer can style the face without the author annotating it, and one fact is not written in two homes.
@@ -391,6 +399,14 @@ How many briefs carry one is the writer's to judge, at any depth. An icon marks 
 The icon is no part of the title, so the brief's address is its title's as before. A heading's anchor is read from its text as a renderer reads it, which keeps the space the icon stood in: `## 2. ![…](…) The tree` is anchored `#2--the-tree`, and a link to the heading before it carried the icon is to be written again, which [the check](skill.md#32-links-and-images) names.
 
 *The author's ask of 2026-10-21, an icon for a brief beside its heading as a file has one, inline as an emoji is rather than large above it; at any depth and as many as the writer judges, the author's the same day, a rule of only the top level being too strict. After the number and quieter than a file's, the session's, which the author took. Twenty pixels and the dark fallback, the session's, read from how GitHub draws an image in a heading.*
+
+#### 8.8.1 An icon draws the heading's essence, standing on its baseline
+
+An icon draws what the heading names, as the first picture a person would reach for on hearing it: a tree for "The tree", a flag for goals. It draws the brief's purpose in the whole, as [its heading names it](#42-a-heading-names-what-its-brief-is-for), never its contents, its mechanism or the sentence a summary would make; where no such picture comes, the heading is likely a summary, and the brief carries no icon until it is named again.
+
+It uses its square as a letter uses its line: its weight sits on the floor of the square and fills it to the width and height a capital takes, and it stands on the baseline of the heading's text, as a letter does, rather than centred in the line or floating above it. A drawing that leaves half its square empty, or hangs in the middle of it, reads smaller than the text beside it and out of line with it.
+
+*The author's learning of 2026-10-21, from drawing icons for briefs here and in another project, where many came out poorly.*
 
 ## 9. Reading and moving by script
 
