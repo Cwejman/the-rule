@@ -9441,9 +9441,20 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .tree.open .kids > .node > .row::after { top: var(--tick); }
 /* the tree is drawn as a file tree is: a level steps in, and its line drops from beneath the mark of the row that holds
    it, each node beneath carrying its stretch of the line and the last only down to its own row */
-.tree .node { position: relative; }
+/* a node holds its sprout's margin, so its stretch of the line reaches the next node's and never leaves a gap between */
+.tree .node { position: relative; display: flow-root; }
 .tree .kids { padding-left: 14px; }
-.tree .kids > .node::before { content: ""; position: absolute; left: -7px; top: 0; bottom: 0; width: 1.25px; background: var(--track); }
+.tree .kids > .node::before { content: ""; position: absolute; left: -7px; top: 0; bottom: 0; width: 1px; background: var(--track); }
+/* a row holding a level carries its line from just beneath its mark down to its foot, so the level's line meets the
+   mark rather than starting a gap below it: beneath an icon's foot, or the point of a fold mark turned open */
+.tree .node:has(> .kids > .node) > .row::before { content: ""; position: absolute; left: 7px; top: calc(var(--tick) + 8px); bottom: 0; width: 1px; background: var(--track); }
+.tree .node:has(> .kids > .node) > .row:has(> .mark:not(.leaf))::before { top: calc(var(--tick) + 4px); }
+/* a step with no icon is a joint: the tick into it runs on to the middle of its mark's room and the line down leaves from
+   there, one line turning, where it ran into an empty room and left again a column over */
+.tree .node:has(> .kids > .node) > .row:has(> .mark.leaf)::before { top: var(--tick); }
+.tree .kids > .node:has(> .kids > .node) > .row:has(> .mark.leaf)::after { width: 15px; }
+/* where the water runs on down the level, it runs through the row's stretch as well */
+.tree .node:has(> .kids > .flow) > .row::before { left: 6.9px; width: 1.5px; background: var(--on); }
 .tree .kids > .node:last-child::before { bottom: auto; height: calc(var(--tick) + 1px); }
 /* the water: down the line of each level the way passes through, to the row it passes into, in the hue of the level;
    what is newly reached runs from the top down, a level after the one above it */
@@ -9453,7 +9464,7 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 @keyframes tree-tick { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 /* the tick into a row says what reaching it crosses: the branch's ink on the way to the focus, and the hue of the
    reading entered, a step stronger, at a file's boundary */
-.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: var(--tick); width: 7px; height: 1.25px; background: var(--track); }
+.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: var(--tick); width: 7px; height: 1px; background: var(--track); }
 .tree .kids > .node.on > .row::after { background: var(--on); }
 .tree .kids > .node.door > .row::after { height: 1.5px; background: var(--door); }
 .tree .row { position: relative; display: flex; align-items: center; gap: 5px; min-height: 21px; padding: 0 6px 0 0; border-radius: 6px; }
