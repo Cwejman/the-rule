@@ -68,15 +68,11 @@ The first program's card was a place to act: it could be pinned and its rooms pr
 
 Reaching it is the problem. On a crowded figure the pointer cannot get from a cell to an overlay without crossing other cells, and crossing them retargets it. Every fix for that is apparatus, and each costs more than it returns.
 
-*Given way in part on 2026-10-21: [the tree's peek](widgets.md#25-a-sprout-pressed-raises-a-peek) is entered, but it is raised by a press rather than by resting, so crossing cells on the way into it retargets nothing.*
-
 ## j. An overlay at all
 
 The second program kept an overlay that only told, raised beside whatever the pointer rested on and never entered.
 
 What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4--the-ahead). An overlay that repeats what is in view competes with the prose.
-
-*Given way in part on 2026-10-21, the author's word that overlays should be used more and told more fully: [the tree's peek](widgets.md#25-a-sprout-pressed-raises-a-peek) tells what is not in view, at the reader's press. What repeats what is in view stays refused.*
 
 ## k. A level to a pane, three abreast
 
