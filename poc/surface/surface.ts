@@ -8907,8 +8907,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) .step:has(.ficon) { display: inline-flex; align-items: center; }
 :is(#crumb, #gcrumb) .step .ficon { vertical-align: 0; }
 :is(#crumb, #gcrumb) .step .ficon svg { width: 100%; height: 100%; opacity: 1; }
-:is(#crumb, #gcrumb) .step:has(.bicon) { display: inline-flex; align-items: center; }
-:is(#crumb, #gcrumb) .step .bicon { vertical-align: 0; }
+:is(#crumb, #gcrumb) .step:has(.bicon) { display: inline-flex; align-items: baseline; }
 :is(#crumb, #gcrumb) .step .bicon svg { width: 100%; height: 100%; opacity: 1; }
 :is(#crumb, #gcrumb) .step.in { color: var(--faint); }
 :is(#crumb, #gcrumb) .step.root { flex: none; color: var(--muted); }
@@ -9328,8 +9327,10 @@ svg.rel { display: inline-block; width: .72em; height: .72em; margin-left: .3em;
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
 .ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }
-/* a brief's icon is part of its name, at its text's size, a step quieter than a file's, which stands for the file whole */
-.bicon { display: inline-block; width: .95em; height: .95em; margin-right: .32em; vertical-align: -.12em; opacity: .78; }
+/* a brief's icon is part of its name and stands on its baseline as a letter does: its square's foot on the line, and its
+   drawing, which fills its square to thirteen units of sixteen, standing as tall as a capital; a step quieter than a
+   file's, which stands for the file whole (practice 8.8.1) */
+.bicon { display: inline-block; width: .94em; height: .94em; margin-right: .3em; vertical-align: baseline; opacity: .78; }
 .bicon svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
