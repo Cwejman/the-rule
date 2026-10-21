@@ -40,11 +40,11 @@ In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down
 
 The page is a row of columns from left to right, and a column holds one program or several stacked from top to bottom.
 
-A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the ahead, the settings and [the keys](widgets.md#8--the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-every-program-has-a-head).
+A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the settings and [the keys](widgets.md#8--the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-every-program-has-a-head).
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
-By default the row is the shape, the body's prose with the links in its right gutter, and the ahead, which is the page as it opens today. Git's prose comes in with the links in its right gutter as well.
+By default the row is the shape, the body's prose with the links in its right gutter, and the tree, which stands where the ahead stood until it [gave way](widgets.md#4--the-ahead), 2026-10-21. Git's prose comes in with the links in its right gutter as well.
 
 *Reasoned, the session's proposal, 2026-10-01, from the wings that already stack two figures; the author built on it, asking for splits across and down. The default is the session's, not yet answered.*
 
@@ -168,7 +168,7 @@ Resting on a figure, a gap or the dock moves them nowhere, so the figures do not
 
 The wheel scrolls the body's prose from anywhere, [as it does today](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere), so the reader never has to move to the prose to read on. Over git's prose it scrolls git's prose instead, over a map it pans that map, and over a meter it turns the meter. Where git's prose is the only prose standing, the wheel scrolls it from anywhere.
 
-The figures, the shape, the tree and the ahead, draw the world holding the keys, so they tell of what the reader is deliberately looking at rather than staying the body's. The plate stays the body's.
+The figures, the shape and the tree, draw the world holding the keys, so they tell of what the reader is deliberately looking at rather than staying the body's. The plate stays the body's.
 
 *Preferred, the author's, 2026-10-01: that only git's and the body's contend, that git's programs catch the keys under the pointer, that the wheel drives the body's prose from anywhere and git's only over it or where it stands alone, and that the figures follow what the reader is deliberately looking at. Within the body as today, the figures reading that as the world holding the keys, and the keys kept where they were while the pointer rests on a figure, are the session's, the last found as it was built.*
 
@@ -182,7 +182,7 @@ A program of git's has its own icon carrying git's glyph as a mark, in the dock 
 
 ## 7. ![A row of icons on a bar beneath the page](.img/dock.icon.svg) The dock
 
-The dock is what the strip becomes. It holds every program once, in groups set apart by room: git's status, git's prose and git's canvas; then the prose, the canvas and the plate; then the figures: the shape, the tree, the ahead, the settings and the keys. It stands down the left edge or along the foot, which is a setting, and it keeps the strip's four weights of ink.
+The dock is what the strip becomes. It holds every program once, in groups set apart by room: git's status, git's prose and git's canvas; then the prose, the canvas and the plate; then the figures: the shape, the tree, the settings and the keys. It stands down the left edge or along the foot, which is a setting, and it keeps the strip's four weights of ink.
 
 An icon is lit exactly while its program can be seen. A press on a lit icon takes the program away; a press on one unlit adds it, back where it stood, beside the nearest program that still stands there if its own place is gone. A press is the intent to add, never to swap: the programs that can be resized shrink to make room for it, and nothing is taken away. Where even then there is no room beside everything that can be seen, the icon stands quieter than the rest, and a press on it only shakes it. Only a screen that narrows leaves a program standing out of sight, and its icon says so; a press on it brings it in the same way, where there is room. A figure that has not stood since the page opened comes in as a new column at the right end of the row as it stands, at its own width. A program that stands alone comes in beside the body's prose, at its left. The last program cannot be taken away, so the row is never empty.
 
@@ -202,7 +202,7 @@ As built it is a figure of fixed size. It tells how far the history is read, how
 
 Every program in the dock has a letter, and pressing it is pressing the program's icon: it takes away a program that can be seen and adds one that cannot, and a full row shakes the icon. A letter lays only the row, so it acts whichever world the keys act in. Held with a modifier it is the browser's, as a digit is, so copying stays the browser's.
 
-The letter is the program's initial where it is free: P the prose, C the canvas, S the shape, T the tree, A the ahead and K the keys. The plate is W, for the body whole, and the settings M, for their meters. Git's prose and git's canvas are the body's letters with shift, as they are the body's programs read in git's world, and git's status is G.
+The letter is the program's initial where it is free: P the prose, C the canvas, S the shape, T the tree and K the keys. The plate is W, for the body whole, and the settings M, for their meters. Git's prose and git's canvas are the body's letters with shift, as they are the body's programs read in git's world, and git's status is G.
 
 The dock's tooltip names an icon's letter, and [the keys](widgets.md#8--the-keys) show every program's letter in a group of their own, each with its icon. A program git's history is off for has no letter, as it has no icon. A phone has no dock and no keys, so a letter does nothing there.
 
@@ -264,7 +264,7 @@ The plus stands in the first empty slot, and adds a copy of the layout in use th
 
 A card is the page its layout lays on this screen, with its own settings, at the page's shape and drawn smaller, each program by its own drawing where it has one, so the cards do not all look the same.
 
-The body's prose is drawn as its lane stands now, and the plate, the shape, the tree, the ahead, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
+The body's prose is drawn as its lane stands now, and the plate, the shape, the tree, the settings and the keys by their own figures. The canvas and git's programs stand as their icon in the room they take.
 
 Since no layout holds a place, what the cards differ in is only how they lay the one reading, which is what the reader chooses between.
 

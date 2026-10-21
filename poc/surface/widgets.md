@@ -164,7 +164,7 @@ A row carries its number faint before its name. A card is underlined in its bran
 
 A brief [related by a quoted link](../practice.md#38-a-quoted-lone-link-relates) stands as a row beneath the brief that relates it, after that brief's level, since it is no part of the level: the mark of a relation, an arrow up and away, in its own branch's hue where a fold mark stands, and its name underlined in that hue as a card's is, since both are doors, with the way to it told on pointing; and no sprout, since what lies beneath it is its own tree's shape and not this one's. It is the one link the tree draws: a link inside a paragraph is an offer, and the tree that drew every offer would bury the shape in them, where a related card is a link its writer raised to stand as one. Where a row is short of room its status gives way before its name. The rows on the way to the focus take their branch's ink.
 
-Where a row hides a level, folded or a card, what it hides stands beneath it as a sprout, starting under the row's name: the files it holds, laid as the outline lays rows, top to bottom in reading order, a step right per file placed in a file, on the tree's spine and ticks. Its first row is what the row holds within its own file. A file is one bar and not its briefs, since a tree of every brief outgrows any room a row has: the bar is as long as the file's text, on a log, and parts at its three heaviest sections where each holds more than a twelfth of it, the rest running as one quiet stretch, so a file reads as its size and how it divides without detail too small to read. The bars' height is [a meter](#61-the-meters) of its own. Unfolding a row puts its level where its sprout stood.
+Where a row hides a level, folded or a card, what it hides stands beneath it as a sprout, starting under the row's name: the files it holds, laid as the outline lays rows, top to bottom in reading order, a step right per file placed in a file, on the tree's spine and ticks. Its first row is what the row holds within its own file. A file is one bar and not its briefs, since a tree of every brief outgrows any room a row has: the bar is as long as the file's text, on a log, and parts at its three heaviest sections where each holds more than a twelfth of it, the rest running as one quiet stretch, so a file reads as its size and how it divides without detail too small to read. The bars' height is [a meter](#61-the-meters) of its own. Unfolding a row puts its level where its sprout stood. Pressing a sprout raises [its peek](#25-a-sprout-pressed-raises-a-peek).
 
 Whether the sprouts stand is a second setting in the tree's head, apart from its room, and a layout holds it too.
 
@@ -189,6 +189,16 @@ The tree stands dense or open, set in its head as a setting of its own, which a 
 What lies beside the way across the body rather than in it: the links the reading open and its neighbours share with other parts, which [the pane of bearings](../../author/ideas-2026-10-07.md#8-a-pane-of-bearings-a-kiosk-and-dimensions) asks for and dimensions would ground. And whether it names files alone when [the way down](#62-the-switches) does.
 
 *Open, 2026-10-14.*
+
+### 2.5 A sprout pressed raises a peek
+
+Pressing a row's sprout raises a peek beside the tree: what that row hides, drawn at a reading size over the page, so a reader sees how a far reading is made and goes straight into it, without unfolding and scoping their way down and leaving each step behind them to undo.
+
+The peek opens with the brief as a reader would meet it: the way to it, its name, its face, and its tally. Beneath stands [the figure of the files it holds](#23-the-reading-open-as-an-outline) as the ahead drew it, the heaviest file running the peek's width, every file named over its bar, and each section heavy enough to be parted out of its bar pressable too. A press on a name or a section goes there, one going the trail keeps as one, and the peek goes with it.
+
+It is raised by a press and never by resting the pointer, so moving into it retargets nothing on the way, which is [what refused an overlay a reader moves into](refused.md#i-an-overlay-a-reader-has-to-move-into). It goes when the pointer leaves it and the sprout it came from, when anything scrolls, when the sprout is pressed again, and on escape, which closes it rather than undoing. It stands only where the tree does, so not on a phone.
+
+*The author's ask of 2026-10-21, a figure in the tree pressed to expand for a preview and for going far without the goings between, gone on leaving it or scrolling; that the ahead gives way to it, the author's the same day. What the peek holds, and that escape closes it, are the session's.*
 
 ## 3. ![Bars stepping right, the lane drawn small](.img/widget-shape.icon.svg) The shape
 
@@ -240,19 +250,15 @@ A row thinner than six pixels is given six to be hit. Under a finger [the rail t
 
 ## 4. ![An eye](.img/widget-ahead.icon.svg) The ahead
 
-The ahead is the right wing's first widget: what the highlighted brief hides. It answers for the focus, or for the brief under the pointer, whenever that brief is folded and hides something, paragraphs beyond its face or a level beneath, and it draws nothing at all when the brief is whole, since then the reader can simply read on.
+The ahead stood in the right wing and drew what the highlighted brief hid, for the focus or for the brief under the pointer whenever it was folded: from 2026-10-15 [the figure of the files it holds](#23-the-reading-open-as-an-outline) at a reading size, each file named over its bar.
 
-*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), which the author narrowed to what is not in view, then [in the shape's form](refused.md#z-the-ahead-in-the-shapes-form) until 2026-10-15.*
+*Reasoned, the author's, 2026-09-13; built first [as an icicle](refused.md#s-the-ahead-as-columns-by-depth), then [in the shape's form](refused.md#z-the-ahead-in-the-shapes-form) until 2026-10-15, then as the files it holds. Given way on 2026-10-21 to [the peek](#25-a-sprout-pressed-raises-a-peek), the author finding a preview raised from the tree, where the reader is already looking at what a row hides, made a wing answering for the pointer redundant.*
 
 ### 4.1 It draws the files the brief holds
 
-It draws [the figure of the files a brief holds](#23-the-reading-open-as-an-outline) at a reading size: the brief's own bar first, then each file placed beneath it, a step right per file placed in a file, on the tree's spine and ticks. Every file is named over its bar, and a name goes there.
+Its figure of files is the peek's now, as it was drawn here: the heaviest file's bar running the width, the rest by the same log, each bar parted at its five heaviest sections where each holds more than a twentieth of it, and reaching past a card, since what lies ahead of a brief is mostly the readings it places.
 
-The heaviest file's bar runs the wing's width and the rest are measured by the same log, so sizes compare across the whole figure, and each bar parts at its five heaviest sections where each holds more than a twentieth of it.
-
-It reaches past a card, unlike the lane: what lies ahead of a brief is mostly the readings it places, and a figure of files is small enough to draw them all, where a figure of every paragraph was not.
-
-*The author's ask of 2026-10-15, when the figure of files had grown more telling than the ahead's own; the files laid across rather than in a column, the author's of the same day.*
+*The author's ask of 2026-10-15; given way with the ahead, 2026-10-21.*
 
 ## 5. ![Two links of a chain](.img/widget-links.icon.svg) Links
 
