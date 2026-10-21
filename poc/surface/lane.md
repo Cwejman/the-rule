@@ -38,7 +38,7 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4--the-ahead) and the tree when the reader is on it.
+A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
 
 The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). Last stands a pencil and how long ago anything within it was [last edited](#61-the-action-line-is-the-press). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
 

@@ -4,5 +4,5 @@ svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px;
 svg.file-icon .f { fill: var(--rest, #dfe5e8); }
 @media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
 </style>
-<circle class="f" cx="4" cy="11.5" r="2.2"/><circle class="s" cx="4" cy="11.5" r="2.2"/><circle class="f" cx="12" cy="4.5" r="2.2"/><circle class="s" cx="12" cy="4.5" r="2.2"/><path class="s" d="M5.8 10.2C8.5 10 7.5 6 10.2 5.8"/>
+<g data-fit="" transform="translate(0.258 1.742) scale(0.968)"><circle class="f" cx="4" cy="11.5" r="2.2"/><circle class="s" cx="4" cy="11.5" r="2.2"/><circle class="f" cx="12" cy="4.5" r="2.2"/><circle class="s" cx="12" cy="4.5" r="2.2"/><path class="s" d="M5.8 10.2C8.5 10 7.5 6 10.2 5.8"/></g>
 </svg>

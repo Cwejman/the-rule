@@ -72,7 +72,7 @@ Reaching it is the problem. On a crowded figure the pointer cannot get from a ce
 
 The second program kept an overlay that only told, raised beside whatever the pointer rested on and never entered.
 
-What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4--the-ahead). An overlay that repeats what is in view competes with the prose.
+What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
 
 ## k. A level to a pane, three abreast
 

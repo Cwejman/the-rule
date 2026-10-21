@@ -24,7 +24,7 @@ The page reads which grain it is in from two facts and nothing else: whether the
 
 *The author's, 2026-09-16, in discussion; the two facts the session's, as built the same day.*
 
-## 2. Room for a finger
+## 2. ![A fingertip pressing](.img/finger.icon.svg) Room for a finger
 
 A finger is a fatter pointer, and everything it presses is given room it can find, near the forty-four pixels a hand asks for. That is not a coat of paint over the same design: where the room cannot be had, the thing itself changes, and the briefs beneath say where.
 
@@ -102,7 +102,7 @@ The row holds three: the pane the reader is not in, which is one press to the ot
 
 Each is a press that does something at once, rather than a choice among choices. The rail leaves the row while the canvas stands or the settings are open, since it belongs to the prose.
 
-[The ahead](widgets.md#4--the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
+[The ahead](widgets.md#4-the-ahead) is not among them. It answers for the brief the pointer rests on, and a phone has no pointer; what a press would give is already said by [the figure on the action line](lane.md#62-the-figure-on-the-line-says-what-a-press-gives).
 
 *The author's, 2026-09-16, and narrowed by him the same day on reading it: five became four.*
 
@@ -222,7 +222,7 @@ The shape gives a brief two presses, [read from where they land](widgets.md#35-t
 
 So the rail is scrubbed and nothing else, and what the two presses gave is had elsewhere: the outline goes, the action line folds.
 
-*Reasoned, 2026-09-16, from [the room a finger asks](#2-room-for-a-finger); as built the same day.*
+*Reasoned, 2026-09-16, from [the room a finger asks](#2--room-for-a-finger); as built the same day.*
 
 ## 6. What the phone drops, and what it keeps
 

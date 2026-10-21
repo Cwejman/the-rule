@@ -26,14 +26,14 @@ A figure stands in a wing. Given the body and the shared state, it returns a dra
 
 A pane stands in the middle, and there are three: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; and the dish, which is [the plate](widgets.md#7--the-plate) at the middle's size. The two that are not the lane are maps. Each pane is drawn from the shared state, and all act through the same verbs. [The history](history.md#41-it-is-a-mode-not-a-pane) is not a pane but a mode the lane and the canvas are turned to.
 
-*Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22; the history a pane 2026-09-27, and a mode 2026-09-28. Superseded wide on 2026-10-01 by [programs](layout.md#2-a-row-of-columns-each-a-stack), the adjunct kept as a setting of each prose and the history's prose and canvas programs of their own.*
+*Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22; the history a pane 2026-09-27, and a mode 2026-09-28. Superseded wide on 2026-10-01 by [programs](layout.md#2--a-row-of-columns-each-a-stack), the adjunct kept as a setting of each prose and the history's prose and canvas programs of their own.*
 
 ## 2. The areas
 
 Each area is as wide as what it holds and no wider, and no ink stands around any of them, no boxes, no borders but [the quiet rim the canvas keeps](#27-the-keys-belong-to-one-pane), the flat page [the design language](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#why-flat--the-newspaper-precedent) asks for. So the page is the prose and what orients it, and nothing else asks for the eye.
 
 ![A row of five areas across the page: a narrow wing on the left holding small bars and blocks with a shaded viewport over them, an empty gutter, a wide lane of grey prose lines with one coloured link in its third line, a gutter holding a short note level with that link, and a narrow wing on the right holding bars and a framed block; a thin rule beneath each area and its name under the rule, lane in bold](.img/areas.svg)\
-The five areas as they stand by default: [the shape](widgets.md#3--the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5--links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4--the-ahead) in the right wing.
+The five areas as they stand by default: [the shape](widgets.md#3--the-shape) in the left wing, the left gutter empty, the lane, [the links](widgets.md#5--links) beside the lane's link in the right gutter, and [the ahead](widgets.md#4-the-ahead) in the right wing.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -79,7 +79,7 @@ Where the lane stands it keeps its measure and a map beside it takes what is lef
 
 The gutters belong to the lane and stand only beside it, wherever in the middle it stands, and the wings do not care what the middle holds.
 
-*The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22. Superseded wide on 2026-10-01 by [the row](layout.md#2-a-row-of-columns-each-a-stack), where any number stand.*
+*The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22. Superseded wide on 2026-10-01 by [the row](layout.md#2--a-row-of-columns-each-a-stack), where any number stand.*
 
 ### 2.7 The keys belong to one pane
 

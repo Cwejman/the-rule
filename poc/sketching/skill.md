@@ -18,7 +18,7 @@ Once a sketch [has earned its place](README.md#1-when-a-sketch-earns-its-place),
 
 *Reasoned, the author's, 2026-09-14.*
 
-## 2. The forms
+## 2. ![A circle, a square and a triangle](.img/forms.icon.svg) The forms
 
 Most sketches are one of a few forms, and the form follows the shape the prose states. A form drawn in its most general version, a flow where a row would do, costs the reader the difference.
 
@@ -66,7 +66,7 @@ A sketch is laid on a grid of four pixels, drawn at 600 wide or narrower, the la
 
 *Reasoned, the author's direction, 2026-09-14.*
 
-## 4. The loop
+## 4. ![Three points joined by arrows in a loop](.img/loop.icon.svg) The loop
 
 A sketch is made in the steps a brief is, [the rule's rounds](../../rule.md#53--the-rounds) turned on a drawing, with [the tool](implementation.md) at each step.
 

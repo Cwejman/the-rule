@@ -28,7 +28,7 @@ Around anything of this that is built, the time the live process takes to hand t
 
 The page's own code grows when it draws the history, and that is measured and said, since a page that grows for its drawing is not a page that carries the history.
 
-*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5-the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
+*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5--the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
 
 ## 2. The history is a holarchy
 
@@ -190,7 +190,7 @@ On the canvas the history's root level runs across, left to right, and each stor
 
 *Preferred, the author's, 2026-09-28: [a trunk and not a tree](../../author/ideas-2026-09-28.md#4-the-canvas-runs-left-to-right-a-trunk-and-not-a-tree), and the direction perhaps every canvas's [the same day](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas). It supersedes the history drawn down the column for coherence, 2026-09-21, which left a toggle between the two directions for later. Which way time runs along the trunk is open.*
 
-## 5. The data, in two tiers
+## 5. ![Two tiers, one above the other](.img/tiers.icon.svg) The data, in two tiers
 
 What a reader sees decides what is fetched. The canvas, the colouring and the filter by where the reader stands span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
 

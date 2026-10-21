@@ -178,7 +178,7 @@ The tree may also follow the levels the lane has unfolded, a third setting in it
 
 The tree takes the width its rows need, measured as it is laid, up to three hundred and twenty pixels, past which a long name is cut; its rows change with the folds and the scope rather than with each step, so the row is laid again only when what the tree needs has changed, and a step never moves the prose.
 
-A reader may pull its edge, as any column's edge [is pulled](layout.md#3-the-gaps-are-the-handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
+A reader may pull its edge, as any column's edge [is pulled](layout.md#3--the-gaps-are-the-handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
 
 *The pull, the author's ask of 2026-10-14, for a reader who would rather have names cut or wrapped than a wide tree; past the most, the author's of the same day, since an open tree cuts nothing and a wide one is the only way its names stand on one line.*
 
@@ -250,7 +250,7 @@ A row thinner than six pixels is given six to be hit. Under a finger [the rail t
 
 *Reasoned, the author's, 2026-09-13; the rail without presses, 2026-09-16. The fold's press given way with the marks, 2026-10-21.*
 
-## 4. ![An eye](.img/widget-ahead.icon.svg) The ahead
+## 4. The ahead
 
 The ahead stood in the right wing and drew what the highlighted brief hid, for the focus or for the brief under the pointer whenever it was folded: from 2026-10-15 [the figure of the files it holds](#23-the-reading-open-as-an-outline) at a reading size, each file named over its bar.
 
@@ -290,7 +290,7 @@ While it is pointed at or turned its value stands in its word's place, so the va
 
 The type is the zoom, the heading ratio and the line height; the colour, the headings' hue and the ground's; the page, the gap, the dim, the edge fade and the height of the file figures the tree and the cards draw. The body's group holds the reading speed, in words a minute, which every card's reading time is reckoned at, and turning it tells each time again in place. The two hues stand at nought until a reader turns them, and [what they colour](#182-the-ground-and-the-headings-may-take-the-hue) is said with the colour. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
 
-*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3-the-gaps-are-the-handles) size them. The two hues, the author's ask of 2026-10-14. The reading speed, the author's ask of 2026-10-17; that it starts at two hundred and thirty words a minute is the session's.*
+*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3--the-gaps-are-the-handles) size them. The two hues, the author's ask of 2026-10-14. The reading speed, the author's ask of 2026-10-17; that it starts at two hundred and thirty words a minute is the session's.*
 
 ### 6.2 The switches
 

@@ -36,7 +36,7 @@ In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down
 
 *Reasoned, the session's, 2026-10-01, from the briefs this touches.*
 
-## 2. A row of columns, each a stack
+## 2. ![Three columns, the last a stack of two](.img/columns.icon.svg) A row of columns, each a stack
 
 The page is a row of columns from left to right, and a column holds one program or several stacked from top to bottom.
 
@@ -44,7 +44,7 @@ A program is what was a pane or a figure: the prose, which is what was the lane,
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
-By default the row is the shape, the body's prose with the links in its right gutter, and the tree, which stands where the ahead stood until it [gave way](widgets.md#4--the-ahead), 2026-10-21. Git's prose comes in with the links in its right gutter as well.
+By default the row is the shape, the body's prose with the links in its right gutter, and the tree, which stands where the ahead stood until it [gave way](widgets.md#4-the-ahead), 2026-10-21. Git's prose comes in with the links in its right gutter as well.
 
 *Reasoned, the session's proposal, 2026-10-01, from the wings that already stack two figures; the author built on it, asking for splits across and down. The default is the session's, not yet answered.*
 
@@ -78,7 +78,7 @@ The layout is kept as a tree of any number of children, held to two levels, a ro
 
 *Reasoned, the session's, 2026-10-01, at the author's question, which the author let stand.*
 
-## 3. The gaps are the handles
+## 3. ![Two panels and the gap between them pulled apart](.img/handles.icon.svg) The gaps are the handles
 
 Every gap beside something that can be pulled can be dragged. The gap between two columns trades width between those two, and the rest of the row stands still; the gap between two growing programs in a stack trades height between them; the gap at either edge of the row sizes the column beside it alone. Nothing new is drawn for a gap but the pointer saying it can pull there.
 

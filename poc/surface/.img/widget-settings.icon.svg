@@ -3,5 +3,5 @@
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 @media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
 </style>
-<path class="s" d="M4 11.5a5.5 5.5 0 1 1 8 0"/><path class="s" d="M8 8v-3"/>
+<g data-fit="" transform="translate(-0.727 2.455) scale(1.091)"><path class="s" d="M4 11.5a5.5 5.5 0 1 1 8 0"/><path class="s" d="M8 8v-3"/></g>
 </svg>
