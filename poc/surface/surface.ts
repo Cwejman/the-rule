@@ -406,6 +406,8 @@ type Brief = {
   drawing?: string;
   /** set by the trace on the root brief of a file whose graphic has an icon beside it: its markup, cleaned as a sketch's is */
   icon?: string;
+  /** set by the trace on a brief whose heading carries an icon after its number: its markup, cleaned as a sketch's is (practice 8.8) */
+  glyph?: string;
   /** set by the trace on the root brief of a file that carries an image: the image, measured as any image is */
   picture?: Tok;
   /** set by the history's trace on a leaf: the full hash of the commit it stands for, which the light tier tells the rest of */
@@ -567,7 +569,7 @@ const lean = (toks: Tok[]): Tok[] => JSON.parse(JSON.stringify(toks, (k, v) => (
 // holds: a title, the prose before the first section, and the sections nested
 // by heading depth. The cut is pure: it reads tokens and returns structure.
 
-type Section = { depth: number; heading: string; body: Tok[]; children: Section[] };
+type Section = { depth: number; heading: string; icon?: Tok; body: Tok[]; children: Section[] };
 type Cut = { title: string | null; before: Tok[]; lead: Tok[]; sections: Section[]; strays: string[] };
 
 function cut(toks: Tok[]): Cut {
@@ -577,7 +579,9 @@ function cut(toks: Tok[]): Cut {
     const isHeading = t.type === "heading";
     if (isHeading && t.depth === 1 && out.title === null) return void (out.title = textOf(t.tokens));
     if (isHeading && t.depth! >= 2) {
-      const s: Section = { depth: t.depth!, heading: textOf(t.tokens), body: [], children: [] };
+      // an image in a heading is its icon, and no part of its text, so the address is the title's alone (practice 8.8)
+      const icon = (t.tokens ?? []).find((x) => x.type === "image");
+      const s: Section = { depth: t.depth!, heading: textOf(t.tokens), ...(icon ? { icon } : {}), body: [], children: [] };
       open.length = open.findLastIndex((o) => o.depth < s.depth) + 1;
       (open.length ? open[open.length - 1].children : out.sections).push(s);
       return void open.push(s);
@@ -682,6 +686,8 @@ async function trace(rootArg: string): Promise<Body> {
     return free;
   };
 
+  /** The icons headings carry, set on their briefs once every image is measured. */
+  const headed: { brief: Brief; tok: Tok; abs: string }[] = [];
   /** A file's graphic and image, held on its root brief and measured with every other image once the trace is done. */
   const owned: { brief: Brief; graphic?: Tok; abs: string }[] = [];
   const carried = (brief: Brief, own: { graphic?: Tok; picture?: Tok }, abs: string): void => {
@@ -719,6 +725,7 @@ async function trace(rootArg: string): Promise<Body> {
       if (written && written !== number) warn(`${file}: "${title}" is numbered ${written} and stands at ${number}`);
       const brief: Brief = { address, title, number, written, file, kind, body: s.body, door: s.children.length > 0 };
       briefs.push(brief);
+      if (s.icon) headed.push({ brief, tok: s.icon, abs }), images.push({ tok: s.icon, file: abs });
       table.set(`${abs}#${slug(s.heading)}`, address);
       gather(s.body, abs, file, title);
       // the parts stand in the order a reader meets them: what the prose places, then the sections beneath it
@@ -879,6 +886,13 @@ async function trace(rootArg: string): Promise<Body> {
     brief.drawing = cleanSketch(readFileSync(at, "utf8"));
     const ico = at.replace(/\.svg$/i, ".icon.svg");
     if (existsSync(ico) && statSync(ico).isFile()) brief.icon = cleanSketch(readFileSync(ico, "utf8"));
+  });
+
+  // a heading's icon is set into the page cleaned as a file's is, so the hue of its branch reaches it (practice 8.8)
+  headed.forEach(({ brief, tok, abs }) => {
+    const at = tok.asset ? join(rootDir, tok.asset) : "";
+    if (at && imageType(at) === "image/svg+xml") brief.glyph = cleanSketch(readFileSync(at, "utf8"));
+    else if (tok.asset || tok.href) warn(`${rel(abs)}: "${brief.title}" carries ${tok.asset ?? tok.href} in its heading, which is not an SVG kept beside it; an icon is drawn, and it is not shown`);
   });
 
   return { title: root.title, root: root.file, briefs, warnings, traced: new Date().toISOString() };
@@ -1676,6 +1690,8 @@ type Settings = {
   crumb: "brief" | "file";
   /** whether the tree stands dense, a row a line and a long name cut, or open, with room between rows and names whole */
   treeRoom: "dense" | "open";
+  /** whether the shape's blocks stand narrow, a scrollbar's width, or wide as they stood while it carried marks */
+  shapeRoom: "narrow" | "wide";
   treeSprouts: "shown" | "hidden";
   /** whether every step of the tree's way stands among its level, or only those the reader opened */
   treeWhole: "way" | "whole";
@@ -1728,6 +1744,7 @@ const DEFAULTS: Settings = {
   colourFrom: "root",
   crumb: "brief",
   treeRoom: "dense",
+  shapeRoom: "narrow",
   treeSprouts: "shown",
   treeWhole: "way",
   treeLevels: "all",
@@ -2866,14 +2883,14 @@ function tileHtml(a: string, related = false): string {
     return (
       `<div class="card tile pictured${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture, false, -1)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
+      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3></div>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${line}</div></div>` +
       `</div>`
     );
   const top = b.picture?.src ? `<div class="tile-picture">${pictureHtml(b.picture, false, 1.6)}</div>` : b.drawing ? `<div class="tile-drawing" aria-hidden="true">${b.drawing}</div>` : "";
   return (
     `<div class="card tile${related ? " related" : ""}" ${at} ${huedRun(a)}>` +
     top +
-    `<div class="tile-text">${related ? whereHtml(a) : ""}<h3 class="card-head">${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
+    `<div class="tile-text">${related ? whereHtml(a) : ""}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stamp ? `<span class="stamp chrome">${esc(stamp)}</span>` : ""}${face ? `<p class="tile-face">${inline(face.tokens)}</p>` : ""}</div>` +
     line +
     `</div>`
   );
@@ -2906,7 +2923,7 @@ function cardHtml(a: string, related = false): string {
     return (
       `<div class="card pictured${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
       `<div class="card-picture">${pictureHtml(b.picture)}<div class="card-blur" aria-hidden="true"></div><div class="card-veil" aria-hidden="true"></div>` +
-      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
+      `<div class="card-over">${related ? whereHtml(a) : ""}<div class="card-top">${iconHtml(b)}<h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stampHtml}</div>${g === "whole" ? "" : line}</div></div>` +
       (g === "whole" ? `<div class="card-body">${blocks(all)}</div>${line}` : "") +
       `</div>`
     );
@@ -2914,7 +2931,7 @@ function cardHtml(a: string, related = false): string {
     `<div class="card${related ? " related" : ""} ${g}" ${at} ${huedRun(a)}>` +
     (b.drawing ? `<div class="card-drawing" aria-hidden="true">${b.drawing}</div>` : "") +
     (related ? whereHtml(a) : "") +
-    `<div class="card-top"><h3 class="card-head">${esc(b.title)}</h3>${stampHtml}</div>` +
+    `<div class="card-top"><h3 class="card-head">${glyphHtml(b)}${esc(b.title)}</h3>${stampHtml}</div>` +
     `<div class="card-body">${blocks(shown)}</div>` +
     line +
     `</div>`
@@ -2940,7 +2957,7 @@ function articleHtml(b: Brief, g: Fold, after: number): string {
   return (
     `<article class="brief ${g}${on ? " on" : ""}${b.address === state.focus ? " here" : ""}" data-a="${esc(b.address)}" style="${hueVars(b.address)};--after:${after}px">` +
     `<div class="surface">` +
-    `<h2 class="head d${d}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${esc(b.title)}</span></h2>` +
+    `<h2 class="head d${d}"><span class="num">${esc(scopedNumber(b))}</span><span class="title">${glyphHtml(b)}${esc(b.title)}</span></h2>` +
     (first ? blocks([first]) : "") +
     more +
     still +
@@ -3528,7 +3545,7 @@ function dockTip(k: string): string {
 // program by its own drawing where it has one.
 
 /** What a layout holds: the row, and each program's own settings, those in its head. Where the reader stands is in none. */
-const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "treeRoom", "treeSprouts", "treeWhole", "treeLevels"] as const;
+const HELD = ["layout", "gutters", "follow", "face", "trunk", "nodes", "mapFrom", "plate", "plateGrain", "shapeRoom", "treeRoom", "treeSprouts", "treeWhole", "treeLevels"] as const;
 type Held = Pick<Settings, (typeof HELD)[number]>;
 const SLOTS = 9;
 
@@ -3821,20 +3838,20 @@ function treeHtml(): string {
       up !== null && many > 0 && settings.treeWhole !== "whole"
         ? `<button class="beside${open ? " on" : ""}" data-beside="${esc(up)}" data-tip="${open ? "close the level back to the way" : `${many} more beside it in its level`}">${open ? "−" : `+${many}`}</button>`
         : "";
-    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
+    return `<div class="${cls(a, "step", a === S ? "open" : "above")}" data-a="${esc(a)}" ${hued(a)}>${ring}${num(b, scopeFor(a))}<span class="name" ${takes}>${glyphHtml(b)}${esc(b.title)}</span>${a === S && body ? bearingHtml(a) : ""}${beside}</div>`;
   };
   // a sibling the way passed by: a row as any row of the outline, and pressing it goes there
   const sibling = (b: Brief): string =>
     node(
       b.address,
-      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${lead(b)}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
+      `<div class="${cls(b.address, "sib")}" data-a="${esc(b.address)}" ${hued(b.address)}>${lead(b)}${num(b, scopeFor(b.address))}<span class="name" data-go="${esc(b.address)}">${glyphHtml(b)}${esc(b.title)}</span>${stamp(b)}</div>${sprout(b, true)}`,
       "",
     );
   // what a brief relates stands after its level as doors, no part of it: the related brief's icon and name in its own
   // hue, a slash for the door in place of a fold mark, and no sprout, since its shape is its own tree's
   const doorsOf = (b: Brief): string =>
     relatedOf(b)
-      .map((t) => `<div class="row related" data-go="${esc(t)}" data-tip="${esc(prefixesOf(t).slice(1).map((x) => brief(x)?.title ?? "").join(" › "))}" ${hued(t)}>${RELATED_MARK}<span class="name" data-go="${esc(t)}">${esc(brief(t)!.title)}</span></div>`)
+      .map((t) => `<div class="row related" data-go="${esc(t)}" data-tip="${esc(prefixesOf(t).slice(1).map((x) => brief(x)?.title ?? "").join(" › "))}" ${hued(t)}>${RELATED_MARK}<span class="name" data-go="${esc(t)}">${glyphHtml(brief(t))}${esc(brief(t)!.title)}</span></div>`)
       .join("");
   // the reading open as the lane holds it, folds and all
   const outline = (b: Brief): string => {
@@ -3844,7 +3861,7 @@ function treeHtml(): string {
     // levels the lane has unfolded are seen alone
     const listed = whole && (settings.treeLevels !== "unfolded" || level(b.address).some((k) => !isCard(k) && foldOf(k.address) === "whole"));
     // a card opens rather than folds, so it carries no fold mark
-    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? lead(b) : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${esc(b.title)}</span>${stamp(b)}</div>`;
+    const row = `<div class="${cls(b.address)}" data-a="${esc(b.address)}" ${hued(b.address)}>${isCard(b) ? lead(b) : foldMark(b)}${num(b, S)}<span class="name" data-go="${esc(b.address)}">${glyphHtml(b)}${esc(b.title)}</span>${stamp(b)}</div>`;
     const kids = (listed ? level(b.address).map(outline).join("") : "") + (whole ? doorsOf(b) : "");
     return node(b.address, row + sprout(b, whole && !listed), kids);
   };
@@ -3923,6 +3940,8 @@ const relatedOf = (b: Brief): string[] => b.body.flatMap((t) => (t.type === "rel
 
 /** A file's icon, where it carries one, set before its name wherever it is named in a line (practice 8.7). */
 const iconHtml = (b: Brief | undefined): string => (b?.icon ? `<span class="ficon" aria-hidden="true">${b.icon}</span>` : "");
+/** A brief's icon, where its heading carries one, set at the head of its name wherever it is named, as an emoji would be (practice 8.8). */
+const glyphHtml = (b: Brief | undefined): string => (b?.glyph ? `<span class="bicon" aria-hidden="true">${b.glyph}</span>` : "");
 
 /** The mark of a relation, a link out of the reading: an arrow up and away, on the fourteen grid the tree's marks take. */
 const RELATED_MARK = `<svg class="mark rel" viewBox="0 0 14 14" aria-hidden="true"><path d="M4.5 9.5 9.5 4.5M5.5 4.5h4v4"/></svg>`;
@@ -4109,6 +4128,7 @@ function settleHeld(): void {
   if (settings.plate !== "scope") settings.plate = "whole";
   if (settings.plateGrain !== "file") settings.plateGrain = "brief";
   if (settings.treeRoom !== "open") settings.treeRoom = "dense";
+  if (settings.shapeRoom !== "wide") settings.shapeRoom = "narrow";
   if (settings.treeSprouts !== "hidden") settings.treeSprouts = "shown";
   if (settings.treeWhole !== "whole") settings.treeWhole = "way";
   if (settings.treeLevels !== "unfolded") settings.treeLevels = "all";
@@ -4154,42 +4174,17 @@ const keysHtml = (): string =>
 
 const SHAPE = { indent: 9, bar: 46, pad: 6, tail: 30, inset: 4, railIndent: 5, railBar: 28 };
 
+/** How wide a block of the shape stands: half what it stood at while it carried marks beside it, or that wide again where its head says so. */
+const shapeBar = (): number => (settings.shapeRoom === "wide" ? SHAPE.bar : Math.round(SHAPE.bar / 2));
+
 /**
- * The width the shape stands in: as far right as it draws, its rows as the lane lays them and the marks of each folded
- * brief beside them, so it takes no room it leaves bare. An unfolded brief's marks are ghosts drawn only under the
- * pointer, and they reach out over the gap beside the shape rather than keeping room for themselves. Before the lane is
- * laid, its deepest possible row.
+ * The width the shape stands in: as far right as it draws, its rows at their depths and a block's width, so it takes no
+ * room it leaves bare. Before the lane is laid, its deepest possible row.
  */
 function shapeWidth(): number {
   const rows = all<HTMLElement>(".brief", ui.lane);
-  const ix = state.index;
-  if (!rows.length || !ix) return SHAPE.pad * 2 + 4 + (ix?.depth ?? 0) * SHAPE.indent + SHAPE.bar + 4 + 26 + SHAPE.tail;
-  // as shapeSvg draws them: the levels above to the left of the rows, then each row at its depth, its bar and its marks
-  const anc = prefixesOf(state.scope).slice(0, -1);
-  const L = anc.length ? anc.length * 8 + 4 : 0;
-  let right = SHAPE.pad + L;
-  for (const el of rows) {
-    const a = el.dataset.a!;
-    const b = brief(a);
-    const x = SHAPE.pad + L + depthIn(a) * SHAPE.indent;
-    let end = x + SHAPE.bar;
-    if (b && foldOf(a) === "face") {
-      const beyond = blocksOf(b).slice(1);
-      const t0 = x + SHAPE.bar + 4;
-      let tx = t0;
-      for (const t of beyond) {
-        const image = t.type === "image";
-        if (tx - t0 + (image ? 5 : 2) > 24) continue;
-        tx += image ? 7 : 3;
-      }
-      tx += beyond.length ? 2 : 0;
-      const hidden = !isCard(b) && level(a).length > 0 ? ix.branch.get(a)! - ix.own.get(a)! : 0;
-      const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, SHAPE.tail) : 0;
-      if (beyond.length || hidden) end = tx + tailW;
-    }
-    right = Math.max(right, end);
-  }
-  return Math.ceil(right + SHAPE.pad);
+  const deepest = rows.length && state.index ? Math.max(0, ...rows.map((el) => depthIn(el.dataset.a!))) : (state.index?.depth ?? 0);
+  return Math.ceil(SHAPE.pad * 2 + deepest * SHAPE.indent + shapeBar());
 }
 /**
  * The rail: where the lane stands alone the shape keeps standing beside it, narrow, since it does not need much width
@@ -4246,78 +4241,33 @@ function shapeSvg(W: number, H: number): string {
   const laid = laidBlocks();
   const total = Math.max(1, box.scrollHeight);
   const k = (H - 8) / total;
-  const ix = state.index!;
-  // as the rail the shape stands narrow, so its marks take the room each row actually has left and no more, rather
-  // than the room the figure declares; and a finger cannot find a row six pixels tall, so the rail takes no presses
-  // under one and answers a scrub instead
+  // a finger cannot find a row six pixels tall, so the rail takes no presses under one and answers a scrub instead
   const rail = onRail();
-  const bar = rail ? SHAPE.railBar : SHAPE.bar;
-  // the levels above the scope stand to the left of the opening's row, a tick per ancestor, outermost leftmost
-  // the ticks for the levels above are marks like any other, so the rail gives up their room as well; the way down,
-  // which reaches over the rail, names those levels and is a press a finger can find
-  const anc = rail ? [] : prefixesOf(state.scope).slice(0, -1);
-  const L = anc.length ? anc.length * 8 + 4 : 0;
+  const bar = rail ? SHAPE.railBar : shapeBar();
   // the shape stands in its own width, never a wider figure's beside it in the same column
   const w = Math.min(W, shapeWidth());
   const cells = laid.map((l) => {
-    // the rail nests a step tighter than a column does, so a level six deep still leaves a row room for its marks
-    const x = SHAPE.pad + L + depthIn(l.a) * (rail ? SHAPE.railIndent : SHAPE.indent);
+    // the rail nests a step tighter than a column does, so a level six deep still leaves a row room
+    const depth = depthIn(l.a);
+    const x = SHAPE.pad + depth * (rail ? SHAPE.railIndent : SHAPE.indent);
     const bars = l.blocks
       .map((b) => blockRect(b.kind, x + Math.round(bar * (b.left ?? 0)), 4 + b.top * k, b.kind === "head" ? Math.round(bar * 0.6) : Math.max(b.left === undefined ? 4 : 2, Math.round(bar * b.width) - (b.left === undefined ? 0 : 1)), Math.max(1.2, b.height * k - 1), b.card ? `data-a="${esc(b.card)}" ${hued(b.card)}` : ""))
       .join("");
-    // beside the face a brief tells what it hides, or would hide: a tick per paragraph and a small frame per image, then
-    // a grey tail as long as the levels beneath are heavy; drawn when folded, and as a ghost under the pointer when unfolded
+    // a brief's icon stands in the room its nesting leaves to the left of its blocks, beside its heading, where nothing
+    // else is drawn; a brief at the scope's own depth has no such room, and the rail none to spare (widgets 3)
     const b = brief(l.a);
-    const folded = b !== undefined && foldOf(l.a) === "face";
-    const ghost = folded ? "" : " ghost";
-    const beyond = b ? blocksOf(b).slice(1) : [];
-    const paras = beyond.length;
-    const hidden = b && !isCard(b) && level(l.a).length > 0 ? ix.branch.get(l.a)! - ix.own.get(l.a)! : 0;
-    const face = l.blocks[1] ?? l.blocks[0];
-    const y = face ? (4 + face.top * k).toFixed(1) : "0";
-    const h = face ? Math.max(1.2, face.height * k - 1).toFixed(1) : "1";
-    // the marks keep to the room the shape declares for them, so a brief of many images stops where eight ticks would;
-    // on the rail the room is what the row has left of the rail's own width, since there is no more to give
-    const t0 = x + bar + 4;
-    const room = rail ? Math.max(0, w - t0 - 2) : 24 + SHAPE.tail;
-    const tickRoom = rail ? Math.max(0, Math.min(24, room - 5)) : 24;
-    let tx = t0;
-    const ticks =
-      face && b
-        ? beyond
-            .map((t) => {
-              const image = t.type === "image";
-              if (tx - t0 + (image ? 5 : 2) > tickRoom) return "";
-              const tick = image ? `<rect class="tick image${ghost}" x="${tx + 0.5}" y="${y}" width="4" height="${h}" rx="1"/>` : `<rect class="tick${ghost}" x="${tx}" y="${y}" width="1.6" height="${h}"/>`;
-              tx += image ? 7 : 3;
-              return tick;
-            })
-            .join("")
+    const head = l.blocks[0];
+    const side = SHAPE.indent - 1;
+    const glyph =
+      b?.glyph && head && depth > 0 && !rail
+        ? b.glyph.replace(/^(\s*<svg\b)([^>]*)>/, (_, open: string, attrs: string) => `${open}${attrs.replace(/\s(width|height|x|y)\s*=\s*"[^"]*"/g, "")} x="${x - SHAPE.indent}" y="${(4 + head.top * k + Math.max(0, head.height * k - side) / 2).toFixed(1)}" width="${side}" height="${side}">`)
         : "";
-    tx += paras ? 2 : 0;
-    const tailW = hidden > 0 ? clamp(3 + Math.sqrt(hidden) / 4, 3, rail ? Math.max(0, w - tx - 2) : SHAPE.tail) : 0;
-    const tail = hidden > 0 && face && tailW >= 3 ? `<rect class="hidden${ghost}" x="${tx}" y="${y}" width="${tailW.toFixed(1)}" height="${h}" rx="1"/>` : "";
-    const marksEnd = tx + tailW + (paras || hidden ? 8 : 0);
-    // the opening's row carries the levels above to its left, each a press that scopes out to it
-    const first = l.blocks[0];
-    const above =
-      l.a === state.scope && first
-        ? anc.map((a, i) => `<g class="cell above" data-a="${esc(a)}" data-scope="${esc(a)}" ${hued(a)}><rect class="hit" x="${SHAPE.pad + i * 8 - 1}" y="${(4 + first.top * k - 4).toFixed(1)}" width="8" height="${(Math.max(10, first.height * k) + 8).toFixed(1)}"/><rect class="head" x="${SHAPE.pad + i * 8}" y="${(4 + first.top * k).toFixed(1)}" width="6" height="${Math.max(10, first.height * k - 1).toFixed(1)}" rx="1.5"/></g>`).join("")
-        : "";
-    // two presses: the blocks go to the brief; the room to their right, where what is hidden stands, folds or unfolds it,
-    // the levels above are drawn last, so they take the press
     const top = (4 + l.top * k).toFixed(1);
     const height = Math.max(1, l.height * k).toFixed(1);
-    // rows touch, so the room keeps to its own row; only a row thinner than a pointer can find is given height, to six pixels
-    const grow = Math.max(0, (6 - l.height * k) / 2);
-    const fy = Math.max(0, 4 + l.top * k - grow).toFixed(1);
-    const fh = (Math.max(1, l.height * k) + 2 * grow).toFixed(1);
     return (
       `<g class="cell${l.a === state.focus ? " here" : ""}" data-a="${esc(l.a)}" ${hued(l.a)}>` +
       (rail && touch ? "" : `<rect class="hit" data-press="go" x="${x - 3}" y="${top}" width="${bar + 5}" height="${height}"/>`) +
-      (!(rail && touch) && (paras || hidden) ? `<rect class="hit" data-press="fold" x="${x + bar + 2}" y="${fy}" width="${Math.max(6, marksEnd - x - bar - 2)}" height="${fh}"/>` : "") +
-      `${bars}${ticks}${tail}</g>` +
-      above
+      `${bars}${glyph}</g>`
     );
   });
   // the band stands half the rail's own inset clear of its rows, and the same clear of its edge, so it is not pressed
@@ -4857,7 +4807,7 @@ function rowHtml(b: Brief, root: string, col: number, o: { head: boolean; opens:
   const num = o.head ? "" : `<span class="num">${esc(n)}</span>`;
   // a node carries its name and what waits beneath it, and nothing else: the width is set so that a name fills it
   // rather than trailing off in one long line, and the figure stands on the line beneath
-  const say = `<span class="say"><span class="title">${esc(b.title)}</span></span>`;
+  const say = `<span class="say"><span class="title">${glyphHtml(b)}${esc(b.title)}</span></span>`;
   // the number stands on the line the figure is on rather than before the name, so the name keeps the node's whole
   // width and a name that wraps needs no hanging indent
   const attrs = `class="${cls}" data-a="${esc(a)}"${o.head ? ` data-head="1"` : ""} ${huedRun(a)}`;
@@ -6231,6 +6181,11 @@ function headSettings(k: string): string {
     const gtip = files ? "a cell per file — press for a cell per brief" : "a cell per brief — press for a cell per file";
     return scope + `<button class="pick${files ? " on" : ""}" data-toggle="grain" data-tip="${esc(gtip)}">${icon("files")}</button>`;
   }
+  if (k === "shape") {
+    const wide = settings.shapeRoom === "wide";
+    const tip = wide ? "the blocks stand wide — press to draw them as narrow as a scrollbar" : "the blocks stand as narrow as a scrollbar — press to draw them wide";
+    return `<button class="pick${wide ? " on" : ""}" data-toggle="shapeRoom" data-tip="${esc(tip)}">${icon("spaced")}</button>`;
+  }
   if (k === "tree") {
     const open = settings.treeRoom === "open";
     const tip = open ? "rows stand apart and names wrap — press to draw them close" : "rows stand close and names are cut — press to give them room";
@@ -6587,7 +6542,7 @@ function drawCrumb(): void {
     const cls = ["step", reading(a) ? "scope" : "", where, ...(ring ? ["ring"] : []), ...(bare ? ["bare"] : []), ...(head ? ["now", ...(ACTIONS.scope.can(a) ? ["opens"] : [])] : [])].filter(Boolean).join(" ");
     const takes = head ? "" : depthOf(a) < depthOf(S) ? ` data-scope="${esc(a)}"` : ` data-go="${esc(a)}"`;
     const title = esc(brief(a)!.title);
-    const face = ring ? (brief(a)!.icon ? `<span class="ficon" aria-label="${title}">${brief(a)!.icon}</span>` : `<i aria-label="${title}"></i>`) : `${n ? `<span class="num">${esc(n)}</span>` : ""}${body && reading(a) ? iconHtml(brief(a)) : ""}${bare ? "" : title}`;
+    const face = ring ? (brief(a)!.icon ? `<span class="ficon" aria-label="${title}">${brief(a)!.icon}</span>` : `<i aria-label="${title}"></i>`) : `${n ? `<span class="num">${esc(n)}</span>` : ""}${body && reading(a) ? iconHtml(brief(a)) : ""}${bare ? "" : glyphHtml(brief(a)) + title}`;
     return `<span class="${cls}" data-a="${esc(a)}"${takes} ${hued(a)}>${face}</span>` + (a === S && body && !narrow() ? bearingHtml(a) : "");
   };
   const mark = (a: string): string => (body && reading(a) ? `<svg class="door" viewBox="0 0 10 10" ${hued(a)}><path d="M6.4 1.2 3.6 8.8"/></svg>` : CHEVRON);
@@ -8074,6 +8029,7 @@ const onClick = (e: MouseEvent): void => {
     else if (what === "levels") settings.treeLevels = settings.treeLevels === "unfolded" ? "all" : "unfolded";
     else if (what === "whole") settings.treeWhole = settings.treeWhole === "whole" ? "way" : "whole";
     else if (what === "sprouts") settings.treeSprouts = settings.treeSprouts === "shown" ? "hidden" : "shown";
+    else if (what === "shapeRoom") settings.shapeRoom = settings.shapeRoom === "wide" ? "narrow" : "wide";
     else if (what === "room") settings.treeRoom = settings.treeRoom === "open" ? "dense" : "open";
     else if (what === "grain") settings.plateGrain = settings.plateGrain === "file" ? "brief" : "file";
     else settings.plate = settings.plate === "scope" ? "whole" : "scope";
@@ -8920,6 +8876,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) .step:has(.ficon) { display: inline-flex; align-items: center; }
 :is(#crumb, #gcrumb) .step .ficon { vertical-align: 0; }
 :is(#crumb, #gcrumb) .step .ficon svg { width: 100%; height: 100%; opacity: 1; }
+:is(#crumb, #gcrumb) .step:has(.bicon) { display: inline-flex; align-items: center; }
+:is(#crumb, #gcrumb) .step .bicon { vertical-align: 0; }
+:is(#crumb, #gcrumb) .step .bicon svg { width: 100%; height: 100%; opacity: 1; }
 :is(#crumb, #gcrumb) .step.in { color: var(--faint); }
 :is(#crumb, #gcrumb) .step.root { flex: none; color: var(--muted); }
 :is(#crumb, #gcrumb) .step .num { margin-right: .35em; font-size: .86em; font-variant-numeric: tabular-nums; color: var(--faint); transition: color .1s; }
@@ -9334,6 +9293,9 @@ body.moving .lot, .lot.lit { background: var(--wash); }
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
 .ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* a brief's icon is part of its name, at its text's size, a step quieter than a file's, which stands for the file whole */
+.bicon { display: inline-block; width: .95em; height: .95em; margin-right: .32em; vertical-align: -.12em; opacity: .78; }
+.bicon svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
 .brief .card .stamp { flex: none; white-space: nowrap; }
