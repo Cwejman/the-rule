@@ -8859,7 +8859,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :is(#crumb, #gcrumb) .step.ring { display: grid; place-items: center; width: 14px; height: 14px; }
 :is(#crumb, #gcrumb) .step.ring i, .tree .ring i { width: 11px; height: 11px; border-radius: 50%; background: conic-gradient(in oklch longer hue, light-dark(oklch(74% .085 0), oklch(54% .07 0)), light-dark(oklch(74% .085 0), oklch(54% .07 0))); -webkit-mask: radial-gradient(circle, transparent 3px, #000 3.5px); mask: radial-gradient(circle, transparent 3px, #000 3.5px); transition: transform .15s; }
 :is(#crumb, #gcrumb) .step.ring:is(:hover, .lit) i { transform: scale(1.18); }
-:is(#crumb, #gcrumb, .tree) .stamp { flex: none; margin-left: -1px; font-size: .86em; color: var(--faint); }
+/* weightless, so the tree's own rule, which lets the status give way before the name, wins over it in a row */
+:where(#crumb, #gcrumb, .tree) .stamp { flex: none; margin-left: -1px; font-size: .86em; color: var(--faint); }
 :is(#crumb, #gcrumb, .tree) .through { flex: none; position: relative; width: 22px; height: 3px; border-radius: 2px; background: var(--track); overflow: hidden; }
 :is(#crumb, #gcrumb, .tree) .through i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--door); transition: width .16s; }
 :is(#crumb, #gcrumb) svg.door { width: 9px; height: 9px; color: var(--door); stroke-width: 1.4; opacity: 1; }
@@ -9496,7 +9497,9 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .files.large .fkids > .fnode > .frow::before { left: -8px; width: 6px; }
 .files.large .fkids > .fnode:last-child::before { height: calc(1.3em + 1px + var(--fp) / 2); }
 .tree .marks { display: flex; align-items: center; flex: 0 100 auto; min-width: 0; gap: 2px; height: 6px; overflow: hidden; }
-.tree .row .stamp { flex: 0 10 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the status takes only the room the name leaves: no width of its own to start from, growing to its whole width at most,
+   so it is cut away entirely before the name gives up a letter */
+.tree .row .stamp { flex: 1 1 0; max-width: max-content; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tree .marks i { display: block; flex: none; width: 4px; height: 3px; border-radius: 1.5px; background: var(--rest); }
 .tree .marks i.image { width: 5px; height: 5px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 1.2px var(--rest); }
 .tree .marks .brief { display: block; flex: none; width: calc(var(--w) / 2); height: 3px; border-radius: 1.5px; background: var(--door); }
