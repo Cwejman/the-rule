@@ -6777,6 +6777,7 @@ function drawLaser(): void {
     const name = sp.previousElementSibling?.querySelector<HTMLElement>(".name");
     if (name) sp.style.setProperty("--under", `${name.offsetLeft}px`);
   });
+  drawTreeLines(tree);
   // the tree draws the world the keys act in, so only that world moves its water
   if (worldNow() !== keysWorld()) return void (waterPlan = []);
   const tick = parseFloat(getComputedStyle(tree).getPropertyValue("--tick")) || 10;
@@ -6791,6 +6792,61 @@ function drawLaser(): void {
     return { el, a, from: at(into), next: after ? after.querySelector<HTMLElement>(":scope > .row")!.dataset.a! : null, to: after ? at(after) : at(into) };
   });
   drawWater();
+}
+
+/**
+ * The tree's lines, drawn once its rows are laid, as one drawing over the tree: each level's line from beneath the mark
+ * of the row holding it down to the tick of its last row, and a tick into each row, every stroke a pixel wide on a
+ * whole pixel. The quiet line is one path in one opaque ink, so nothing darkens where strokes meet; a tick on the way to
+ * the focus takes its branch's ink and a tick into a file the hue of the reading entered, drawn over it. Lines kept by
+ * each row's own styles met at three widths, two offsets and a translucent ink that darkened wherever two crossed.
+ */
+function drawTreeLines(tree: HTMLElement): void {
+  tree.querySelector(":scope > svg.lines")?.remove();
+  const box = tree.getBoundingClientRect();
+  const X = (v: number): number => Math.round(v - box.left) + 0.5;
+  const Y = (v: number): number => Math.round(v - box.top) + 0.5;
+  const ink = (el: Element, name: string): string => getComputedStyle(el).getPropertyValue(name).trim();
+  const quiet: string[] = [];
+  const inked: string[] = [];
+  const stroke = (d: string, colour: string) => inked.push(`<path d="${d}" style="stroke:${colour}"/>`);
+  const markOf = (row: Element): DOMRect => (row.firstElementChild as HTMLElement).getBoundingClientRect();
+  // a row whose mark's room is empty is a joint: a line into it turns down in the middle of that room
+  const joint = (row: Element): boolean => !!row.firstElementChild?.matches("span.mark.leaf");
+  for (const node of all<HTMLElement>(".node", tree)) {
+    const row = node.querySelector<HTMLElement>(":scope > .row");
+    const kids = node.querySelector<HTMLElement>(":scope > .kids");
+    const subs = kids ? all<HTMLElement>(":scope > .node", kids) : [];
+    if (!row || !kids || !subs.length) continue;
+    const m = markOf(row);
+    const x = X(m.left + m.width / 2);
+    // beneath an open fold mark's point, an icon's foot, or from the middle of a joint
+    const first = row.firstElementChild!;
+    const from = joint(row) ? Y(m.top + m.height / 2) : first.matches("button.mark") ? Y(m.top + m.height / 2 + 4) : Y(m.bottom + 1);
+    let last = from;
+    for (const sub of subs) {
+      const r = sub.querySelector<HTMLElement>(":scope > .row");
+      if (!r) continue;
+      const sm = markOf(r);
+      const y = Y(sm.top + sm.height / 2);
+      const to = joint(r) && sub.querySelector(":scope > .kids > .node") ? X(sm.left + sm.width / 2) : X(sm.left) - 1;
+      const d = `M${x} ${y}H${to}`;
+      if (sub.classList.contains("on")) stroke(d, ink(sub, "--on"));
+      else if (sub.classList.contains("door")) stroke(d, ink(sub, "--door"));
+      else quiet.push(d);
+      last = y;
+    }
+    quiet.push(`M${x} ${from}V${last}`);
+    // where the way runs on down this level the water runs through the stretch above it too, and is kept on the line
+    const flow = kids.querySelector<HTMLElement>(":scope > .flow");
+    if (flow) {
+      const k = kids.getBoundingClientRect();
+      stroke(`M${x} ${from}V${Y(k.top)}`, ink(node, "--on"));
+      flow.style.left = `${x - 0.5 - Math.round(k.left - box.left)}px`;
+    }
+  }
+  const svg = `<svg class="lines" width="${tree.scrollWidth}" height="${tree.scrollHeight}" aria-hidden="true"><path class="quiet" d="${quiet.join("")}"/>${inked.join("")}</svg>`;
+  tree.insertAdjacentHTML("afterbegin", svg);
 }
 
 /** The band of the wing, as fractions of its height, the reader's place in the tree is kept within. */
@@ -9438,42 +9494,29 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .adj.foot .gloss { margin-bottom: 2px; }
 /* the links figure, in a wing while the gutter has no room: the same adjuncts, stacked, under the brief's name */
 
-.tree { --tick: 10px; position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; }
+/* the tree's one quiet ink for its lines, opaque, so no two strokes darken where they meet */
+.tree { --line: color-mix(in oklch, var(--ground), var(--ink) 15%); --tick: 10px; position: relative; font-family: var(--sans); font-size: var(--small); line-height: 1.35; color: var(--muted); width: 100%; }
 /* open, the rows stand apart and a long name wraps rather than being cut, the marks before it held to its first line */
 .tree.open { --tick: 13px; line-height: 1.4; }
 .tree.open .row { align-items: flex-start; min-height: 26px; padding-block: 3px; }
 .tree.open .name { white-space: normal; overflow: visible; }
 .tree.open .row > :is(.mark, .ring, .num) { margin-top: 2px; }
 .tree.open .row > :is(.stamp, .through, .marks, .beside) { margin-top: 5px; }
-.tree.open .kids > .node > .row::after { top: var(--tick); }
 /* the tree is drawn as a file tree is: a level steps in, and its line drops from beneath the mark of the row that holds
    it, each node beneath carrying its stretch of the line and the last only down to its own row */
 /* a node holds its sprout's margin, so its stretch of the line reaches the next node's and never leaves a gap between */
 .tree .node { position: relative; display: flow-root; }
 .tree .kids { padding-left: 14px; }
-.tree .kids > .node::before { content: ""; position: absolute; left: -7px; top: 0; bottom: 0; width: 1px; background: var(--track); }
-/* a row holding a level carries its line from just beneath its mark down to its foot, so the level's line meets the
-   mark rather than starting a gap below it: beneath an icon's foot, or the point of a fold mark turned open */
-.tree .node:has(> .kids > .node) > .row::before { content: ""; position: absolute; left: 7px; top: calc(var(--tick) + 8px); bottom: 0; width: 1px; background: var(--track); }
-.tree .node:has(> .kids > .node) > .row:has(> .mark:not(.leaf))::before { top: calc(var(--tick) + 4px); }
-/* a step with no icon is a joint: the tick into it runs on to the middle of its mark's room and the line down leaves from
-   there, one line turning, where it ran into an empty room and left again a column over */
-.tree .node:has(> .kids > .node) > .row:has(> .mark.leaf)::before { top: var(--tick); }
-.tree .kids > .node:has(> .kids > .node) > .row:has(> .mark.leaf)::after { width: 15px; }
-/* where the water runs on down the level, it runs through the row's stretch as well */
-.tree .node:has(> .kids > .flow) > .row::before { left: 6.9px; width: 1.5px; background: var(--on); }
-.tree .kids > .node:last-child::before { bottom: auto; height: calc(var(--tick) + 1px); }
 /* the water: down the line of each level the way passes through, to the row it passes into, in the hue of the level;
    what is newly reached runs from the top down, a level after the one above it */
 .tree .kids { position: relative; }
-.tree .flow { position: absolute; z-index: 1; left: 6.9px; top: 0; width: 1.5px; height: 0; border-radius: 1px; background: var(--on); transform-origin: top; pointer-events: none; }
-.tree .kids > .node.fresh > .row::after { transform-origin: left; animation: tree-tick .12s ease-out calc(var(--delay, 0s) + .2s) both; }
-@keyframes tree-tick { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.tree .flow { position: absolute; z-index: 1; left: 7px; top: 0; width: 1px; height: 0; background: var(--on); transform-origin: top; pointer-events: none; }
+/* the lines, drawn over the tree from its rows as laid: one width, whole pixels, and one opaque quiet ink */
+.tree > svg.lines { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.tree > svg.lines path { fill: none; stroke-width: 1; stroke-linecap: square; }
+.tree > svg.lines path.quiet { stroke: var(--line); }
 /* the tick into a row says what reaching it crosses: the branch's ink on the way to the focus, and the hue of the
    reading entered, a step stronger, at a file's boundary */
-.tree .kids > .node > .row::after { content: ""; position: absolute; left: -7px; top: var(--tick); width: 7px; height: 1px; background: var(--track); }
-.tree .kids > .node.on > .row::after { background: var(--on); }
-.tree .kids > .node.door > .row::after { height: 1.5px; background: var(--door); }
 .tree .row { position: relative; display: flex; align-items: center; gap: 5px; min-height: 21px; padding: 0 6px 0 0; border-radius: 6px; }
 .tree .row .mark { position: static; flex: none; width: 14px; height: 14px; }
 .tree .ring { flex: none; width: 14px; height: 14px; display: grid; place-items: center; }
@@ -9504,9 +9547,9 @@ svg.fig.marks .more { fill: var(--faint); font-family: var(--sans); font-size: 1
 .files .frow i.q { opacity: .35; }
 .files .fkids { padding-left: 9px; }
 .files .fkids > .fnode { position: relative; }
-.files .fkids > .fnode::before { content: ""; position: absolute; left: -6px; top: 0; bottom: 0; width: 1px; background: var(--track); }
+.files .fkids > .fnode::before { content: ""; position: absolute; left: -6px; top: 0; bottom: 0; width: 1px; background: var(--line); }
 .files .fkids > .fnode:last-child::before { bottom: auto; height: calc(var(--fp) / 2 + .5px); }
-.files .fkids > .fnode > .frow::before { content: ""; position: absolute; left: -6px; top: calc(50% - .5px); width: 5px; height: 1px; background: var(--track); }
+.files .fkids > .fnode > .frow::before { content: ""; position: absolute; left: -6px; top: calc(50% - .5px); width: 5px; height: 1px; background: var(--line); }
 .tree .sprout { margin: 0 0 3px var(--under, 19px); cursor: pointer; }
 .tree .row:is(:hover, .lit) + .sprout .frow i { opacity: 1; }
 .tree .row:is(:hover, .lit) + .sprout .frow i.q { opacity: .5; }
