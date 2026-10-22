@@ -6780,12 +6780,18 @@ function drawLaser(): void {
   drawTreeLines(tree);
   // the tree draws the world the keys act in, so only that world moves its water
   if (worldNow() !== keysWorld()) return void (waterPlan = []);
-  const tick = parseFloat(getComputedStyle(tree).getPropertyValue("--tick")) || 10;
+  // the water ends on the tick it turns into, measured as the lines are, from the middle of the row's mark on its whole
+  // pixel to the tick's far edge; reckoned from the tree's spacing it stopped a pixel and a half short of every turn, and
+  // the quiet line showed through the corner
+  const treeTop = tree.getBoundingClientRect().top;
   waterPlan = all<HTMLElement>(".flow", tree).map((el) => {
     const kids = el.parentElement!;
     const into = kids.querySelector<HTMLElement>(":scope > .node.on");
     const top = kids.getBoundingClientRect().top;
-    const at = (n: Element): number => n.querySelector(":scope > .row")!.getBoundingClientRect().top - top + tick;
+    const at = (n: Element): number => {
+      const m = (n.querySelector(":scope > .row")!.firstElementChild as HTMLElement).getBoundingClientRect();
+      return Math.round(m.top + m.height / 2 - treeTop) + 1 - (top - treeTop);
+    };
     if (!into) return { el, a: "", from: 0, next: null, to: 0 };
     const after = into.nextElementSibling?.matches(".node") ? into.nextElementSibling : null;
     const a = into.querySelector<HTMLElement>(":scope > .row")!.dataset.a!;
