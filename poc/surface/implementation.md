@@ -12,17 +12,17 @@ The surface is one page the browser manages, and one TypeScript file run with Bu
 
 Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters). Run with `--history`, it traces [the history](history.md) apart from the body, and prints its stories, their commits and its warnings, which is how a session reads back the story it has told.
 
-Either way the file reads [the stamped](README.md#2-the-root) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
+Either way the file reads [the stamped](README.md#2--the-root) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
 
 *In force, the author's decision, 2026-09-12.*
 
 ## 1. ![A globe](.img/browser.icon.svg) In the browser
 
-Everything a reader does happens in the browser: the lane and its folds, the widgets, and every move between them. So one client serves both moments of a repository, live and published, and the two differ only in where the body comes from, [beneath](#5-live-and-published).
+Everything a reader does happens in the browser: the lane and its folds, the widgets, and every move between them. So one client serves both moments of a repository, live and published, and the two differ only in where the body comes from, [beneath](#5--live-and-published).
 
 *In force, the author's decision, 2026-09-12.*
 
-## 2. The process and the page
+## 2. ![A gear](.img/process.icon.svg) The process and the page
 
 A program should receive structure, never recover it. So the process that reads the files, the trace, reads the body once and hands the page each brief already parsed and already placed, and the page carries no markdown parser, resolves no paths, and guesses at nothing.
 
@@ -138,13 +138,13 @@ The page's URL holds the address of the brief in focus, and after `?in=` [the sc
 surface.html#/the-proof-of-concept/the-surface/reading-and-orientation-come-apart?in=the-proof-of-concept/the-surface
 ```
 
-It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, [its reading laid whole](lane.md#3-laid-whole).
+It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, [its reading laid whole](lane.md#3--laid-whole).
 
 The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5--arrival), and the folds a reader made are kept apart from it, [in the browser](#66-what-the-browser-keeps).
 
 *In force, the author's decision, 2026-09-12; the scope and the focus in the address as built on 2026-09-13.*
 
-## 5. Live and published
+## 5. ![A point sending out waves](.img/live.icon.svg) Live and published
 
 Whether the body is served to the page or written into it is the only difference between the two moments, so the page never knows which it is in, and nothing is built twice.
 
@@ -184,7 +184,7 @@ The rule's own page is built this way on every commit to its main branch, by a w
 
 *In force, the author's decision, 2026-09-12; images beside the page rather than inside it, and the rule's pipeline, the author's asks of 2026-09-14. That parsing a JSON string is faster than an equally large object literal is carried from V8's guidance and not checked here.*
 
-## 6. Drawing
+## 6. ![A brush](.img/brush.icon.svg) Drawing
 
 The page draws from [the shared state](framework.md#4-shared-state) and nothing else, and every change to one part of it draws again only what depends on that part. So nothing is drawn twice for one change, and nothing drawn can disagree with the state.
 
@@ -218,7 +218,7 @@ When the line eases to the ends, the room above and below the lane is set each t
 
 A wing lays its figures in slots: a figure of fixed size is drawn first and measured, a growing figure is drawn into what is left, and a figure that answers the focus or the pointer is drawn again in its own slot alone.
 
-Each figure is drawn whole from the state whenever the state it reads changes: [the tree](widgets.md#2--the-tree) and [the settings](widgets.md#6--settings) as HTML, [the ahead](widgets.md#4-the-ahead), [the shape](widgets.md#3--the-shape) and [the plate](widgets.md#7--the-plate) as SVG. A slot too short to draw a figure in is left empty, since a figure scaled to nothing draws marks of no size.
+Each figure is drawn whole from the state whenever the state it reads changes: [the tree](widgets.md#2--the-tree) and [the settings](widgets.md#6--settings) as HTML, [the ahead](widgets.md#4--the-ahead), [the shape](widgets.md#3--the-shape) and [the plate](widgets.md#7--the-plate) as SVG. A slot too short to draw a figure in is left empty, since a figure scaled to nothing draws marks of no size.
 
 The lane's ends and the shape's slot depend on each other, so they are settled in a few steps: the wings are laid, the lane's ends are set to the shape's slot, and the wings are drawn again if that moved them. [The strips](framework.md#3-the-strip) are laid over the foot of the row from the areas' own geometry, so a closed area's rail stands where the area stood.
 
@@ -258,7 +258,7 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws [the path the reader has opened](canvas.md#3-the-opened-path) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-shared-state), and both are kept in the browser with the view.
+The canvas draws [the path the reader has opened](canvas.md#3--the-opened-path) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-shared-state), and both are kept in the browser with the view.
 
 Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
@@ -280,7 +280,7 @@ Nothing of the lane or the canvas is written twice. What the history needs of it
 
 Its addresses are its own, so nothing the body lights reaches its briefs, and as yet nothing it lights reaches the body's.
 
-*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world. Superseded on 2026-10-01 by [two worlds standing at once](layout.md#6--two-worlds): the history's world holds the elements it is drawn in, and is set in the state's place while anything is drawn or done there; where the lane stands alone it is set there for as long as the one pane reads it.*
+*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3--one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world. Superseded on 2026-10-01 by [two worlds standing at once](layout.md#6--two-worlds): the history's world holds the elements it is drawn in, and is set in the state's place while anything is drawn or done there; where the lane stands alone it is set there for as long as the one pane reads it.*
 
 ### 6.6 What the browser keeps
 
@@ -302,7 +302,7 @@ The rail is the shape at a width the fit hands it, at the edge the reader put it
 
 *In force, 2026-09-16, as built; the rail as the shape at an edge rather than a wing, 2026-10-02.*
 
-## 7. One file
+## 7. ![A file of code](.img/codefile.icon.svg) One file
 
 The file is composed the way a brief is, so it is read by depth like anything else under the rule. What it is and how it is run come first, then how the body is assembled, then how it is drawn, and the details beneath, with numbered headings in comments.
 
@@ -320,7 +320,7 @@ The author's guidelines from the sister project are guidance for taste, not rule
 
 *In force, the author's.*
 
-## 8. Plain functions
+## 8. ![Three plain blocks](.img/blocks.icon.svg) Plain functions
 
 The lane and the widgets are plain functions that return HTML and SVG, written to one style so they read as a family. A framework such as Solid would render in the browser like anything else, but it needs its own compile step for its markup, and that step is exactly what one file run with Bun avoids.
 

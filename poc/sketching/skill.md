@@ -12,7 +12,7 @@ What a session does to make a sketch: when one earns its place, the forms a sket
 
 *In force, 2026-09-14.*
 
-## 1. What it draws
+## 1. ![A framed picture](.img/picture.icon.svg) What it draws
 
 Once a sketch [has earned its place](README.md#1--when-to-sketch), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.
 
@@ -32,9 +32,9 @@ A matrix is two questions asked of the same things, the things down one side and
 
 *Reasoned, the author's direction, 2026-09-14; the forms are the ones the first sketches asked for.*
 
-## 3. The design language
+## 3. ![Swatches fanned](.img/swatch.icon.svg) The design language
 
-A sketch is drawn in the surface's language, carried from [what every widget keeps](../surface/widgets.md#1-what-every-widget-keeps), so a reader meets one family in the page and in the pictures. This is the language's home for sketches, and the tool checks a sketch against it.
+A sketch is drawn in the surface's language, carried from [what every widget keeps](../surface/widgets.md#1--what-every-widget-keeps), so a reader meets one family in the page and in the pictures. This is the language's home for sketches, and the tool checks a sketch against it.
 
 *Reasoned, the author's direction, 2026-09-14.*
 
@@ -54,7 +54,7 @@ The hue is the only colour a sketch has, and it says where in the body a thing s
 
 ### 3.3 Two sizes of text, measured for room
 
-Text comes in two sizes and no smaller: a label at 13 pixels and a note at 11, strong only where a label names the thing the sketch is about. Room is measured before it is given, with [the tool's `measure`](implementation.md#3-measuring-labels), so a label fits in the widest face it may be set in.
+Text comes in two sizes and no smaller: a label at 13 pixels and a note at 11, strong only where a label names the thing the sketch is about. Room is measured before it is given, with [the tool's `measure`](implementation.md#3--measuring-labels), so a label fits in the widest face it may be set in.
 
 *Reasoned, the author's direction, 2026-09-14.*
 

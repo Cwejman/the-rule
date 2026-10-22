@@ -27,7 +27,7 @@ The stance on how a model and a harness should be offered comes first, since it 
 
 ## 2. Letting go by contract
 
-[To debrief](../rule.md#55-the-debrief) is to let go: the detail stays beneath, the conclusion goes to the surface, and what the surface keeps is a contraction of what was there. What is kept is typed, or at least categorised, and then it is what a program can take: substrate as argument data. The author's point is that the contraction can be made contractual.
+[To debrief](../rule.md#55--the-debrief) is to let go: the detail stays beneath, the conclusion goes to the surface, and what the surface keeps is a contraction of what was there. What is kept is typed, or at least categorised, and then it is what a program can take: substrate as argument data. The author's point is that the contraction can be made contractual.
 
 That is the whole of how programs are directed under the medium, a program says what it takes, and a contracted piece of the substrate is handed to it because it matches. So letting go is not loss; it is the making of an interface. Whoever cannot let go cannot direct, because what they hold is not yet in a shape anything can take.
 

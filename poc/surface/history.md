@@ -14,7 +14,7 @@ Its data is built, its stories are traced, and it is drawn as a pane of its own,
 
 *Preferred, the author's design, settled in discussion with the session 2026-09-21 and laid again 2026-09-28 as a mode; the data as built 2026-09-21, the trace and the pane 2026-09-27, and the rest open.*
 
-## 1. Why again
+## 1. ![A lightbulb](../.img/why.icon.svg) Why again
 
 Git was given to the surface once already, on 2026-09-17, and [taken out the same evening](../../ideas/history.md): it slowed every request for the body, it laid the commits into the body as a level nobody wrote, and sixty commits in a list helped nobody understand what changed.
 
@@ -30,7 +30,7 @@ The page's own code grows when it draws the history, and that is measured and sa
 
 *In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5--two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
 
-## 2. Stories
+## 2. ![Books stacked](.img/stories.icon.svg) Stories
 
 Commits are one level, and the low one, and gathering them under a git branch leaves them at that level. What raises them is prose: a story tells what a run of commits did together, a larger story holds smaller ones, and the commits are the leaves at the foot of it all.
 
@@ -76,7 +76,7 @@ The trace resolves a short hash, and warns where one is ambiguous, where a run i
 
 ### 2.3 A commit is a brief of its own kind
 
-A commit leaf is a brief like any other in what the surface holds of it, which is what lets [one code draw both](#3-one-code-for-both): a parent, which is the story that placed it, or the history's own brief for a commit no story tells yet; an address, which is its parent's with the commit's hash beneath it; and a title, which is its subject.
+A commit leaf is a brief like any other in what the surface holds of it, which is what lets [one code draw both](#3--one-code-for-both): a parent, which is the story that placed it, or the history's own brief for a commit no story tells yet; an address, which is its parent's with the commit's hash beneath it; and a title, which is its subject.
 
 What it carries instead of prose is the briefs it touched, and a way to the lines it changed in [the heavy tier](#52-the-heavy-tier-is-had-a-commit-at-a-time).
 
@@ -98,7 +98,7 @@ And it [never retires](../practice.md#22-a-record-retires-once-its-conclusion-is
 
 ### 2.5 A session writes the story as its debrief
 
-A stretch of work ends with [its debrief](../../rule.md#55-the-debrief): the conclusion goes to the surface and the detail stays beneath. Over commits, the story is that conclusion and the commits are the detail, so a session writes the story of its own commits before it ends, and the author ratifies it or comments on it.
+A stretch of work ends with [its debrief](../../rule.md#55--the-debrief): the conclusion goes to the surface and the detail stays beneath. Over commits, the story is that conclusion and the commits are the detail, so a session writes the story of its own commits before it ends, and the author ratifies it or comments on it.
 
 So the history is told as the work is done, not afterwards, and what [many small commits](../practice.md#13-a-commit-is-one-purpose) cost is answered here.
 
@@ -114,7 +114,7 @@ A leaf carries its hash and no more of the commit, since the rest is in the hist
 
 *Preferred, the author's, 2026-09-27, that the history travels flat as the briefs do; the name and the hash's length the session's. As built the same day.*
 
-## 3. One code for both
+## 3. ![A stamp](.img/stamp.icon.svg) One code for both
 
 The body and the history are the same structure, so the same code draws both: the canvas, the lane, selection, the keys and folding take a commit as they take a brief. A second code path for history would be a double standard, and every rule of the surface would then have to be kept twice.
 
@@ -122,7 +122,7 @@ As built, the canvas's code draws the history and the lane does not yet. [In the
 
 *Preferred, the author's, 2026-09-21; as built, 2026-09-27. The lane drawing the history, the author's, 2026-09-28: [a canvas alone is not enough](../../author/ideas-2026-09-28.md#2-a-canvas-alone-is-not-enough).*
 
-## 4. The reader's view
+## 4. ![An eye](.img/eye.icon.svg) The reader's view
 
 The history is a mode the middle is turned to, read from where the reader stands in the body, and what is selected in it shows what it touched there. Its canvas runs across, as a trunk.
 

@@ -12,7 +12,7 @@ The widgets are what can stand in a wing or a gutter: the tree, the shape, the a
 
 *Reasoned, 2026-09-13; each widget carries its own grade beneath.*
 
-## 1. What every widget keeps
+## 1. ![A toolbox](.img/toolbox.icon.svg) What every widget keeps
 
 Every shape is computed from the substrate and none is invented, because a picture a reader cannot trust is worse than no picture at all. What the widgets share beyond that is the rules beneath, and keeping them is what makes seven drawings one family.
 
@@ -74,7 +74,7 @@ Beside a brief the cap says how that brief is reached. On the brief the reading 
 
 A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
 
-Where there is no key to draw, the badge carries the word alone, which is [its third grain](touch.md#8-keyless-badges); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
+Where there is no key to draw, the badge carries the word alone, which is [its third grain](touch.md#8--keyless-badges); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
 
 *The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
 
@@ -250,7 +250,7 @@ A row thinner than six pixels is given six to be hit. Under a finger [the rail t
 
 *Reasoned, the author's, 2026-09-13; the rail without presses, 2026-09-16. The fold's press given way with the marks, 2026-10-21.*
 
-## 4. The ahead
+## 4. ![An eye](.img/eye.icon.svg) The ahead
 
 The ahead stood in the right wing and drew what the highlighted brief hid, for the focus or for the brief under the pointer whenever it was folded: from 2026-10-15 [the figure of the files it holds](#23-the-reading-open-as-an-outline) at a reading size, each file named over its bar.
 

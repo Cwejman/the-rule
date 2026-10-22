@@ -166,7 +166,7 @@ Held this way the rule is not obeyed but embodied, in how one talks and works. A
 
 This section holds early experience, and what it finds will reach the whole rule once it is lived enough to lift. Where it comes from is more than method, and the author says so in [a personal note](study/10-comprehension/note.md), an ontological view of existence, the ground the rule emanated from.
 
-### 5.1 What inference can do
+### 5.1 ![A spark](.img/spark.icon.svg) What inference can do
 
 A model infers; it does not comprehend. The rule does not say how to come closer, by memory, iteration or whatever comes next. It sits underneath, giving any such reasoning something to reason about other than the words, and a structure to build on.
 
@@ -188,11 +188,11 @@ Briefs stand on each other, so a change to one cascades to those that stand on i
 
 This is what gives the quality, and it is brutally costly. A better rule makes each round shorter, but the cost is in the cascade and the iterations needed and the practice of running it is still in its early days.
 
-### 5.4 The fresh head
+### 5.4 ![A head](.img/head.icon.svg) The fresh head
 
 A writer cannot see its own text whole, and what it left out it does not know it left out. A session holding only the rule and the draft has no picture of what was meant, so it reads what the text actually gives. It hands back what it did not understand, what came before its ground, and what it would cut. It writes nothing; the writer holds the material and the judgment. It is the peer review an agent gets while it iterates.
 
-### 5.5 The debrief
+### 5.5 ![A clipboard with a tick](.img/debrief.icon.svg) The debrief
 
 A session ends, and what it did not write is lost with it. So before it ends it debriefs: the piece it made stands as the brief, and beside it, in a few lines, what it left out, what it left open, and what it decided on its own. Written then or never, since how the work went exists only while the session does. This depends on the work at hand and is not so much an instruction as an exemplification of the rule embodied.
 

@@ -19,7 +19,7 @@ A file is read the way [the gradient](../rule.md#31--the-gradient) is laid: its 
 
 [A lone link](practice.md#3-a-lone-link-places-a-part) is where the file ends. What it places is not in this file, so a session that reads an entry to its depth has read what the entry says and not what its parts give, and reading on means opening each file and reading it the same way. That is the same act the reader makes at [a boundary](practice.md#11-a-file-is-one-linear-reading), and a session pays it for the same reason: depth here is cheap, and depth across every boundary at once is the whole body.
 
-The whole is held that way, by depth, and a brief is read in full only where the work will touch it. The session that just wrote a brief does not read it again; the fresh read belongs to [a fresh head](../rule.md#54-the-fresh-head).
+The whole is held that way, by depth, and a brief is read in full only where the work will touch it. The session that just wrote a brief does not read it again; the fresh read belongs to [a fresh head](../rule.md#54--the-fresh-head).
 
 *Seen, in [the study's labs](../study/README.md); read again under the boundary, 2026-09-18.*
 
@@ -77,7 +77,7 @@ Before a file is written, its stamp is read. A file stamped `ratified` is change
 
 ## 5. Keep the record as you go
 
-A session whose cost is counted, as every lab run was, keeps a debrief, `debrief.md`: one file, the record of its run, with an entry per round. It is opened when the work begins and appended after every round, never written at the end, so a session that is cut short still leaves its record whole up to the last round. That is [the rule's debrief](../rule.md#55-the-debrief), written as the work goes rather than at its close.
+A session whose cost is counted, as every lab run was, keeps a debrief, `debrief.md`: one file, the record of its run, with an entry per round. It is opened when the work begins and appended after every round, never written at the end, so a session that is cut short still leaves its record whole up to the last round. That is [the rule's debrief](../rule.md#55--the-debrief), written as the work goes rather than at its close.
 
 The account is a table inside the debrief of what the run cost, with the clock time each step began and whatever the harness shows of spend; what the harness does not show, the transcript does, and a script over it counts each API message once.
 

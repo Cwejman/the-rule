@@ -14,7 +14,7 @@ It is built, and its design was laid again on 2026-09-18. What stands beneath is
 
 *The author's, 2026-09-15; laid again from his direction of 2026-09-18, and open.*
 
-## 1. Why a canvas
+## 1. ![A lightbulb](../.img/why.icon.svg) Why a canvas
 
 Comprehension does not always come from head-on analysis, from untangling a thought while resting on the focus of what is known. A person and an inference machine, as inference works today, are quite different in this. The author woke on 2026-09-15 with a wish, not an argument: a canvas on which to view the substrate and move about in it.
 
@@ -38,7 +38,7 @@ These became the panes of the middle; a mode now names only what the history tur
 
 *The author's, 2026-09-15; the last sentence the session's, 2026-09-28.*
 
-## 3. The opened path
+## 3. ![An open door](.img/door.icon.svg) The opened path
 
 The canvas draws where the reader has been: the root's column, and beside it every reading they have opened. Nothing else is laid out, so the map is as large as what they opened and no larger.
 
@@ -48,7 +48,7 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 *The author's decision, 2026-09-18, as built the same day; the whole map is his own of 2026-09-15, held for later.*
 
-## 4. Two directions
+## 4. ![An arrow down and an arrow across](.img/directions.icon.svg) Two directions
 
 The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's level runs across.
 
@@ -82,7 +82,7 @@ A file opened on the canvas shows its heading tree whole. The reader asked to se
 
 Folding is what they do afterwards, to a part they have read or do not want: fold it from the acts, or move [the depth](#61-the-depth-strip), which folds and unfolds the reading by levels. Since the fold state is one, a file opened whole on the canvas stands unfolded in the lane as well.
 
-*The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3-laid-whole) as well, which is the session's reading of one state and is his to refuse.*
+*The author's decision, 2026-09-18, as built the same day: [the lane lays its reading whole](lane.md#3--laid-whole) as well, which is the session's reading of one state and is his to refuse.*
 
 ### 4.4 A level of a file opened to the right waits
 
@@ -162,7 +162,7 @@ The root's level may be laid across instead of down: its rows side by side left 
 
 Only the root's level turns. Everything beneath it goes down as a file's levels do, and [the moves](#52-the-moves-on-a-map) keep their meanings: shift with the arrows jumps along the trunk as it jumps from level to level, and backspace and shift with the space bar fold. What backspace folds on a row of the trunk, which has nothing above it but the root, is open.
 
-Laid across, the root's rows stand where [an opening](#4-two-directions) would stand, since across is also the step into another reading. While the history is one file it opens nothing, so there the two do not meet; once it is a folder, and in the body, where an opened reading stands when the root runs across is open.
+Laid across, the root's rows stand where [an opening](#4--two-directions) would stand, since across is also the step into another reading. While the history is one file it opens nothing, so there the two do not meet; once it is a folder, and in the body, where an opened reading stands when the root runs across is open.
 
 So is which way the arrows go on the trunk. Kept to their meanings, down walks the trunk rightward and right goes in, which on a trunk with nothing to open does nothing; following the screen instead, right and left walk the trunk and the step in needs another key. Which reads right is felt, and the author settles it by looking.
 
@@ -278,9 +278,9 @@ Where the frame is too narrow for the words, the badges fall back to their glyph
 
 The field is naked. No surface is drawn under it and no rim around it, since the page is flat and a bar of glass over a map is a second thing to look at; what keeps it readable is the page's own ground rising behind it, as the prose fades at its edges. The face is not naked: it is a thing standing over the map rather than a row of acts at its edge, so it keeps its own rim.
 
-So [the mark that opened a pill of choices](touch.md#3-the-chooser) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
+So [the mark that opened a pill of choices](touch.md#3--the-chooser) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
-*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-the-chooser), and what becomes of the page's own strip while the canvas stands is open. Wide, from 2026-10-01, the face's eye and the root's direction stand in [the canvas's head](layout.md#4--heads) rather than here, and the field holds the acts of what is selected.*
+*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3--the-chooser), and what becomes of the page's own strip while the canvas stands is open. Wide, from 2026-10-01, the face's eye and the root's direction stand in [the canvas's head](layout.md#4--heads) rather than here, and the field holds the acts of what is selected.*
 
 ### 5.2 The moves on a map
 
@@ -300,7 +300,7 @@ Three of the moves act on the map's structure: right, left and backspace; in the
 
 - The full stop takes the reader back to where they are: the selection returns to the reading line, the way to it is opened where the map had closed it, and anything folded over it is unfolded. With shift it leaves only that way, folding and closing everything else. A map that spreads needs both, since what the reader opened stays open until they say otherwise.
 
-Backspace and shift with return divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have taken the prose there with return, [the map holds the reading the lane holds](#6-one-state), so closing it has to take the prose out first, which is what shift with return does; backspace does not close there, and waits for shift with return.
+Backspace and shift with return divide by where the prose stands. While the reader is only looking, backspace closes the reading. Once they have taken the prose there with return, [the map holds the reading the lane holds](#6--one-state), so closing it has to take the prose out first, which is what shift with return does; backspace does not close there, and waits for shift with return.
 
 That backspace and the prose's own fold above are one act is the author's, 2026-09-19, read from the map: closing a reading and folding a brief are the same move on either side of a boundary. It never unfolds, since a reader who asks for less is not asking for more, and at the head of the root's reading, where nothing stands above and nothing open stands to be closed, it is quiet.
 
@@ -318,7 +318,7 @@ It hides into an eye in the field, in both grains, and comes back by the same ey
 
 *The author's decision, 2026-09-18; as built the same day on a desk. It retires [the card at the foot of the phone](touch.md#46-what-is-chosen-on-the-canvas-raises-a-card), since what is selected is named above and the foot is acts alone, and that move is not built.*
 
-## 6. One state
+## 6. ![A store](.img/state.icon.svg) One state
 
 The canvas draws the same state the lane draws: the fold of every brief, the focus, the pointer and the scope. Folding on one is folding on the other, and a brief lit in one is lit in the other, as [everywhere](widgets.md#14-one-brief-is-lit-wherever-it-is-drawn).
 
@@ -378,7 +378,7 @@ Each canvas keeps its own, as it keeps [whether its nodes are text](#4116-each-c
 
 *The author's ask, 2026-10-12, that the canvas be like the plate, scoped or global. That a scoped map stands at the scope's brief whether a file or a brief, keeps what is open outside it, is drawn again and fitted at every change of scope, that shift with return steps out of the scope at its head, and that each canvas keeps its own and starts from the root, are the session's. As built the same day.*
 
-## 7. From the substrate
+## 7. ![A box giving something up](.img/substrate.icon.svg) From the substrate
 
 Three things in the markdown carry a flow, and nothing new is written for the canvas.
 
@@ -392,7 +392,7 @@ Both kinds of link lead somewhere, so going in at either opens a column to the r
 
 Opening links as well as placements makes the map a graph, so a way may lead back to a reading already open. What happens then is not answered, and it waits with the whole body being laid out at once.
 
-*The author's, 2026-09-18; how the two are told apart in the drawing is open, and the first build's answer, cells in a port, is [replaced](#8-the-first-build).*
+*The author's, 2026-09-18; how the two are told apart in the drawing is open, and the first build's answer, cells in a port, is [replaced](#8--the-first-build).*
 
 ### 7.2 A level of letters is independence, and a flow reads it as a choice
 
@@ -406,7 +406,7 @@ It costs one addition the practice must name: the trace reads the written headin
 
 *The author's proposal, 2026-09-15, its meaning as independence found in discussion that day; the decision the author's, and open.*
 
-## 8. The first build
+## 8. ![A hammer](.img/build.icon.svg) The first build
 
 The canvas was built on 2026-09-15 and read against real material since, and four of its answers do not survive the design above. They are kept here so none of them is built a second time.
 
@@ -414,7 +414,7 @@ The ports, a row of cells at either side of a node for what points at it and wha
 
 The zone, a shaded panel held by dashed edges out of the parent row's sides, holding a level beneath its parent. [The file tree](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) replaces it.
 
-The whole body drawn at once. [The chain](#3-the-opened-path) replaces it, and the whole map waits.
+The whole body drawn at once. [The chain](#3--the-opened-path) replaces it, and the whole map waits.
 
 The prose drawer, a pane of prose to one side with the nodes condensed, which was proposed on 2026-09-15 and never built. The lane already stands beside the canvas and is the reading; what the drawer was also for, knowing what a node holds without going there, is [the face of what is selected](#53-what-is-selected-shows-its-face).
 

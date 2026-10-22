@@ -10,11 +10,11 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4--heads), [moving live and only between](#5--dragging) and [a press that opens or closes](#7--the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-built-so-far) is the meeting of the two worlds, which waits on the history's own next steps.
+It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4--heads), [moving live and only between](#5--dragging) and [a press that opens or closes](#7--the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9--built-so-far) is the meeting of the two worlds, which waits on the history's own next steps.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
-## 1. Why by hand
+## 1. ![A lightbulb](../.img/why.icon.svg) Why by hand
 
 Today five areas stand in a fixed row, and an icon at the foot cycles a widget through nowhere, the left and the right. A wing holds two figures and the middle two panes, and nothing is dragged. So an arrangement is had by a run of presses, some cannot be had at all, and the widths are knobs set away from what they size.
 
@@ -44,7 +44,7 @@ A program is what was a pane or a figure: the prose, which is what was the lane,
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
-By default the row is the shape, the body's prose with the links in its right gutter, and the tree, which stands where the ahead stood until it [gave way](widgets.md#4-the-ahead), 2026-10-21. Git's prose comes in with the links in its right gutter as well.
+By default the row is the shape, the body's prose with the links in its right gutter, and the tree, which stands where the ahead stood until it [gave way](widgets.md#4--the-ahead), 2026-10-21. Git's prose comes in with the links in its right gutter as well.
 
 *Reasoned, the session's proposal, 2026-10-01, from the wings that already stack two figures; the author built on it, asking for splits across and down. The default is the session's, not yet answered.*
 
@@ -278,11 +278,11 @@ A digit from 1 to 9, which named no act before, lays the layout in its slot from
 
 ### 8.8 Not on a phone
 
-Where the page is too narrow for anything to stand beside the body's prose at the page's measure, which no layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-built-so-far) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
+Where the page is too narrow for anything to stand beside the body's prose at the page's measure, which no layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9--built-so-far) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
 
 *Reasoned, the session's, 2026-10-07.*
 
-## 9. Built so far
+## 9. ![A bar part filled](.img/progress.icon.svg) Built so far
 
 Everything above is built wide but the meeting of the two worlds: the row on 2026-10-01, and [the layouts](#8--layouts) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6--next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
 

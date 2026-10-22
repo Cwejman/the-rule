@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 16 16" width="20" height="20">
+<style>
+svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.file-icon .f { fill: var(--rest, #dfe5e8); }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
+</style>
+<g data-fit="" transform="translate(-0.051 0.13) scale(1.026)"><path class="f" d="M2 5H5.3A1.7 1.7 0 1 1 8.7 5H12V8.3A1.7 1.7 0 1 1 12 11.7V14.5H2Z"/><path class="s" d="M2 5H5.3A1.7 1.7 0 1 1 8.7 5H12V8.3A1.7 1.7 0 1 1 12 11.7V14.5H2Z"/></g>
+</svg>

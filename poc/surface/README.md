@@ -26,7 +26,7 @@ Both of those are bought by refusing more. This builds no new substrate and no n
 
 *Reasoned, the author's, 2026-09-12.*
 
-## 2. The root
+## 2. ![A tree on its root](.img/root.icon.svg) The root
 
 The surface is given a path in a working tree and never reads above it, so a repository, a folder inside one, or a single file are all valid roots. What the root connects is the body, the whole the surface reads and draws.
 

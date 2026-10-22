@@ -12,7 +12,7 @@ One TypeScript file run with Bun, beside the entry, that writes a sketch's skele
 
 *In force, 2026-09-14.*
 
-## 1. One file
+## 1. ![A file of code](.img/codefile.icon.svg) One file
 
 [`sketch.ts`](sketch.ts) is one file in this folder, run with Bun from the proof of concept's folder, so a session needs nothing installed beyond what the arc's package file names. It has five commands:
 
@@ -24,11 +24,11 @@ bun sketching/sketch.ts check <file.svg>...
 bun sketching/sketch.ts look <file.svg> [out.png]
 ```
 
-It imports the palette from [the surface's file](../surface/implementation.md#7-one-file), so the roles a sketch reads have one home, and it is laid by depth as that file is, with numbered headings in its comments.
+It imports the palette from [the surface's file](../surface/implementation.md#7--one-file), so the roles a sketch reads have one home, and it is laid by depth as that file is, with numbered headings in its comments.
 
 *In force, 2026-09-14.*
 
-## 2. The skeleton
+## 2. ![A wireframe](.img/skeleton.icon.svg) The skeleton
 
 [The surface's palette](../surface/implementation.md#64-one-palette-two-sides) is data, every role once with its light and its dark value, and a sketch's style is written from the same data, [as the entry says](README.md#3--the-palette). The roles that carry the branch hue, rest, door, on and lit, fall back on a hue of their own where no page gives one.
 
@@ -36,7 +36,7 @@ It imports the palette from [the surface's file](../surface/implementation.md#7-
 
 *In force, 2026-09-14.*
 
-## 3. Measuring labels
+## 3. ![A label and its width](.img/measure.icon.svg) Measuring labels
 
 A label is set in the surface's sans, Source Sans, in the page and in the system's sans elsewhere, so `measure` gives the room for the widest of them.
 
@@ -46,7 +46,7 @@ It holds each printable character's advance as the widest of Source Sans 3, Helv
 
 ## 4. ![A tick in a circle](.img/check.icon.svg) The check
 
-`check` reads the markup with Bun's HTML rewriter and says, per sketch, what breaks [the language](skill.md#3-the-design-language), so a fault is found before a look is spent on it.
+`check` reads the markup with Bun's HTML rewriter and says, per sketch, what breaks [the language](skill.md#3--the-design-language), so a fault is found before a look is spent on it.
 
 It lists a colour written as a value, in an attribute, a style attribute or a style of its own. A label set under the note size the language gives. A label whose measured room runs out of the view box or onto another label's. A sketch wider than the language allows. A root without a view box, a width and a height, or not marked as a sketch, and a sketch never stamped. An id, which two sketches in one page would share. And any element the surface drops when it sets a sketch into its page.
 
@@ -62,7 +62,7 @@ resvg reads fewer colour forms and fewer selectors than a browser. So before ren
 
 *In force, 2026-09-14. resvg is the arc's second dependency, in the package file it now carries of its own.*
 
-## 6. In the surface
+## 6. ![A picture set in a frame](.img/inframe.icon.svg) In the surface
 
 What the surface does with a sketch is written where the surface is: [a sketch is set into the page](../surface/implementation.md#363-a-sketch-is-set-into-the-page), its markup cleaned, with the alt text as its label, on the page's own ground. This tool only marks the root so the surface knows a sketch when it reaches one.
 

@@ -12,7 +12,7 @@ A reader reads one thing at a time, and the eye that moves to a second column of
 
 *Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
 
-## 1. One reading
+## 1. ![A page of text](.img/reading.icon.svg) One reading
 
 The lane holds one reading depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the scope's title and its first paragraph, stands first.
 
@@ -38,7 +38,7 @@ What the reader loses is one scroll past a card. What the reader gains is that e
 
 The card takes one unfolding, to the whole of the brief on the other side, and no more. Past that the reader opens it, and the reading changes. So a card is where the folding of a reading ends and the crossing begins, and it looks like neither the prose around it nor a brief folded within it.
 
-A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4-the-ahead) and the tree when the reader is on it.
+A card carries no figure of what lies beyond it; how much waits is said by its tally, and its shape by [the ahead](widgets.md#4--the-ahead) and the tree when the reader is on it.
 
 The tally stands on the card's act line in glyphs rather than words: a brief's glyph and how many briefs lie beneath it, a file's glyph and how many files are placed among them, and a clock and how long the whole of it takes to read, at the speed the reader sets by [a meter](widgets.md#61-the-meters). Last stands a pencil and how long ago anything within it was [last edited](#61-the-action-line-is-the-press). A count of none is left out, since a glyph beside nothing says nothing; the time always stands, as every card has some to read. Pointing at a glyph names what it counts.
 
@@ -94,7 +94,7 @@ Org-mode has cycled a heading between folded, children and whole for twenty year
 
 *Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third state, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 
-## 3. Laid whole
+## 3. ![A book lying open](.img/whole.icon.svg) Laid whole
 
 The lane lays all of the reading it holds: every brief of the file unfolded, its prose whole, down to its last heading. The reader crossed a boundary to get here and asked for this reading; handing it a level at a time makes them ask again at every level.
 
@@ -152,7 +152,7 @@ The fade at the top comes in with the reading line, since nothing stands above t
 
 ## 5. ![A map pin](.img/arrival.icon.svg) Arrival
 
-Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
+Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3--laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
 
 Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the browser's history, and that history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7--scoping). The browser's back and forward walk them.
 
@@ -174,7 +174,7 @@ Scrolling alone is not a change, and a new change clears what was undone.
 
 *Reasoned, the author's ask of 2026-09-14, after a step back through the history had not returned a reader from holding the space bar.*
 
-## 6. Folding and unfolding
+## 6. ![A folded map](.img/folding.icon.svg) Folding and unfolding
 
 Folding takes a brief to its face and unfolding takes it whole, [the two states](#2--face-or-whole), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
@@ -278,7 +278,7 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken [out of this reading](#72-widening-the-scope), as some applications refresh when pulled past their top.
 
-A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-the-lane-alone).
+A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10--the-lane-alone).
 
 One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands in is scrolled to the card it left, so every event after it met a lane that was no longer at its top, drained the pull and armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for the hand to let go, which is a push the other way or the quiet the gauge already springs back after, and the rest of that movement does not scroll the reading it landed in either, since it was carrying the reader off the card the pull had put them on.
 
@@ -338,7 +338,7 @@ The reader is told where a link leads before they take it: its target stands bes
 
 *Reasoned, the author's, 2026-09-15: that a non-local link scopes, that a local one does not, and that the way down levels up to carry both how here is placed and how the reader came here. The first model laid every link afresh, 2026-09-13.*
 
-## 10. The lane alone
+## 10. ![A single column](.img/alone.icon.svg) The lane alone
 
 On a narrow screen the sides give way, [the gutters first, then the right wing, then the left](framework.md#28-giving-way), and the lane stands alone, which it can, since orientation is help and never the reading. A reader may also close any area by hand, and a closed area [takes no room](framework.md#24-closing-by-hand), so the lane stands centred in what is left.
 

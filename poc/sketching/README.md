@@ -16,11 +16,11 @@ Sketching is how a session draws a structure or a flow a brief states, as an SVG
 
 A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the rule's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.
 
-A sketch is [an image like any other](../practice.md#8-visuals) in where it stands and how it is captioned. What sets it apart is that it is drawn from the text, and drawn in [the surface's language](skill.md#3-the-design-language), so a reader meets one family in the page and in the pictures.
+A sketch is [an image like any other](../practice.md#8-visuals) in where it stands and how it is captioned. What sets it apart is that it is drawn from the text, and drawn in [the surface's language](skill.md#3--the-design-language), so a reader meets one family in the page and in the pictures.
 
 *Reasoned, the author's, 2026-09-14; the practice's hypothesis of drawing from the text, taken up.*
 
-## 2. Prose and code
+## 2. ![A page of prose and a page of code](.img/prose-code.icon.svg) Prose and code
 
 What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5--open-questions).
 
@@ -44,7 +44,7 @@ A sketch names no face. Set into the page it takes the surface's sans, and shown
 
 *Reasoned, the author's direction, 2026-09-14.*
 
-## 4. Making one
+## 4. ![A pencil over a sheet](.img/drafting.icon.svg) Making one
 
 A session makes a sketch by prose and a little code, and both stand apart: what it does, when a sketch earns its place and the language it is drawn in; and the one file that keeps the geometry exact and lets the session look at what it drew.
 
@@ -68,7 +68,7 @@ So far the drawings that teach best, and carry the win first, come from the huma
 
 *Open, 2026-09-14; the art direction seen in the author's reading of the first sketches for the rule, 2026-09-15.*
 
-## 6. Refused
+## 6. ![A sign of refusal](.img/refused.icon.svg) Refused
 
 A flat run, looked up when one of these is proposed again.
 

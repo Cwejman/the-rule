@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 16 16" width="20" height="20">
+<style>
+svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+svg.file-icon .f { fill: var(--rest, #dfe5e8); }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
+</style>
+<g data-fit="" transform="translate(0.604 1.604) scale(0.924)"><path class="f" d="M14.16 5.92L14.49 7.57L12.89 8.32L12.64 9.57L13.83 10.88L12.89 12.28L11.23 11.69L10.17 12.39L10.08 14.16L8.43 14.49L7.68 12.89L6.43 12.64L5.12 13.83L3.72 12.89L4.31 11.23L3.61 10.17L1.84 10.08L1.51 8.43L3.11 7.68L3.36 6.43L2.17 5.12L3.11 3.72L4.77 4.31L5.83 3.61L5.92 1.84L7.57 1.51L8.32 3.11L9.57 3.36L10.88 2.17L12.28 3.11L11.69 4.77L12.39 5.83Z"/><path class="s" d="M14.16 5.92L14.49 7.57L12.89 8.32L12.64 9.57L13.83 10.88L12.89 12.28L11.23 11.69L10.17 12.39L10.08 14.16L8.43 14.49L7.68 12.89L6.43 12.64L5.12 13.83L3.72 12.89L4.31 11.23L3.61 10.17L1.84 10.08L1.51 8.43L3.11 7.68L3.36 6.43L2.17 5.12L3.11 3.72L4.77 4.31L5.83 3.61L5.92 1.84L7.57 1.51L8.32 3.11L9.57 3.36L10.88 2.17L12.28 3.11L11.69 4.77L12.39 5.83Z"/><path class="s" d="M5.9 8A2.1 2.1 0 1 0 10.1 8A2.1 2.1 0 1 0 5.9 8Z"/></g>
+</svg>
