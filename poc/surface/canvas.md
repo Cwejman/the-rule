@@ -30,7 +30,7 @@ A piece of work in front of the reader, a step inside it, and on entering the st
 
 *The author's, 2026-09-15.*
 
-## 2. Modes
+## 2. ![A switch](.img/modes.icon.svg) Modes
 
 The surface is going to have a few modes, chosen perhaps from a centred menu at its foot. The first is the current lane of prose with its wings. The second is the canvas, and there the exploring begins: a few variants are made and held here, and as they are learned from they are removed or refined.
 
@@ -52,7 +52,7 @@ On arriving the chain is the path of the address the reader stands at, so a link
 
 The two dimensions say two different things. Down is the reading: one column is one file, its own brief at the top and its headings beneath it in the order they are read, as the lane reads them. Across is the opening: each step right is a boundary the reader chose to cross. The one exception is a root whose level is [laid across](#410-the-roots-level-runs-down-or-across), where the root's level runs across.
 
-Going in at a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Go in again inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened. Going in is [an act of its own](#5-presses) and never a press.
+Going in at a node that leads to another reading draws an edge from its row to the right, and what it leads to opens there as a column of its own, beginning with the brief that file opens with. Go in again inside that column and the map grows again: the goals, the work one goal names, the reusable work inside that, its own steps. The edge is drawn, and it is what says the opening happened. Going in is [an act of its own](#5--presses) and never a press.
 
 Opening is not scoping. The canvas is not reframed around what was opened, nothing leaves the map, and the way back is the column the edge came from.
 
@@ -112,7 +112,7 @@ Every line on the map keeps one weight, whatever the view: a rim and a line are 
 
 A node held at two lines whatever its name was tried and refused: it stood half empty on every short name, and space kept for nothing is space taken from the map.
 
-A node that carried its name and the opening words of its face was tried and refused: it filled the node, but it made the map a page of prose to be read where what a reader wants of a map is to find their way in it. What the face says belongs to [a mode of its own](#10-open-questions).
+A node that carried its name and the opening words of its face was tried and refused: it filled the node, but it made the map a page of prose to be read where what a reader wants of a map is to find their way in it. What the face says belongs to [a mode of its own](#10--open-questions).
 
 *The author's, 2026-09-18, on reading a canvas whose rows had lost their edges, whose chevrons did not line up and whose margins were each their own number; as built the same day.*
 
@@ -166,7 +166,7 @@ Laid across, the root's rows stand where [an opening](#4-two-directions) would s
 
 So is which way the arrows go on the trunk. Kept to their meanings, down walks the trunk rightward and right goes in, which on a trunk with nothing to open does nothing; following the screen instead, right and left walk the trunk and the step in needs another key. Which reads right is felt, and the author settles it by looking.
 
-As built, one line runs along beneath the root's row and drops into the head of each row of the trunk, and an act in [the canvas's head](layout.md#4-heads) turns it, each canvas keeping its own.
+As built, one line runs along beneath the root's row and drops into the head of each row of the trunk, and an act in [the canvas's head](layout.md#4--heads) turns it, each canvas keeping its own.
 
 *The author's, 2026-09-28: [the root's direction](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas), perhaps for the body's canvas as well, and across by default in the history; as built the same day. That only the root's level turns, and his ask that folding with shift and the arrows work there too read as the jump by shift and the arrows and the fold by backspace, are the session's reading; where an opening stands across and which way the arrows go on the trunk are the session's questions, and open.*
 
@@ -250,13 +250,13 @@ In text, a map laid again is not where a scale would put it, so the zoom holds t
 
 #### 4.11.6 Each canvas keeps its own
 
-Whether a canvas draws boxes or text is a setting in [its head](layout.md#4-heads), and the body's canvas and the history's each keep their own, as each keeps which way its root runs; [a layout](layout.md#81-what-a-layout-holds) holds it with the rest of the head. A canvas starts in boxes.
+Whether a canvas draws boxes or text is a setting in [its head](layout.md#4--heads), and the body's canvas and the history's each keep their own, as each keeps which way its root runs; [a layout](layout.md#81-what-a-layout-holds) holds it with the rest of the head. A canvas starts in boxes.
 
 A phone has no heads, so its canvas draws as it was last set and cannot be turned there, as the way its root runs cannot; text reads on a phone as it does wide, the map cut at the screen's edge as any map is.
 
 *The session's, 2026-10-12, that each canvas keeps its own and starts in boxes, until the author has looked.*
 
-## 5. Presses
+## 5. ![A pointer](.img/presses.icon.svg) Presses
 
 Three things a reader wants of a node, and they are not one act. To know what it is. To go there and read it. To see what it holds without leaving where they are.
 
@@ -266,7 +266,7 @@ Going takes the reader to the prose, so where the middle holds the canvas alone 
 
 A press that both selected and opened was built first and refused: it took a requirement the author had given in two parts and made it one, so a node that arrived already selected answered its first press by going where the reader already stood, and a reader who only wanted to look at a node had the map grow under them.
 
-*The author's decision, 2026-09-18, given as one press selects and two presses go; as built the same day, after a first cut conflated the two. Wide, from 2026-10-01, going where the canvas stands without the prose brings the prose in [as a column beside it](layout.md#6-two-worlds), rather than in its place.*
+*The author's decision, 2026-09-18, given as one press selects and two presses go; as built the same day, after a first cut conflated the two. Wide, from 2026-10-01, going where the canvas stands without the prose brings the prose in [as a column beside it](layout.md#6--two-worlds), rather than in its place.*
 
 ### 5.1 The field the acts stand in
 
@@ -280,7 +280,7 @@ The field is naked. No surface is drawn under it and no rim around it, since the
 
 So [the mark that opened a pill of choices](touch.md#3-the-chooser) goes. It was already the second thing of its kind refused, after [the mark at the foot](refused.md#y-a-mark-at-the-foot-that-opens-the-row), and what it hid is what a reader came for.
 
-*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-the-chooser), and what becomes of the page's own strip while the canvas stands is open. Wide, from 2026-10-01, the face's eye and the root's direction stand in [the canvas's head](layout.md#4-heads) rather than here, and the field holds the acts of what is selected.*
+*The author's decision, 2026-09-18; as built the same day on a desk, and stripped of its glass on his reading of the first cut. A phone still holds [the row and the pill it had](touch.md#3-the-chooser), and what becomes of the page's own strip while the canvas stands is open. Wide, from 2026-10-01, the face's eye and the root's direction stand in [the canvas's head](layout.md#4--heads) rather than here, and the field holds the acts of what is selected.*
 
 ### 5.2 The moves on a map
 
@@ -362,13 +362,13 @@ Whether a map follows is a setting in its head. Following, it brings where the r
 
 ### 6.4 A map may be drawn from the scope, as the plate may
 
-A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4-heads), from the scope, as [the plate](widgets.md#7--the-plate) may draw the scope.
+A reader scoped into one part of the body may want the map of that part alone: the scope's brief with everything beneath it, without the root and the way down to it. So the canvas draws from the root of its world, or, set in [its head](layout.md#4--heads), from the scope, as [the plate](widgets.md#7--the-plate) may draw the scope.
 
 Drawn from the scope, the scope's brief is the head of the first column, where the root stands otherwise, whether the scope is a file or a brief inside one. Everything beneath it is drawn as beneath the root: its level down, or [across](#410-the-roots-level-runs-down-or-across) where the canvas lays its first level so, and each opening beside the row that named it. Its rows are numbered from the scope, so its first level reads 1, as the lane's [registers count from the scope](lane.md#71-scoping-does-what-heading-sizes-can-only-do-so-far) once scoped.
 
 The scope's brief is a place to stand as the root's head is. Left from it goes nowhere and backspace there is quiet, since what lies above is past where the map is drawn from. Shift with return goes out of the scope, which at any other head closes the reading and takes the prose out to the brief that placed it; here no column stands to its left to close into, so the scope steps out as [widening the scope](lane.md#72-widening-the-scope) does, and the map is drawn again from there. [The way to where the reader stands](#49-the-way-from-the-root-to-where-the-reader-stands-is-lit) is lit from the scope's brief, which takes the ink of the branch it stands in, where the root takes none.
 
-The map follows the scope wherever it moves. Going on the map into a row of the same reading leaves the scope as it is; going into another reading scopes the lane to it, as [going does](#5-presses), and the map is drawn again from there, the column it came from gone from this map though it stays open, as the next paragraph says. Scoping by the way down or by the lane does the same.
+The map follows the scope wherever it moves. Going on the map into a row of the same reading leaves the scope as it is; going into another reading scopes the lane to it, as [going does](#5--presses), and the map is drawn again from there, the column it came from gone from this map though it stays open, as the next paragraph says. Scoping by the way down or by the lane does the same.
 
 Nothing outside the scope is drawn. The way down above the map says what lies above it, and what stands open outside the scope stays open for when the map is drawn from the root again.
 
@@ -400,7 +400,7 @@ The markdown does not say whether a level is a sequence or a set, and only a set
 
 What a reader makes of that independence is the domain's reading, and it is the part this level owes. A flow reads a lettered level under a step as alternatives, take one, which [toolmaking](../../tool-making/README.md) can say for itself; a body of knowledge reads it as a set, take any or all, looked up rather than read through.
 
-The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#6-earlier-programs) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
+The rule already holds such levels and says so in prose each time: [the surface's refusals](README.md#6--earlier-programs) are a flat run, since no refusal stands on another, and the widgets, the ideas and the tenants stand near that. Prose is linear, so a set is still laid in some order on the page, the most useful first; the letter removes only the reader's right to infer dependence from that order.
 
 It costs one addition the practice must name: the trace reads the written heading to tell the two apart, the check warns where a level mixes them, and addresses gain the form 4.a, nesting as 4.a.1. Letters run out at z and continue as aa, as columns do. The refusals, lettered, are the first body to try it on.
 
@@ -420,7 +420,7 @@ The prose drawer, a pane of prose to one side with the nodes condensed, which wa
 
 *Seen, 2026-09-18, in the author's reading of the canvas as built; each replaced by a brief above, and all four taken out of the code the same day.*
 
-## 9. Faults
+## 9. ![A warning sign](.img/faults.icon.svg) Faults
 
 Zooming shifted the nodes in small jagged steps rather than scaling them evenly. The type was counter-scaled against the transform, by the square root of the zoom, so every row was laid again at each step; it now scales with the transform like everything else, and the whole map moves as one picture.
 
@@ -428,7 +428,7 @@ Pinching on a phone behaves strangely, and that is not mended. The gesture arriv
 
 *The author's report, 2026-09-18; the zoom mended the same day, the pinch owed.*
 
-## 10. Open questions
+## 10. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 Which of [the two lines](#42-within-a-file-the-hierarchy-goes-down-drawn-as-a-file-tree) draws a file's nesting between boxes, which the author settles by looking; [text](#4112-the-lines-are-a-file-trees) draws the spine alone.
 

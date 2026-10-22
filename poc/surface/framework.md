@@ -143,7 +143,7 @@ Everything drawn that names a brief carries that brief's address. That one conve
 
 Two things are kept beside the state, and neither is a second answer to anything it holds. The history is a second body and not a second answer about this one, so it keeps [a world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) that stands in this one's place while the history is read, and its addresses are its own, lighting only on its own lane and map [as yet](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own). And what a pane press pushed out is a memory of the strip's that nothing draws from, read only by the next press.
 
-*Reasoned, carried from [the first program](README.md#6-earlier-programs), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built, and the world held for a mode, 2026-09-28. On 2026-10-01 the two worlds came to stand at once, each with [its own part](layout.md#6-two-worlds) of the state, and the page keeps the layout, the settings and which world holds the keys once.*
+*Reasoned, carried from [the first program](README.md#6--earlier-programs), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built, and the world held for a mode, 2026-09-28. On 2026-10-01 the two worlds came to stand at once, each with [its own part](layout.md#6--two-worlds) of the state, and the page keeps the layout, the settings and which world holds the keys once.*
 
 ### 4.1 Every act is one entry in one table
 

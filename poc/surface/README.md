@@ -16,7 +16,7 @@ So the surface reads a body in one lane of prose, each brief folded or unfolded 
 
 *The author's, 2026-09-13; the first reading model was built, used and refused in a day, and this one is in use. What here pertains to AI rather than to a reader moves to the skill in [what comes next](../../repository.md#7-what-comes-next).*
 
-## 1. One interface
+## 1. ![A window](.img/interface.icon.svg) One interface
 
 One interface serves two moments of the same repository. Locally it reads a working tree, again as the files change, which is the live view a session needs while it works. Published, it reads what a build emits from that same tree, so a repository's site is the repository rather than a site kept in step by hand.
 
@@ -36,7 +36,7 @@ What it finds there it does not interpret. What counts as a brief, and what nest
 
 *Reasoned, 2026-09-12.*
 
-## 3. The reading
+## 3. ![A page of text](.img/reading.icon.svg) The reading
 
 Everything above says what the surface is handed. What follows is what it does with it, and it is laid in the order it was built: the reading first, then what the orientation stands in, then the widgets that fill it, then the one file that makes the whole.
 
@@ -50,7 +50,7 @@ Everything above says what the surface is handed. What follows is what it does w
 
 *Reasoned, the author's, 2026-09-13.*
 
-## 4. Past the reading
+## 4. ![A page with an arrow leading past it](.img/beyond.icon.svg) Past the reading
 
 Past the reading stand two readings of their own. The canvas is the second pane, the body as nodes, built and still being laid; the phone takes away the pointer, the keyboard and the room for two panes, and each of those moves a rule rather than only a size.
 
@@ -68,7 +68,7 @@ How the page is laid is the reader's by hand: a row of columns, each a stack of 
 
 *The author's, 2026-09-15 and 2026-09-16; both are built, and the canvas's design is open where its own foot says so. History, 2026-09-21, is open; built as a pane 2026-09-27, and as a mode 2026-09-28. The page laid by hand, 2026-10-01, is open, and built the same day but for the meeting of the two worlds.*
 
-## 5. Open questions
+## 5. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 Four things the surface does not answer cross the levels beneath, so they stand here rather than at one level's foot.
 
@@ -78,11 +78,11 @@ Whether the harness can be modified after all. Its SDK could assemble a context 
 
 What a session keeps. The lane and the widgets read any substrate, so they read a session's record once it is written down, but nothing here says what a session should write, or how it is made to write it while it works rather than at its close.
 
-What stands beside a brief in the left gutter. Commits and people belong there, and both wait for git, which [the implementation](implementation.md#9-git) leaves for history.
+What stands beside a brief in the left gutter. Commits and people belong there, and both wait for git, which [the implementation](implementation.md#9--git) leaves for history.
 
 *Open, 2026-09-13.*
 
-## 6. Earlier programs
+## 6. ![An archive box](.img/earlier.icon.svg) Earlier programs
 
 Last, and read only when someone proposes one of them again: what the programs before this model reached for, and the reason each is not wanted. That level is a flat run rather than a gradient, since a refusal is looked up and never read through, so no refusal stands on another and its briefs carry [letters](../practice.md#41-a-level-of-letters-is-a-set) rather than numbers.
 

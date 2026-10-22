@@ -14,7 +14,7 @@ Every rule it moves is written beneath, and most of them are built. What it stil
 
 *The author's, 2026-09-16; built the same day, on a browser told to pretend, and what is still open stands at its foot.*
 
-## 1. The phone
+## 1. ![A phone](.img/phone.icon.svg) The phone
 
 Three things a phone takes away, and each one moves a rule rather than only a size. There is no pointer, so nothing can be told by hovering and no figure can answer for what the pointer rests on. There is no keyboard, so a key cap names nothing. And there is room for one thing at a time, so the panes are a choice rather than a pair.
 
@@ -122,7 +122,7 @@ The settings are the one figure that stands that way now. The outline was built 
 
 Both were built into the pill and both were taken out on the author's reading. The outline read poorly whole on a phone, and he does not use it. The radial cannot be hit: a press on it goes to whatever cell the finger lands on, and no finger can land on a cell that small.
 
-What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#10-open-questions). Until each has its own touch reading, neither stands.
+What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#10--open-questions). Until each has its own touch reading, neither stands.
 
 *The author's, 2026-09-16, on reading the first build; taken out the same day.*
 
@@ -180,7 +180,7 @@ The scope's own root is not a choice, since the entry on the canvas takes no pre
 
 *The one row is the session's, 2026-09-16, which the author asked to have built rather than argued, and the card came of his reading it. The one size and the glyphs are his, on reading the worded row. As built the same day.*
 
-## 5. The rail
+## 5. ![A scroll rail](.img/rail.icon.svg) The rail
 
 [The shape](widgets.md#3--the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, and it is only ever scrubbed, so the width its briefs are drawn in can go too.
 
@@ -192,7 +192,7 @@ The band that says what of the lane is on the screen stands the same clear of th
 
 What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge the rail stands on, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
 
-The rail stands at whichever edge the reader put the shape on, and takes the space that stood there, so the lane gives it its room rather than the page growing one. The side is a press in [the foot's row](#3-the-chooser), cycling left, right and away as the strip cycles a widget on a desk, since a reader scrubbing with the hand they have wants the rail under that hand and [the callout](#5-the-rail) away from it; the reset's direction follows the side. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
+The rail stands at whichever edge the reader put the shape on, and takes the space that stood there, so the lane gives it its room rather than the page growing one. The side is a press in [the foot's row](#3-the-chooser), cycling left, right and away as the strip cycles a widget on a desk, since a reader scrubbing with the hand they have wants the rail under that hand and [the callout](#5--the-rail) away from it; the reset's direction follows the side. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
 *The author's, 2026-09-16; the callout his, the marks his on reading a rail without them, and the narrowing his, from a rail nothing is ever aimed at. Measured as built the same day: the rail stands 74 on this body and leaves the lane 268 of a 390 screen, against 104 and 238 before it. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
 
@@ -288,7 +288,7 @@ It is built as the last step of that order: the wings give way, then the gutters
 
 *A trial, 2026-09-16, as built; the author's word is wanted before the rule moves.*
 
-## 10. Open questions
+## 10. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 Which edge the rail stands on: the left, as built, where the shape has always stood, and the reset's direction follows from it. Whether it is the right edge, under the thumb of a hand holding the phone, is the author's to say.
 

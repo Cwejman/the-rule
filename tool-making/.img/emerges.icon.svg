@@ -2,7 +2,8 @@
 <style>
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 svg.file-icon .f { fill: var(--rest, #dfe5e8); }
-@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
 </style>
-<g data-fit="" transform="translate(-0.348 -0.13) scale(1.043)"><path class="f" d="M8 9C8 6 6 4.5 3 4.5C3 7.5 5 9 8 9ZM8 7.5C8 5 10 3 13 3C13 6 11 7.5 8 7.5Z"/><path class="s" d="M8 14.5V7.5M8 9C8 6 6 4.5 3 4.5C3 7.5 5 9 8 9M8 7.5C8 5 10 3 13 3C13 6 11 7.5 8 7.5M5 14.5H11"/></g>
+<g data-fit="" transform="translate(-0.348 -0.13) scale(1.043)"><path class="f" d="M8 9C8 6 6 4.5 3 4.5C3 7.5 5 9 8 9Z"/><path class="s" d="M8 9C8 6 6 4.5 3 4.5C3 7.5 5 9 8 9Z"/><path class="f" d="M8 7.5C8 5 10 3 13 3C13 6 11 7.5 8 7.5Z"/><path class="s" d="M8 7.5C8 5 10 3 13 3C13 6 11 7.5 8 7.5Z"/><path class="s" d="M8 14.5V7.5M5.5 14.5H10.5"/></g>
 </svg>

@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 16 16" width="20" height="20">
 <style>
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
+svg.file-icon .f { fill: var(--rest, #dfe5e8); }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
 </style>
-<g data-fit="" transform="translate(-1.6 -0.6) scale(1.2)"><path class="s" d="M3 3h4M6 8h6M8 13h5M4.5 3v5M6.5 8v5"/></g>
+<g data-fit="" transform="translate(0.615 1.615) scale(0.923)"><path class="f" d="M2.5 1.5H5.5A1 1 0 0 1 6.5 2.5V4.5A1 1 0 0 1 5.5 5.5H2.5A1 1 0 0 1 1.5 4.5V2.5A1 1 0 0 1 2.5 1.5Z"/><path class="s" d="M2.5 1.5H5.5A1 1 0 0 1 6.5 2.5V4.5A1 1 0 0 1 5.5 5.5H2.5A1 1 0 0 1 1.5 4.5V2.5A1 1 0 0 1 2.5 1.5Z"/><path class="f" d="M7.5 6H10.5A1 1 0 0 1 11.5 7V9A1 1 0 0 1 10.5 10H7.5A1 1 0 0 1 6.5 9V7A1 1 0 0 1 7.5 6Z"/><path class="s" d="M7.5 6H10.5A1 1 0 0 1 11.5 7V9A1 1 0 0 1 10.5 10H7.5A1 1 0 0 1 6.5 9V7A1 1 0 0 1 7.5 6Z"/><path class="f" d="M10.5 10.5H13.5A1 1 0 0 1 14.5 11.5V13.5A1 1 0 0 1 13.5 14.5H10.5A1 1 0 0 1 9.5 13.5V11.5A1 1 0 0 1 10.5 10.5Z"/><path class="s" d="M10.5 10.5H13.5A1 1 0 0 1 14.5 11.5V13.5A1 1 0 0 1 13.5 14.5H10.5A1 1 0 0 1 9.5 13.5V11.5A1 1 0 0 1 10.5 10.5Z"/><path class="s" d="M4 5.5V8H6.5M8.5 10V12.5H9.5"/></g>
 </svg>

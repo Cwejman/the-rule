@@ -12,7 +12,7 @@ Sketching is how a session draws a structure or a flow a brief states, as an SVG
 
 *Reasoned, the author's, 2026-09-14; the first sketch was drawn under it the same day.*
 
-## 1. When to sketch
+## 1. ![A pencil](.img/sketch.icon.svg) When to sketch
 
 A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the rule's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.
 
@@ -22,13 +22,13 @@ A sketch is [an image like any other](../practice.md#8-visuals) in where it stan
 
 ## 2. Prose and code
 
-What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5-open-questions).
+What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5--open-questions).
 
 What prose cannot give is geometry a model cannot measure, and a sight of what it drew. A label that overflows its room, two labels on one spot, a colour written as a value that no theme can reach: these are what make a generated drawing look cheap, and none of them is a matter of taste. So the rule is thin, and it does only what prose cannot: it keeps the geometry exact and lets the session look.
 
 *Reasoned, the author's, 2026-09-14. Whether prose and this much code hold a sketch at the quality the surface sets is open, and the first sketches are what measure it.*
 
-## 3. The palette
+## 3. ![A painter's palette](.img/palette.icon.svg) The palette
 
 A sketch colours by role and never by value, so that [the branch hue](../surface/widgets.md#15-ink-is-spent-only-where-a-reader-has-asked) and the theme reach it. Each role is written as [the surface's own variable](../surface/implementation.md#64-one-palette-two-sides) with a fallback taken from the palette's light side, `var(--ink, #141414)`.
 
@@ -54,7 +54,7 @@ A session makes a sketch by prose and a little code, and both stand apart: what 
 
 *In force, 2026-09-14.*
 
-## 5. Open questions
+## 5. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 Whether components are needed. The practice's hypothesis of a few reusable pieces in one file [gave way to this level](../practice.md#81-the-sketch), and is taken up only when the same composition is drawn by hand for the third time.
 

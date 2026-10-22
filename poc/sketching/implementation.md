@@ -30,7 +30,7 @@ It imports the palette from [the surface's file](../surface/implementation.md#7-
 
 ## 2. The skeleton
 
-[The surface's palette](../surface/implementation.md#64-one-palette-two-sides) is data, every role once with its light and its dark value, and a sketch's style is written from the same data, [as the entry says](README.md#3-the-palette). The roles that carry the branch hue, rest, door, on and lit, fall back on a hue of their own where no page gives one.
+[The surface's palette](../surface/implementation.md#64-one-palette-two-sides) is data, every role once with its light and its dark value, and a sketch's style is written from the same data, [as the entry says](README.md#3--the-palette). The roles that carry the branch hue, rest, door, on and lit, fall back on a hue of their own where no page gives one.
 
 `new` writes a skeleton at a width and a height, with a view box, the root marked as a sketch, and the style already stamped. `stamp` writes that style between markers in the sketch's own `<style>` and marks the root as a sketch, so stamping again replaces the style whole and nothing else in the file moves.
 
@@ -44,7 +44,7 @@ It holds each printable character's advance as the widest of Source Sans 3, Helv
 
 *Measured, in Chromium on 2026-09-14, by a canvas over each face at a thousand pixels; Helvetica and Arial ran about six percent wider than Source Sans 3 over a sentence.*
 
-## 4. The check
+## 4. ![A tick in a circle](.img/check.icon.svg) The check
 
 `check` reads the markup with Bun's HTML rewriter and says, per sketch, what breaks [the language](skill.md#3-the-design-language), so a fault is found before a look is spent on it.
 
@@ -54,7 +54,7 @@ It follows translations only, and says where a label stands under any other tran
 
 *In force, 2026-09-14; each fault was made on purpose in a sketch built to break them, and each was found.*
 
-## 5. The look
+## 5. ![An eye](.img/look.icon.svg) The look
 
 `look` renders a sketch to a PNG with resvg, at twice its size, to a scratch place unless another is named, and prints where. No page supplies the roles there, so each variable is read at its fallback.
 
@@ -68,7 +68,7 @@ What the surface does with a sketch is written where the surface is: [a sketch i
 
 *In force, 2026-09-14.*
 
-## 7. Open questions
+## 7. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 Whether a sketch's text should follow the reader's choice of face in the surface, as the prose does, or keep the sans the chrome and the figures keep. Whether ids should be allowed under a prefix, for markers and gradients a drawing needs. And whether the table of widths wants the faces of Windows and Linux measured too.
 

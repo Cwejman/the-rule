@@ -54,7 +54,7 @@ The comments carry the dated story of many decisions, which [the briefs](impleme
 
 *Measured, the session's, 2026-10-01, of the code as it stood at commit 25ee761, by reading and by count; the faults by the reviews of 977f285, 1a54efb and f927248.*
 
-## 3. The lore
+## 3. ![A book](.img/lore.icon.svg) The lore
 
 The author's [principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-) carry two traditions into plain TypeScript, and a third names this kind of program. Each move [beneath](#4-the-moves) names the principle it serves, so it is weighed against the lore and not against taste.
 
@@ -272,7 +272,7 @@ Each move is one commit, after the harness, the type checker and a cold review a
 
 *Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves. Measured, 2026-10-02, after the eighth: the page's script went from 4,069 lines of code to 3,956, every record of the harness equal throughout. The three largest moves are the author's, so the larger part of the estimate waits with them.*
 
-## 8. Open questions
+## 8. ![A speech bubble holding a question](../.img/open.icon.svg) Open questions
 
 - Whether the file becomes a few, [above](#411-one-file-or-a-few): not yet, the author's word of 2026-10-02.
 - Whether the heavy tier of git's history, served and written but read by nothing yet, stays until [the history](history.md) reaches it.

@@ -2,7 +2,8 @@
 <style>
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 svg.file-icon .f { fill: var(--rest, #dfe5e8); }
-@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
 </style>
-<g data-fit="" transform="translate(-0.421 0.263) scale(1.053)"><circle class="f" cx="8" cy="5" r="2.4"/><circle class="s" cx="8" cy="5" r="2.4"/><path class="s" d="M3.3 14A4.7 4.7 0 0 1 12.7 14"/></g>
+<g data-fit="" transform="translate(0.32 1.08) scale(0.96)"><path class="f" d="M5 5A3 3 0 1 0 11 5A3 3 0 1 0 5 5Z"/><path class="s" d="M5 5A3 3 0 1 0 11 5A3 3 0 1 0 5 5Z"/><path class="f" d="M2.5 14.5C2.5 11 5 9.5 8 9.5C11 9.5 13.5 11 13.5 14.5Z"/><path class="s" d="M2.5 14.5C2.5 11 5 9.5 8 9.5C11 9.5 13.5 11 13.5 14.5Z"/></g>
 </svg>

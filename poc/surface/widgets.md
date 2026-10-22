@@ -208,7 +208,7 @@ The shape is the lane's scrollbar: the lane as laid, drawn small, so the reader 
 
 Each brief in the lane stands as its blocks, a heading a short bar and a paragraph a block as tall as it is drawn, shifted right by the brief's depth. Every block a brief has is drawn, a list or a table as readily as a paragraph, and an image as a frame as wide and as tall as it stands in the lane.
 
-Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-rail), nesting a step tighter and giving its marks whatever room each row has left.
+Where every other area has given way it stands narrow, as [the rail](touch.md#5--the-rail), nesting a step tighter and giving its marks whatever room each row has left.
 
 It is as wide as it draws, its rows as the lane lays them, so it takes no room it leaves bare and widens and narrows with the depth the lane is scoped and folded to. A block is half the width it stood at while the shape carried marks beside it, and its head offers it wide again, a setting a layout holds.
 
@@ -262,7 +262,7 @@ Its figure of files was drawn here: the heaviest file's bar running the width, t
 
 *The author's ask of 2026-10-15; given way with the ahead, 2026-10-21.*
 
-## 5. ![Two links of a chain](.img/widget-links.icon.svg) Links
+## 5. ![Two links of a chain](.img/link.icon.svg) Links
 
 Links is the right [gutter's](framework.md#2-the-areas) first widget. Beside each link in a brief, on the link's own line, it tells the target: where it stands, its whole path drawn as the way down draws one, then its title and the opening words of its face, or that it leads out of the body, or that the brief is not yet written.
 
@@ -328,7 +328,7 @@ It draws the body whole, or, set in its head, only the reading the reader is sco
 
 At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-earlier-programs), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough. The author's, 2026-10-05, that it may follow the scope or stand global, and that a cell per file or per brief is a choice where the room allows one.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6--earlier-programs), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough. The author's, 2026-10-05, that it may follow the scope or stand global, and that a cell per file or per brief is a choice where the room allows one.*
 
 ### 7.1 A cell's room is how many stand beneath it
 

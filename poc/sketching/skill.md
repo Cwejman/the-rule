@@ -14,7 +14,7 @@ What a session does to make a sketch: when one earns its place, the forms a sket
 
 ## 1. What it draws
 
-Once a sketch [has earned its place](README.md#1-when-to-sketch), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.
+Once a sketch [has earned its place](README.md#1--when-to-sketch), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.
 
 *Reasoned, the author's, 2026-09-14.*
 

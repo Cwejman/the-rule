@@ -2,7 +2,8 @@
 <style>
 svg.file-icon .s { fill: none; stroke: var(--on, #3d4a52); stroke-width: 1.25px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 svg.file-icon .f { fill: var(--rest, #dfe5e8); }
-@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } }
+svg.file-icon .d { fill: var(--on, #3d4a52); }
+@media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
 </style>
-<g data-fit="" transform="translate(0.081 1.614) scale(0.99)"><path class="s" d="M13.5 8A5.5 5.5 0 1 1 11.4 3.7M10.7 1.4L11.4 3.7L9 3.6"/></g>
+<g data-fit="" transform="translate(0.615 1.615) scale(0.923)"><path class="f" d="M1.5 8A6.5 6.5 0 1 0 14.5 8A6.5 6.5 0 1 0 1.5 8Z"/><path class="s" d="M1.5 8A6.5 6.5 0 1 0 14.5 8A6.5 6.5 0 1 0 1.5 8Z"/><path class="s" d="M10.6 5.6A3.4 3.4 0 1 0 11.4 8.6M10.6 3.6V5.8H12.8"/></g>
 </svg>
