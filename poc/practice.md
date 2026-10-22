@@ -410,7 +410,9 @@ It uses its square as a letter uses its line: its weight sits on the floor of th
 
 #### 8.8.2 The icons are one family, built one way
 
-A body's icons read as a family only where each is built the same way, and a shared stroke width is not that. Every icon draws one object with a body: a closed shape filled with the quiet fill and outlined in the line's ink, with at most two strokes of detail on it or beside it, seen flat and from the front. A magnifying glass is a filled lens in its rim with a handle, never a circle and a line; a wave is a filled band, never a bare stroke. An icon drawn as bare lines beside icons drawn as bodies is a stranger in the family, however even its line.
+A body's icons read as a family only where each is built the same way, and a shared stroke width is not that. Every icon draws one object with a body: a closed shape in the quiet fill, outlined in the line's ink, with at most two strokes of detail, seen flat and from the front.
+
+A magnifying glass is a filled lens in its rim with a handle, never a circle and a line; a wave is a filled band, never a bare stroke. An icon of bare lines beside icons of bodies is a stranger in the family, however even its line.
 
 What is shared beyond that: rounded joins and ends, one corner radius on every rectangle, a body taking about half its square, and one level of detail, so no icon is a diagram where its neighbours are signs. A brief's icon and a file's are the same family, and a reader who has met a few should be able to tell a new one belongs before reading its heading.
 
