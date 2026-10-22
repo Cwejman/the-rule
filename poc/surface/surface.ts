@@ -6812,8 +6812,9 @@ function drawTreeLines(tree: HTMLElement): void {
   const stroke = (d: string, colour: string) => inked.push(`<path d="${d}" style="stroke:${colour}"/>`);
   const markOf = (row: Element): DOMRect => (row.firstElementChild as HTMLElement).getBoundingClientRect();
   // a row whose mark's room is empty, with no fold mark and no icon, is met where it begins to show: at its number, or
-  // its name where it has none; one holding a level beneath is a joint, where the line into it turns down in the middle
-  // of that room
+  // its name where it has none; one holding a level beneath is a joint, its line down leaving the tick into it from the
+  // middle of that room, so the line meets the step's text and runs on from it, where turning in the empty room left the
+  // line a column short of the step it belongs to
   const empty = (row: Element): boolean => !!row.firstElementChild?.matches(".mark.leaf");
   const joint = (row: Element): boolean => empty(row) && !!row.parentElement?.querySelector(":scope > .kids > .node");
   for (const node of all<HTMLElement>(".node", tree)) {
@@ -6833,7 +6834,7 @@ function drawTreeLines(tree: HTMLElement): void {
       const sm = markOf(r);
       const y = Y(sm.top + sm.height / 2);
       const shown = r.children[1] as HTMLElement | undefined;
-      const to = joint(r) ? X(sm.left + sm.width / 2) : empty(r) && shown ? X(shown.getBoundingClientRect().left) - 4 : X(sm.left) - 1;
+      const to = empty(r) && shown ? X(shown.getBoundingClientRect().left) - 4 : X(sm.left) - 1;
       const d = `M${x} ${y}H${to}`;
       if (sub.classList.contains("on")) stroke(d, ink(sub, "--on"));
       else if (sub.classList.contains("door")) stroke(d, ink(sub, "--door"));
@@ -9327,10 +9328,10 @@ svg.rel { display: inline-block; width: .72em; height: .72em; margin-left: .3em;
 /* a file's icon stands before its name wherever it is named in a line, a letter's size and sat on the line's baseline */
 .ficon { display: inline-block; flex: none; width: 1.05em; height: 1.05em; margin-right: .38em; vertical-align: -.16em; }
 .ficon svg { display: block; width: 100%; height: 100%; overflow: visible; }
-/* a brief's icon is part of its name and stands on its baseline as a letter does: its square's foot on the line, and its
-   drawing, which fills its square to thirteen units of sixteen, standing as tall as a capital; a step quieter than a
-   file's, which stands for the file whole (practice 8.8.1) */
-.bicon { display: inline-block; width: .94em; height: .94em; margin-right: .3em; vertical-align: baseline; opacity: .78; }
+/* a brief's icon is part of its name and stands on its baseline as a letter does: its drawing stands on the grid's line
+   two units above its square's floor, so the square is set that far below the baseline, by a shift that holds in a line
+   of text and in a row laid as flex alike; a step quieter than a file's, which stands for the file whole (practice 8.8.1) */
+.bicon { display: inline-block; width: .94em; height: .94em; margin-right: .3em; vertical-align: baseline; position: relative; top: calc(.94em * 2 / 16); opacity: .78; }
 .bicon svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .brief .card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .5em; }
 .brief .card-head { flex: 1; font-family: var(--head-face); font-size: var(--h2); font-weight: calc(600 - var(--thin)); line-height: 1.2; margin: 0; letter-spacing: calc(-.008em * var(--head-tight)); }
