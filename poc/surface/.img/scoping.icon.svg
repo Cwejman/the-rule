@@ -5,5 +5,5 @@ svg.file-icon .f { fill: var(--rest, #dfe5e8); }
 svg.file-icon .d { fill: var(--on, #3d4a52); }
 @media (prefers-color-scheme: dark) { svg.file-icon .s { stroke: var(--on, #c3ccd1); } svg.file-icon .f { fill: var(--rest, #39434a); } svg.file-icon .d { fill: var(--on, #c3ccd1); } }
 </style>
-<g data-fit="" transform="translate(0.647 1.647) scale(0.902)"><path class="f" d="M1.5 6.5A5 5 0 1 0 11.5 6.5A5 5 0 1 0 1.5 6.5Z"/><path class="s" d="M1.5 6.5A5 5 0 1 0 11.5 6.5A5 5 0 1 0 1.5 6.5Z"/><path class="f" d="M10.2 11.6L11.6 10.2L14.6 13.2A1 1 0 0 1 13.2 14.6Z"/><path class="s" d="M10.2 11.6L11.6 10.2L14.6 13.2A1 1 0 0 1 13.2 14.6Z"/></g>
+<g data-fit="" transform="translate(0.647 0.647) scale(0.902)"><path class="f" d="M1.5 6.5A5 5 0 1 0 11.5 6.5A5 5 0 1 0 1.5 6.5Z"/><path class="s" d="M1.5 6.5A5 5 0 1 0 11.5 6.5A5 5 0 1 0 1.5 6.5Z"/><path class="f" d="M10.2 11.6L11.6 10.2L14.6 13.2A1 1 0 0 1 13.2 14.6Z"/><path class="s" d="M10.2 11.6L11.6 10.2L14.6 13.2A1 1 0 0 1 13.2 14.6Z"/></g>
 </svg>
