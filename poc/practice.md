@@ -404,9 +404,9 @@ The icon is no part of the title, so the brief's address is its title's as befor
 
 An icon draws what the heading names, as the first picture a person would reach for on hearing it: a tree for "The tree", a flag for goals. It draws the brief's purpose in the whole, as [its heading names it](#42-a-heading-names-what-its-brief-is-for), never its contents, its mechanism or the sentence a summary would make; where no such picture comes, the heading is likely a summary, and the brief carries no icon until it is named again.
 
-It uses its square as a letter uses its line: its weight sits on the floor of the square and fills it to the width and height a capital takes, and it stands on the baseline of the heading's text, as a letter does, rather than centred in the line or floating above it. A drawing that leaves half its square empty, or hangs in the middle of it, reads smaller than the text beside it and out of line with it.
+It uses its square as a letter uses its line. The 16-unit square keeps two units of room on each side, so a drawing stands on the grid's line at y=14 and reaches up to y=2, as tall as a capital, and the renderer sets that line on the heading's baseline: the icon stands on the baseline as a letter does, rather than centred in the line or floating above it. A drawing that leaves half its room empty, or hangs in the middle of it, reads smaller than the text beside it and out of line with it; a drawing pushed to the square's edge to meet the baseline is the renderer's fault passed to the drawing.
 
-*The author's learning of 2026-10-21, from drawing icons for briefs here and in another project, where many came out poorly.*
+*The author's learning of 2026-10-21, from drawing icons for briefs here and in another project, where many came out poorly. The grid's line at fourteen and the renderer's offset to it, 2026-10-22, on a report from that project that icons drawn to the grid floated once the surface set the square's floor on the baseline instead.*
 
 #### 8.8.2 The icons are one family, built one way
 
