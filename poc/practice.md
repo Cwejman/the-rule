@@ -408,6 +408,14 @@ It uses its square as a letter uses its line: its weight sits on the floor of th
 
 *The author's learning of 2026-10-21, from drawing icons for briefs here and in another project, where many came out poorly.*
 
+#### 8.8.2 The icons are one family, built one way
+
+A body's icons read as a family only where each is built the same way, and a shared stroke width is not that. Every icon draws one object with a body: a closed shape filled with the quiet fill and outlined in the line's ink, with at most two strokes of detail on it or beside it, seen flat and from the front. A magnifying glass is a filled lens in its rim with a handle, never a circle and a line; a wave is a filled band, never a bare stroke. An icon drawn as bare lines beside icons drawn as bodies is a stranger in the family, however even its line.
+
+What is shared beyond that: rounded joins and ends, one corner radius on every rectangle, a body taking about half its square, and one level of detail, so no icon is a diagram where its neighbours are signs. A brief's icon and a file's are the same family, and a reader who has met a few should be able to tell a new one belongs before reading its heading.
+
+*The author's learning of 2026-10-22, from another project under the rule whose icons kept one line width and still did not read as one hand, some drawn as bodies and some as bare strokes.*
+
 ## 9. Reading and moving by script
 
 The making wants to read a document by depth and move a brief without retyping it, and no tool for that is built. Scripts over the headings are enough for now, and what they do is said in prose in [the skill](skill.md), so a session writes the script it needs when it needs it.
