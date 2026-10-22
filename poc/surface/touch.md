@@ -14,7 +14,7 @@ Every rule it moves is written beneath, and most of them are built. What it stil
 
 *The author's, 2026-09-16; built the same day, on a browser told to pretend, and what is still open stands at its foot.*
 
-## 1. What a phone changes
+## 1. The phone
 
 Three things a phone takes away, and each one moves a rule rather than only a size. There is no pointer, so nothing can be told by hovering and no figure can answer for what the pointer rests on. There is no keyboard, so a key cap names nothing. And there is room for one thing at a time, so the panes are a choice rather than a pair.
 
@@ -68,7 +68,7 @@ Even fitted, the figure and the acts on one line left neither room to read, so o
 
 *The author's reading, 2026-09-16: the acts were the right size and the line was wrong. As built the same day.*
 
-## 3. One chooser, in two grains
+## 3. The chooser
 
 The foot is not a second design. It is [the strip](framework.md#3-the-strip) in a second grain: wide, it is the row of every choice there is; narrow, it is a shorter row of the few that mean anything on a phone, and that row always stands. One table, one set of states, so a choice is never specified twice.
 
@@ -96,7 +96,7 @@ Wide this does not hold: the row spans the page, so it keeps its room and the pr
 
 *The author's, 2026-09-16, on reading a foot that had kept 78 clear of a screen 844 tall; as built the same day, the prose running 54 further down.*
 
-## 4. What stands on a phone
+## 4. On a phone
 
 The row holds three: the pane the reader is not in, which is one press to the other; the rail, while the prose stands; and the settings. [The help](widgets.md#8--the-keys) joins them only where there are keys to name, since on a phone it would list what nobody can press.
 
@@ -122,7 +122,7 @@ The settings are the one figure that stands that way now. The outline was built 
 
 Both were built into the pill and both were taken out on the author's reading. The outline read poorly whole on a phone, and he does not use it. The radial cannot be hit: a press on it goes to whatever cell the finger lands on, and no finger can land on a cell that small.
 
-What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#10-what-is-not-answered). Until each has its own touch reading, neither stands.
+What is wanted is not a bigger target but a different gesture, and the radial has one owed to it [at the foot](#10-open-questions). Until each has its own touch reading, neither stands.
 
 *The author's, 2026-09-16, on reading the first build; taken out the same day.*
 
@@ -144,7 +144,7 @@ What it keeps is a fade at its top and its foot, as the prose has, so the way do
 
 ### 4.5 The mark does not leave while the canvas stands
 
-The mark [gets out of the way while a reader reads](#3-one-chooser-in-two-grains), which it reckons from the lane's own scrolling. On the canvas there is no reading to leave, and going to a node scrolls the lane out of sight, which took the mark with it and left a reader on the canvas with no way to anything.
+The mark [gets out of the way while a reader reads](#3-the-chooser), which it reckons from the lane's own scrolling. On the canvas there is no reading to leave, and going to a node scrolls the lane out of sight, which took the mark with it and left a reader on the canvas with no way to anything.
 
 So it leaves only while the lane is the pane that stands.
 
@@ -180,7 +180,7 @@ The scope's own root is not a choice, since the entry on the canvas takes no pre
 
 *The one row is the session's, 2026-09-16, which the author asked to have built rather than argued, and the card came of his reading it. The one size and the glyphs are his, on reading the worded row. As built the same day.*
 
-## 5. The minimap is a rail, not a mode
+## 5. The rail
 
 [The shape](widgets.md#3--the-shape) is not a mode a reader picks. It stands beside the prose as a narrow rail, and a phone has room for it: it does not need much width to make itself clear, and it is only ever scrubbed, so the width its briefs are drawn in can go too.
 
@@ -192,7 +192,7 @@ The band that says what of the lane is on the screen stands the same clear of th
 
 What it gains is the callout beneath: while a finger rests on it, the path and the name of what the finger is over stand beside the thumb, on the side away from the edge the rail stands on, so the hand never covers the answer. That is [the tooltip](widgets.md#16-one-tooltip-beneath-the-pointer) in a touch grain, and the finger is only a fatter pointer.
 
-The rail stands at whichever edge the reader put the shape on, and takes the space that stood there, so the lane gives it its room rather than the page growing one. The side is a press in [the foot's row](#3-one-chooser-in-two-grains), cycling left, right and away as the strip cycles a widget on a desk, since a reader scrubbing with the hand they have wants the rail under that hand and [the callout](#5-the-minimap-is-a-rail-not-a-mode) away from it; the reset's direction follows the side. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
+The rail stands at whichever edge the reader put the shape on, and takes the space that stood there, so the lane gives it its room rather than the page growing one. The side is a press in [the foot's row](#3-the-chooser), cycling left, right and away as the strip cycles a widget on a desk, since a reader scrubbing with the hand they have wants the rail under that hand and [the callout](#5-the-rail) away from it; the reset's direction follows the side. The lane keeps two hundred at the least; below that the rail does not stand at all and the lane is alone, as it was.
 
 *The author's, 2026-09-16; the callout his, the marks his on reading a rail without them, and the narrowing his, from a rail nothing is ever aimed at. Measured as built the same day: the rail stands 74 on this body and leaves the lane 268 of a 390 screen, against 104 and 238 before it. It stands from 390 up; below that the lane would be left under two hundred, so a screen of 360 or 320 reads without it, and where that floor belongs is the author's to judge.*
 
@@ -224,7 +224,7 @@ So the rail is scrubbed and nothing else, and what the two presses gave is had e
 
 *Reasoned, 2026-09-16, from [the room a finger asks](#2--room-for-a-finger); as built the same day.*
 
-## 6. What the phone drops, and what it keeps
+## 6. Dropped and kept
 
 [The way down](lane.md#75-the-way-down-stands-over-the-lane) keeps its placement, which is one line and the cheapest orientation there is, and it spans the rail as well as the prose, so the placement has the whole row to read in.
 
@@ -260,7 +260,7 @@ That last is why it stands at all on a phone, since undo has no other home there
 
 *As built, 2026-09-16; the line was hiding the only way back until it was told to count that.*
 
-## 7. What the settings can say here
+## 7. Settings here
 
 A setting that cannot change anything is not drawn. The measure is set by the width, the canvas takes the page whole, the ahead does not stand and the flick reads a wheel no finger sends, so those four leave and the rest stand as they are.
 
@@ -272,7 +272,7 @@ A knob is turned by a finger that covers it, and the value it is turning to stan
 
 *The author's, 2026-09-16; as built the same day.*
 
-## 8. A badge without a key
+## 8. Keyless badges
 
 [A badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands) carries a key and a word. A phone has no key, so it carries the word alone, and the cap's room goes with the cap. That is the badge's third grain beside the worded and the tight, and a tight badge, which is its keys alone, falls back to the word, since its keys were all it had to show.
 
@@ -280,7 +280,7 @@ A badge that cannot be taken is not drawn at all. It keeps its room on a desk so
 
 *Reasoned, 2026-09-16, from what a phone takes away; the quiet badge dropped is the session's. As built the same day.*
 
-## 9. What this asks of the framework
+## 9. Asks of the framework
 
 A phone holds the lane and one narrow rail, and [the order of giving way](framework.md#28-giving-way) says the wings go before the lane stands alone. So the order needs an exception: a narrow reading keeps one narrow figure where the reader has asked for one.
 
@@ -288,7 +288,7 @@ It is built as the last step of that order: the wings give way, then the gutters
 
 *A trial, 2026-09-16, as built; the author's word is wanted before the rule moves.*
 
-## 10. What is not answered
+## 10. Open questions
 
 Which edge the rail stands on: the left, as built, where the shape has always stood, and the reset's direction follows from it. Whether it is the right edge, under the thumb of a hand holding the phone, is the author's to say.
 

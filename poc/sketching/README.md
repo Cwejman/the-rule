@@ -12,7 +12,7 @@ Sketching is how a session draws a structure or a flow a brief states, as an SVG
 
 *Reasoned, the author's, 2026-09-14; the first sketch was drawn under it the same day.*
 
-## 1. When a sketch earns its place
+## 1. When to sketch
 
 A sketch is drawn where a brief states a shape and a reader has to hold it in their head to go on: parts standing in a row, a holarchy, what flows into what, two things measured against each other. The test is the rule's own, turned on a picture: if the understanding comes as easily from the prose alone, the sketch is wrong, and it is not drawn.
 
@@ -20,15 +20,15 @@ A sketch is [an image like any other](../practice.md#8-visuals) in where it stan
 
 *Reasoned, the author's, 2026-09-14; the practice's hypothesis of drawing from the text, taken up.*
 
-## 2. Prose decides what is drawn, and a little code keeps it exact
+## 2. Prose and code
 
-What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5-what-this-does-not-answer).
+What a sketch shows, in which form, and in what language is prose, in the skill beneath. A model composes well from a design language held clearly, and components written before the forms are known would fix a style too early, which is why [components stay open](#5-open-questions).
 
 What prose cannot give is geometry a model cannot measure, and a sight of what it drew. A label that overflows its room, two labels on one spot, a colour written as a value that no theme can reach: these are what make a generated drawing look cheap, and none of them is a matter of taste. So the rule is thin, and it does only what prose cannot: it keeps the geometry exact and lets the session look.
 
 *Reasoned, the author's, 2026-09-14. Whether prose and this much code hold a sketch at the quality the surface sets is open, and the first sketches are what measure it.*
 
-## 3. A sketch reads the surface's palette
+## 3. The palette
 
 A sketch colours by role and never by value, so that [the branch hue](../surface/widgets.md#15-ink-is-spent-only-where-a-reader-has-asked) and the theme reach it. Each role is written as [the surface's own variable](../surface/implementation.md#64-one-palette-two-sides) with a fallback taken from the palette's light side, `var(--ink, #141414)`.
 
@@ -44,7 +44,7 @@ A sketch names no face. Set into the page it takes the surface's sans, and shown
 
 *Reasoned, the author's direction, 2026-09-14.*
 
-## 4. What makes one
+## 4. Making one
 
 A session makes a sketch by prose and a little code, and both stand apart: what it does, when a sketch earns its place and the language it is drawn in; and the one file that keeps the geometry exact and lets the session look at what it drew.
 
@@ -54,7 +54,7 @@ A session makes a sketch by prose and a little code, and both stand apart: what 
 
 *In force, 2026-09-14.*
 
-## 5. What this does not answer
+## 5. Open questions
 
 Whether components are needed. The practice's hypothesis of a few reusable pieces in one file [gave way to this level](../practice.md#81-the-sketch), and is taken up only when the same composition is drawn by hand for the third time.
 
@@ -68,7 +68,7 @@ So far the drawings that teach best, and carry the win first, come from the huma
 
 *Open, 2026-09-14; the art direction seen in the author's reading of the first sketches for the rule, 2026-09-15.*
 
-## 6. What was tried and refused
+## 6. Refused
 
 A flat run, looked up when one of these is proposed again.
 

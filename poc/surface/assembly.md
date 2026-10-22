@@ -14,7 +14,7 @@ Assembled again on the lore of building programs, the page's script would keep e
 
 *Open, the session's, 2026-10-01, asked by the author: "what is really the function, and how may it really be assembled", with "the foundational lore as wisdom about building programs … such as unix, functional programming" there as the sister project's principles hold it, "of course not changing behaviour", and "there must be immense simplification possible under that wisdom". Read cold three times, as a brief and against the code, until a round changed only words; each move says beneath it when it is built.*
 
-## 1. What the program is for
+## 1. Purpose
 
 A reader takes in a body of knowledge laid by the gradient, at the depth they need, and always sees where they stand in it. Beside it they can read how it came to be, git's history, laid the same way. Everything the page does serves that, and it comes to four parts, with a shell around them.
 
@@ -31,7 +31,7 @@ The process that traces the body and the history and serves the page is apart fr
 
 *Reasoned, the session's, 2026-10-01, from the whole file read through; that the surface is for reading a body at the depth one needs is [the surface's own](README.md).*
 
-## 2. What the code is now
+## 2. The code now
 
 The file has three parts.
 
@@ -54,9 +54,9 @@ The comments carry the dated story of many decisions, which [the briefs](impleme
 
 *Measured, the session's, 2026-10-01, of the code as it stood at commit 25ee761, by reading and by count; the faults by the reviews of 977f285, 1a54efb and f927248.*
 
-## 3. The lore it stands on
+## 3. The lore
 
-The author's [principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-) carry two traditions into plain TypeScript, and a third names this kind of program. Each move [beneath](#4-how-it-is-assembled) names the principle it serves, so it is weighed against the lore and not against taste.
+The author's [principles](https://github.com/Hjulverkstan/hjulverkstan/blob/main/GUIDELINES.md#principles-) carry two traditions into plain TypeScript, and a third names this kind of program. Each move [beneath](#4-the-moves) names the principle it serves, so it is weighed against the lore and not against taste.
 
 *The principles are the author's, carried from the sister project, where [the implementation](implementation.md#71-taste-in-the-rule-itself) brought them as taste; this brief brings them as ground.*
 
@@ -81,7 +81,7 @@ A page like this one has a known shape:
 - a **view**, a pure function from the model to what is drawn;
 - an **update**, which takes an act and the model and gives the next model.
 
-The program's four parts are that shape, with the layout as a view of the settings. Taken whole, as a framework, it would bring a compile step and a runtime the surface refused when it [chose plain functions](implementation.md#8-plain-functions-before-a-framework). Taken as a shape, it costs nothing and tells each function where it belongs.
+The program's four parts are that shape, with the layout as a view of the settings. Taken whole, as a framework, it would bring a compile step and a runtime the surface refused when it [chose plain functions](implementation.md#8-plain-functions). Taken as a shape, it costs nothing and tells each function where it belongs.
 
 One part of the shape is not taken: the update here changes the reading in place rather than giving a new one. A reading is one object that a few hundred functions read, the undo already keeps the reading as it stood before each change, and a new reading at every scroll would be a copy made to be thrown away.
 
@@ -92,7 +92,7 @@ One part of the shape is not taken: the update here changes the reading in place
 The author holds these, and every move is weighed against them:
 
 - **Simplicity and coherence.** The simplest way that meets the need, and one pattern for one kind of thing.
-- **Dumb is smart.** Plain repetition beats a clever abstraction, and few abstractions beat many. So it stays vanilla TypeScript, with no currying and no piping; that it also takes no framework is [the surface's own decision](implementation.md#8-plain-functions-before-a-framework).
+- **Dumb is smart.** Plain repetition beats a clever abstraction, and few abstractions beat many. So it stays vanilla TypeScript, with no currying and no piping; that it also takes no framework is [the surface's own decision](implementation.md#8-plain-functions).
 - **Describe over instruct, and data over logic.** A table of cases rather than a branch for each.
 - **Pure functions, effects kept apart, one thing well.** Large things are composed of small ones.
 - **A single source of truth.** Flat, normalized data, derived when needed, flowing one way.
@@ -101,7 +101,7 @@ From the project's rules, three more apply here: code documents itself where it 
 
 *Preferred, the author's, carried from the sister project, the first five from its principles and the last three from its rules; not checked here.*
 
-## 4. How it is assembled
+## 4. The moves
 
 Each move keeps every behaviour, names the principle it serves, and says roughly what it removes. Together they remove about 670 to 780 lines of the page's code, and 60 to 100 of its comments.
 
@@ -146,7 +146,7 @@ The pointer is chosen over handing each function its world as an argument. The w
 
 The move is mechanical but wide: every reading of the view, the ends or a world's elements becomes a reading of the world now, so the change touches hundreds of lines while it removes a hundred.
 
-*A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken. It supersedes the world set in the state's place of [the implementation](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) and of [the framework's shared state](framework.md#4-one-shared-state-and-a-few-verbs), where they say so. Fulfilled, 2026-10-02, in c1becf3: the harness equal, and a cold review found no path where writing live differs from copying back.*
+*A single source of truth, and dumb is smart. Reasoned, the session's; a cold reader preferred the argument for its purity, and that is weighed here and not taken. It supersedes the world set in the state's place of [the implementation](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) and of [the framework's shared state](framework.md#4-shared-state), where they say so. Fulfilled, 2026-10-02, in c1becf3: the harness equal, and a cold review found no path where writing live differs from copying back.*
 
 ### 4.4 What the map decides before it draws
 
@@ -160,7 +160,7 @@ This removes no lines. It makes plain the one place a view decides anything.
 
 ### 4.5 The settings are a table
 
-The settings are the page's, apart from both worlds. Today they are checked by hand, one setting at a time. The switches already list each setting's legal values, so the check becomes one pass over that list. The dated repairs to settings kept from before 2026-09-17 are [the author's to let go](#5-what-only-the-author-can-let-go).
+The settings are the page's, apart from both worlds. Today they are checked by hand, one setting at a time. The switches already list each setting's legal values, so the check becomes one pass over that list. The dated repairs to settings kept from before 2026-09-17 are [the author's to let go](#5-the-authors-to-let-go).
 
 About 30 lines.
 
@@ -184,7 +184,7 @@ An act changes a reading or the settings, and the page is drawn again from them.
 
 Building toward it showed the lists are already few and short. Drawing everything is one function, and each part a function of its own. Laying the row again with what each world measures against it is one function, and drawing what changed with the pointer or the focus is one as well. What an act draws beyond those is particular to it: which world, which part, and what must keep its place, such as the scroll it anchors on. Drawing at a coarser level would lay a prose anew where today it is left alone, and so lose what a reader holds in it: a selection of its text, the focus of an element, an image already decoded.
 
-So it is not built. [The implementation's rule](implementation.md#6-how-it-is-drawn), that a change draws again only what depends on it, stands.
+So it is not built. [The implementation's rule](implementation.md#6-drawing), that a change draws again only what depends on it, stands.
 
 *Describe over instruct, and dumb is smart, weighed against keeping behaviour. Reasoned, the session's, 2026-10-02, from the call sites read through: the move as first proposed would have added a layer of levels to save some forty lines, at the cost of what a reader holds.*
 
@@ -218,13 +218,13 @@ The longer story of how a decision was reached, with its dates, stands in the br
 
 ### 4.11 One file, or a few
 
-[The implementation](implementation.md#7-one-file-laid-by-the-gradient) keeps the surface in one file because it is the proof of concept. It says that once the file outgrows reading by depth, each widget becomes a file of its own.
+[The implementation](implementation.md#7-one-file) keeps the surface in one file because it is the proof of concept. It says that once the file outgrows reading by depth, each widget becomes a file of its own.
 
 The page's script is cut out of the file by its comment headings and transpiled. Bun would bundle it from a few files as it serves the page, with no build step of its own. The parts would be the process, the substrate, the readings, the layout, the views, the acts with their gestures, and the style. A split saves no lines, but it replaces cutting by headings, which breaks on a renamed heading, with imports.
 
 *Small parts that each do one thing. Whether it is time is the author's, since it reverses his decision of 2026-09-12. Every move above holds either way, and each is a seam a file could be cut along.*
 
-## 5. What only the author can let go
+## 5. The author's to let go
 
 Keeping behaviour keeps some that exists only because of how the code grew. Each would simplify further, and each is the author's to let go or keep:
 
@@ -234,7 +234,7 @@ Keeping behaviour keeps some that exists only because of how the code grew. Each
 
 *Seen in the code, 2026-10-01; each is unanswered.*
 
-## 6. How the behaviour is kept
+## 6. Keeping behaviour
 
 Nothing a reader sees or does may change, and that is shown, not argued.
 
@@ -255,7 +255,7 @@ The harness sits outside the surface and ships nothing. The scenarios cover what
 
 *Measured, 2026-10-01: the page run against itself through the harness, 166 records over twelve scenarios, comes out equal. Two things had to be stilled first: the rasteriser's shade at a rounded corner, which the comparison sets aside below a few pixels, and the blur behind a phone's frosted pill, which the harness turns off on both sides. Reasoned, of the rest.*
 
-## 7. The order of the work
+## 7. Order of work
 
 Each move is one commit, after the harness, the type checker and a cold review are each clean. The removals come first, then what makes one thing one, then the world, which every later move stands on. Then the layout, the draw, the acts and the gestures.
 
@@ -272,7 +272,7 @@ Each move is one commit, after the harness, the type checker and a cold review a
 
 *Reasoned, the session's, 2026-10-01; the order is a cold reader's, who put what only removes before what moves. Measured, 2026-10-02, after the eighth: the page's script went from 4,069 lines of code to 3,956, every record of the harness equal throughout. The three largest moves are the author's, so the larger part of the estimate waits with them.*
 
-## 8. What this leaves open
+## 8. Open questions
 
 - Whether the file becomes a few, [above](#411-one-file-or-a-few): not yet, the author's word of 2026-10-02.
 - Whether the heavy tier of git's history, served and written but read by nothing yet, stays until [the history](history.md) reaches it.

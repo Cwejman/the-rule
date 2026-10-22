@@ -40,7 +40,7 @@ Wherever a figure draws a brief's blocks it draws an image as a frame, where a p
 
 ### 1.4 One brief is lit wherever it is drawn
 
-Every widget draws the same briefs from the same sizes, so the brief highlighted, [the focus or the one under the pointer](lane.md#4--where-you-are-is-the-brief-in-focus), lights in all of them at once. Where a figure has merged past the brief being pointed at, the cell holding it is lit instead.
+Every widget draws the same briefs from the same sizes, so the brief highlighted, [the focus or the one under the pointer](lane.md#4--the-focus), lights in all of them at once. Where a figure has merged past the brief being pointed at, the cell holding it is lit instead.
 
 A light eases in and out rather than snapping, so the eye follows where it went: a cell of [the plate](#7--the-plate) and its glow, a card's rim and ink, and a box on the canvas over about a sixth of a second. In prose, a lit title, number or link takes a tenth, since a reader moving the pointer across words should not see a trail of fading ink behind it. Every move eases, a scroll as much as a press or the pointer: the plate drawn again as the focus moves keeps the cells it has already laid and changes only their marks, and a widget drawn wholly anew shows its marks at once. A glow comes and goes at once, since one eased from nothing passes through black before it takes its hue.
 
@@ -74,7 +74,7 @@ Beside a brief the cap says how that brief is reached. On the brief the reading 
 
 A badge that cannot be taken now keeps its room and goes quiet, so a row never shifts under the pointer. Pressing one does what its key does, and [the tooltip](#16-one-tooltip-beneath-the-pointer) tells the rest: what the act does, what the same key with shift does, and the other ways to the same thing.
 
-Where there is no key to draw, the badge carries the word alone, which is [its third grain](touch.md#8-a-badge-without-a-key); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
+Where there is no key to draw, the badge carries the word alone, which is [its third grain](touch.md#8-keyless-badges); and where it stands in a row of round buttons, its glyph alone, which is [the fourth](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it).
 
 *The author's ask of 2026-09-16, that every act a key fires be visible where it makes sense; the glyphs drawn rather than set, the author's ask the same day.*
 
@@ -178,7 +178,7 @@ The tree may also follow the levels the lane has unfolded, a third setting in it
 
 The tree takes the width its rows need, measured as it is laid, up to three hundred and twenty pixels, past which a long name is cut; its rows change with the folds and the scope rather than with each step, so the row is laid again only when what the tree needs has changed, and a step never moves the prose.
 
-A reader may pull its edge, as any column's edge [is pulled](layout.md#3--the-gaps-are-the-handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
+A reader may pull its edge, as any column's edge [is pulled](layout.md#3--handles), and a layout keeps the pull: narrower, down to a hundred and twenty, or wider than the three hundred and twenty it stands at unpulled, as far as its longest name on one line, at most six hundred and forty. The pull is a ceiling and not a width: the tree still takes no more than its rows need, and below that a name is cut where the tree is dense and wraps onto more lines where it is open.
 
 *The pull, the author's ask of 2026-10-14, for a reader who would rather have names cut or wrapped than a wide tree; past the most, the author's of the same day, since an open tree cuts nothing and a wide one is the only way its names stand on one line.*
 
@@ -208,7 +208,7 @@ The shape is the lane's scrollbar: the lane as laid, drawn small, so the reader 
 
 Each brief in the lane stands as its blocks, a heading a short bar and a paragraph a block as tall as it is drawn, shifted right by the brief's depth. Every block a brief has is drawn, a list or a table as readily as a paragraph, and an image as a frame as wide and as tall as it stands in the lane.
 
-Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-minimap-is-a-rail-not-a-mode), nesting a step tighter and giving its marks whatever room each row has left.
+Where every other area has given way it stands narrow, as [the rail](touch.md#5-the-rail), nesting a step tighter and giving its marks whatever room each row has left.
 
 It is as wide as it draws, its rows as the lane lays them, so it takes no room it leaves bare and widens and narrows with the depth the lane is scoped and folded to. A block is half the width it stood at while the shape carried marks beside it, and its head offers it wide again, a setting a layout holds.
 
@@ -276,7 +276,7 @@ As the width tightens [the gutter narrows](framework.md#28-giving-way) rather th
 
 ## 6. ![A dial](.img/widget-settings.icon.svg) Settings
 
-Settings is a wing widget that edits [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values.
+Settings is a wing widget that edits [the settings](framework.md#5-settings-as-data) by eye against real prose, since the page redraws as a value changes. It is meters for what has a range and switches for what has a few values.
 
 They stand in groups by what they change, each group named over a hairline with its meters first and its switches after: the type, the colour, the page, how the reading moves, then the canvas's and git's own. A setting a program holds as its own, the tree's room or the plate's reach, is set in that program's head and is not among them.
 
@@ -290,7 +290,7 @@ While it is pointed at or turned its value stands in its word's place, so the va
 
 The type is the zoom, the heading ratio and the line height; the colour, the headings' hue and the ground's; the page, the gap, the dim, the edge fade and the height of the file figures the tree and the cards draw. The body's group holds the reading speed, in words a minute, which every card's reading time is reckoned at, and turning it tells each time again in place. The two hues stand at nought until a reader turns them, and [what they colour](#182-the-ground-and-the-headings-may-take-the-hue) is said with the colour. The space beneath a heading grows with the heading, so a larger ratio opens the room between a heading and its prose as well.
 
-*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3--the-gaps-are-the-handles) size them. The two hues, the author's ask of 2026-10-14. The reading speed, the author's ask of 2026-10-17; that it starts at two hundred and thirty words a minute is the session's.*
+*Reasoned, the author's, 2026-09-13. The measure's meter and the canvas's width went on 2026-10-01, since [the gaps](layout.md#3--handles) size them. The two hues, the author's ask of 2026-10-14. The reading speed, the author's ask of 2026-10-17; that it starts at two hundred and thirty words a minute is the session's.*
 
 ### 6.2 The switches
 
@@ -328,7 +328,7 @@ It draws the body whole, or, set in its head, only the reading the reader is sco
 
 At the middle's size it is [the dish](framework.md#26-the-middle-holds-one-pane-or-two), a pane of its own, which is where a body too large for a wing's plate has the room to be seen a cell per brief.
 
-*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-the-programs-before-this-one), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough. The author's, 2026-10-05, that it may follow the scope or stand global, and that a cell per file or per brief is a choice where the room allows one.*
+*Reasoned, the author's, 2026-09-12, carried from [the first program's figures](README.md#6-earlier-programs), and laid again as a plate of cells on 2026-09-22, with the dish the same day; off the phone since 2026-09-16. Wide, from 2026-10-01, the plate and the dish are [one program](layout.md#22-the-plate-and-the-dish-are-one-program), drawn as the dish once its column is pulled wide enough. The author's, 2026-10-05, that it may follow the scope or stand global, and that a cell per file or per brief is a choice where the room allows one.*
 
 ### 7.1 A cell's room is how many stand beneath it
 
@@ -362,7 +362,7 @@ A cell marked or lit lights up as a coloured lamp does, and never darkens: on a 
 
 ## 8. ![A keyboard](.img/widget-keys.icon.svg) The keys
 
-The keys is a wing widget: every act with the key that fires it, grouped by what each works on: the brief, the scope, the reading, the map, the lane, [the programs](layout.md#72-a-letter-presses-each-icon) by their letters and [the layouts](layout.md#8--layouts-kept-by-number) by their digits. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading, the letters and the digits have no object on the page, and this is where a reader meets them.
+The keys is a wing widget: every act with the key that fires it, grouped by what each works on: the brief, the scope, the reading, the map, the lane, [the programs](layout.md#72-a-letter-presses-each-icon) by their letters and [the layouts](layout.md#8--layouts) by their digits. Most acts stand as [a badge where their object stands](#17-a-key-stands-as-a-badge-where-its-act-stands); the arrows that move the reading, the letters and the digits have no object on the page, and this is where a reader meets them.
 
 It answers for the focus, so what the space bar would do now is what it says, and an act out of reach stands quiet in its place. Every badge in it is pressable, and each tells what it does on pointing, so it is the help as well as the list.
 

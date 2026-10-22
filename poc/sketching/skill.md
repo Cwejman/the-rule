@@ -12,9 +12,9 @@ What a session does to make a sketch: when one earns its place, the forms a sket
 
 *In force, 2026-09-14.*
 
-## 1. A sketch draws only what the text says
+## 1. What it draws
 
-Once a sketch [has earned its place](README.md#1-when-a-sketch-earns-its-place), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.
+Once a sketch [has earned its place](README.md#1-when-to-sketch), it draws only what the text says, and says it again in the text beneath it. It is never decoration, never a second argument, and never a mood; an image for breathing space is [the artful kind](../practice.md#82-the-artful-image), found rather than drawn.
 
 *Reasoned, the author's, 2026-09-14.*
 
@@ -54,7 +54,7 @@ The hue is the only colour a sketch has, and it says where in the body a thing s
 
 ### 3.3 Two sizes of text, measured for room
 
-Text comes in two sizes and no smaller: a label at 13 pixels and a note at 11, strong only where a label names the thing the sketch is about. Room is measured before it is given, with [the tool's `measure`](implementation.md#3-a-labels-room-is-measured-for-the-widest-face), so a label fits in the widest face it may be set in.
+Text comes in two sizes and no smaller: a label at 13 pixels and a note at 11, strong only where a label names the thing the sketch is about. Room is measured before it is given, with [the tool's `measure`](implementation.md#3-measuring-labels), so a label fits in the widest face it may be set in.
 
 *Reasoned, the author's direction, 2026-09-14.*
 

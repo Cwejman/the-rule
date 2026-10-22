@@ -18,7 +18,7 @@ Two programs were built before this model. A reader and its nine briefs of speci
 
 The first program gave a pane to a single brief and put the rest of its level in a list to choose from.
 
-That makes a level a choice between peers, where [a level is read through](lane.md#1-the-lane-holds-one-reading).
+That makes a level a choice between peers, where [a level is read through](lane.md#1-one-reading).
 
 ## b. Panes scrolling at graded speeds
 
@@ -30,7 +30,7 @@ The author's verdict on the coupling was that one small scroll moved three panes
 
 A preview pane showing faces and no prose.
 
-The level beneath stands in the lane already, since [a reading is laid whole](lane.md#3-a-reading-is-laid-whole), and what lies past its boundaries is entered. Prose inline in the reading is not this refusal, which was a pane of doors standing beside it.
+The level beneath stands in the lane already, since [a reading is laid whole](lane.md#3-laid-whole), and what lies past its boundaries is entered. Prose inline in the reading is not this refusal, which was a pane of doors standing beside it.
 
 ## d. Two scroll axes in one region
 
@@ -60,7 +60,7 @@ The author judged it failed, and droplets replace it rather than rings or bars.
 
 The first program read a harness's transcripts directly and drew them, which made the surface a monitor of one tool rather than a reader of a substrate.
 
-The surface is [handed a directory and reads only that](README.md#2-what-it-is-handed), so whatever wants to be read writes itself into the substrate first.
+The surface is [handed a directory and reads only that](README.md#2-the-root), so whatever wants to be read writes itself into the substrate first.
 
 ## i. An overlay a reader has to move into
 
@@ -72,7 +72,7 @@ Reaching it is the problem. On a crowded figure the pointer cannot get from a ce
 
 The second program kept an overlay that only told, raised beside whatever the pointer rested on and never entered.
 
-What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-a-reading-is-laid-whole) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
+What it told now has a home a reader can see without pointing: a link's target [beside the link](widgets.md#5--links), a brief's level [in the lane](lane.md#3-laid-whole) and [in the ahead](widgets.md#4-the-ahead). An overlay that repeats what is in view competes with the prose.
 
 ## k. A level to a pane, three abreast
 
@@ -90,7 +90,7 @@ Refused with the panes; there is no row to move.
 
 The second program drew the level beneath a brief as a small band beside its heading, told it on pointing, and unfolded it on a press.
 
-That is not how a document reads: its subsections present themselves as you scroll. The lane lays [the reading whole](lane.md#3-a-reading-is-laid-whole), and a reader folds what they do not want rather than asking for what they do.
+That is not how a document reads: its subsections present themselves as you scroll. The lane lays [the reading whole](lane.md#3-laid-whole), and a reader folds what they do not want rather than asking for what they do.
 
 ## n. Pressing a brief to unfold its level without entering it
 
@@ -108,13 +108,13 @@ The author found it strange: a brief's children stood at the bottom of the figur
 
 Every brief a little dimmer the further it stood from the reading line, continuously.
 
-The author could not read what it meant. [One step](lane.md#4--where-you-are-is-the-brief-in-focus) says it: the focus whole, the rest dimmer, and the prose fading only at the edges of the viewport.
+The author could not read what it meant. [One step](lane.md#4--the-focus) says it: the focus whole, the rest dimmer, and the prose fading only at the edges of the viewport.
 
 ## q. Folding to the heading alone
 
 A third state beneath the face: the brief as a bare name.
 
-Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [the two states](lane.md#2--folded-to-its-face-or-whole) suffice, and folding becomes one act with one inverse.
+Refused by the author on the second reading as impractical and strange. A brief always keeps its face, [the two states](lane.md#2--face-or-whole) suffice, and folding becomes one act with one inverse.
 
 ## r. A fold mark beside the heading
 
@@ -162,7 +162,7 @@ Surveyed across eighteen widths and seven configurations: the same seven figures
 
 Where the lane stood alone, one round mark at the foot of the page, which a press opened as a wide pill of the choices and a second press closed.
 
-The author's verdict on reading it: every choice is two presses away, and while the pill stands open it hides [the acts of what was chosen](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it), which stand in the same place. A mark and a pill also read as two different things, one sheer and one solid. [One row that always stands](touch.md#3-one-chooser-in-two-grains), of the few choices a phone has, has none of that, and it is short enough to need no opening.
+The author's verdict on reading it: every choice is two presses away, and while the pill stands open it hides [the acts of what was chosen](touch.md#462-the-foot-is-one-row-and-the-card-is-what-stands-behind-it), which stand in the same place. A mark and a pill also read as two different things, one sheer and one solid. [One row that always stands](touch.md#3-the-chooser), of the few choices a phone has, has none of that, and it is short enough to need no opening.
 
 ## z. The ahead in the shape's form
 

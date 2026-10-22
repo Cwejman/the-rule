@@ -10,11 +10,11 @@ status: open
 
 The page is a row of columns, each a stack of programs, and the reader lays it by dragging: a program by its grip, a width or a height by the gap beside it. The prose and the canvas belong to the body or to git, a dock holds every program once, and each program carries a head with its own settings.
 
-It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-every-program-has-a-head), [moving live and only between](#5-a-program-is-moved-by-dragging-it) and [a press that opens or closes](#7--the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-what-is-built-and-what-is-not) is the meeting of the two worlds, which waits on the history's own next steps.
+It is built, wide, as laid here but for what the author found on first using it, 2026-10-03: [the frame every program shares](#21-three-ways-to-take-height), [the head shown on pointing](#4-heads), [moving live and only between](#5-dragging) and [a press that opens or closes](#7--the-dock), built the same day, and [what it supersedes](#11-what-it-supersedes) stands beneath its reason; [what is not built](#9-built-so-far) is the meeting of the two worlds, which waits on the history's own next steps.
 
 *Preferred, the author's, 2026-10-01, in discussion with the session, and built the same day. What the session proposed says so where it stands, and whether the author let it stand or has not answered it; where the build departs from what was laid, the section says so.*
 
-## 1. Why it is laid again
+## 1. Why by hand
 
 Today five areas stand in a fixed row, and an icon at the foot cycles a widget through nowhere, the left and the right. A wing holds two figures and the middle two panes, and nothing is dragged. So an arrangement is had by a run of presses, some cannot be had at all, and the widths are knobs set away from what they size.
 
@@ -26,21 +26,21 @@ What a reader wants is to put a thing where they want it and to pull it to the s
 
 The words it uses here are given in the sections below.
 
-In the framework it supersedes [the three kinds of widget](framework.md#1-three-kinds-of-widget), keeping the adjunct as a setting of each prose, and of [the areas](framework.md#2-the-areas) it supersedes what an area holds, keeping only its growing and fixed figures, less the plate, which stands alone, and it supersedes the cycle that closed an area by hand, the two sides of the middle, the keys among them and the order of giving way. It keeps [the widths](framework.md#21-widths) a figure declares, [the spaces between as one](framework.md#22-the-spaces-between-are-one) when the room is spread, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose), read of a column beside the prose nearest it, with the dock's room at the foot where it stands there. It supersedes [the strip](framework.md#3-the-strip), which becomes the dock and keeps its four weights of ink, and what a pane gives back; [the one shared state](framework.md#4-one-shared-state-and-a-few-verbs), which is kept for each world but for what the page keeps once; and the measure, the canvas's width and the widget of each area among [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them).
+In the framework it supersedes [the three kinds of widget](framework.md#1-three-kinds-of-widget), keeping the adjunct as a setting of each prose, and of [the areas](framework.md#2-the-areas) it supersedes what an area holds, keeping only its growing and fixed figures, less the plate, which stands alone, and it supersedes the cycle that closed an area by hand, the two sides of the middle, the keys among them and the order of giving way. It keeps [the widths](framework.md#21-widths) a figure declares, [the spaces between as one](framework.md#22-the-spaces-between-are-one) when the room is spread, and [figures reaching as far as the prose](framework.md#23-a-wings-figures-reach-as-far-as-the-prose), read of a column beside the prose nearest it, with the dock's room at the foot where it stands there. It supersedes [the strip](framework.md#3-the-strip), which becomes the dock and keeps its four weights of ink, and what a pane gives back; [the one shared state](framework.md#4-shared-state), which is kept for each world but for what the page keeps once; and the measure, the canvas's width and the widget of each area among [the settings](framework.md#5-settings-as-data).
 
-Among the widgets, the dish as [a pane of its own](widgets.md#7--the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters), with the canvas's width meter as built; where they say a wing, read a column. On the canvas, [the face's eye](canvas.md#53-what-is-selected-shows-its-face) and [the root's direction](canvas.md#410-the-roots-level-runs-down-or-across) leave [its field](canvas.md#51-the-field-the-acts-stand-in) for its head; that brief still names the other pane and the settings as the field's standing acts, which the strip has since taken. And [going](canvas.md#5-one-press-selects-two-presses-go) where the canvas stands without the prose no longer puts the prose in its place.
+Among the widgets, the dish as [a pane of its own](widgets.md#7--the-plate) goes, and so does [the measure's meter](widgets.md#61-the-meters), with the canvas's width meter as built; where they say a wing, read a column. On the canvas, [the face's eye](canvas.md#53-what-is-selected-shows-its-face) and [the root's direction](canvas.md#410-the-roots-level-runs-down-or-across) leave [its field](canvas.md#51-the-field-the-acts-stand-in) for its head; that brief still names the other pane and the settings as the field's standing acts, which the strip has since taken. And [going](canvas.md#5-presses) where the canvas stands without the prose no longer puts the prose in its place.
 
 In the history it supersedes [the mode](history.md#41-it-is-a-mode-not-a-pane) and its switch, [a selection kept when the mode is left](history.md#43-a-selection-shows-what-it-touched), and [what stands beside the switch](history.md#44-what-is-selected-stands-beside-the-switch). [Reading it ahead](history.md#411-turning-to-it-never-waits-for-what-was-read-before) stays, and so does a published page's history as files: a program of git's that waits on its first read says so in itself, and the icon of each program of git's that waits breathes in the dock as the switch did.
 
-In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down-stands-over-the-lane), and keeps [the wheel scrolling the lane from anywhere](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere) for the body's prose, with git's prose taking it where the pointer rests on it, as [the two worlds](#6-the-body-and-git-two-worlds) say. In the implementation it supersedes [the history's world set in the body's place](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own), and what turns back to the body before it goes, the browser's back and forward among it.
+In the lane it supersedes [the way down over the middle](lane.md#75-the-way-down-stands-over-the-lane), and keeps [the wheel scrolling the lane from anywhere](lane.md#42-the-wheel-scrolls-the-lane-from-anywhere) for the body's prose, with git's prose taking it where the pointer rests on it, as [the two worlds](#6-two-worlds) say. In the implementation it supersedes [the history's world set in the body's place](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own), and what turns back to the body before it goes, the browser's back and forward among it.
 
 *Reasoned, the session's, 2026-10-01, from the briefs this touches.*
 
-## 2. ![Three columns, the last a stack of two](.img/columns.icon.svg) A row of columns, each a stack
+## 2. ![Three columns, the last a stack of two](.img/columns.icon.svg) Columns
 
 The page is a row of columns from left to right, and a column holds one program or several stacked from top to bottom.
 
-A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the settings and [the keys](widgets.md#8--the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-every-program-has-a-head).
+A program is what was a pane or a figure: the prose, which is what was the lane, and the canvas, one of each for the body and for git; the plate; and the figures, the shape, the tree, the settings and [the keys](widgets.md#8--the-keys). Git's status is a program too, and new. An adjunct is not a program but [a setting of a prose](#4-heads).
 
 That is the whole arrangement of programs; the dock stands apart from it. A wing was a column of figures and the middle the columns holding panes, so neither stands as a place of its own any longer.
 
@@ -78,7 +78,7 @@ The layout is kept as a tree of any number of children, held to two levels, a ro
 
 *Reasoned, the session's, 2026-10-01, at the author's question, which the author let stand.*
 
-## 3. ![Two panels and the gap between them pulled apart](.img/handles.icon.svg) The gaps are the handles
+## 3. ![Two panels and the gap between them pulled apart](.img/handles.icon.svg) Handles
 
 Every gap beside something that can be pulled can be dragged. The gap between two columns trades width between those two, and the rest of the row stands still; the gap between two growing programs in a stack trades height between them; the gap at either edge of the row sizes the column beside it alone. Nothing new is drawn for a gap but the pointer saying it can pull there.
 
@@ -110,7 +110,7 @@ Once only the body's prose is left in the row it narrows as the screen does: its
 
 *The sharing is the author's, 2026-10-05, that what can be resized shrinks to make room, the prose and the canvas alike; it supersedes the body's prose keeping its width while the rest shrank. The rest is reasoned, the session's, 2026-10-01, not yet answered, from [the order today](framework.md#28-giving-way), the pane beside the lane first, the right before the left and the lane last. It departs from it on the gutters, which today give way before the wings and here only once the body's prose is left alone in the row, and in letting the columns at the ends give way before a map beside the prose, where today that map goes first.*
 
-## 4. Every program has a head
+## 4. Heads
 
 A program's head is a thin row along its top edge: the grip at its left, and after it the settings of that program alone, drawn light once shown, in the four weights of ink [the strip has](framework.md#31-four-weights-of-ink) and the dock keeps. It shows when the pointer comes near the program's top edge.
 
@@ -130,11 +130,11 @@ What each head holds:
 | figures | nothing yet |
 | git's status | open |
 
-So the gutters are not in the dock but a setting of each prose, and both proses can carry links. Of the acts in the canvas's field today, the face of what is selected and which way its root's level runs move into its head, and the acts of what is selected stay at its foot. The settings program keeps what belongs to the whole page, as [the settings](framework.md#5-settings-are-data-and-a-figure-edits-them) list them less the measure, the canvas's width and the widget of each area, with the centring and the dock's edge added.
+So the gutters are not in the dock but a setting of each prose, and both proses can carry links. Of the acts in the canvas's field today, the face of what is selected and which way its root's level runs move into its head, and the acts of what is selected stay at its foot. The settings program keeps what belongs to the whole page, as [the settings](framework.md#5-settings-as-data) list them less the measure, the canvas's width and the widget of each area, with the centring and the dock's edge added.
 
 *Preferred, the author's, 2026-10-01, that a program's own settings stand where its grip stands and show on pointing, and that a gutter is a setting of each prose. The head showing only near the top edge is the session's, which the author let stand; where it stands on a map or a figure, what the canvas's head holds, and the centring and the dock's edge joining the settings are the session's, not yet answered.*
 
-## 5. A program is moved by dragging it
+## 5. Dragging
 
 A program is taken by its grip, or anywhere on it with the alt key held. The grip is for whoever does not know the key, the key for whoever does.
 
@@ -146,11 +146,11 @@ Where it would land is judged against the row as it stands, the program already 
 
 *Preferred, the author's, 2026-10-01, that moving is by drag and that both the grip and the key are needed; and the author's, 2026-10-03, that a program is put between and never on, since putting it on another only replaces that one, and that the page moves as it is dragged, live moving not being a problem. Laying the row again took 13 to 31 milliseconds, measured on the page. Judging against the row as it stands, with the program's own place and a little travel holding it still, is the session's, found on the page: judged against the row as it stood without the program, the places offered were not the ones the reader saw. It supersedes the five zones of a program, its halves and its middle, and the trade. The spaces lit while it is held are the author's, 2026-10-05, since moving was blind.*
 
-## 6. The body and git, two worlds
+## 6. Two worlds
 
 The prose and the canvas belong to one of two worlds, the body or git, and the plate to the body alone. Each world keeps in step with itself, so the history is no longer a mode the panes are turned to, and its switch and its key go: git's prose and canvas are programs that stand beside the body's.
 
-Each world keeps its own part of [the shared state](framework.md#4-one-shared-state-and-a-few-verbs): its focus, the address the pointer rests on, its scope, its folds, where the reader stands on its map, its trail, its undo and where its prose was scrolled, most of which [the history's world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) keeps today. The page keeps the rest once: the layout, the settings and which world holds the keys.
+Each world keeps its own part of [the shared state](framework.md#4-shared-state): its focus, the address the pointer rests on, its scope, its folds, where the reader stands on its map, its trail, its undo and where its prose was scrolled, most of which [the history's world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) keeps today. The page keeps the rest once: the layout, the settings and which world holds the keys.
 
 Each world's way down stands over its own prose, or over its canvas where its prose does not stand, and its depth moves that world's prose and canvas. Git's way down names the body's scope it is filtered by, [as the history says](history.md#42-only-the-commits-that-touch-where-you-stand). Going anywhere in a world whose prose does not stand brings that prose in, as a new column at its own width on the canvas's side towards the body's prose, or its right where none stands.
 
@@ -208,7 +208,7 @@ The dock's tooltip names an icon's letter, and [the keys](widgets.md#8--the-keys
 
 *The author's ask of 2026-10-20, a letter to toggle each widget. Which letter each takes, shift for git's prose and canvas, and the group in the keys are the session's.*
 
-## 8. ![Four squares in a grid](.img/layouts.icon.svg) Layouts kept by number
+## 8. ![Four squares in a grid](.img/layouts.icon.svg) Layouts
 
 A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or from an overview the dock opens: the layouts as cards in a grid, each the page it lays drawn small, with a plus that adds one. A layout is how the page is laid, never where the reader stands in it.
 
@@ -216,7 +216,7 @@ A reader keeps up to nine layouts and moves between them by the keys 1 to 9, or 
 
 ### 8.1 What a layout holds
 
-A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-every-program-has-a-head) but the depth.
+A layout holds the row: its columns, what each stacks, and every width and height pulled. It holds as well each program's own settings, those [in its head](#4-heads) but the depth.
 
 Those are the gutters of each prose, and of each canvas whether it follows, whether the face of what is selected stands beside it, which way its root's level runs, whether it draws boxes or text and whether from the root or the scope, and of the plate whether it draws the body whole or the scope, a cell per brief or per file. A layout holds them for every program, standing or not, so a program added to it takes what it holds.
 
@@ -278,19 +278,19 @@ A digit from 1 to 9, which named no act before, lays the layout in its slot from
 
 ### 8.8 Not on a phone
 
-Where the page is too narrow for anything to stand beside the body's prose at the page's measure, which no layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-what-is-built-and-what-is-not) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
+Where the page is too narrow for anything to stand beside the body's prose at the page's measure, which no layout holds, on a phone or in a window narrowed as far, it turns to [the reading a phone keeps](#9-built-so-far) and there is no row to lay, so there are no layouts: no icon, no overview, and the digits do nothing. The layout in use stands again as the page widens. A phone keeps [its own reading](touch.md).
 
 *Reasoned, the session's, 2026-10-07.*
 
-## 9. What is built, and what is not
+## 9. Built so far
 
-Everything above is built wide but the meeting of the two worlds: the row on 2026-10-01, and [the layouts](#8--layouts-kept-by-number) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-what-comes-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
+Everything above is built wide but the meeting of the two worlds: the row on 2026-10-01, and [the layouts](#8--layouts) on 2026-10-07. A selection in git lighting what it touched in the body, and git's programs showing only the commits that touched the body's scope, are [the history's own next steps](history.md#6-next), and neither is built; so git's way down names no filter yet, and git's status has no selection to let go.
 
 Where the lane stands alone a phone keeps its reading as it was: one pane, the rail, and a switch at the foot that turns the pane to the history and back, which is the mode kept for a phone. The way down stands a head's room lower wide, so the heads have the top edge to themselves.
 
 *Seen, as built and looked at on the page, 2026-10-01, the session's.*
 
-## 10. What this leaves open
+## 10. Open questions
 
 Whether anything should say which world holds the keys, now that nothing does. Whether a gap is as easy to hit as the gap setting makes it, or needs a least width of its own, is not known until it is tried.
 

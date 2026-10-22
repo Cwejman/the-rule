@@ -29,7 +29,7 @@ Sketching follows the surface, since a drawing is made in the surface's own lang
 
 [Sketching](sketching/README.md)
 
-## 1. The rename breaks dependents
+## 1. Broken dependents
 
 [escalation] On 2026-09-17 the law took its name in one commit: `code.md` became `rule.md`, every stamp that read `under: the code` reads `under: the rule`, the first section's anchor became `#1-why-there-is-a-rule` and [the practice's](practice.md#2-a-file-says-it-is-under-the-rule) `#2-a-file-says-it-is-under-the-rule`, and every address the surface gives under `#/the-code/` now stands under `#/the-rule/`. Anything that holds this repository as a submodule and links into it by path breaks when it moves past that commit, and so does anything of its own that reads the stamp for the old value.
 
@@ -37,7 +37,7 @@ The change is one commit so that a dependent is never between two states: it sta
 
 *The author's escalation, 2026-09-17; the account of what changed is the session's.*
 
-## 2. What the rule is owed
+## 2. Owed to the rule
 
 Reading the whole of this level against the rule turns up faults in the rule's own text, and [a ratified file is edited only in review](practice.md#24-a-ratified-file-is-edited-only-in-review) with whoever ratified it. So they wait here, where the rule is lived, rather than in a record that retires with the session that found them.
 

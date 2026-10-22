@@ -12,17 +12,17 @@ The surface is one page the browser manages, and one TypeScript file run with Bu
 
 Run with `--check`, it only traces, and prints its warnings and every face past [the practice's flag](../practice.md#53-the-check-flags-a-face-past-four-hundred-characters). Run with `--history`, it traces [the history](history.md) apart from the body, and prints its stories, their commits and its warnings, which is how a session reads back the story it has told.
 
-Either way the file reads [the stamped](README.md#2-what-it-is-handed) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
+Either way the file reads [the stamped](README.md#2-the-root) markdown and hands the page the substrate already typed, as data with its structure declared, so the page draws structure it receives and never parses prose to find it. It is kept to one file because this is the proof of concept.
 
 *In force, the author's decision, 2026-09-12.*
 
-## 1. Nothing is rendered on a server for a request
+## 1. In the browser
 
-Everything a reader does happens in the browser: the lane and its folds, the widgets, and every move between them. So one client serves both moments of a repository, live and published, and the two differ only in where the body comes from, [beneath](#5-live-and-published-differ-only-in-where-the-body-comes-from).
+Everything a reader does happens in the browser: the lane and its folds, the widgets, and every move between them. So one client serves both moments of a repository, live and published, and the two differ only in where the body comes from, [beneath](#5-live-and-published).
 
 *In force, the author's decision, 2026-09-12.*
 
-## 2. The process assembles the substrate, and the page only draws
+## 2. The process and the page
 
 A program should receive structure, never recover it. So the process that reads the files, the trace, reads the body once and hands the page each brief already parsed and already placed, and the page carries no markdown parser, resolves no paths, and guesses at nothing.
 
@@ -30,7 +30,7 @@ What the page computes, it computes from what it was given: a brief's place from
 
 *In force, the author's decision, 2026-09-12; that a program receives structure rather than recovering it is the project's own claim, carried here.*
 
-## 3. The body, traced and flat
+## 3. The body
 
 The body is traced from a root and handed over as a flat list of briefs in reading order, each carrying its address, its title, the file it came from, and its markdown already parsed, with an image's size and source and a sketch's markup [where a brief shows one](#36-an-image-is-measured). Nothing else is stored, since everything else follows from those.
 
@@ -130,21 +130,21 @@ It warns of a written heading number that disagrees with a brief's place, two br
 
 *In force, 2026-09-14, as built.*
 
-## 4. The address sits after a hash
+## 4. The address
 
-The page's URL holds the address of the brief in focus, and after `?in=` [the scope](lane.md#7--scoping-the-lane), when the lane is scoped:
+The page's URL holds the address of the brief in focus, and after `?in=` [the scope](lane.md#7--scoping), when the lane is scoped:
 
 ```
 surface.html#/the-proof-of-concept/the-surface/reading-and-orientation-come-apart?in=the-proof-of-concept/the-surface
 ```
 
-It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, [its reading laid whole](lane.md#3-a-reading-is-laid-whole).
+It sits after a `#` because that works on any static host and inside one file, where a path of its own would need the host to serve the page for every URL. A reader who arrives without an address stands at the root, [its reading laid whole](lane.md#3-laid-whole).
 
-The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5-arriving-lays-the-lane), and the folds a reader made are kept apart from it, [in the browser](#66-what-the-browser-keeps).
+The address says where a reader stands and not how the lane is laid. Arriving at one lays the lane afresh, as [the lane says](lane.md#5-arrival), and the folds a reader made are kept apart from it, [in the browser](#66-what-the-browser-keeps).
 
 *In force, the author's decision, 2026-09-12; the scope and the focus in the address as built on 2026-09-13.*
 
-## 5. Live and published differ only in where the body comes from
+## 5. Live and published
 
 Whether the body is served to the page or written into it is the only difference between the two moments, so the page never knows which it is in, and nothing is built twice.
 
@@ -178,15 +178,15 @@ The page is written with the body inside it, in a script tag that holds data rat
 
 The browser never runs that tag, so nothing in a brief can become code. Every `<` in the JSON is written as `\u003c`, since a brief containing the closing tag would otherwise end it early. On start the client reads the tag if it is there, and asks the process for the body if it is not.
 
-A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). History is written beside the page and never inside it, [its two tiers](history.md#5--the-data-in-two-tiers) and its traced stories at the paths the live process answers at too. The pipeline clones the whole history for it, since a clone holds one commit unless told otherwise, and a clone of part of its history writes none rather than one that never happened. Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
+A sketch is inside the page already, as [markup set into it](#363-a-sketch-is-set-into-the-page). History is written beside the page and never inside it, [its two tiers](history.md#5--two-tiers) and its traced stories at the paths the live process answers at too. The pipeline clones the whole history for it, since a clone holds one commit unless told otherwise, and a clone of part of its history writes none rather than one that never happened. Every other image the body holds as a file is written beside the page, at the path it has in the body, so the page stays light and an image is fetched only when the lane reaches it. Its address carries a hash of its bytes, so a changed image is fetched again rather than kept from before. A remote image stays remote, since it may change after the build, and the page takes its new shape if it has.
 
 The rule's own page is built this way on every commit to its main branch, by a workflow in `.github/workflows/pages.yml`, and served at [its GitHub Pages address](https://cwejman.github.io/the-rule/). The workflow runs the check first, so its warnings stand in the run, and ships the page whatever they say.
 
 *In force, the author's decision, 2026-09-12; images beside the page rather than inside it, and the rule's pipeline, the author's asks of 2026-09-14. That parsing a JSON string is faster than an equally large object literal is carried from V8's guidance and not checked here.*
 
-## 6. How it is drawn
+## 6. Drawing
 
-The page draws from [the shared state](framework.md#4-one-shared-state-and-a-few-verbs) and nothing else, and every change to one part of it draws again only what depends on that part. So nothing is drawn twice for one change, and nothing drawn can disagree with the state.
+The page draws from [the shared state](framework.md#4-shared-state) and nothing else, and every change to one part of it draws again only what depends on that part. So nothing is drawn twice for one change, and nothing drawn can disagree with the state.
 
 *In force, the author's decision, 2026-09-13.*
 
@@ -258,7 +258,7 @@ So every role's chroma sits under what the weakest hue holds at the role's light
 
 ### 6.5 The canvas is HTML under one transform
 
-The canvas draws [the path the reader has opened](canvas.md#3-the-path-the-reader-has-opened-and-not-the-whole-body) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-one-shared-state-and-a-few-verbs), and both are kept in the browser with the view.
+The canvas draws [the path the reader has opened](canvas.md#3-the-opened-path) from the same state the lane draws, so folding on one is folding on the other. What stands open and what is selected are the map's part of [the shared state](framework.md#4-shared-state), and both are kept in the browser with the view.
 
 Each node is HTML laid out by the browser: a column is a flex column of rows, a row's level is a flex column stepped in beneath it, and an opening lays the row and the reading it opened side by side, so the reading begins level with the row that named it and nothing is positioned by hand. One SVG behind the nodes draws the lines once they are measured: the nesting of a file, from the brief that holds a level down to its last row, and the opening, from the row pressed to the head of the reading it named. They are drawn again on a fold, a resize, a change of what is selected, or the fonts landing.
 
@@ -266,7 +266,7 @@ Pan and zoom are one transform on the stage, which the browser composites withou
 
 With the lane taken out of the middle, the lane is kept laid out of sight rather than hidden, since the shape, the reading line and the focus all measure it, so every widget goes on working from a map alone.
 
-*In force, 2026-09-18, as built, and the lane kept out of sight when a map stands without it the same day; what stands open moved into the shared state 2026-09-19, and the fit at another width, 2026-09-27. The pinch under a finger is [owed](canvas.md#9-two-faults-as-built).*
+*In force, 2026-09-18, as built, and the lane kept out of sight when a map stands without it the same day; what stands open moved into the shared state 2026-09-19, and the fit at another width, 2026-09-27. The pinch under a finger is [owed](canvas.md#9-faults).*
 
 #### 6.5.1 The history is the lane and the canvas over a world of its own
 
@@ -280,7 +280,7 @@ Nothing of the lane or the canvas is written twice. What the history needs of it
 
 Its addresses are its own, so nothing the body lights reaches its briefs, and as yet nothing it lights reaches the body's.
 
-*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world. Superseded on 2026-10-01 by [two worlds standing at once](layout.md#6-the-body-and-git-two-worlds): the history's world holds the elements it is drawn in, and is set in the state's place while anything is drawn or done there; where the lane stands alone it is set there for as long as the one pane reads it.*
+*In force, 2026-09-28, as built; that one code draws both is [the author's](history.md#3-one-code-for-both), and the world is the session's way of honouring it in a file whose functions read one state. It supersedes the pane of 2026-09-27, the canvas alone over the history's world. Superseded on 2026-10-01 by [two worlds standing at once](layout.md#6-two-worlds): the history's world holds the elements it is drawn in, and is set in the state's place while anything is drawn or done there; where the lane stands alone it is set there for as long as the one pane reads it.*
 
 ### 6.6 What the browser keeps
 
@@ -294,7 +294,7 @@ And every change a reader makes is recorded as the lane stood before it, the sco
 
 ### 6.7 The touch grain is two facts and a class
 
-[A touch reading](touch.md#1-what-a-phone-changes) is not a second page. It is the same drawing under two facts: whether the reader has a finger, which the browser answers and which the page asks again at the first touch, since a machine may hold both a pointer and a screen; and whether the width has given every area away, which the fit already reckons.
+[A touch reading](touch.md#1-the-phone) is not a second page. It is the same drawing under two facts: whether the reader has a finger, which the browser answers and which the page asks again at the first touch, since a machine may hold both a pointer and a screen; and whether the width has given every area away, which the fit already reckons.
 
 The first is carried as a class on the body, so most of what a finger changes is style and not branches: the room around a press, an act drawn as a button, the acts moved to a row of their own. What it cannot be is drawn differently: a badge without its cap, a rail that nests tighter and fits its marks to the room each row has left.
 
@@ -302,7 +302,7 @@ The rail is the shape at a width the fit hands it, at the edge the reader put it
 
 *In force, 2026-09-16, as built; the rail as the shape at an edge rather than a wing, 2026-10-02.*
 
-## 7. One file, laid by the gradient
+## 7. One file
 
 The file is composed the way a brief is, so it is read by depth like anything else under the rule. What it is and how it is run come first, then how the body is assembled, then how it is drawn, and the details beneath, with numbered headings in comments.
 
@@ -320,7 +320,7 @@ The author's guidelines from the sister project are guidance for taste, not rule
 
 *In force, the author's.*
 
-## 8. Plain functions before a framework
+## 8. Plain functions
 
 The lane and the widgets are plain functions that return HTML and SVG, written to one style so they read as a family. A framework such as Solid would render in the browser like anything else, but it needs its own compile step for its markup, and that step is exactly what one file run with Bun avoids.
 
@@ -328,7 +328,7 @@ Whether the functions grow into components is left until their use asks for it.
 
 *In force, the author's decision, 2026-09-12; the components open.*
 
-## 9. Git waits for history
+## 9. Git
 
 Git could carry the files, and it is not used for that, because the surface wants files now and git offers commits. Git belongs where the surface needs history rather than files: [resolving a link against the state it was written in](../practice.md#64-how-a-link-holds-its-state-is-open), drawing where a reader has been, and [history](history.md), whose data is the first thing taken up, both its tiers read by the live process asking the git CLI.
 
@@ -336,7 +336,7 @@ A JavaScript client such as isomorphic-git speaks git's smart HTTP protocol, and
 
 *Reasoned, 2026-09-12. The protocol and the client's limits are from [git's documentation](https://git-scm.com/docs/http-protocol) and [isomorphic-git's](https://isomorphic-git.org/docs/en/next/faq), read that day. The CLI road taken for history, 2026-09-21, and for the runs its stories tell, read by git's own descent, 2026-09-27.*
 
-## 10. What is not settled yet
+## 10. Open questions
 
 Whether a file's status travels with its briefs, which waits until a widget needs it; its kind already does, since a record's level says so.
 

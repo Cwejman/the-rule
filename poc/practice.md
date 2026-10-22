@@ -43,7 +43,7 @@ The judgement never excuses a flat file.
 
 ### 1.3 A commit is one purpose
 
-A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief); where two sessions' commits fall between each other's is [still open](surface/history.md#7-what-this-leaves-open).
+A commit tells one thing: the work of one purpose on the part of the holarchy that purpose is about. Two purposes are two commits, even in one file. And no commit holds the work of two sessions, since each session tells the commits it made in a story of its own, [the history's](surface/history.md#25-a-session-writes-the-story-as-its-debrief); where two sessions' commits fall between each other's is [still open](surface/history.md#7-open-questions).
 
 One purpose may reach far. A change made for one reason that the briefs standing on it must follow is still one commit, however many briefs it reaches, and so is a new file whose briefs were all added for one purpose.
 
@@ -368,7 +368,7 @@ Both are written in the file, so what the file carries is read from the file. Se
 
 The graphic is a drawing that stands for the file, drawn in one hand so a run of them reads as a set.
 
-Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-a-sketch-reads-the-surfaces-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
+Each is line art on a 64-unit square, scaled to stand at any size; the line keeps one weight at every size, as an engraving's does, with round ends, and one quiet fill. It colours [by role as a sketch does](sketching/README.md#3-the-palette): its line `on`, its fill `rest`, and the ground `ground`, each with its light fallback, so the hue of the branch the file stands under reaches it in the page.
 
 Its icon is kept beside it under the graphic's name with `.icon` before the extension, `orders.icon.svg` beside `orders.svg`: the same thing said in the fewest lines, on a 16-unit square with no texture, for where the file is named in a line of text, the rows of a tree or the steps of a way down. They are two files and not one sheet of both, since a sheet's parts show only through a page that picks them out, and each should open as itself anywhere a repository is browsed.
 

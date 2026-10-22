@@ -12,7 +12,7 @@ A reader reads one thing at a time, and the eye that moves to a second column of
 
 *Reasoned, the author's, 2026-09-13, from a day's use of [the first reading model](refused.md#k-a-level-to-a-pane-three-abreast), which gave a level to a pane.*
 
-## 1. The lane holds one reading
+## 1. One reading
 
 The lane holds one reading depth first: a brief, then the level beneath it, then the next brief of its level. It is the order a document with headings already reads, and it is the order the rule lays, since [a level's briefs stand on the ones before them](../../rule.md#42-the-order-of-a-holarchy) and what a brief did not need stands beneath it. The opening, the scope's title and its first paragraph, stands first.
 
@@ -74,7 +74,7 @@ The reading line passes through a row of tiles as through a column of cards. The
 
 *The author's, 2026-10-16, agreed when the cards were first given drawings and built the same day; the row's height shared among its tiles, the author's ask the same day, when the line and the water jumped a row at once; an image tile drawn as the image card is, the author's the same day, when a band of image over a text tile did not hold beside the card at full width.*
 
-A card takes [the reading line](#4--where-you-are-is-the-brief-in-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
+A card takes [the reading line](#4--the-focus) as a brief does, since a reader scrolling past one has moved, and it lights wherever it is drawn. What it does not do is move the map, which follows the reading rather than each step of the line and eases only where the line reaches another brief.
 
 The line holds the last thing it has reached, and never falls back. A card stands inside the prose of the brief that places it, so a line asking what it is inside of answered the card while it crossed one and the brief again in the prose after it: an entry that places six parts bounced the address, the way down and the map's selection between the parent and one card after another, thirteen times in one scroll of this body's root, where the reading has seven places to stand. A reading is passed through in one direction, so where the reader stands moves in one direction too.
 
@@ -84,7 +84,7 @@ A step by the arrow keys stops on each card too, in the order the reading draws 
 
 *The author's, 2026-09-18, on the substrate-native presentation he asked for on [2026-09-17](../../author/ideas-2026-09-17.md#1-a-sketch-or-an-image-as-substrate-native-presentation): not a link with a hover and not the gutter, but the part presented first class where it is placed. The author's, 2026-10-05, that a step stops on each card, since the steps passed them over. The author's, 2026-10-14, that the cards not stood on read as faded beside full prose, and the outline is enough. The hold, the author's report of 2026-10-17 that the outline did not move smoothly between tiles.*
 
-## 2. ![Two chevrons opening](.img/folded.icon.svg) Folded to its face, or whole
+## 2. ![Two chevrons opening](.img/folded.icon.svg) Face or whole
 
 Every brief in the lane stands in one of two states: folded to its face, the heading and the first paragraph, which is what [the practice](../practice.md#5-the-face-is-declared-by-position) says tells a reader whether to enter; or whole, with every paragraph shown and its level standing beneath it.
 
@@ -94,7 +94,7 @@ Org-mode has cycled a heading between folded, children and whole for twenty year
 
 *Reasoned, the author's, 2026-09-13; the org-mode ground is from memory and not checked. [A third state, the heading alone](refused.md#q-folding-to-the-heading-alone), was built and refused the same day.*
 
-## 3. A reading is laid whole
+## 3. Laid whole
 
 The lane lays all of the reading it holds: every brief of the file unfolded, its prose whole, down to its last heading. The reader crossed a boundary to get here and asked for this reading; handing it a level at a time makes them ask again at every level.
 
@@ -102,7 +102,7 @@ Folding is what they do afterwards, to a part they have read or do not want, and
 
 *The author's decision, 2026-09-18. It supersedes the lane revealing one step ahead of the reading, reasoned 2026-09-13, which was written when the lane held the whole body and a fold was the only thing keeping four hundred briefs out of one run; [the boundary](#11-why-the-lane-stops-there) does that now.*
 
-## 4. ![The reading line between two quiet lines](.img/focus.icon.svg) Where you are is the brief in focus
+## 4. ![The reading line between two quiet lines](.img/focus.icon.svg) The focus
 
 The focus is the brief under the reading line, a line across the viewport where the reading is taken to be, and it moves as the lane scrolls. So a reader who only scrolls never needs the pointer: the brief on the reading line is the one highlighted, in the lane and in [every widget](widgets.md), and it is what every act on the lane acts on.
 
@@ -150,11 +150,11 @@ The fade at the top comes in with the reading line, since nothing stands above t
 
 *Reasoned, the author's, 2026-09-13; the edge fade was shortened and moved in on the author's second reading, and lengthened again on 2026-09-16, when a short fade made the way down read as a surface laid over the page rather than as part of it.*
 
-## 5. Arriving lays the lane
+## 5. Arrival
 
-Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-a-reading-is-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
+Going to an address, by a press, by a link or by the browser's history, lays the lane afresh: [the reading whole](#3-laid-whole), whatever the reader had folded before. Then the lane scrolls to the address.
 
-Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the browser's history, and that history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7--scoping-the-lane). The browser's back and forward walk them.
+Scrolling afterwards folds nothing, so nothing reflows under a reader who is only reading. The page's address follows the focus without entering the browser's history, and that history holds only the moves a reader chose: arrivals, goings from the tree or a figure, and changes of [scope](#7--scoping). The browser's back and forward walk them.
 
 *Reasoned, the author's, 2026-09-13.*
 
@@ -176,7 +176,7 @@ Scrolling alone is not a change, and a new change clears what was undone.
 
 ## 6. Folding and unfolding
 
-Folding takes a brief to its face and unfolding takes it whole, [the two states](#2--folded-to-its-face-or-whole), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
+Folding takes a brief to its face and unfolding takes it whole, [the two states](#2--face-or-whole), and a line the brief carries is what a reader presses to do either: beneath the face of a folded brief, where the reader is already looking, or at the foot of a whole one, where the reading ends.
 
 [A card](#12-a-placed-part-raises-a-card) carries the same line and takes the same two states, since what stands on it is a brief like any other. What it does not carry is a way further in: past whole, the act on a card is open.
 
@@ -224,7 +224,7 @@ The space bar folds or unfolds the brief in focus, and with shift held it folds 
 
 Backspace folds the brief above as well. [On the map it is one act](canvas.md#52-the-moves-on-a-map), asking for less of whatever the reader is inside, and folding the brief above is what that means in the prose.
 
-The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with up and down moves to the brief before or after at this level instead, passing over whatever stands beneath it, [as it does on the map](canvas.md#52-the-moves-on-a-map). Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#61-the-depth-strip) does. Enter and shift with enter [scope the lane](#7--scoping-the-lane).
+The arrow keys move the focus and fold nothing: up and down to the brief before and after in the lane, left to the parent, right into the first brief beneath when it stands in the lane. Shift with up and down moves to the brief before or after at this level instead, passing over whatever stands beneath it, [as it does on the map](canvas.md#52-the-moves-on-a-map). Shift with left and right unfolds the scope one level less or one level more, as [the depth strip](canvas.md#61-the-depth-strip) does. Enter and shift with enter [scope the lane](#7--scoping).
 
 Every key here is named where its act stands, [as a badge](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), and the few that have no object on the page, the arrows that move the reading, are met in [the keys](widgets.md#8--the-keys).
 
@@ -244,7 +244,7 @@ A small reversal of the scroll, down then up then down within a moment, folds or
 
 *A trial, 2026-09-13.*
 
-## 7. ![A circle with a quarter of it marked](.img/scoping.icon.svg) Scoping the lane
+## 7. ![A circle with a quarter of it marked](.img/scoping.icon.svg) Scoping
 
 A reader can make any brief the root of the lane: its heading becomes the opening, its holon becomes the whole, and everything above it leaves the lane. Enter does it to the brief in focus, when that brief has a level beneath it, and the address carries the scope after the focus, so a scoped place can be handed to someone like any other.
 
@@ -262,7 +262,7 @@ The registers, the heading sizes that step down by depth as [the design language
 
 Shift with enter goes out of this reading, to the brief that placed it: the lane takes the reading that brief stands in, and the reader is left on [the card](#12-a-placed-part-raises-a-card), beside the reading rather than inside it, which is where going in left from.
 
-Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came. What a link out of the scope does is [answered where links are](#9-following-a-link-moves-you), and not here.
+Every change of scope is a change [escape undoes](#52-escape-is-an-undo), so a reader who scoped in three times can leave the way they came. What a link out of the scope does is [answered where links are](#9-following-a-link), and not here.
 
 It went to the parent brief until 2026-09-20, which is a heading inside the placing file and not a reading: the lane was laid from a section of a run nobody composed, and the reader was left at an address it no longer held. The boundary is what going out crosses, so the reading on the other side of it is where it lands.
 
@@ -278,7 +278,7 @@ The levels above the scope stay visible in the figures, as the levels beneath a 
 
 At the top of a scope, scrolling up beyond where the lane can go fills a gauge, a hairline over the prose that grows from its middle out, and when it is full the reader is taken [out of this reading](#72-widening-the-scope), as some applications refresh when pulled past their top.
 
-A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-where-only-the-lane-fits).
+A pull that stops drains, so nothing happens by accident: it springs back after a second of quiet, long enough for a second swipe of a trackpad to continue the first, since one swipe with its momentum seldom reaches the whole pull, and a mouse wheel, told apart by its notches, keeps its pull longer between them. It is one movement with the scroll that reached the top, since pausing to pull again is impractical, and yet the momentum of a scroll that merely reaches the top never counts: momentum is an unbroken stream of events, and a finger touching the pad stops it dead before its swipe begins, so the pull arms only on an upward event at the top that comes after a gap in the stream, which no one feels as a pause. A short dead zone keeps the first of a pull from showing the gauge. With the whole body as scope there is nothing to pull up to, and a touch reading is [still open](#10-the-lane-alone).
 
 One movement of the hand is one pull. A swipe carries on past the moment the gauge fills, and the reading it lands in is scrolled to the card it left, so every event after it met a lane that was no longer at its top, drained the pull and armed it again: one swipe carried the reader out of one reading after another to the root. A spent pull waits for the hand to let go, which is a push the other way or the quiet the gauge already springs back after, and the rest of that movement does not scroll the reading it landed in either, since it was carrying the reader off the card the pull had put them on.
 
@@ -290,7 +290,7 @@ The way down stands over the middle, as wide as whatever it holds, the lane alon
 
 The line is as wide as what it spans, the lane alone or the canvas beside it, and no wider until it has to be. Where the run of names, the depth and the trail do not fit that, it grows to the right rather than cutting names, out to the margin the page keeps at its edge. So it stands over the prose in the ordinary case and reaches past it only when it is carrying more than the prose is wide.
 
-How here is placed is the run of levels from the root down to [the brief in focus](#4--where-you-are-is-the-brief-in-focus), not only to the scope: a reader who has scrolled into a brief has its heading off the screen, and where they stand is what the line is for.
+How here is placed is the run of levels from the root down to [the brief in focus](#4--the-focus), not only to the scope: a reader who has scrolled into a brief has its heading off the screen, and where they stand is what the line is for.
 
 The run says of each step what it is and where it stands, each by one means, and no shape is drawn around any of them. The weight says the kind: a reading, the root or a placed file, stands bold, and a section at normal weight after its number, as the lane numbers it in the reading it stands in. The ink says where: what stands above the sections of the reading open is muted, those sections fainter, and the head, what the reader is looking at, takes full ink, and where it opens onto a reading of its own it is underlined in its branch's hue, as a link that can be followed is. The mark before a step says what going to it crosses: a chevron within a file, and at a file's boundary a slash in the hue of the reading entered, as a path is written. Each is lit in its colour when pointed at; a name above the scope is a press that scopes out to it, and one within the scope a press that goes there.
 
@@ -302,9 +302,9 @@ The acts of the rightmost stand after the run. Where it is a reading of its own,
 
 Where the line is too narrow to read them all, the run is cut at its root until every name it still shows reads whole, with one mark standing for what was cut, since a name squeezed to a letter says nothing; the brief in focus is never cut. The prose is always clear beneath it, whatever the fade at the top is doing, and a wing's figures begin below it too.
 
-How the reader came here is the trail, against the lane's right edge on the same line, so its cells keep their place as moves are added at the right: a cell per move, oldest first. A going is a small block, a scoping a chevron down or up, [a link followed](#9-following-a-link-moves-you) the link glyph, each in the hue of where it went, and pointing at one says what it was. Folds and scrolls are not moves, and two moves that bring the lane back where it stood before the first, a scoping in and out again, are no journey, so both leave. Pressing a cell lays the lane back as it stood before that move and cuts the trail back to there; where the trail grows too long it is cut at its root, the oldest first. It stands only once a move has been made. Past it stands [the key that undoes the last change](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), which is where a reader looks to be back where they were, and it is quiet while there is nothing to take back.
+How the reader came here is the trail, against the lane's right edge on the same line, so its cells keep their place as moves are added at the right: a cell per move, oldest first. A going is a small block, a scoping a chevron down or up, [a link followed](#9-following-a-link) the link glyph, each in the hue of where it went, and pointing at one says what it was. Folds and scrolls are not moves, and two moves that bring the lane back where it stood before the first, a scoping in and out again, are no journey, so both leave. Pressing a cell lays the lane back as it stood before that move and cuts the trail back to there; where the trail grows too long it is cut at its root, the oldest first. It stands only once a move has been made. Past it stands [the key that undoes the last change](widgets.md#17-a-key-stands-as-a-badge-where-its-act-stands), which is where a reader looks to be back where they were, and it is quiet while there is nothing to take back.
 
-*Reasoned, the author's, 2026-09-14; the growing past the lane his ask of 2026-09-18, and the three parts told by the type his direction of the same day, after a first cut drew them as chips and he refused it; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day; the run reaching down to the focus rather than to the scope, his ask of 2026-09-16, from reading on a phone and finding he wanted the address of where he had scrolled to. Wide, from 2026-10-01, each world's way down stands over [its own prose](layout.md#6-the-body-and-git-two-worlds), or over its canvas where its prose does not stand, a head's room below the top edge. The weight for the kind, the numbers, the slash at a boundary and the files alone are the author's ask of 2026-10-14, that the line say more and may show files only; the means are the session's, until the author has looked.*
+*Reasoned, the author's, 2026-09-14; the growing past the lane his ask of 2026-09-18, and the three parts told by the type his direction of the same day, after a first cut drew them as chips and he refused it; the trail as cells the author's ask of 2026-09-15, titles having been tried first that day; the run reaching down to the focus rather than to the scope, his ask of 2026-09-16, from reading on a phone and finding he wanted the address of where he had scrolled to. Wide, from 2026-10-01, each world's way down stands over [its own prose](layout.md#6-two-worlds), or over its canvas where its prose does not stand, a head's room below the top edge. The weight for the kind, the numbers, the slash at a boundary and the files alone are the author's ask of 2026-10-14, that the line say more and may show files only; the means are the session's, until the author has looked.*
 
 #### 7.5.1 What the line carries beside the names
 
@@ -318,7 +318,7 @@ Some of this belongs as well to [the pane of bearings](../../author/ideas-2026-1
 
 *The author's ask of 2026-10-14, taking all five the session had proposed; the means are the session's, until the author has looked. The bar counts text and not the folds, so it says where the focus stands in the reading and not how far the lane has scrolled. The body's icon for the root, in place of the ring, and in the tab, the author's ask of 2026-10-16.*
 
-## 8. A record is ordered by time
+## 8. Records
 
 The lane lays a level as a reading: the brief that gives the most understanding comes first, and each after it stands on those before. A record is not laid that way. Its order is when each entry happened, run either way, and an entry's place says nothing more than when.
 
@@ -326,9 +326,9 @@ The lane lays a level as a reading: the brief that gives the most understanding 
 
 *Reasoned, carried from the practice and not checked here.*
 
-## 9. Following a link moves you
+## 9. Following a link
 
-A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3--the-shape) already shows it, unfolded or folded, [lays the lane afresh](#5-arriving-lays-the-lane) at the target and scopes nothing; enter scopes once there.
+A link's target lies elsewhere, and what following it does depends on how far. A local link, whose target stands within the scope, so [the shape](widgets.md#3--the-shape) already shows it, unfolded or folded, [lays the lane afresh](#5-arrival) at the target and scopes nothing; enter scopes once there.
 
 Any other link scopes the lane to its target, so the target's holon becomes the whole and its registers count from it. Either way the link is one move on [the trail](#75-the-way-down-stands-over-the-lane).
 
@@ -338,7 +338,7 @@ The reader is told where a link leads before they take it: its target stands bes
 
 *Reasoned, the author's, 2026-09-15: that a non-local link scopes, that a local one does not, and that the way down levels up to carry both how here is placed and how the reader came here. The first model laid every link afresh, 2026-09-13.*
 
-## 10. Where only the lane fits
+## 10. The lane alone
 
 On a narrow screen the sides give way, [the gutters first, then the right wing, then the left](framework.md#28-giving-way), and the lane stands alone, which it can, since orientation is help and never the reading. A reader may also close any area by hand, and a closed area [takes no room](framework.md#24-closing-by-hand), so the lane stands centred in what is left.
 

@@ -10,11 +10,11 @@ status: open
 
 History is how the knowledge came to be what it is where a reader stands: which commits touched it, and the stories told over them. Git's history is read as a holarchy of its own, with the stories as its briefs and the commits as the leaves beneath them.
 
-Its data is built, its stories are traced, and it is drawn as a pane of its own, its stories and commits as nodes. It is to be a mode instead, read in the lane and on the canvas alike and filtered by the scope the reader stands in, and neither that nor what a selection touched is built yet. [What comes next](#6-what-comes-next) says in what order.
+Its data is built, its stories are traced, and it is drawn as a pane of its own, its stories and commits as nodes. It is to be a mode instead, read in the lane and on the canvas alike and filtered by the scope the reader stands in, and neither that nor what a selection touched is built yet. [What comes next](#6-next) says in what order.
 
 *Preferred, the author's design, settled in discussion with the session 2026-09-21 and laid again 2026-09-28 as a mode; the data as built 2026-09-21, the trace and the pane 2026-09-27, and the rest open.*
 
-## 1. Why it is laid again
+## 1. Why again
 
 Git was given to the surface once already, on 2026-09-17, and [taken out the same evening](../../ideas/history.md): it slowed every request for the body, it laid the commits into the body as a level nobody wrote, and sixty commits in a list helped nobody understand what changed.
 
@@ -28,9 +28,9 @@ Around anything of this that is built, the time the live process takes to hand t
 
 The page's own code grows when it draws the history, and that is measured and said, since a page that grows for its drawing is not a page that carries the history.
 
-*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5--the-data-in-two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
+*In force, from [the history of the first attempt](../../ideas/history.md#2-why-it-came-out); the author's rule since 2026-09-17, read by the session on 2026-09-27 as a rule on history's data, which is what the first attempt broke. Measured around both tiers of [the data](#5--two-tiers), 2026-09-21: the body stood at 0.71 to 0.75 seconds throughout, and the page's script did not change by a byte. Measured around the trace and the pane, 2026-09-27: the body stood at 0.75 seconds, no data of history's is in the page, and the page's script grew by 10 KB, the panes' two sides and the history's pane together.*
 
-## 2. The history is a holarchy
+## 2. Stories
 
 Commits are one level, and the low one, and gathering them under a git branch leaves them at that level. What raises them is prose: a story tells what a run of commits did together, a larger story holds smaller ones, and the commits are the leaves at the foot of it all.
 
@@ -88,7 +88,7 @@ Its face and its figure are the only things drawn for it alone. The face says th
 
 ### 2.4 It is a record whose entries are holons
 
-The history's file is [a record whose entries are holons](../practice.md#21-the-stamp-says-the-kind): its order is time and not importance, the newest first, so now is what a reader meets, and [the lane reads a record so](lane.md#8-a-record-is-ordered-by-time). Each entry is a story with its level beneath it, and within a story the commits of a run stand newest first as well; where separate links place commits out of time's order, the trace warns.
+The history's file is [a record whose entries are holons](../practice.md#21-the-stamp-says-the-kind): its order is time and not importance, the newest first, so now is what a reader meets, and [the lane reads a record so](lane.md#8-records). Each entry is a story with its level beneath it, and within a story the commits of a run stand newest first as well; where separate links place commits out of time's order, the trace warns.
 
 Commits no story tells yet stand among the stories in the order of time, each where it happened, and a story takes their place once it is written. So nothing is missing before it has been told, and the untold, mostly the newest, stand where a reader looks first.
 
@@ -108,7 +108,7 @@ The story carries as well what the work cost the author, his writing and his rea
 
 ### 2.6 It is handed over flat, as the body is
 
-The history's trace is handed to the page as [the body is](implementation.md#3-the-body-traced-and-flat): one flat list in reading order, which for a record is newest first, each brief carrying its address. Stories and leaves stand in the one list, a leaf being a brief whose address ends in its commit's hash, cut as git cuts one, to seven characters, and lengthened where two commits share their first seven.
+The history's trace is handed to the page as [the body is](implementation.md#3-the-body): one flat list in reading order, which for a record is newest first, each brief carrying its address. Stories and leaves stand in the one list, a leaf being a brief whose address ends in its commit's hash, cut as git cuts one, to seven characters, and lengthened where two commits share their first seven.
 
 A leaf carries its hash and no more of the commit, since the rest is in the history's data, [beneath](#51-the-light-tier-is-had-whole), and a fact has one home. Live, the trace is read from `history.md` whenever the history is asked for; published, the build writes it; either way it stands at `stories.json`, beside the data.
 
@@ -122,7 +122,7 @@ As built, the canvas's code draws the history and the lane does not yet. [In the
 
 *Preferred, the author's, 2026-09-21; as built, 2026-09-27. The lane drawing the history, the author's, 2026-09-28: [a canvas alone is not enough](../../author/ideas-2026-09-28.md#2-a-canvas-alone-is-not-enough).*
 
-## 4. What a reader sees
+## 4. The reader's view
 
 The history is a mode the middle is turned to, read from where the reader stands in the body, and what is selected in it shows what it touched there. Its canvas runs across, as a trunk.
 
@@ -136,7 +136,7 @@ What stands where does not change, and the history is not a pane. The widgets th
 
 A pane's icon cycles it through the middle's sides; a mode has no side, so its icon is a switch. The page fetches the history's data when the reader reaches for the switch and not before, so a reader who never reads the history never pays for it.
 
-*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch as the reader reaches for it are the session's. Its key, and whether the mode enters the page's address, are open. Superseded wide on 2026-10-01 by [git's prose and canvas as programs](layout.md#6-the-body-and-git-two-worlds) beside the body's; where the lane stands alone the mode stands as it was, its switch at the foot.*
+*Preferred, the author's, 2026-09-28: [two alternatives](../../author/ideas-2026-09-28.md#3-two-alternatives), of which [the special thing](../../author/ideas-2026-09-28.md#5-the-special-thing-since-mounting-conflicts), a mode and not a pane; the reason, that mounting `history.md` in the body would make the history a place in it and the reader would stop standing where it is meant to filter by, is the session's, which he took. It supersedes the pane of 2026-09-27, as built. The plate staying the body is his; the dish with it, the widgets and the links following the lane, the switch, its place first in the strip and the fetch as the reader reaches for it are the session's. Its key, and whether the mode enters the page's address, are open. Superseded wide on 2026-10-01 by [git's prose and canvas as programs](layout.md#6-two-worlds) beside the body's; where the lane stands alone the mode stands as it was, its switch at the foot.*
 
 #### 4.1.1 Turning to it never waits for what was read before
 
@@ -190,7 +190,7 @@ On the canvas the history's root level runs across, left to right, and each stor
 
 *Preferred, the author's, 2026-09-28: [a trunk and not a tree](../../author/ideas-2026-09-28.md#4-the-canvas-runs-left-to-right-a-trunk-and-not-a-tree), and the direction perhaps every canvas's [the same day](../../author/ideas-2026-09-28.md#6-a-mode-a-status-and-the-roots-direction-for-every-canvas). It supersedes the history drawn down the column for coherence, 2026-09-21, which left a toggle between the two directions for later. Which way time runs along the trunk is open.*
 
-## 5. ![Two tiers, one above the other](.img/tiers.icon.svg) The data, in two tiers
+## 5. ![Two tiers, one above the other](.img/tiers.icon.svg) Two tiers
 
 What a reader sees decides what is fetched. The canvas, the colouring and the filter by where the reader stands span the whole history and need only which commits exist and what each touched; only a change shown in place needs the lines. So the data comes in two tiers: a light one had whole, and a heavy one had a commit at a time.
 
@@ -214,7 +214,7 @@ Only the substrate is held. What a commit did to code or to images is counted in
 
 *Measured, 2026-09-21, on 460 commits: 3.6 MB together, 761 bytes at the median and 305 KB at the most; a commit read cold in 0.24 seconds and warm in 0.04.*
 
-## 6. What comes next
+## 6. Next
 
 Done: the data, 2026-09-21; the trace, the first stories and a pane drawn by the canvas's code, 2026-09-27; [the mode](#41-it-is-a-mode-not-a-pane) with the lane drawing the history, and [its root running across](#45-its-roots-level-runs-left-to-right-a-trunk), 2026-09-28. What is next is laid in the order each step stands on the one before, and a session taking this up begins at the first step not done.
 
@@ -224,7 +224,7 @@ Done: the data, 2026-09-21; the trace, the first stories and a pane drawn by the
 
 *In force as the order, the session's, 2026-09-21; laid again 2026-09-27, and again 2026-09-28, when the author made the history a mode and answered where it stands from. The trunk was laid third that day and built second, on the author's word that the history running left to right had been clear; the order had put a step of his first requirement after one he had not asked for first. Each step is looked at on the page before the next.*
 
-## 7. What this leaves open
+## 7. Open questions
 
 How overlapping stories would be drawn, and so whether stories may overlap at all, or group commits along more than one line at once, which [the author doubts we are ready for](../../author/ideas-2026-09-21.md#14-partition-or-many-directions).
 

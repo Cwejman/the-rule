@@ -8,7 +8,7 @@ status: in force
 
 # Five areas, and what stands in them
 
-Five areas stand in a row: a wing at either edge, the middle between them, and a gutter at either side of the lane, wherever in the middle it stands. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, and the wings hold figures, the widgets that draw [the body](README.md#2-what-it-is-handed) and stand on their own.
+Five areas stand in a row: a wing at either edge, the middle between them, and a gutter at either side of the lane, wherever in the middle it stands. The middle holds the panes, the lane of prose or a map, one or two at once. The gutters hold what stands beside a brief of the lane, and the wings hold figures, the widgets that draw [the body](README.md#2-the-root) and stand on their own.
 
 One light row of icons at the page's foot chooses what each holds. That is a small framework, kept small on purpose. It is what lets a new drawing be tried by adding one function, and what keeps every drawing in step, since all of them read one shared state and act through the same few verbs.
 
@@ -26,7 +26,7 @@ A figure stands in a wing. Given the body and the shared state, it returns a dra
 
 A pane stands in the middle, and there are three: the lane, which is the reading; [the canvas](canvas.md), which is the scope as nodes; and the dish, which is [the plate](widgets.md#7--the-plate) at the middle's size. The two that are not the lane are maps. Each pane is drawn from the shared state, and all act through the same verbs. [The history](history.md#41-it-is-a-mode-not-a-pane) is not a pane but a mode the lane and the canvas are turned to.
 
-*Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22; the history a pane 2026-09-27, and a mode 2026-09-28. Superseded wide on 2026-10-01 by [programs](layout.md#2--a-row-of-columns-each-a-stack), the adjunct kept as a setting of each prose and the history's prose and canvas programs of their own.*
+*Reasoned, the author's, 2026-09-13; the pane 2026-09-15, the dish 2026-09-22; the history a pane 2026-09-27, and a mode 2026-09-28. Superseded wide on 2026-10-01 by [programs](layout.md#2--columns), the adjunct kept as a setting of each prose and the history's prose and canvas programs of their own.*
 
 ## 2. The areas
 
@@ -55,7 +55,7 @@ The gap setting is the least a space is given, and what the width leaves over is
 
 ### 2.3 A wing's figures reach as far as the prose
 
-Vertically a wing's figures reach no further up or down than the prose does. They stand between the middles of the lane's fades at its top and its foot, so they follow [the fade setting](#5-settings-are-data-and-a-figure-edits-them), keeping at least a gap at the top and the room of [the strip](#3-the-strip) at the foot, with one gap between two figures.
+Vertically a wing's figures reach no further up or down than the prose does. They stand between the middles of the lane's fades at its top and its foot, so they follow [the fade setting](#5-settings-as-data), keeping at least a gap at the top and the room of [the strip](#3-the-strip) at the foot, with one gap between two figures.
 
 *Reasoned, the author's, 2026-09-14.*
 
@@ -79,7 +79,7 @@ Where the lane stands it keeps its measure and a map beside it takes what is lef
 
 The gutters belong to the lane and stand only beside it, wherever in the middle it stands, and the wings do not care what the middle holds.
 
-*The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22. Superseded wide on 2026-10-01 by [the row](layout.md#2--a-row-of-columns-each-a-stack), where any number stand.*
+*The author's, 2026-09-27, that the middle holds two panes and no more, once the dish had made three and the history was to make four. It supersedes the order of 2026-09-15, the canvas at the left and the lane at the right, which the dish had lengthened to three abreast on 2026-09-22. Superseded wide on 2026-10-01 by [the row](layout.md#2--columns), where any number stand.*
 
 ### 2.7 The keys belong to one pane
 
@@ -97,7 +97,7 @@ A gutter narrows before it gives way, and comes back when a wing gives way and f
 
 An area given no room is gone from the row until the screen widens, and [its icon says so](#31-four-weights-of-ink) rather than leaving the foot.
 
-The order has one exception at its end, and it is written where it was found: where the lane would stand alone, [a touch reading](touch.md#9-what-this-asks-of-the-framework) keeps one narrow figure beside it, the shape as a rail.
+The order has one exception at its end, and it is written where it was found: where the lane would stand alone, [a touch reading](touch.md#9-asks-of-the-framework) keeps one narrow figure beside it, the shape as a rail.
 
 *Reasoned, the author's, 2026-09-13; the canvas first, 2026-09-15, since the lane is the reading, and any pane beside it first, 2026-09-27, when the middle took sides. The exception is a trial, 2026-09-16, and waits on the author's word before it is written in here. Superseded wide on 2026-10-01 by [the row's giving way](layout.md#32-giving-way); where the lane stands alone this order still holds.*
 
@@ -131,11 +131,11 @@ A lone pane pressed moves to the right where what it pushed out can come back to
 
 *The author's, 2026-09-27; what a lone pane does and what a reload forgets are the session's. Superseded on 2026-10-01 with the middle's two sides.*
 
-## 4. One shared state, and a few verbs
+## 4. Shared state
 
 Every widget reads one state and nothing else, and acts through the same few verbs. A widget is a plain function in a table keyed by its name, and adding one is adding a function and a name.
 
-The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7--scoping-the-lane), and to open a reading or close it.
+The state is the body and its index of [addresses](implementation.md#32-the-address-is-the-path-of-titles), the address in focus, the address the pointer rests on, the scope, the fold of every brief in the lane, the settings, which pane stands on which side of the middle, [the pane holding the keys](#27-the-keys-belong-to-one-pane), and where the reader stands on the map: the node they are on, which of [a placed file's two rows](canvas.md#48-a-card-and-the-head-of-its-reading-are-two-places-to-stand) that is, and which node of each column stands open. The verbs are to go to an address, to point at one, to fold one, to scope to one, [making it the root of the lane](lane.md#7--scoping), and to open a reading or close it.
 
 Where the reader stands lived outside this state until 2026-09-19, in three values of the canvas's own, and what it cost was the level above: two panes each held their own answer to where the reader was, so a key had to ask which pane the reader's hand was in before it could act, and the focus went on lighting both rows of a card because it never learned what the selection had learned. A second store beside the one state is how a shared state stops being shared.
 
@@ -143,7 +143,7 @@ Everything drawn that names a brief carries that brief's address. That one conve
 
 Two things are kept beside the state, and neither is a second answer to anything it holds. The history is a second body and not a second answer about this one, so it keeps [a world](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own) that stands in this one's place while the history is read, and its addresses are its own, lighting only on its own lane and map [as yet](implementation.md#651-the-history-is-the-lane-and-the-canvas-over-a-world-of-its-own). And what a pane press pushed out is a memory of the strip's that nothing draws from, read only by the next press.
 
-*Reasoned, carried from [the first program](README.md#6-the-programs-before-this-one), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built, and the world held for a mode, 2026-09-28. On 2026-10-01 the two worlds came to stand at once, each with [its own part](layout.md#6-the-body-and-git-two-worlds) of the state, and the page keeps the layout, the settings and which world holds the keys once.*
+*Reasoned, carried from [the first program](README.md#6-earlier-programs), 2026-09-12; the history's world and the press's memory, 2026-09-27, as built, and the world held for a mode, 2026-09-28. On 2026-10-01 the two worlds came to stand at once, each with [its own part](layout.md#6-two-worlds) of the state, and the page keeps the layout, the settings and which world holds the keys once.*
 
 ### 4.1 Every act is one entry in one table
 
@@ -153,17 +153,17 @@ An entry also says whether its act can be taken at all, so a badge for an act ou
 
 *Reasoned, the author's ask of 2026-09-16, when the keys were named nowhere but in the branch of code that fired them.*
 
-## 5. Settings are data, and a figure edits them
+## 5. Settings as data
 
 The settings are one object of values. They apply as style variables and layout facts, and they live in the browser's own storage, never in the address. A figure edits them, [the settings widget](widgets.md#6--settings), which is a wing widget like any other.
 
-The type: the zoom on the prose, the ratio by which each heading register grows over the body, and the height of the prose's lines. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4--where-you-are-is-the-brief-in-focus), the fade at the edges, whether the room left over is spread or centred, and the edge the dock stands along. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4--where-you-are-is-the-brief-in-focus). The look: the theme, the face of the headings and the face of the prose. And the layout: the row of columns and what each stacks, and the gutters of each prose, by default the shape, the body's prose with the links in its right gutter, and the ahead.
+The type: the zoom on the prose, the ratio by which each heading register grows over the body, and the height of the prose's lines. The page: the gap between areas, the dim on every brief but [the highlighted one](lane.md#4--the-focus), the fade at the edges, whether the room left over is spread or centred, and the edge the dock stands along. The reading: where the reading line stands, the flick, and the weight, each [as the lane gives it](lane.md#4--the-focus). The look: the theme, the face of the headings and the face of the prose. And the layout: the row of columns and what each stacks, and the gutters of each prose, by default the shape, the body's prose with the links in its right gutter, and the ahead.
 
 The lane's measure and the canvas's greatest width were settings with a meter each until 2026-10-01, when the gaps between columns came to size them, and where the lane stands alone the widget of each area is still kept for it.
 
 *Reasoned, the author's, 2026-09-13; that headings scale by depth departs from [the design language's register rule](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/design.md#rhythm--depth-derived-never-stated-twice), at the author's ask. The layout, the room and the dock as settings, 2026-10-01, as [the page laid by hand](layout.md) asks.*
 
-## 6. What this is a small copy of
+## 6. The pilot's view layer
 
 [The pilot's view layer](https://github.com/Cwejman/OpenLight/blob/main/@md/spec/view.md) has components, mounts, one context handed to each, and an offer flowing down the tree. This framework is that in miniature, and it stays dumb on purpose, so that it never grows into a second one. What it finds is recorded as findings for that layer rather than built here.
 
